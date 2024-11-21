@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+
+{% block title %}{{ first_name }} {{ last_name }}{% endblock %}
+
+{% block styles %}
+    <!-- Include your stylesheets -->
+    <link href="https://fonts.googleapis.com/css2?family=MuseoModerno:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Work+Sans:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('main.static', filename='style.css') }}" />
+{% endblock %}
+
+{% block content %}
+    <div class="grid"></div>
+    <header class="header">
+        <a href="{{ url_for('main.home') }}">
+            <img src="{{ url_for('main.static', filename='img-asset/rflogoblack.png') }}" alt="Homepage">
+        </a>
+    </header>
+    <div id="container-one">
+        <section class="a">
+        </section>
+        <section class="b">
+            <div class="inner-grid">
+                <div class="ba">
+                    <div class="circle"></div>
+                    <div class="corner"></div>
+                </div>
+                <div class="bb"></div>
+                <div class="bc">
+                    <div class="bc-grid">
+                        <div class="bca"></div>
+                        <div class="bcb">
+                            <img src="{{ url_for('main.static', filename='img-asset/python.png') }}" class="icon-bottom-left icon-one">
+                        </div>
+                        <div class="bcc">
+                            <img src="{{ url_for('main.static', filename='img-asset/Swift.png') }}" class="icon-top-left icon-two">
+                        </div>
+                        <div class="bcd">
+                            <img src="{{ url_for('main.static', filename='img-asset/database.svg') }}" class="icon-bottom-left icon-three">
+                        </div>
+                    </div>
+                </div>
+                <div class="bd"></div>
+                <div class="be">
+                    <img src="{{ url_for('main.static', filename='img-asset/profile.png') }}" class="profile-pic">
+                </div>
+                <div class="bf">
+                    <div class="bf-text">{{ title | safe }}</div>
+                    <div class="bf-text outer">{{ title | safe }}</div>
+                </div>
+                <div class="bg-bh">
+                    <div class="name-container">
+                        {{ first_name }} <br> {{ last_name }}
+                    </div>
+                    <div class="name-container outer">
+                        {{ first_name }} <br> {{ last_name }}
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section class="c">
+            <p>{{ welcomemessage }}</p>
+        </section>
+    </div>
+    <div id="container-two">
+        <div class="block-title">
+            <div class="block-a"></div>
+            <div class="block-b">
+                <div class="block-text">EXPERIENCE</div>
+                <div class="block-outer">EXPERIENCE</div>
+            </div>
+            <div class="block-c">
+                <div class="bubble-left">
+                    <div class="left-text">WORK</div>
+                    <div class="left-text outer">WORK</div>
+                </div>
+                <div class="bubble-rigt">PROJECT</div>
+                <div class="bubble-rigt outer">PROJECT</div>
+            </div>
+        </div>
+
+        {% for project in projects %}
+            <a href="{{ url_for('main.experience', project_id=project['id']) }}" class="project-link">
+                <div class="project">
+                    <div class="project-icon">
+                        <img src="{{ url_for('main.static', filename='img-asset/' + project['image']) }}" alt="{{ project['company'] }}">
+                    </div>
+                    <div class="project-text">
+                        <div class="project-term">{{ project['title'] }}</div>
+                        <div class="project-term outer">{{ project['title'] }}</div>
+                        <div class="project-board">
+                            <div class="project-role">{{ project['role'] | safe }}</div>
+                            <div class="project-company">{{ project['company'] }}</div>
+                        </div>
+                    </div>
+                </div>
+            </a>
+            <a href="{{ url_for('main.experience', project_id=project['id']) }}" id="preview-{{ project['id'] }}" class="preview-container"></a>
+        {% endfor %}
+    </div>
+
+    <section id="container-three">
+        <div class="block-title">
+            <div class="block-a"></div>
+            <div class="block-b">
+                <div class="block-text">CONTACT</div>
+                <div class="block-outer">CONTACT</div>
+            </div>
+            <div class="block-c">
+                <div class="bubble-left">
+                    <div class="left-text">FIND</div>
+                    <div class="left-text outer">FIND</div>
+                </div>
+            </div>
+        </div>
+
+        {% for link in links %}
+            <a class="link-board" href="{{ link['url'] }}">
+                <img src="{{ url_for('main.static', filename='img-asset/' + link['icon']) }}" alt="{{ link['title'] }}">
+                <div class="link-title">{{ link['title'] }}</div>
+            </a>
+        {% endfor %}
+
+        <div id="footer"></div>
+    </section>
+{% endblock %}
+
+{% block scripts %}
+    <!-- Pass the project data URL to your script -->
+    <script>
+        const projectDataUrl = "{{ url_for('main.project_data') }}";
+    </script>
+    <script src="{{ url_for('main.static', filename='script.js') }}"></script>
+    <script>
+        let projects = [];
+        fetch('{{ url_for("main.project_data") }}')
+            .then(response => response.json())
+            .then(data => {
+                projects = data;
+            });
+    </script>
+{% endblock %}

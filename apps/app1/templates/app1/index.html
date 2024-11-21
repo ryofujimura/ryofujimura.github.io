@@ -1,0 +1,416 @@
+{% extends "base.html" %}
+
+{% block title %}Class Scheduler{% endblock %}
+
+{% block styles %}
+    <!-- Include Bootstrap CSS (optional but recommended) -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* Basic styling for schedule table */
+        .schedule-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        .schedule-table th, .schedule-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+            vertical-align: middle;
+        }
+        .schedule-table th {
+            background-color: #f2f2f2;
+        }
+        .personal-block {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 10px;
+            position: relative;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        .remove-block {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+        .title-container, .days-container, .time-container {
+            margin-bottom: 10px;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">Class Scheduler</h1>
+    <form id="schedulerForm">
+        <!-- Class Selection -->
+        <div class="mb-4">
+            <h3>Select Classes:</h3>
+            <div id="classList" class="row">
+                {% for class in classes %}
+                <div class="col-md-3">
+                    <div class="form-check">
+                        <input class="form-check-input class-checkbox" type="checkbox" name="classCheckbox" value="{{ class.id }}" id="class{{ class.id }}">
+                        <label class="form-check-label" for="class{{ class.id }}">
+                            {{ class.class_id }}
+                        </label>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Personal Schedule Blocks -->
+        <div class="mb-4">
+            <h3>Personal Schedule:</h3>
+            <div id="personalSchedule">
+                <!-- Personal schedule blocks will be appended here -->
+            </div>
+            <button type="button" id="addPersonalBlock" class="btn btn-secondary">Add Personal Schedule Block</button>
+        </div>
+
+        <!-- Time Increment Selection -->
+        <div class="mb-4">
+            <h3>Time Increment:</h3>
+            <select id="timeIncrement" class="form-select w-25">
+                <option value="15">15 Minutes</option>
+                <option value="30" selected>30 Minutes</option>
+                <option value="60">60 Minutes</option>
+                <option value="120">120 Minutes</option>
+            </select>
+        </div>
+    </form>
+
+    <!-- Display Generated Schedules -->
+    <div id="schedules" class="mt-5">
+        <!-- Generated schedules will be displayed here -->
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+    <!-- Include jQuery from CDN -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Include Bootstrap JS (optional if you use Bootstrap's JS components) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      // Function to format time from HHMM to HH:MM
+      function formatTime(timeStr) {
+          if (timeStr.length !== 4) {
+              return timeStr; // Return as is if not in HHMM format
+          }
+          return timeStr.substring(0,2) + ':' + timeStr.substring(2,4);
+      }
+
+      // Function to generate pastel colors
+      function generatePastelColors(count) {
+          const colors = [];
+          for (let i = 0; i < count; i++) {
+              const hue = Math.floor(Math.random() * 360);
+              const pastel = `hsl(${hue}, 100%, 85%)`;
+              colors.push(pastel);
+          }
+          return colors;
+      }
+
+      // Add personal schedule block with title
+      $('#addPersonalBlock').click(function() {
+          $('#personalSchedule').append(`
+              <div class="personal-block">
+                  <button type="button" class="btn btn-danger btn-sm remove-block">Remove</button>
+                  <div class="title-container">
+                      <label>Title:
+                          <input type="text" class="form-control personal-title" placeholder="e.g., Study Time">
+                      </label>
+                  </div>
+                  <div class="days-container">
+                      <label>Days:</label><br>
+                      <div class="form-check form-check-inline">
+                          <input class="form-check-input" type="checkbox" name="daysCheckbox" value="M" id="M">
+                          <label class="form-check-label" for="M">Monday</label>
+                      </div>
+                      <div class="form-check form-check-inline">
+                          <input class="form-check-input" type="checkbox" name="daysCheckbox" value="Tu" id="Tu">
+                          <label class="form-check-label" for="Tu">Tuesday</label>
+                      </div>
+                      <div class="form-check form-check-inline">
+                          <input class="form-check-input" type="checkbox" name="daysCheckbox" value="W" id="W">
+                          <label class="form-check-label" for="W">Wednesday</label>
+                      </div>
+                      <div class="form-check form-check-inline">
+                          <input class="form-check-input" type="checkbox" name="daysCheckbox" value="Th" id="Th">
+                          <label class="form-check-label" for="Th">Thursday</label>
+                      </div>
+                      <div class="form-check form-check-inline">
+                          <input class="form-check-input" type="checkbox" name="daysCheckbox" value="F" id="F">
+                          <label class="form-check-label" for="F">Friday</label>
+                      </div>
+                      <div class="form-check form-check-inline">
+                          <input class="form-check-input" type="checkbox" name="daysCheckbox" value="Sa" id="Sa">
+                          <label class="form-check-label" for="Sa">Saturday</label>
+                      </div>
+                      <div class="form-check form-check-inline">
+                          <input class="form-check-input" type="checkbox" name="daysCheckbox" value="Su" id="Su">
+                          <label class="form-check-label" for="Su">Sunday</label>
+                      </div>
+                  </div>
+                  <div class="time-container">
+                      <label>Start Time:
+                          <input type="time" class="form-control start-time" required>
+                      </label>
+                      <label>End Time:
+                          <input type="time" class="form-control end-time" required>
+                      </label>
+                  </div>
+              </div>
+          `);
+          triggerUpdateSchedules();
+      });
+
+      // Remove personal schedule block
+      $(document).on('click', '.remove-block', function() {
+          $(this).parent('.personal-block').remove();
+          triggerUpdateSchedules();
+      });
+
+      // Function to validate time format (optional)
+      function isValidTime(timeStr) {
+          // Basic validation for HH:MM format
+          return /^([01]\d|2[0-3]):([0-5]\d)$/.test(timeStr);
+      }
+
+      // Function to render schedule table
+      function renderScheduleTable(matrix, colorMapping, timeIncrement) {
+          // Define full day names
+          const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+          const startTime = 8 * 60; // 8:00 AM in minutes
+          const endTime = 22 * 60;  // 10:00 PM in minutes
+          const increment = parseInt(timeIncrement); // Convert to integer
+
+          // Calculate the number of time slots based on the increment
+          const totalTimeSlots = (endTime - startTime) / increment;
+
+          // Generate time labels
+          let timeLabels = [];
+          for (let minutes = startTime; minutes < endTime; minutes += increment) {
+              let hours = Math.floor(minutes / 60);
+              let mins = minutes % 60;
+              let timeLabel = `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`;
+              timeLabels.push(timeLabel);
+          }
+
+          // Build the table
+          let tableHtml = `<table class="schedule-table table table-bordered"><thead><tr><th>Time</th>`;
+          days.forEach(day => {
+              tableHtml += `<th>${day}</th>`;
+          });
+          tableHtml += `</tr></thead><tbody>`;
+
+          // Track classes already displayed to prevent duplication
+          let displayedClasses = {};
+
+          // Build table rows
+          for (let i = 0; i < totalTimeSlots; i++) {
+              tableHtml += `<tr><td>${timeLabels[i]}</td>`;
+              for (let j = 0; j < days.length; j++) {
+                  let cellContent = '';
+                  let cellStyle = '';
+                  let matrixIndex = i; // Each row corresponds to a time slot
+
+                  if (matrixIndex >= matrix.length) {
+                      matrixIndex = matrix.length - 1;
+                  }
+
+                  if (matrix[matrixIndex][j]) {
+                      let classInfo = matrix[matrixIndex][j];
+                      let className = classInfo.class_name;
+                      let startTime = formatTime(classInfo.start_time);
+                      let endTime = formatTime(classInfo.end_time);
+
+                      // Generate a unique identifier for the class section
+                      let classId = `${className}_${startTime}_${endTime}_${j}`;
+
+                      if (!displayedClasses[classId]) {
+                          cellContent = `${className}<br>${startTime} - ${endTime}`;
+                          displayedClasses[classId] = true;
+                      } else {
+                          // Optionally, mark continuation
+                          cellContent = `...`;
+                      }
+
+                      // Get the color for the class
+                      let classColor = colorMapping[className] || '#8ac6d1'; // Default color if not found
+                      cellStyle = `background-color: ${classColor}; color: #000;`;
+                  }
+                  tableHtml += `<td style="${cellStyle}">${cellContent}</td>`;
+              }
+              tableHtml += `</tr>`;
+          }
+
+          tableHtml += `</tbody></table>`;
+          return tableHtml;
+      }
+
+      // Function to update schedules
+      function updateSchedules() {
+          let selectedClassIds = $('input[name="classCheckbox"]:checked').map(function() {
+              return $(this).val();
+          }).get();
+
+          let selectedIncrement = $('#timeIncrement').val(); // Capture the selected increment
+
+          console.log('Selected Class IDs:', selectedClassIds);
+          console.log('Selected Time Increment:', selectedIncrement);
+
+          // Get personal schedule blocks
+          let personalSchedule = [];
+          $('.personal-block').each(function() {
+              // Collect selected days from checkboxes
+              let selectedDays = [];
+              $(this).find('input[name="daysCheckbox"]:checked').each(function() {
+                  selectedDays.push($(this).val());
+              });
+
+              let startTime = $(this).find('.start-time').val();
+              let endTime = $(this).find('.end-time').val();
+              let title = $(this).find('.personal-title').val().trim(); // Capture the title
+
+              if (startTime && endTime && (!isValidTime(startTime) || !isValidTime(endTime))) {
+                  alert('Please enter valid start and end times.');
+                  return false;
+              }
+
+              if (selectedDays.length > 0 && startTime && endTime) {
+                  personalSchedule.push({
+                      'title': title !== '' ? title : 'Personal Time', // Use provided title or default
+                      'days': selectedDays.join(''),
+                      'start_time': startTime.replace(':', ''),
+                      'end_time': endTime.replace(':', '')
+                  });
+              }
+          });
+
+          console.log('Personal Schedule:', personalSchedule);
+
+          if (selectedClassIds.length > 0 || personalSchedule.length > 0) { // Allow generating schedules even if no classes are selected
+              $.ajax({
+                  url: "/app1/generate_schedules",
+                  method: "POST",
+                  contentType: "application/json",
+                  data: JSON.stringify({
+                      'class_ids': selectedClassIds,
+                      'personal_schedule': personalSchedule,
+                      'time_increment': selectedIncrement // Include the increment
+                  }),
+                  success: function(response) {
+                      console.log('AJAX Success. Response:', response);
+                      $('#schedules').empty();
+
+                      if (response.length > 0) {
+                          // Create a set to hold unique class names
+                          let classNamesSet = new Set();
+
+                          // Collect all class names from the schedules
+                          response.forEach(function(schedule) {
+                              schedule.sections.forEach(function(section) {
+                                  classNamesSet.add(section.class_name);
+                              });
+                          });
+
+                          // Convert the set to an array for indexing
+                          const classNamesArray = Array.from(classNamesSet);
+
+                          // Generate pastel colors
+                          const pastelColors = generatePastelColors(classNamesArray.length + 1); // +1 for 'Personal Time'
+
+                          // Create a color mapping for class names
+                          let colorMapping = {};
+
+                          classNamesArray.forEach(function(className, index) {
+                              colorMapping[className] = pastelColors[index];
+                          });
+
+                          // Assign the last color to 'Personal Time'
+                          colorMapping['Personal Time'] = pastelColors[classNamesArray.length];
+
+                          // Render each schedule
+                          response.forEach(function(schedule, index) {
+                              let scheduleHtml = `<h3>Schedule Option ${index + 1}</h3>`;
+
+                              // Render the schedule table with color mapping and selected increment
+                              scheduleHtml += renderScheduleTable(schedule.matrix, colorMapping, selectedIncrement);
+
+                              // Display the class sections
+                              scheduleHtml += `<table class="table table-striped">
+                                  <thead>
+                                      <tr>
+                                          <th>Class Name</th>
+                                          <th>Time</th>
+                                          <th>Days</th>
+                                      </tr>
+                                  </thead>
+                                  <tbody>`;
+                              schedule.sections.forEach(function(section) {
+                                  scheduleHtml += `<tr>
+                                      <td>${section.class_name}</td>
+                                      <td>${formatTime(section.start_time)} - ${formatTime(section.end_time)}</td>
+                                      <td>${section.days}</td>
+                                  </tr>`;
+                              });
+                              scheduleHtml += `</tbody></table>`;
+                              $('#schedules').append(scheduleHtml);
+                          });
+                      } else {
+                          $('#schedules').append('<p>No valid schedules found based on your selections.</p>');
+                      }
+                  },
+                  error: function(jqXHR, textStatus, errorThrown) {
+                      console.log('AJAX Error:', textStatus, errorThrown);
+                      if (jqXHR.responseJSON && jqXHR.responseJSON.error) {
+                          alert(jqXHR.responseJSON.error);
+                      } else {
+                          alert('An error occurred while generating schedules. Please try again.');
+                      }
+                  }
+              });
+          } else {
+              $('#schedules').empty();
+          }
+      }
+
+      // Function to trigger schedule update with debounce
+      let debounceTimer;
+      function triggerUpdateSchedules() {
+          clearTimeout(debounceTimer);
+          debounceTimer = setTimeout(function() {
+              updateSchedules();
+          }, 500); // Adjust the debounce delay as needed
+      }
+
+      // Event listeners for automatic schedule updates
+      $(document).on('change', '.class-checkbox', function() {
+          triggerUpdateSchedules();
+      });
+
+      $(document).on('change', '.personal-title', function() {
+          triggerUpdateSchedules();
+      });
+
+      $(document).on('change', '.personal-block input[type="checkbox"]', function() {
+          triggerUpdateSchedules();
+      });
+
+      $(document).on('change', '.personal-block .start-time', function() {
+          triggerUpdateSchedules();
+      });
+
+      $(document).on('change', '.personal-block .end-time', function() {
+          triggerUpdateSchedules();
+      });
+
+      $('#timeIncrement').change(function() {
+          triggerUpdateSchedules();
+      });
+  </script>
+{% endblock %}
