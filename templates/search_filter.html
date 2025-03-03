@@ -6,50 +6,90 @@
     <div class="filter-options inset-mini">
       {% if tags %}
       {% for tag in tags %}
-        <button class="filter-button outer-mini">
-          {{ tag.name }}
+        <button class="filter-button outer-mini tag-button" data-tag="{{ tag.name }}">
+          <!-- We'll use JavaScript to check if the image exists -->
+          <span class="tag-text">{{ tag.name }}</span>
         </button>
       {% endfor %}
       {% else %}
       <button class="filter-button outer-mini">No tags found.</button>
       {% endif %}
-
       
-      <button class="filter-button outer-mini">
-        <img src="/static/images/swift.png" alt="Swift" />
-      </button>
-      <button class="filter-button outer-mini">
-        <img src="/static/images/aws.png" alt="AWS" />
-      </button>
-      <button class="filter-button outer-mini">
-        <img src="/static/images/swift.png" alt="Swift" />
-      </button>
-      <button class="filter-button outer-mini">
-        <img src="/static/images/aws.png" alt="AWS" />
-      </button>
-      <button class="filter-button outer-mini">
-        <img src="/static/images/swift.png" alt="Swift" />
-      </button>
-      <button class="filter-button outer-mini">
-        <img src="/static/images/aws.png" alt="AWS" />
-      </button>
-      <button class="filter-button outer-mini">
-        <img src="/static/images/swift.png" alt="Swift" />
-      </button>
-      <button class="filter-button outer-mini">
-        <img src="/static/images/aws.png" alt="AWS" />
-      </button>
-      <button class="filter-button outer-mini">
-        <img src="/static/images/swift.png" alt="Swift" />
-      </button>
-      <button class="filter-button outer-mini">
-        <img src="/static/images/aws.png" alt="AWS" />
-      </button>
-      <button class="filter-button outer-mini">
-        <img src="/static/images/swift.png" alt="Swift" />
-      </button>
-      <button class="filter-button outer-mini">
-        <img src="/static/images/aws.png" alt="AWS" />
-      </button>
+      <!-- You can remove these hardcoded buttons if you want to only use dynamically created ones -->
     </div>
   </div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const tagButtons = document.querySelectorAll('.tag-button');
+    
+    tagButtons.forEach(button => {
+      const tagName = button.getAttribute('data-tag');
+      const tagText = button.querySelector('.tag-text');
+      
+      // Try to load png first
+      const img = new Image();
+      img.onload = function() {
+        // PNG exists
+        button.innerHTML = ''; // Clear the text
+        button.appendChild(img);
+        button.classList.remove('missing-image');
+      };
+      
+      img.onerror = function() {
+        // Try SVG instead
+        const svgImg = new Image();
+        svgImg.onload = function() {
+          // SVG exists
+          button.innerHTML = ''; // Clear the text
+          button.appendChild(svgImg);
+          button.classList.remove('missing-image');
+        };
+        
+        svgImg.onerror = function() {
+          // Neither image exists, style button with red border
+          button.classList.add('missing-image');
+          // Keep the text visible
+        };
+        
+        svgImg.src = `/static/images/${tagName}.svg`;
+        svgImg.alt = tagName;
+        svgImg.className = 'tag-image';
+      };
+      
+      img.src = `/static/images/${tagName}.png`;
+      img.alt = tagName;
+      img.className = 'tag-image';
+      
+      // Initially mark as missing until proven otherwise
+      button.classList.add('missing-image');
+    });
+  });
+</script>
+
+<style>
+  /* Style for buttons with missing images */
+  .missing-image {
+    border: 2px solid red !important;
+    color: black;
+    font-size: 0.7em;
+    font-weight: bold;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .tag-image {
+    max-width: 16px;
+    max-height: 16px;
+  }
+  
+  .tag-text {
+    font-size: 0.7em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 28px;
+    text-align: center;
+  }
+</style>

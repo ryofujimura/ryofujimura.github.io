@@ -38,19 +38,11 @@
 
         {% if exp.link_images %}
         <div class="experience-link-images">
-          <img 
-            src="/static/images/MacOS.svg" 
-            alt="placeholder" class="link-image
-          ">
-          <img 
-            src="/static/images/MacOS.svg" 
-            alt="placeholder" class="link-image
-          ">
-          <!-- {% for image in exp.link_images.split(',') %}
+          {% for image in exp.link_images.split(',') %}
           <img 
             src="{{ url_for('static', filename='images/' + image) }}" 
             alt="Link Image" class="link-image">
-          {% endfor %} -->
+          {% endfor %}
         </div>
         {% endif %}
 

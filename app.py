@@ -61,7 +61,7 @@ def seed_data():
     data = {
         "experiences": [
             {
-                "experience_type": "Project",
+                "experience_type": "Work",
                 "title": "Software Engineer Intern",
                 "subtitle": "American Honda Motor Company, Inc.",
                 "term": "June 2024 - August 2024",
@@ -72,22 +72,22 @@ def seed_data():
                 # New arrays:
                 "links": [
                     "https://www.honda.com/",
-                    "https://apps.apple.com/us/app/matcha-time/id6497067918?mt=12"
+                    "/static/images/HondaDigitalServiceDevelopment-2024SummerInternProjectReport.pdf"
                 ],
                 "link_images": [
-                    "honda_icon.svg",
-                    "MacOS.svg"
+                    "honda.svg",
+                    "cuda.png"
                 ],
                 "images": [
-                    "honda.svg"
+                    "hondalogo.svg"
                 ],
-                "tags": ["swift", "computer_science"]
+                "tags": ["honda", "nvidia", "cuda", "linux", "ai", "automotive", "nlp", "profit", "research", "team_collaboration"]
             },
             {
                 "experience_type": "Work",
                 "title": "Data Engineer",
                 "subtitle": "CUSCO USA Inc.",
-                "term": "October 2021 - May 2024",
+                "term": "October 2021 - Present",
                 "short_description": "Led a team to develop Python apps extracting data from thousands of PDFs.",
                 "long_description": (
                     "Led a three-member team in developing a Python application that extracted data from 11,560 archived PDF files, utilizing advanced software development methodologies. Demonstrated proficiency in testing and development, including creation of comprehensive test cases to ensure software quality. Enhanced user access to historical data dating back to 1977, resulting in a 30% revenue increase by enabling retrieval of previously inaccessible info."
@@ -103,7 +103,7 @@ def seed_data():
                 "images": [
                     "cusco.svg"
                 ],
-                "tags": ["python", "project_management", "adobe"]
+                "tags": ["python", "project_management", "adobe", "data_management", "profit", "photoshop", "illustrator", "indesign", "google_drive", "automotive"]
             },
             {
                 "experience_type": "Work",
@@ -125,7 +125,7 @@ def seed_data():
                 "images": [
                     "fujitsubo.svg"
                 ],
-                "tags": ["python", "adobe"]
+                "tags": ["python", "adobe", "profit", "photoshop", "indesign", "automotive", "data_scraper"]
             },
             {
                 "experience_type": "Work",
@@ -147,7 +147,7 @@ def seed_data():
                 "images": [
                     "matchatime.svg"
                 ],
-                "tags": ["swift", "project_management"]
+                "tags": ["swift", "project_management", "team_collaboration", "macos", "deployed", "appstore"]
             },
             {
                 "experience_type": "Project",
@@ -169,7 +169,7 @@ def seed_data():
                 "images": [
                     "poker.png"
                 ],
-                "tags": ["swift", "project_management"]
+                "tags": ["swift", "project_management", "watchos", "appstore", "algorithm"]
             },
             {
                 "experience_type": "Project",
@@ -191,7 +191,7 @@ def seed_data():
                 "images": [
                     "schedule.jpg"
                 ],
-                "tags": ["python", "computer_science"]
+                "tags": ["python", "computer_science", "flask", "project_management", "cartesian_product", "algorithm", "web_app"]
             },
             {
                 "experience_type": "Project",
@@ -213,29 +213,7 @@ def seed_data():
                 "images": [
                     "shoheihomeground.svg"
                 ],
-                "tags": ["python", "project_management"]
-            },
-            {
-                "experience_type": "Leadership",
-                "title": "Trainer",
-                "subtitle": "Amazon Web Services",
-                "term": "September 2023 - November 2023",
-                "short_description": "AWS cloud infrastructure training.",
-                "long_description": (
-                    "Provided training sessions to professionals on Amazon Web Services, imparting knowledge on cloud infrastructure and services."
-                ),
-                "links": [
-                    "/",
-                    "https://www.google.com"
-                ],
-                "link_images": [
-                    "aws_icon.svg",
-                    "image_placeholder.svg"
-                ],
-                "images": [
-                    "aws.png"
-                ],
-                "tags": ["aws"]
+                "tags": ["python", "project_management", "profit", "instagram", "api", "automation", "photography"]
             },
             {
                 "experience_type": "Publication",
@@ -252,12 +230,34 @@ def seed_data():
                 ],
                 "link_images": [
                     "paper_icon.svg",
-                    "image_placeholder.svg"
+                    "wireless.svg"
+                ],
+                "images": [
+                    
+                    "resume.png"
+                ],
+                "tags": ["computer_science", "research", "blockchain", "networking"]
+            },
+            {
+                "experience_type": "Publication",
+                "title": "Demo Abstract: Custom 3D-Printed Mouse: A Proof of Concept for Personalized Input Devices",
+                "subtitle": "Research Paper",
+                "term": "Febuary 2025",
+                "short_description": "This project explores the design and creation of a personalized, ergonomic mouse by reconfiguring a standard mouse's internal components and housing them in a custom 3D-printed shell tailored to the user's hand.",
+                "long_description": (
+                    "This project focuses on developing a customized input device by reengineering a standard mouse to better suit individual ergonomic needs. Using a BambuLab A1 Mini 3D printer and PLA filament, a lightweight and personalized mouse shell was designed and fabricated to precisely fit the user's hand. The work demonstrates the feasibility of adapting off-the-shelf hardware into bespoke solutions, offering potential applications in personalized ergonomics and robotic system integration. By combining 3D printing with hardware reconfiguration, this project highlights the possibilities for creating tailored, user-centric devices."
+                ),
+                "links": [
+                    "https://drive.google.com/file/d/1vRWFlfFa8N1zJt2LPrJAcNOIH81A1COB/view?usp=sharing"
+                ],
+                "link_images": [
+                    "paper_icon.svg",
+                    "3dprint.svg"
                 ],
                 "images": [
                     "resume.png"
                 ],
-                "tags": ["computer_science"]
+                "tags": ["computer_science", "research", "3d_printing", "hardware", "ergonomics", "robotics"]
             }
         ]
     }
