@@ -26,8 +26,13 @@
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   grid-auto-flow: dense;
   grid-auto-columns: 1fr;
+  gap: 1rem;
 }
 
+
+.experience-section > * {
+  aspect-ratio: 1 / 1;
+}
 
 
 @media (max-width: 571px) {
@@ -35,16 +40,24 @@
     grid-template-columns: repeat(auto-fit, minmax(50px, 1fr));
     gap: 1rem;
   }
+
+  .experience-section > * {
+    aspect-ratio: 1 / 1;
+  }
 }
 @media (max-width: 975px) {
   .experience-section {
     grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
     gap: 1rem;
   }
+
+  .experience-section > * {
+    aspect-ratio: 1 / 1;
+  }
 }
 
 .outer {
-  aspect-ratio: 1;
+  /* aspect-ratio: 1; */
   overflow-y: clip;
   overflow-x: clip;
 }
@@ -117,11 +130,40 @@
   height: auto;
 }
 
+@media (min-width: 1460px) {
+  .experience-section {
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  }
+}
+/* For 3-column layouts */
+@media (min-width: 1114px) and (max-width: 1459px) {
+  .experience-section {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  }
+  
+  /* Special items for 3-column layout */
+}
+
+/* For 2-column layouts */
+@media (max-width: 1113px) {
+  .experience-section {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  }
+  
+  /* Special items for 2-column layout */
+}
+
+/* For 1-column mobile layouts */
+@media (max-width: 571px) {
+  .experience-section {
+    grid-template-columns: repeat(auto-fit, minmax(50px, 1fr));
+  }
+}
 /* Project 1 */
 /* 4 x 3 */
 @media (min-width: 1460px) {
   #project-1 { 
-    aspect-ratio: unset;
+    aspect-ratio: 1;
     grid-column: span 2;
     grid-row: span 2;
     /* background-color: #9999ff; */
@@ -184,7 +226,7 @@
 /* 3 x 3 */
 @media (min-width: 1114px) and (max-width: 1459px) {
   #project-1 { 
-    aspect-ratio: unset;
+    aspect-ratio: 2/1;
     grid-column: span 2;
     grid-row: span 1;
     /* background-color: white; */
@@ -316,11 +358,10 @@
 /* Project 2 */
 /* 4 x 3 */
   #project-2 { 
-    aspect-ratio: unset;
     grid-column: span 1;
     grid-row: span 1;
     /* background-color: #99ff99; */
-    aspect-ratio: 1/1;
+    aspect-ratio: 1;
 
     display: grid;
     grid-template-rows: 0.1fr 1fr ;
@@ -429,7 +470,7 @@
 /* 3 x 3 */
 @media (min-width: 1114px) and (max-width: 1459px) {
   #project-3 { 
-    aspect-ratio: unset;
+    aspect-ratio: 1;
     grid-column: span 1;
     grid-row: span 2;
     grid-column-start: 3;
@@ -653,11 +694,10 @@
 
 /* Project 5 */
   #project-5 { 
-    aspect-ratio: unset;
     grid-column: span 1;
     grid-row: span 1;
     /* background-color: #99ffff; */
-    aspect-ratio: 1/1;
+    aspect-ratio: 1;
 
     display: grid;
     grid-template-rows: 0.1fr 1fr ;
@@ -810,11 +850,10 @@
 /* 4 x 3 */
 @media (min-width: 1114px) {
   #project-7 { 
-    aspect-ratio: unset;
     grid-column: span 1;
     grid-row: span 1;
     /* background-color: #cccccc; */
-    aspect-ratio: 1/1;
+    aspect-ratio: 1;
 
     display: grid;
     grid-template-rows: 0.1fr 1fr ;
@@ -922,11 +961,10 @@
 /* cant make a flask loop in css :( */
 
   #project-8 { 
-    aspect-ratio: unset;
     grid-column: span 1;
     grid-row: span 1;
     /* background-color: #ffff99; */
-    aspect-ratio: 1/1;
+    aspect-ratio: 1;
 
     display: grid;
     grid-template-rows: 0.1fr 1fr ;
@@ -964,11 +1002,10 @@
   }
   
   #project-9 { 
-    aspect-ratio: unset;
     grid-column: span 1;
     grid-row: span 1;
     /* background-color: #ffff99; */
-    aspect-ratio: 1/1;
+    aspect-ratio: 1;
 
     display: grid;
     grid-template-rows: 0.1fr 1fr ;
@@ -1006,11 +1043,10 @@
   }
  
   #project-10 { 
-    aspect-ratio: unset;
     grid-column: span 1;
     grid-row: span 1;
     /* background-color: #ffff99; */
-    aspect-ratio: 1/1;
+    aspect-ratio: 1;
 
     display: grid;
     grid-template-rows: 0.1fr 1fr ;
