@@ -1,10 +1,14 @@
 /* Updated CSS for Mobile View */
 
+
 @media (max-width: 879px) {
   .content-container {
     border-radius: 15px;
   }
-
+  .experience-section {
+    max-width: 100%;
+    overflow-x: hidden;
+  }
   .layout-container {
     flex-direction: column;
     height: auto;
@@ -38,20 +42,20 @@
   }
 
   .profile-content h2 {
-    font-size: 1.5rem;
+    font-size: 1.4rem;
   }
 
   .profile-content h4 {
-    font-size: 0.8rem;
+    font-size: 0.7rem;
     margin: 10% auto auto auto;
   }
 
   .profile-numbers h3 {
-    font-size: 1.5rem;
+    font-size: 1.4rem;
   }
 
   .profile-numbers p {
-    font-size: 0.9rem;
+    font-size: 0.8rem;
   }
 
   .profile-content {
