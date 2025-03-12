@@ -47,14 +47,12 @@
         {% endif %}
 
         {% if exp.images %}
-        <div class="experience-images">
-          {% for image in exp.images.split(',') %}
-          <img 
-            src="{{ url_for('static', filename='images/' + image) }}" 
-            alt="Experience Image" class="additional-image">
-          {% endfor %}
-        </div>
-        {% endif %}
+          <div class="experience-images">
+              <img 
+                  src="{{ url_for('static', filename='images/' + exp.images.split(',')[0]) }}" 
+                  alt="Experience Image" class="additional-image">
+          </div>
+      {% endif %}
 
         <div class="experience-tags">
           {% for tag in exp.tags %}
@@ -74,17 +72,16 @@
 <div id="projectModal" class="modal">
   <div class="modal-content">
     <span class="close-modal">&times;</span>
-    <div class="modal-header">
-      <h2 id="modal-title"></h2>
-      <h3 id="modal-subtitle"></h3>
+    <div id="modal-images"></div>
+    <div id="modal-info">
+      <div id="modal-title"></div>
+      <div id="modal-subtitle"></div>
       <div id="modal-term"></div>
+      <div id="modal-tags"></div>
     </div>
-    <div class="modal-body">
-      <div id="modal-main-image"></div>
+    <div id="modal-descriptions">
       <div id="modal-description"></div>
       <div id="modal-links"></div>
-      <div id="modal-images"></div>
-      <div id="modal-tags"></div>
     </div>
   </div>
 </div>
@@ -100,6 +97,7 @@
       term: "{{ exp.term }}",
       type: "{{ exp.experience_type.name }}",
       shortDescription: "{{ exp.short_description }}",
+      longDescription: "{{ exp.long_description }}",
       mainImage: "{{ exp.main_image or 'default_image.png' }}",
       links: "{{ exp.links or '' }}".split(',').filter(Boolean),
       linkImages: "{{ exp.link_images or '' }}".split(',').filter(Boolean),
@@ -159,20 +157,27 @@
     document.getElementById("modal-title").textContent = project.title;
     document.getElementById("modal-subtitle").textContent = project.subtitle;
     document.getElementById("modal-term").textContent = project.term;
+    document.getElementById("modal-description").innerHTML = `<p>${project.longDescription}</p>`;
     
-    // Main image
-    document.getElementById("modal-main-image").innerHTML = `
-      <img src="/static/images/${project.mainImage}" alt="${project.title}">
-    `;
+    // // Main image
+    // document.getElementById("modal-main-image").innerHTML = `
+    //   <img src="/static/images/${project.mainImage}" alt="${project.title}">
+    // `;
     
     // Description
     document.getElementById("modal-description").innerHTML = `
-      <p>${project.shortDescription}</p>
+      <p>${project.longDescription}</p>
     `;
     
     // Links
     let linksHTML = '';
-    if (project.links.length) {
+    if (project.links.length && project.linkImages.length && project.links.length === project.linkImages.length) {
+      linksHTML = '<h4>Links</h4><div class="link-buttons">';
+      project.links.forEach((link, index) => {
+        linksHTML += `<a href="${link}" target="_blank"><img src="/static/images/${project.linkImages[index]}" alt="Link"></a>`;
+      });
+      linksHTML += '</div>';
+    } else if (project.links.length) {
       linksHTML = '<h4>Links</h4><ul>';
       project.links.forEach(link => {
         linksHTML += `<li><a href="${link}" target="_blank">${link}</a></li>`;
@@ -194,21 +199,17 @@
       navigator.clipboard.writeText(window.location.href)
         .then(() => {
           this.textContent = "Copied!";
-          setTimeout(() => {
-            this.textContent = "Copy Link";
-          }, 2000);
+          setTimeout(() => this.textContent = "Copy Link", 2000);
         })
         .catch(err => console.error('Failed to copy: ', err));
     });
     
     // Additional images
     let imagesHTML = '';
-    if (project.images.length) {
-      imagesHTML = '<h4>Gallery</h4><div class="image-gallery">';
-      project.images.forEach(img => {
+    if (project.images.length > 1) { // Check if there are additional images
+      project.images.slice(1).forEach(img => {
         imagesHTML += `<img src="/static/images/${img}" alt="Project image">`;
       });
-      imagesHTML += '</div>';
     }
     document.getElementById("modal-images").innerHTML = imagesHTML;
     

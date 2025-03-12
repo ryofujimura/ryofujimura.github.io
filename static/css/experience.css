@@ -27,6 +27,9 @@
   grid-auto-flow: dense;
   grid-auto-columns: 1fr;
 }
+
+
+
 @media (max-width: 571px) {
   .experience-section {
     grid-template-columns: repeat(auto-fit, minmax(50px, 1fr));
@@ -108,8 +111,9 @@
     justify-content: center;
 }
 
-img {
-  max-width: 100px;
+.experience-section img {
+  aspect-ratio: 1;
+  max-width: min(200px, 90%);
   height: auto;
 }
 
@@ -383,9 +387,9 @@ img {
   #project-3 .experience-images {
     grid-row: 2;
     display: flex;
-    align-items: center;
+    /* align-items: center; */
     justify-content: center;
-    overflow: hidden;
+    /* overflow: hidden; */
   }
 
   #project-3 .experience-images img {
@@ -451,9 +455,9 @@ img {
   #project-3 .experience-images {
     grid-row: 2;
     display: flex;
-    align-items: center;
+    /* align-items: center; */
     justify-content: center;
-    overflow: hidden;
+    /* overflow: hidden; */
   }
 
   #project-3 .experience-images img {

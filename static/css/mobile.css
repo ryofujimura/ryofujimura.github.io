@@ -1,6 +1,10 @@
 /* Updated CSS for Mobile View */
 
 @media (max-width: 879px) {
+  .content-container {
+    border-radius: 15px;
+  }
+
   .layout-container {
     flex-direction: column;
     height: auto;
@@ -127,12 +131,5 @@
   .filter-options {
     margin: 0px;
     /* justify-content: center; */
-  }
-
-    /* Experience Section */
-  .content-container {
-    border-radius: 15px;  
-  }
-
-  
+  }  
 }
