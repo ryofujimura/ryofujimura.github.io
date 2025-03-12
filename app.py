@@ -66,22 +66,63 @@ def seed_data():
                 "subtitle": "American Honda Motor Company, Inc.",
                 "term": "June 2024 - August 2024",
                 "short_description": "Researched on-device generative AI for automotive applications. Developed and demonstrated AI features on an NVIDIA Jetson Orin Nano 8GB using Linux, CUDA, and Meta's Llama 3 model.",
-                 "long_description": (
+                    "long_description": (
                     "Conducted comprehensive research on on-device generative AI, focusing on its potential applications within the automotive industry to enhance vehicle functionalities. Developed and demonstrated applications on an NVIDIA Jetson Orin Nano 8GB using Linux and CUDA, showcasing on-device generative AI capabilities with Meta's Llama 3 model."
                 ),
-                # New arrays:
                 "links": [
-                    "https://www.honda.com/",
-                    "/static/images/HondaDigitalServiceDevelopment-2024SummerInternProjectReport.pdf"
+                    "/static/images/HondaDigitalServiceDevelopment-2024SummerInternProjectReport.pdf",
+                    "https://www.honda.com/"
                 ],
                 "link_images": [
-                    "honda.svg",
-                    "cuda.png"
+                    "resume.png",
+                    "honda.svg"
                 ],
                 "images": [
-                    "hondalogo.svg"
+                    "hondalogo.svg", "honda_1.jpg", "honda_2.jpg", "honda_3.jpg"
                 ],
                 "tags": ["honda", "nvidia", "cuda", "linux", "ai", "automotive", "nlp", "profit", "research", "team_collaboration"]
+            },
+            {
+                "experience_type": "Work",
+                "title": "Co-PM / Developer",
+                "subtitle": "Matcha Time",
+                "term": "March 2024 - April 2024",
+                "short_description": "Swift/SwiftUI project with multi-city sync.",
+                "long_description": (
+                    "Developed and created application functions with Swift/SwiftUI, implemented multi-city synchronization, designed and tested features, fixed bugs, and deployed solutions. Planned and completed the project in 4 weeks, launched the application on the Mac App Store."
+                ),
+                "links": [
+                    "https://apps.apple.com/us/app/matcha-time/id6497067918?mt=12",
+                    "https://www.moyaifujimura.com/work/matcha-time"
+                ],
+                "link_images": [
+                    "appstorelogo.svg",
+                    "moyai_1.jpeg"
+                ],
+                "images": [
+                    "matchatime.svg","matchatime_1.jpg", "matchatime_2.jpg", "matchatime_3.jpg"
+                ],
+                "tags": ["swift", "project_management", "team_collaboration", "macos", "deployed", "appstore"]
+            },
+            {
+                "experience_type": "Publication",
+                "title": "Custom Input Device",
+                "subtitle": "Research Paper",
+                "term": "Febuary 2025",
+                "short_description": "Demo Abstract: Custom 3D-Printed Mouse: A Proof of Concept for Personalized Input Devices. This project explores the design and creation of a personalized, ergonomic mouse by reconfiguring a standard mouse's internal components and housing them in a custom 3D-printed shell tailored to the user's hand.",
+                "long_description": (
+                    "This project focuses on developing a customized input device by reengineering a standard mouse to better suit individual ergonomic needs. Using a BambuLab A1 Mini 3D printer and PLA filament, a lightweight and personalized mouse shell was designed and fabricated to precisely fit the user's hand. The work demonstrates the feasibility of adapting off-the-shelf hardware into bespoke solutions, offering potential applications in personalized ergonomics and robotic system integration. By combining 3D printing with hardware reconfiguration, this project highlights the possibilities for creating tailored, user-centric devices."
+                ),
+                "links": [
+                    "https://drive.google.com/file/d/1vRWFlfFa8N1zJt2LPrJAcNOIH81A1COB/view?usp=sharing"
+                ],
+                "link_images": [
+                    "resume.png",
+                ],
+                "images": [
+                    "3dprint.png", "3dprint_1.jpeg", "3dprint_2.jpeg", "3dprint_3.jpeg", "3dprint_4.jpeg", "3dprint_5.jpeg"
+                ],
+                "tags": ["computer_science", "research", "3d_printing", "hardware", "ergonomics", "robotics"]
             },
             {
                 "experience_type": "Work",
@@ -93,61 +134,15 @@ def seed_data():
                     "Led a three-member team in developing a Python application that extracted data from 11,560 archived PDF files, utilizing advanced software development methodologies. Demonstrated proficiency in testing and development, including creation of comprehensive test cases to ensure software quality. Enhanced user access to historical data dating back to 1977, resulting in a 30% revenue increase by enabling retrieval of previously inaccessible info."
                 ),
                 "links": [
-                    "https://cuscousainc.com/",
-                    "https://www.google.com"
+                    "https://cuscousainc.com/support/vehicle-specific-catalogs"
                 ],
                 "link_images": [
-                    "cusco_icon.svg",
-                    "image_placeholder.svg"
+                    "cusco_c.svg",
                 ],
                 "images": [
-                    "cusco.svg"
+                    "cusco.svg", "cusco_1.jpg", "cusco_2.jpg", "cusco_3.jpg"
                 ],
                 "tags": ["python", "project_management", "adobe", "data_management", "profit", "photoshop", "illustrator", "indesign", "google_drive", "automotive"]
-            },
-            {
-                "experience_type": "Work",
-                "title": "Data Engineer",
-                "subtitle": "FUJITSUBO GIKEN KOGYO CO., LTD",
-                "term": "September 2023 - November 2023",
-                "short_description": "Python-based scraper to automate data extraction.",
-                "long_description": (
-                    "Engineered a Python-based software program employing web scraping techniques to extract crucial data from diverse websites. Automated generation workflows with Adobe InDesign, significantly boosting efficiency and achieving a 100% error-free rate by eliminating manual effort across various cases."
-                ),
-                "links": [
-                    "https://www.fujitsubo.co.jp/",
-                    "https://www.google.com"
-                ],
-                "link_images": [
-                    "fujitsubo_icon.svg",
-                    "image_placeholder.svg"
-                ],
-                "images": [
-                    "fujitsubo.svg"
-                ],
-                "tags": ["python", "adobe", "profit", "photoshop", "indesign", "automotive", "data_scraper"]
-            },
-            {
-                "experience_type": "Work",
-                "title": "Co-PM and Developer",
-                "subtitle": "Matcha Time",
-                "term": "March 2024 - April 2024",
-                "short_description": "Swift/SwiftUI project with multi-city sync.",
-                "long_description": (
-                    "Developed and created application functions with Swift/SwiftUI, implemented multi-city synchronization, designed and tested features, fixed bugs, and deployed solutions. Planned and completed the project in 4 weeks, launched the application on the Mac App Store."
-                ),
-                "links": [
-                    "https://apps.apple.com/us/app/matcha-time/id6497067918?mt=12",
-                    "https://www.google.com"
-                ],
-                "link_images": [
-                    "matchatime_icon.svg",
-                    "image_placeholder.svg"
-                ],
-                "images": [
-                    "matchatime.svg"
-                ],
-                "tags": ["swift", "project_management", "team_collaboration", "macos", "deployed", "appstore"]
             },
             {
                 "experience_type": "Project",
@@ -160,42 +155,19 @@ def seed_data():
                 ),
                 "links": [
                     "https://apps.apple.com/us/app/poker-pocket-odds/id6499280318",
-                    "https://www.google.com"
                 ],
                 "link_images": [
-                    "poker_icon.svg",
-                    "image_placeholder.svg"
+                    "poker.png",
                 ],
                 "images": [
-                    "poker.png"
+                    "poker.png", "poker_1.jpg", "poker_2.jpg", "poker_3.jpg", "poker_4.jpg"
                 ],
                 "tags": ["swift", "project_management", "watchos", "appstore", "algorithm"]
             },
             {
+                # koko
                 "experience_type": "Project",
-                "title": "Developer",
-                "subtitle": "Schedule Mastermind",
-                "term": "December 2023 - February 2024",
-                "short_description": "Streamlined scheduling with Python & Flask.",
-                "long_description": (
-                    "Engineered a Python-based application with the Flask framework, streamlining scheduling operations for over 500 classes. Created a user-friendly interface for course selection, timetable generation, and conflict resolution, achieving a 100% reduction in scheduling errors and boosting overall productivity by 25% through automation."
-                ),
-                "links": [
-                    "/app1",
-                    "https://www.google.com"
-                ],
-                "link_images": [
-                    "schedule_icon.svg",
-                    "image_placeholder.svg"
-                ],
-                "images": [
-                    "schedule.jpg"
-                ],
-                "tags": ["python", "computer_science", "flask", "project_management", "cartesian_product", "algorithm", "web_app"]
-            },
-            {
-                "experience_type": "Project",
-                "title": "Developer and Project Leader",
+                "title": "Project Leader",
                 "subtitle": "Shohei Home Ground",
                 "term": "March 2023 - November 2023",
                 "short_description": "Automated Instagram posting, grew 11k followers.",
@@ -203,61 +175,37 @@ def seed_data():
                     "Engineered and deployed a streamlined content scheduling and posting process using Python and the Instagram API, achieving 685 posts and increasing followers by 11,000 in 8 months. Transformed the project from a non-revenue-generating initiative to a profitable venture."
                 ),
                 "links": [
-                    "https://www.instagram.com/shoheihomeground/",
-                    "https://www.google.com"
+                    "https://www.instagram.com/shoheihomeground/"
                 ],
                 "link_images": [
-                    "shohei_icon.svg",
-                    "image_placeholder.svg"
+                    "shohei_icon.svg"
                 ],
                 "images": [
-                    "shoheihomeground.svg"
+                    "shoheihomeground.svg", "shoheihomeground_1.jpg", "shoheihomeground_2.jpg", "shoheihomeground_3.jpg"
                 ],
                 "tags": ["python", "project_management", "profit", "instagram", "api", "automation", "photography"]
             },
             {
                 "experience_type": "Publication",
-                "title": "6G Network and Data Management with Blockchain",
+                "title": "6G and Blockchain",
                 "subtitle": "Research Paper",
                 "term": "September 2024",
                 "short_description": "Research on AWS & Blockchain for 6G networks.",
                 "long_description": (
-                    "Explored emerging paradigms in 6G networking and how blockchain can enhance data management and security. Evaluated AWS-based solutions for distributed infrastructures."
+                    "Title: 6G Network and Data Management with Blockchain. Explored emerging paradigms in 6G networking and how blockchain can enhance data management and security. Evaluated AWS-based solutions for distributed infrastructures."
                 ),
                 "links": [
-                    "https://docs.google.com/document/d/1K49_6etVnN7hcCNUc1l-0wJpp3B-NT9J/edit?usp=sharing",
-                    "https://www.google.com"
+                    "https://drive.google.com/file/d/1LTF__g_qyuyI3-H3hHJsZfPw10Vxv3v5/view?usp=sharing",
+                    "https://docs.google.com/document/d/1K49_6etVnN7hcCNUc1l-0wJpp3B-NT9J/edit?usp=sharing"
                 ],
                 "link_images": [
-                    "paper_icon.svg",
-                    "wireless.svg"
+                    "poster_icon.svg",
+                    "resume.png"
                 ],
                 "images": [
-                    
-                    "resume.png"
+                    "poster_icon.svg", "6GBlockchain_1.jpg", "6GBlockchain_2.jpg", "6GBlockchain_3.jpg"
                 ],
                 "tags": ["computer_science", "research", "blockchain", "networking"]
-            },
-            {
-                "experience_type": "Publication",
-                "title": "Demo Abstract: Custom 3D-Printed Mouse: A Proof of Concept for Personalized Input Devices",
-                "subtitle": "Research Paper",
-                "term": "Febuary 2025",
-                "short_description": "This project explores the design and creation of a personalized, ergonomic mouse by reconfiguring a standard mouse's internal components and housing them in a custom 3D-printed shell tailored to the user's hand.",
-                "long_description": (
-                    "This project focuses on developing a customized input device by reengineering a standard mouse to better suit individual ergonomic needs. Using a BambuLab A1 Mini 3D printer and PLA filament, a lightweight and personalized mouse shell was designed and fabricated to precisely fit the user's hand. The work demonstrates the feasibility of adapting off-the-shelf hardware into bespoke solutions, offering potential applications in personalized ergonomics and robotic system integration. By combining 3D printing with hardware reconfiguration, this project highlights the possibilities for creating tailored, user-centric devices."
-                ),
-                "links": [
-                    "https://drive.google.com/file/d/1vRWFlfFa8N1zJt2LPrJAcNOIH81A1COB/view?usp=sharing"
-                ],
-                "link_images": [
-                    "paper_icon.svg",
-                    "3dprint.svg"
-                ],
-                "images": [
-                    "resume.png"
-                ],
-                "tags": ["computer_science", "research", "3d_printing", "hardware", "ergonomics", "robotics"]
             }
         ]
     }
@@ -274,7 +222,7 @@ def seed_data():
             term=item.get("term"),
             short_description=item.get("short_description"),
             long_description=item.get("long_description"),
-            main_image=item.get("main_image", "default_image.png"),  # Use a default image if none is provided
+            # main_image=item.get("main_image", "default_image.png"),  # Use a default image if none is provided
             links=",".join(item.get("links", [])),  # Convert list to comma-separated string
             link_images=",".join(item.get("link_images", [])),
             images=",".join(item.get("images", [])),
