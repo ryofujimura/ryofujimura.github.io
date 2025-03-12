@@ -135,30 +135,6 @@
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   }
 }
-/* For 3-column layouts */
-@media (min-width: 1114px) and (max-width: 1459px) {
-  .experience-section {
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  }
-  
-  /* Special items for 3-column layout */
-}
-
-/* For 2-column layouts */
-@media (max-width: 1113px) {
-  .experience-section {
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  }
-  
-  /* Special items for 2-column layout */
-}
-
-/* For 1-column mobile layouts */
-@media (max-width: 571px) {
-  .experience-section {
-    grid-template-columns: repeat(auto-fit, minmax(50px, 1fr));
-  }
-}
 /* Project 1 */
 /* 4 x 3 */
 @media (min-width: 1460px) {
