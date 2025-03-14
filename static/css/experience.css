@@ -45,7 +45,11 @@
     aspect-ratio: 1 / 1;
   }
 }
-@media (max-width: 975px) {
+@media (max-width: 879px) {
+  .content-container {
+    overflow-y: hidden;
+  }
+
   .experience-section {
     grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
     gap: 1rem;
@@ -130,14 +134,14 @@
   height: auto;
 }
 
-@media (min-width: 1460px) {
+@media (min-width: 1376px) {
   .experience-section {
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   }
 }
 /* Project 1 */
 /* 4 x 3 */
-@media (min-width: 1460px) {
+@media (min-width: 1376px) {
   #project-1 { 
     aspect-ratio: 1;
     grid-column: span 2;
@@ -200,7 +204,7 @@
 }
 
 /* 3 x 3 */
-@media (min-width: 1114px) and (max-width: 1459px) {
+@media (min-width: 1114px) and (max-width: 1375px) {
   #project-1 { 
     aspect-ratio: 2/1;
     grid-column: span 2;
@@ -377,7 +381,7 @@
 
 /* Project 3 */
 /* 4 x 3 */
-@media (min-width: 1460px) {
+@media (min-width: 1376px) {
   #project-3 {
     aspect-ratio: 1/2;
     grid-column: span 1;
@@ -444,9 +448,9 @@
 }
 
 /* 3 x 3 */
-@media (min-width: 1114px) and (max-width: 1459px) {
+@media (min-width: 1114px) and (max-width: 1375px) {
   #project-3 { 
-    aspect-ratio: 1;
+    aspect-ratio: 1/2;
     grid-column: span 1;
     grid-row: span 2;
     grid-column-start: 3;

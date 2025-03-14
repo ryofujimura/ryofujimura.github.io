@@ -233,6 +233,7 @@
   #modal-images {
     display: flex; 
     height: 250px; 
+    overflow-y:hidden;
     overflow-x: auto; 
     gap: 10px; 
     align-items: center; 
