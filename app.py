@@ -1,4 +1,4 @@
-import os
+import os, requests
 from flask import Flask, render_template
 from models import db, Profile, Experience, Tag, ExperienceType
 
@@ -109,7 +109,7 @@ def seed_data():
                 "title": "Custom Input Device",
                 "subtitle": "Research Paper",
                 "term": "Febuary 2025",
-                "short_description": "Demo Abstract: Custom 3D-Printed Mouse: A Proof of Concept for Personalized Input Devices. This project explores the design and creation of a personalized, ergonomic mouse by reconfiguring a standard mouse's internal components and housing them in a custom 3D-printed shell tailored to the user's hand.",
+                "short_description": "Ergonomic mouse by reconfiguring a standard mouse's internal components and housing them in a custom 3D-printed shell tailored to the user's hand.",
                 "long_description": (
                     "This project focuses on developing a customized input device by reengineering a standard mouse to better suit individual ergonomic needs. Using a BambuLab A1 Mini 3D printer and PLA filament, a lightweight and personalized mouse shell was designed and fabricated to precisely fit the user's hand. The work demonstrates the feasibility of adapting off-the-shelf hardware into bespoke solutions, offering potential applications in personalized ergonomics and robotic system integration. By combining 3D printing with hardware reconfiguration, this project highlights the possibilities for creating tailored, user-centric devices."
                 ),
@@ -237,6 +237,60 @@ def seed_data():
 
     db.session.commit()
 
+def get_github_stats(username, access_token):
+    """Fetch GitHub repository count and contributions"""
+    headers = {
+        'Authorization': f'token {access_token}',
+        'Accept': 'application/vnd.github.v3+json'
+    }
+    
+    # Get repository count (including private)
+    repo_url = 'https://api.github.com/user/repos?per_page=100'
+    repos = []
+    page = 1
+    
+    while True:
+        response = requests.get(f'{repo_url}&page={page}', headers=headers)
+        if response.status_code != 200 or not response.json():
+            break
+        repos.extend(response.json())
+        page += 1
+        if page > 10:  # Safety limit
+            break
+    
+    # For contributions, use GraphQL API
+    graphql_url = 'https://api.github.com/graphql'
+    query = """
+    query {
+      user(login: "%s") {
+        contributionsCollection {
+          contributionCalendar {
+            totalContributions
+          }
+        }
+      }
+    }
+    """ % username
+    
+    graphql_response = requests.post(
+        graphql_url, 
+        json={'query': query}, 
+        headers=headers
+    )
+    
+    contribution_count = 0
+    if graphql_response.status_code == 200:
+        data = graphql_response.json()
+        try:
+            contribution_count = data['data']['user']['contributionsCollection']['contributionCalendar']['totalContributions']
+        except (KeyError, TypeError):
+            pass
+    
+    return {
+        "repo_count": len(repos),
+        "contribution_count": contribution_count
+    }
+
 @app.route('/')
 def home():
     """
@@ -245,8 +299,14 @@ def home():
     profile = Profile.query.first()
     experiences = Experience.query.all()
     tags = Tag.query.all()
+
+    # Get GitHub stats (if configured)
+    username = "ryofujimura"
+    access_token = ""
     
-    return render_template('index.html', profile=profile, experiences=experiences, tags=tags)
+    github_stats = get_github_stats(username, access_token)
+    
+    return render_template('index.html', profile=profile, experiences=experiences, tags=tags, github_stats=github_stats)
 
 @app.route('/project/<int:project_id>')
 def project_detail(project_id):
