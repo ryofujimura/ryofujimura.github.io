@@ -72,6 +72,10 @@
     text-align: center;
     padding: 10px;
   }
+
+  .profile-numbers a {
+    text-decoration: none;
+  }
   
   .profile-numbers h3 {
     font-family: 'SF Pro Rounded Bold', Arial, sans-serif;
