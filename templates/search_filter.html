@@ -2,6 +2,7 @@
     <div class="search-bar inset-mini">
       <div>🔍</div>
       <input type="text" placeholder="" class="search-input" aria-label="Search" />
+      <button id="clear-filters" class="clear-filters-btn" style="display: none;">Clear</button>
     </div>
     <div class="filter-options inset-mini">
       {% if tags %}
@@ -21,8 +22,53 @@
 
 <script>
   document.addEventListener('DOMContentLoaded', function() {
-    const tagButtons = document.querySelectorAll('.tag-button');
+    // Add tooltip container to body
+    const tooltipContainer = document.createElement('div');
+    tooltipContainer.className = 'tooltip-container';
+    document.body.appendChild(tooltipContainer);
     
+    // Create tooltip element
+    const tooltip = document.createElement('div');
+    tooltip.className = 'tag-tooltip';
+    tooltipContainer.appendChild(tooltip);
+    
+    const tagButtons = document.querySelectorAll('.tag-button');
+    const clearFiltersBtn = document.getElementById('clear-filters');
+    
+    // Function to clear all filters
+    function clearAllFilters() {
+      const experienceSection = document.querySelector('.experience-section');
+      
+      // Clear tag filter
+      if (window.activeTag) {
+        document.querySelectorAll('.tag-button').forEach(btn => {
+          btn.classList.remove('active-filter');
+        });
+        window.activeTag = null;
+      }
+      
+      // Clear search input
+      const searchInput = document.querySelector('.search-input');
+      if (searchInput) {
+        searchInput.value = '';
+      }
+      
+      // Show all projects
+      document.querySelectorAll('.project-item').forEach(item => {
+        item.classList.remove('filtered-hidden');
+      });
+      
+      // Remove filtering-active class
+      experienceSection.classList.remove('filtering-active');
+      
+      // Hide clear button
+      clearFiltersBtn.style.display = 'none';
+    }
+    
+    // Add click event for clear filters button
+    clearFiltersBtn.addEventListener('click', clearAllFilters);
+    
+    // Show tooltip when hovering over tag buttons
     tagButtons.forEach(button => {
       const tagName = button.getAttribute('data-tag');
       const tagText = button.querySelector('.tag-text');
@@ -63,7 +109,101 @@
       
       // Initially mark as missing until proven otherwise
       button.classList.add('missing-image');
+      
+      // Add hover events for tooltip
+      button.addEventListener('mouseenter', function() {
+        const rect = this.getBoundingClientRect();
+        tooltip.textContent = tagName;
+        tooltip.style.left = rect.left + (rect.width / 2) + 'px';
+        tooltip.style.top = rect.top - 40 + 'px';
+        tooltip.style.opacity = '1';
+        tooltip.style.visibility = 'visible';
+        tooltip.style.transform = 'translateX(-50%) scale(1)';
+      });
+      
+      button.addEventListener('mouseleave', function() {
+        tooltip.style.opacity = '0';
+        tooltip.style.visibility = 'hidden';
+      });
+      
+      // Add click event for filtering
+      button.addEventListener('click', function() {
+        // Call the filterByTag function defined in experience.html
+        if (typeof window.filterByTag === 'function') {
+          window.filterByTag(tagName);
+          
+          // Show clear filters button if active tag is set
+          if (window.activeTag) {
+            clearFiltersBtn.style.display = 'block';
+          } else {
+            clearFiltersBtn.style.display = 'none';
+          }
+        }
+      });
     });
+    
+    // Add search functionality
+    const searchInput = document.querySelector('.search-input');
+    if (searchInput) {
+      searchInput.addEventListener('input', function() {
+        const searchTerm = this.value.trim().toLowerCase();
+        const experienceSection = document.querySelector('.experience-section');
+        
+        // Show/hide clear button based on search term
+        if (searchTerm || window.activeTag) {
+          clearFiltersBtn.style.display = 'block';
+        } else {
+          clearFiltersBtn.style.display = 'none';
+        }
+        
+        // If no search term and no active tag, show all projects
+        if (!searchTerm && !window.activeTag) {
+          document.querySelectorAll('.project-item').forEach(item => {
+            item.classList.remove('filtered-hidden');
+          });
+          experienceSection.classList.remove('filtering-active');
+          return;
+        }
+        
+        // Add filtering-active class
+        experienceSection.classList.add('filtering-active');
+        
+        const projectItems = document.querySelectorAll('.project-item');
+        
+        projectItems.forEach(item => {
+          const projectId = item.getAttribute('data-project-id');
+          const project = window.projectsData.find(p => p.id == projectId);
+          
+          if (!project) return;
+          
+          const title = project.title.toLowerCase();
+          const subtitle = project.subtitle.toLowerCase();
+          const description = project.shortDescription.toLowerCase();
+          const tags = project.tags.map(tag => tag.toLowerCase());
+          
+          let shouldShow = true;
+          
+          // Apply search term filter if it exists
+          if (searchTerm) {
+            shouldShow = title.includes(searchTerm) || 
+                         subtitle.includes(searchTerm) || 
+                         description.includes(searchTerm) ||
+                         tags.some(tag => tag.includes(searchTerm));
+          }
+          
+          // Apply tag filter if it exists
+          if (shouldShow && window.activeTag) {
+            shouldShow = project.tags.includes(window.activeTag);
+          }
+          
+          if (shouldShow) {
+            item.classList.remove('filtered-hidden');
+          } else {
+            item.classList.add('filtered-hidden');
+          }
+        });
+      });
+    }
   });
 </script>
 
@@ -91,5 +231,123 @@
     white-space: nowrap;
     max-width: 28px;
     text-align: center;
+  }
+  
+  /* Active filter style */
+  .active-filter {
+    box-shadow: inset 3px 3px 6px #cfcfcf, inset -3px -3px 6px #ffffff !important;
+    transform: scale(1.05);
+    background-color: #f0f0f0;
+  }
+  
+  /* Clear filters button */
+  .clear-filters-btn {
+    background: none;
+    border: none;
+    color: #555;
+    cursor: pointer;
+    font-size: 12px;
+    padding: 0 8px;
+    margin-left: 4px;
+    border-radius: 12px;
+    transition: background-color 0.2s;
+  }
+  
+  .clear-filters-btn:hover {
+    background-color: #f0f0f0;
+  }
+  
+  /* Filtered hidden class */
+  .filtered-hidden {
+    display: none !important;
+  }
+  
+  /* Tooltip styles for tag buttons */
+  .tag-button {
+    position: relative;
+  }
+  
+  /* Filtering active class - applied to the experience-section container */
+  .filtering-active {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr) !important;
+    grid-auto-flow: row !important;
+    gap: 1rem;
+    padding: 0 10px;
+  }
+  
+  /* Make each item maintain a 2:1 aspect ratio when filtering is active */
+  .filtering-active > .project-item:not(.filtered-hidden) {
+    aspect-ratio: 2 / 1 !important;
+    grid-column: span 1 !important;
+    width: 100%;
+    margin: 0;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    position: relative;
+  }
+  
+  /* Style adjustments for filtered items */
+  .filtering-active > .project-item:not(.filtered-hidden) .experience-image-container {
+    height: 100%;
+    object-fit: cover;
+    width: 100%;
+  }
+  
+  .filtering-active > .project-item:not(.filtered-hidden) .experience-type {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-size: 0.65em;
+    font-weight: bold;
+    z-index: 10;
+  }
+  
+  .filtering-active > .project-item:not(.filtered-hidden) .experience-content {
+    padding: 10px;
+    position: absolute;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.8);
+    width: 100%;
+    z-index: 5;
+  }
+  
+  .filtering-active > .project-item:not(.filtered-hidden) .experience-title {
+    font-size: 0.9em;
+    margin-bottom: 3px;
+  }
+  
+  .filtering-active > .project-item:not(.filtered-hidden) .experience-subtitle,
+  .filtering-active > .project-item:not(.filtered-hidden) .experience-term {
+    font-size: 0.7em;
+  }
+  
+  /* Hide some elements when in filtered mode to keep the 2x1 ratio clean */
+  .filtering-active > .project-item:not(.filtered-hidden) .experience-shortdes,
+  .filtering-active > .project-item:not(.filtered-hidden) .experience-tags,
+  .filtering-active > .project-item:not(.filtered-hidden) .experience-links,
+  .filtering-active > .project-item:not(.filtered-hidden) .experience-link-images,
+  .filtering-active > .project-item:not(.filtered-hidden) .experience-images {
+    display: none;
+  }
+  
+  /* Media query for mobile screens */
+  @media (max-width: 768px) {
+    .filtering-active {
+      grid-template-columns: 1fr !important; /* One column on mobile */
+      padding: 0 5px;
+    }
+    
+    .filtering-active > .project-item:not(.filtered-hidden) {
+      aspect-ratio: 2 / 1 !important;
+      margin-bottom: 15px;
+    }
+    
+    .filtering-active > .project-item:not(.filtered-hidden) .experience-content {
+      padding: 8px;
+    }
   }
 </style>

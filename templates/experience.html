@@ -93,6 +93,70 @@
   </div>
 </div>
 
+<style>
+  /* Styling for the modal tag buttons */
+  .modal-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 15px;
+    margin-bottom: 20px;
+  }
+  
+  .modal-tag-button {
+    background-color: #ffffff;
+    aspect-ratio: 1/1;
+    white-space: nowrap;
+    border: none;
+    height: 32px;
+    width: 32px;
+    border-radius: 100px;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1);
+    position: relative; /* For tooltip positioning */
+  }
+  
+  .modal-tag-button:hover {
+    box-shadow: 0px 3px 8px rgba(0, 0, 0, 0.15);
+    transform: scale(1.05);
+  }
+  
+  .modal-tag-button.missing-image {
+    border: 2px solid red !important;
+    color: black;
+    font-size: 0.7em;
+    font-weight: bold;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .modal-tag-button .tag-image {
+    max-width: 16px;
+    max-height: 16px;
+  }
+  
+  .modal-tag-button .tag-text {
+    font-size: 0.7em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 28px;
+    text-align: center;
+  }
+  
+  /* Make modal tags section title */
+  #modal-tags::before {
+    content: "Tags";
+    display: block;
+    font-weight: bold;
+    margin-bottom: 10px;
+    font-size: 1.1em;
+  }
+</style>
+
 <script>
   // Store experience data in a JavaScript object for easy access
   window.projectsData = [
@@ -266,16 +330,105 @@
     }
     document.getElementById("modal-images").innerHTML = imagesHTML;
     
-    // Tags
+    // Tags - Updated to display tag icons instead of plain text
     let tagsHTML = '';
     if (project.tags.length) {
       tagsHTML = '<div class="modal-tags">';
-      project.tags.forEach(tag => {
-        tagsHTML += `<span class="tag">${tag}</span>`;
+      project.tags.forEach(tagName => {
+        // Create a button similar to the filter buttons
+        tagsHTML += `<button class="filter-button tag-button modal-tag-button" data-tag="${tagName}">`;
+        tagsHTML += `<span class="tag-text">${tagName}</span>`;
+        tagsHTML += `</button>`;
       });
       tagsHTML += '</div>';
     }
     document.getElementById("modal-tags").innerHTML = tagsHTML;
+    
+    // Ensure tooltip container exists
+    let tooltipContainer = document.querySelector('.tooltip-container');
+    let tooltip = document.querySelector('.tag-tooltip');
+    
+    // Create tooltip container if it doesn't exist
+    if (!tooltipContainer) {
+      tooltipContainer = document.createElement('div');
+      tooltipContainer.className = 'tooltip-container';
+      document.body.appendChild(tooltipContainer);
+      
+      tooltip = document.createElement('div');
+      tooltip.className = 'tag-tooltip';
+      tooltipContainer.appendChild(tooltip);
+    }
+    
+    // Now apply the same image loading logic for the tag buttons in the modal
+    const modalTagButtons = document.querySelectorAll('.modal-tag-button');
+    modalTagButtons.forEach(button => {
+      const tagName = button.getAttribute('data-tag');
+      
+      // Try to load png first
+      const img = new Image();
+      img.onload = function() {
+        // PNG exists
+        button.innerHTML = ''; // Clear the text
+        button.appendChild(img);
+        button.classList.remove('missing-image');
+      };
+      
+      img.onerror = function() {
+        // Try SVG instead
+        const svgImg = new Image();
+        svgImg.onload = function() {
+          // SVG exists
+          button.innerHTML = ''; // Clear the text
+          button.appendChild(svgImg);
+          button.classList.remove('missing-image');
+        };
+        
+        svgImg.onerror = function() {
+          // Neither image exists, style button with red border
+          button.classList.add('missing-image');
+          // Keep the text visible
+        };
+        
+        svgImg.src = `/static/images/${tagName}.svg`;
+        svgImg.alt = tagName;
+        svgImg.className = 'tag-image';
+      };
+      
+      img.src = `/static/images/${tagName}.png`;
+      img.alt = tagName;
+      img.className = 'tag-image';
+      
+      // Initially mark as missing until proven otherwise
+      button.classList.add('missing-image');
+      
+      // Add hover events for tooltip
+      button.addEventListener('mouseenter', function() {
+        const rect = this.getBoundingClientRect();
+        tooltip.textContent = tagName;
+        tooltip.style.left = rect.left + (rect.width / 2) + 'px';
+        tooltip.style.top = rect.top - 40 + 'px';
+        tooltip.style.opacity = '1';
+        tooltip.style.visibility = 'visible';
+        tooltip.style.transform = 'translateX(-50%) scale(1)';
+      });
+      
+      button.addEventListener('mouseleave', function() {
+        tooltip.style.opacity = '0';
+        tooltip.style.visibility = 'hidden';
+      });
+      
+      // Add click event to filter by this tag when clicked
+      button.addEventListener('click', function(event) {
+        event.stopPropagation(); // Stop event from bubbling to the modal
+        closeModal(true); // Close the modal
+        // Call the filterByTag function after a small delay to allow the modal to close
+        setTimeout(() => {
+          if (typeof window.filterByTag === 'function') {
+            window.filterByTag(tagName);
+          }
+        }, 100);
+      });
+    });
     
     // Show the modal
     modal.style.display = "block";
