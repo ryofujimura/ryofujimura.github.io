@@ -4,7 +4,7 @@
     <div class="experience-section">
       {% if experiences %}
       {% for exp in experiences %}
-      <div id="project-{{ loop.index }}" class="outer project-item" data-project-id="{{ exp.id }}">
+      <div id="project-{{ loop.index }}" class="outer project-item mobile-optimize" data-project-id="{{ exp.id }}">
         {% if exp.images and exp.images.split(',') | length > 1 %}
           <!-- Display the second image if available -->
           <img 
@@ -18,10 +18,10 @@
             src="{{ url_for('static', filename='images/' + (exp.main_image or 'default_image.png')) }}" 
             alt="Experience Image">
         {% endif %}
-        <div class="experience-content">
-          <div class="experience-title">{{ exp.title }}</div>
-          <div class="experience-subtitle">{{ exp.subtitle }}</div>
-          <div class="experience-term">{{ exp.term }}</div>
+        <div class="experience-content mobile-tile-content">
+          <div class="experience-title mobile-optimize mobile-truncate lines-2">{{ exp.title }}</div>
+          <div class="experience-subtitle mobile-optimize mobile-truncate lines-1">{{ exp.subtitle }}</div>
+          <div class="experience-term mobile-optimize">{{ exp.term }}</div>
         </div>
         <div class="experience-type 
           {% if exp.experience_type.name == 'Work' %}work
@@ -30,14 +30,14 @@
           {% endif %}">
           {{ exp.experience_type.name }}
         </div>
-        <div class="experience-shortdes">{{ exp.short_description }}</div>
+        <div class="experience-shortdes mobile-optimize mobile-truncate lines-3">{{ exp.short_description }}</div>
 
         {% if exp.links %}
         <div class="experience-links">
           <ul>
             {% for link in exp.links.split(',') %}
             <li>
-              <a href="{{ link }}" target="_blank">{{ link }}</a>
+              <a href="{{ link }}" target="_blank" class="mobile-truncate lines-1">{{ link }}</a>
             </li>
             {% endfor %}
           </ul>
@@ -64,7 +64,7 @@
 
         <div class="experience-tags">
           {% for tag in exp.tags %}
-          <span class="tag">{{ tag.name }}</span>
+          <span class="tag mobile-tag">{{ tag.name }}</span>
           {% endfor %}
         </div>
       </div>

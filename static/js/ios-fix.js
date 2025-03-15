@@ -1,11 +1,12 @@
 /**
- * iOS Safari Scroll Fix and Content Optimization
- * This script helps resolve nested scrolling issues on iOS Safari and optimizes content display
+ * iOS Safari Scroll Fix
+ * This script helps resolve nested scrolling issues on iOS Safari
  */
 
 document.addEventListener('DOMContentLoaded', function() {
   // Detect iOS
   const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+  const isMobile = window.innerWidth <= 879;
   
   if (isIOS) {
     // Add iOS-specific class to body
@@ -41,58 +42,67 @@ document.addEventListener('DOMContentLoaded', function() {
       projectTiles.forEach(tile => {
         tile.style.overflow = 'visible';
       });
-      
-      // Optimize content display based on screen width
-      const screenWidth = window.innerWidth;
-      
-      // For very small screens, hide less important elements
-      if (screenWidth <= 375) { // iPhone SE/mini size
-        // Hide tags on small screens
-        const tags = document.querySelectorAll('.experience-tags');
-        tags.forEach(tag => {
-          tag.style.display = 'none';
-        });
-        
-        // Limit short description to fewer lines
-        const shortDes = document.querySelectorAll('.experience-shortdes');
-        shortDes.forEach(des => {
-          des.style.display = '-webkit-box';
-          des.style.webkitLineClamp = '2';
-          des.style.webkitBoxOrient = 'vertical';
-          des.style.overflow = 'hidden';
-          des.style.fontSize = '0.7rem';
-        });
-        
-        // Adjust padding for more space
-        const outerTiles = document.querySelectorAll('.outer');
-        outerTiles.forEach(tile => {
-          tile.style.padding = '0.5rem';
-        });
-      }
-      
-      // Check if iPhone Plus/Pro Max models with more space
-      if (screenWidth >= 414) {
-        // Allow more content to show on larger iPhones
-        const shortDes = document.querySelectorAll('.experience-shortdes');
-        shortDes.forEach(des => {
-          des.style.display = '-webkit-box';
-          des.style.webkitLineClamp = '5'; // More lines on larger screens
-          des.style.webkitBoxOrient = 'vertical';
-          des.style.overflow = 'hidden';
-          des.style.fontSize = '0.8rem'; // Slightly larger font
-        });
-      }
     }
     
     // Run on load and resize
     adjustHeights();
     window.addEventListener('resize', adjustHeights);
-    window.addEventListener('orientationchange', adjustHeights);
     
     // Additional touch events to ensure smooth scrolling
     document.addEventListener('touchstart', function() {
       // Ensure body is scrollable
       document.body.style.overflow = 'auto';
     }, {passive: true});
+  }
+  
+  // Text optimization for all mobile devices
+  if (isMobile) {
+    document.body.classList.add('mobile-device');
+    
+    // Optimize text for mobile
+    function optimizeTextForMobile() {
+      // Find all title elements and ensure text fits properly
+      const titles = document.querySelectorAll('.experience-title');
+      titles.forEach(title => {
+        title.classList.add('mobile-optimize');
+        
+        // If title is very long, add more truncation
+        if (title.textContent.length > 30) {
+          title.classList.add('mobile-truncate');
+          title.classList.add('lines-2');
+        }
+      });
+      
+      // Optimize descriptions
+      const descriptions = document.querySelectorAll('.experience-shortdes');
+      descriptions.forEach(desc => {
+        desc.classList.add('mobile-optimize');
+        desc.classList.add('mobile-truncate');
+        desc.classList.add('lines-3');
+        
+        // On very small screens, limit to 2 lines
+        if (window.innerWidth <= 450) {
+          desc.classList.remove('lines-3');
+          desc.classList.add('lines-2');
+        }
+      });
+      
+      // Handle overflow in tiles
+      const tiles = document.querySelectorAll('.project-item');
+      tiles.forEach(tile => {
+        const tileWidth = tile.offsetWidth;
+        
+        // Adjust font size based on tile width for better proportions
+        if (tileWidth < 180) {
+          tile.classList.add('very-small-tile');
+        } else if (tileWidth < 250) {
+          tile.classList.add('small-tile');
+        }
+      });
+    }
+    
+    // Run optimizations
+    optimizeTextForMobile();
+    window.addEventListener('resize', optimizeTextForMobile);
   }
 }); 

@@ -23,12 +23,8 @@
     display: grid;
     height: auto !important;
     min-height: 0 !important;
-    /* Adjust grid for better mobile display */
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)) !important;
-    gap: 0.85rem !important;
   }
   
-  /* Make project tiles more compact and optimized for small screens */
   .project-item {
     overflow: visible !important;
     height: auto !important;
@@ -40,20 +36,38 @@
     position: relative !important;
     transform: translateZ(0);
     -webkit-backface-visibility: hidden;
-    display: flex !important;
-    flex-direction: column !important;
   }
-  
-  /* Optimize tag display for mobile */
-  .tag {
-    display: inline-block !important;
-    font-size: 0.65rem !important;
-    padding: 2px 4px !important;
-    margin: 1px !important;
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-    max-width: 100px !important;
+
+  /* Enhanced mobile optimization for tile content */
+  @media (max-width: 450px) {
+    /* Even smaller text for very small screens */
+    .experience-title {
+      font-size: 0.95rem !important;
+    }
+    
+    .experience-subtitle {
+      font-size: 0.7rem !important;
+    }
+    
+    .experience-term {
+      font-size: 0.65rem !important;
+    }
+    
+    .experience-shortdes {
+      font-size: 0.65rem !important;
+      -webkit-line-clamp: 2; /* Show only 2 lines on very small screens */
+    }
+    
+    /* Further reduce padding for more space */
+    .project-item, .outer {
+      padding: 0.6rem !important;
+    }
+    
+    /* Make tags even more compact */
+    .experience-tags .tag {
+      font-size: 0.6rem !important;
+      padding: 1px 4px !important;
+    }
   }
 
   .layout-container {
@@ -185,29 +199,6 @@
     margin: 0px;
     /* justify-content: center; */
   }  
-}
-
-/* Extra styling for very small mobile screens */
-@media (max-width: 400px) {
-  .experience-section {
-    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)) !important;
-    gap: 0.7rem !important;
-  }
-  
-  /* Make project display more compact */
-  .experience-section > * {
-    aspect-ratio: 1 / 1.1 !important; /* Slightly taller to fit content */
-  }
-  
-  /* Reduce padding more */
-  .experience-section-container {
-    padding: 12px !important;
-  }
-  
-  /* Hide some less important elements on very small screens */
-  .experience-tags {
-    display: none !important;
-  }
 }
 
 /* Fix for nested scrolling on iOS specifically */
