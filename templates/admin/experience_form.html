@@ -1,0 +1,271 @@
+{% extends 'admin/base.html' %}
+
+{% block content %}
+<style>
+    /* Custom styling for experience type colors */
+    .type-preview {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        margin-left: 10px;
+        vertical-align: middle;
+    }
+    .type-work {
+        background-color: #dc3545; /* Red for Work */
+    }
+    .type-project {
+        background-color: #d9b518; /* Mustard yellow for Project */
+    }
+    .type-publication {
+        background-color: #0d6efd; /* Blue for Publication */
+    }
+    .type-other {
+        background-color: #198754; /* Green for any other type */
+    }
+</style>
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2">{% if experience %}Edit{% else %}Add New{% endif %} Experience</h1>
+        <div class="btn-toolbar mb-2 mb-md-0">
+            <a href="{{ url_for('admin_dashboard') }}" class="btn btn-sm btn-outline-secondary">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <form method="POST" class="needs-validation" novalidate>
+                <div class="row mb-4">
+                    <!-- Left Column -->
+                    <div class="col-md-6">
+                        <div class="card shadow-sm">
+                            <div class="card-header bg-light">
+                                <h5 class="mb-0">Basic Information</h5>
+                            </div>
+                            <div class="card-body">
+                                <!-- Experience Type -->
+                                <div class="mb-3">
+                                    <label for="experience_type" class="form-label">Experience Type</label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" id="experience_type" name="experience_type" list="experience_types" 
+                                            value="{{ experience.experience_type.name if experience else '' }}" required>
+                                        <datalist id="experience_types">
+                                            {% for type in experience_types %}
+                                            <option value="{{ type.name }}">
+                                            {% endfor %}
+                                        </datalist>
+                                        <div class="invalid-feedback">
+                                            Please provide an experience type.
+                                        </div>
+                                    </div>
+                                    <div class="mt-2">
+                                        <span class="text-muted">e.g., Work, Project, Publication</span>
+                                        <div class="mt-1">
+                                            <span class="me-2">Color preview:</span>
+                                            <span class="type-preview type-work" title="Work"></span>
+                                            <span class="ms-1">Work</span>
+                                            <span class="type-preview type-project ms-3" title="Project"></span>
+                                            <span class="ms-1">Project</span>
+                                            <span class="type-preview type-publication ms-3" title="Publication"></span>
+                                            <span class="ms-1">Publication</span>
+                                            <span class="type-preview type-other ms-3" title="Other"></span>
+                                            <span class="ms-1">Other</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Title -->
+                                <div class="mb-3">
+                                    <label for="title" class="form-label">Title</label>
+                                    <input type="text" class="form-control" id="title" name="title" 
+                                        value="{{ experience.title if experience else '' }}" required>
+                                    <div class="invalid-feedback">
+                                        Please provide a title.
+                                    </div>
+                                </div>
+
+                                <!-- Subtitle -->
+                                <div class="mb-3">
+                                    <label for="subtitle" class="form-label">Subtitle</label>
+                                    <input type="text" class="form-control" id="subtitle" name="subtitle" 
+                                        value="{{ experience.subtitle if experience else '' }}">
+                                    <small class="text-muted">e.g., Company name, project name</small>
+                                </div>
+
+                                <!-- Term -->
+                                <div class="mb-3">
+                                    <label for="term" class="form-label">Term</label>
+                                    <input type="text" class="form-control" id="term" name="term" 
+                                        value="{{ experience.term if experience else '' }}">
+                                    <small class="text-muted">e.g., January 2022 - April 2024</small>
+                                </div>
+
+                                <!-- Tags -->
+                                <div class="mb-3">
+                                    <label for="tags" class="form-label">Tags</label>
+                                    <input type="text" class="form-control" id="tags" name="tags" 
+                                        value="{{ current_tags if experience else '' }}">
+                                    <small class="text-muted">Comma-separated list of tags (e.g., python, ai, data_management)</small>
+                                    
+                                    <!-- Available tags -->
+                                    <div class="mt-2">
+                                        <label class="form-label">Available Tags:</label>
+                                        <div class="d-flex flex-wrap gap-1 available-tags">
+                                            {% for tag in tags %}
+                                            <span class="badge bg-light text-dark border tag-badge" onclick="addTag('{{ tag.name }}')">{{ tag.name }}</span>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Column -->
+                    <div class="col-md-6">
+                        <div class="card shadow-sm">
+                            <div class="card-header bg-light">
+                                <h5 class="mb-0">Descriptions</h5>
+                            </div>
+                            <div class="card-body">
+                                <!-- Short Description -->
+                                <div class="mb-3">
+                                    <label for="short_description" class="form-label">Short Description</label>
+                                    <textarea class="form-control" id="short_description" name="short_description" rows="2">{{ experience.short_description if experience else '' }}</textarea>
+                                    <small class="text-muted">Brief summary of the experience</small>
+                                </div>
+
+                                <!-- Long Description -->
+                                <div class="mb-3">
+                                    <label for="long_description" class="form-label">Long Description</label>
+                                    <textarea class="form-control" id="long_description" name="long_description" rows="6">{{ experience.long_description if experience else '' }}</textarea>
+                                    <small class="text-muted">Detailed information about the experience</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Media Section -->
+                <div class="row mb-4">
+                    <div class="col-md-12">
+                        <div class="card shadow-sm">
+                            <div class="card-header bg-light">
+                                <h5 class="mb-0">Media</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <!-- Links -->
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label for="links" class="form-label">Links</label>
+                                            <textarea class="form-control" id="links" name="links" rows="4">{{ experience.links if experience else '' }}</textarea>
+                                            <small class="text-muted">One URL per line</small>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Link Images -->
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label for="link_images" class="form-label">Link Images</label>
+                                            <textarea class="form-control" id="link_images" name="link_images" rows="4">{{ experience.link_images if experience else '' }}</textarea>
+                                            <small class="text-muted">One image filename per line, corresponding to links</small>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Images -->
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label for="images" class="form-label">Images</label>
+                                            <textarea class="form-control" id="images" name="images" rows="4">{{ experience.images if experience else '' }}</textarea>
+                                            <small class="text-muted">One image filename per line</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end mb-4">
+                    <a href="{{ url_for('admin_dashboard') }}" class="btn btn-secondary me-md-2">Cancel</a>
+                    <button type="submit" class="btn btn-primary">Save Experience</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Form validation
+    (function () {
+        'use strict'
+        
+        // Fetch all forms to which we want to apply custom validation
+        const forms = document.querySelectorAll('.needs-validation')
+        
+        // Loop over them and prevent submission
+        Array.prototype.slice.call(forms).forEach(function (form) {
+            form.addEventListener('submit', function (event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault()
+                    event.stopPropagation()
+                }
+                
+                form.classList.add('was-validated')
+            }, false)
+        })
+    })()
+    
+    // Format text areas that have comma-separated values when loaded
+    function formatTextAreas() {
+        const links = document.getElementById('links');
+        const linkImages = document.getElementById('link_images');
+        const images = document.getElementById('images');
+        
+        if (links.value) {
+            // Split by comma and convert to newlines
+            const linkValues = links.value.split(',').map(link => link.trim()).filter(link => link);
+            links.value = linkValues.join('\n');
+        }
+        
+        if (linkImages.value) {
+            const linkImageValues = linkImages.value.split(',').map(img => img.trim()).filter(img => img);
+            linkImages.value = linkImageValues.join('\n');
+        }
+        
+        if (images.value) {
+            const imageValues = images.value.split(',').map(img => img.trim()).filter(img => img);
+            images.value = imageValues.join('\n');
+        }
+    }
+    
+    // Add tag to the tags input
+    function addTag(tagName) {
+        const tagsInput = document.getElementById('tags');
+        let currentTags = tagsInput.value.split(',').map(tag => tag.trim()).filter(tag => tag);
+        
+        // Only add if not already present
+        if (!currentTags.includes(tagName)) {
+            currentTags.push(tagName);
+            tagsInput.value = currentTags.join(', ');
+        }
+    }
+    
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        formatTextAreas();
+        
+        // Add click event to tag badges
+        document.querySelectorAll('.tag-badge').forEach(badge => {
+            badge.style.cursor = 'pointer';
+        });
+    });
+</script>
+{% endblock %} 

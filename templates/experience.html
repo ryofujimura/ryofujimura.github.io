@@ -26,6 +26,7 @@
         <div class="experience-type 
           {% if exp.experience_type.name == 'Work' %}work
           {% elif exp.experience_type.name == 'Project' %}project
+          {% elif exp.experience_type.name == 'Publication' %}publication
           {% else %}other
           {% endif %}">
           {{ exp.experience_type.name }}

@@ -233,18 +233,27 @@
 }
 
 .work {
-  color: red;
-  border: 2px solid red;
+  color: #dc3545;
+  /* background-color: #dc3545; */
+  border: 2px solid #dc3545;
 }
 
 .project {
-  color: #d4a017;
-  border: 2px solid #d4a017;
+  color: #d9b518;
+  /* background-color: #d9b518; */
+  border: 2px solid #d9b518;
+}
+
+.publication {
+  color: #0d6efd;
+  /* background-color: #0d6efd; */
+  border: 2px solid #0d6efd;
 }
 
 .other {
-  color: #333;
-  border: 2px solid #0d9118;
+  color: #198754;
+  /* background-color: #198754; */
+  border: 2px solid #198754;
 }
 
 /* .experience-image-container img {
