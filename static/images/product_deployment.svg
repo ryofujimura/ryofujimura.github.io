@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg width="800px" height="800px" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .icon-shape {fill:none; stroke:#000000; stroke-width:1; stroke-linecap:round; stroke-linejoin:round;}
+      .fill-shape {fill:#000000;}
+    </style>
+  </defs>
+  
+  <!-- App Store A symbol (modified) -->
+  <path class="icon-shape" d="M16,12 L24,32 L32,12" stroke-width="2"/>
+  <line class="icon-shape" x1="18" y1="25" x2="30" y2="25" stroke-width="2"/>
+  
+  <!-- Deployment/Rocket icon -->
+  <g transform="translate(24, 22) scale(0.8)">
+    <!-- Rocket body -->
+    <path class="icon-shape" d="M0,16 C2,11 10,3 16,0 C19,3 22,8 16,16" fill="#EFEFEF"/>
+    <path class="icon-shape" d="M0,16 C-2,11 -10,3 -16,0 C-19,3 -22,8 -16,16" fill="#EFEFEF"/>
+    <!-- Rocket bottom -->
+    <path class="fill-shape" d="M-5,17 L5,17 L0,25 Z"/>
+    <!-- Rocket window -->
+    <circle cx="0" cy="8" r="2" class="fill-shape"/>
+  </g>
+  
+  <!-- Cloud shape for deployment -->
+  <path class="icon-shape" d="M12,36 C7,36 4,33 4,29 C4,25 7,22 11,22 C11,18 14,14 19,14 C24,14 27,18 27,22 C31,22 35,25 35,30 C35,34 31,36 27,36" fill="#EFEFEF"/>
+  
+  <!-- Download arrow into cloud -->
+  <path class="fill-shape" d="M22,25 L26,30 L18,30 Z"/>
+  <line class="icon-shape" x1="22" y1="20" x2="22" y2="30" stroke-width="1.5"/>
+</svg> 

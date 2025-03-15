@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg width="800px" height="800px" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .outline {fill:none; stroke:#000000; stroke-width:1; stroke-linecap:round; stroke-linejoin:round;}
+      .filled {fill:#000000;}
+    </style>
+  </defs>
+  
+  <!-- Linux Penguin (Tux) simplified -->
+  <g transform="translate(12, 12) scale(0.8)">
+    <ellipse cx="0" cy="0" rx="8" ry="10" class="outline" fill="#EFEFEF"/>
+    <ellipse cx="-3" cy="-5" rx="1.5" ry="1.5" class="filled"/>
+    <ellipse cx="3" cy="-5" rx="1.5" ry="1.5" class="filled"/>
+    <ellipse cx="0" cy="-1" rx="2" ry="1.5" class="outline" fill="#EFEFEF"/>
+    <path d="M-6,0 C-6,4 -4,8 0,8 C4,8 6,4 6,0" class="outline" fill="#EFEFEF"/>
+  </g>
+  
+  <!-- CUDA parallel processing representation -->
+  <g transform="translate(30, 14)">
+    <rect x="0" y="0" width="2" height="6" class="filled"/>
+    <rect x="4" y="0" width="2" height="6" class="filled"/>
+    <rect x="8" y="0" width="2" height="6" class="filled"/>
+    <rect x="0" y="8" width="10" height="2" class="filled"/>
+    <rect x="0" y="12" width="10" height="2" class="filled"/>
+  </g>
+  
+  <!-- NVIDIA-inspired GPU chip -->
+  <g transform="translate(24, 28)">
+    <rect x="-12" y="0" width="24" height="12" rx="1" ry="1" class="outline" fill="#EFEFEF"/>
+    
+    <!-- Circuit traces -->
+    <line x1="-10" y1="3" x2="10" y2="3" class="outline"/>
+    <line x1="-10" y1="6" x2="10" y2="6" class="outline"/>
+    <line x1="-10" y1="9" x2="10" y2="9" class="outline"/>
+    
+    <line x1="-8" y1="0" x2="-8" y2="12" class="outline"/>
+    <line x1="-4" y1="0" x2="-4" y2="12" class="outline"/>
+    <line x1="0" y1="0" x2="0" y2="12" class="outline"/>
+    <line x1="4" y1="0" x2="4" y2="12" class="outline"/>
+    <line x1="8" y1="0" x2="8" y2="12" class="outline"/>
+    
+    <!-- Connection pins -->
+    <rect x="-10" y="12" width="2" height="2" class="filled"/>
+    <rect x="-6" y="12" width="2" height="2" class="filled"/>
+    <rect x="-2" y="12" width="2" height="2" class="filled"/>
+    <rect x="2" y="12" width="2" height="2" class="filled"/>
+    <rect x="6" y="12" width="2" height="2" class="filled"/>
+  </g>
+</svg> 

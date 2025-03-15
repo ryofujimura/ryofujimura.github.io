@@ -80,7 +80,7 @@ def seed_data():
                 "images": [
                     "hondalogo.svg", "honda_1.jpg", "honda_2.jpg", "honda_3.jpg"
                 ],
-                "tags": ["honda", "nvidia", "cuda", "linux", "ai", "automotive", "nlp", "profit", "research", "team_collaboration"]
+                "tags": ["honda", "hardware_and_systems", "ai_and_algorithms", "automotive", "profit", "research", "team_collaboration"]
             },
             {
                 "experience_type": "Work",
@@ -102,7 +102,7 @@ def seed_data():
                 "images": [
                     "matchatime.svg","matchatime_1.jpg", "matchatime_2.jpg", "matchatime_3.jpg"
                 ],
-                "tags": ["swift", "project_management", "team_collaboration", "macos", "deployed", "appstore"]
+                "tags": ["apple_development", "project_leadership", "product_deployment"]
             },
             {
                 "experience_type": "Publication",
@@ -122,7 +122,7 @@ def seed_data():
                 "images": [
                     "3dprint.png", "3dprint_1.jpeg", "3dprint_2.jpeg", "3dprint_3.jpeg", "3dprint_4.jpeg", "3dprint_5.jpeg"
                 ],
-                "tags": ["computer_science", "research", "3d_printing", "hardware", "ergonomics", "robotics"]
+                "tags": ["cs_research", "3d_printing", "hardware", "ergonomics", "robotics"]
             },
             {
                 "experience_type": "Work",
@@ -142,7 +142,7 @@ def seed_data():
                 "images": [
                     "cusco.svg", "cusco_1.jpg", "cusco_2.jpg", "cusco_3.jpg"
                 ],
-                "tags": ["python", "project_management", "adobe", "data_management", "profit", "photoshop", "illustrator", "indesign", "google_drive", "automotive"]
+                "tags": ["python", "project_leadership", "adobe_creative_suite", "data_management", "profit", "google_drive", "automotive"]
             },
             {
                 "experience_type": "Project",
@@ -162,7 +162,7 @@ def seed_data():
                 "images": [
                     "poker.png", "poker_1.jpg", "poker_2.jpg", "poker_3.jpg", "poker_4.jpg"
                 ],
-                "tags": ["swift", "project_management", "watchos", "appstore", "algorithm"]
+                "tags": ["apple_development", "project_leadership", "product_deployment", "ai_and_algorithms"]
             },
             {
                 # koko
@@ -183,7 +183,7 @@ def seed_data():
                 "images": [
                     "shoheihomeground.svg", "shoheihomeground_1.jpg", "shoheihomeground_2.jpg", "shoheihomeground_3.jpg"
                 ],
-                "tags": ["python", "project_management", "profit", "instagram", "api", "automation", "photography"]
+                "tags": ["python", "project_leadership", "profit", "instagram", "api", "automation", "photography"]
             },
             {
                 "experience_type": "Publication",
@@ -205,7 +205,7 @@ def seed_data():
                 "images": [
                     "poster_icon.svg", "6GBlockchain_1.jpg", "6GBlockchain_2.jpg", "6GBlockchain_3.jpg"
                 ],
-                "tags": ["computer_science", "research", "blockchain", "networking"]
+                "tags": ["cs_research", "blockchain", "networking"]
             }
         ]
     }
