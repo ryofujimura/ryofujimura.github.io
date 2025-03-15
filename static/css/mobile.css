@@ -1,6 +1,6 @@
 /* Updated CSS for Mobile View */
 
-@media (max-width: 879px) {
+@media (max-width: 473px) {
   .content-container {
     border-radius: 15px;
     overflow-y: visible;
@@ -10,7 +10,7 @@
   }
   
   .experience-section-container {
-    padding: 20px 0;
+    padding: 20px;
     height: auto !important;
     max-height: none !important;
     overflow: visible !important;

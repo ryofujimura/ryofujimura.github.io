@@ -157,6 +157,7 @@
     object-position: center !important;
     z-index: 0;
     box-sizing: border-box !important;
+    border-radius: 15px;
   }
   
   .outer {
