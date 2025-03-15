@@ -1,6 +1,7 @@
 import os, requests
 from flask import Flask, render_template
 from models import db, Profile, Experience, Tag, ExperienceType
+from sqlalchemy import func
 
 app = Flask(__name__)
 
@@ -80,7 +81,7 @@ def seed_data():
                 "images": [
                     "hondalogo.svg", "honda_1.jpg", "honda_2.jpg", "honda_3.jpg"
                 ],
-                "tags": ["honda", "hardware_and_systems", "ai_and_algorithms", "automotive", "profit", "research", "team_collaboration"]
+                "tags": ["honda", "hardware_and_systems", "ai_and_algorithms", "automotive", "profit", "cs_research", "team_collaboration"]
             },
             {
                 "experience_type": "Work",
@@ -142,7 +143,7 @@ def seed_data():
                 "images": [
                     "cusco.svg", "cusco_1.jpg", "cusco_2.jpg", "cusco_3.jpg"
                 ],
-                "tags": ["python", "project_leadership", "adobe_creative_suite", "data_management", "profit", "google_drive", "automotive"]
+                "tags": ["python", "project_leadership", "adobe", "data_management", "profit", "google_drive", "automotive"]
             },
             {
                 "experience_type": "Project",
@@ -298,7 +299,22 @@ def home():
     """
     profile = Profile.query.first()
     experiences = Experience.query.all()
-    tags = Tag.query.all()
+    
+    # Get tags sorted by frequency (number of experiences using each tag)
+    # This query counts how many experiences use each tag and orders by that count
+    tag_counts = db.session.query(
+        Tag, 
+        func.count(Experience.tags).label('tag_count')
+    ).join(
+        Experience.tags
+    ).group_by(
+        Tag.id
+    ).order_by(
+        func.count(Experience.tags).desc()
+    ).all()
+    
+    # Extract just the Tag objects from the results, maintaining order
+    tags = [tag for tag, count in tag_counts]
 
     # Get GitHub stats (if configured)
     username = "ryofujimura"
@@ -315,7 +331,21 @@ def project_detail(project_id):
     """
     profile = Profile.query.first()
     experiences = Experience.query.all()
-    tags = Tag.query.all()
+    
+    # Get tags sorted by frequency (number of experiences using each tag)
+    tag_counts = db.session.query(
+        Tag, 
+        func.count(Experience.tags).label('tag_count')
+    ).join(
+        Experience.tags
+    ).group_by(
+        Tag.id
+    ).order_by(
+        func.count(Experience.tags).desc()
+    ).all()
+    
+    # Extract just the Tag objects from the results, maintaining order
+    tags = [tag for tag, count in tag_counts]
     
     # Get the specific project (or 404 if not found)
     project = Experience.query.get_or_404(project_id)

@@ -43,6 +43,11 @@ class Tag(db.Model):
     """
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), unique=True, nullable=False)
+    
+    @property
+    def experience_count(self):
+        """Return the number of experiences using this tag"""
+        return len(self.experiences)
 
     def __repr__(self):
         return f'<Tag {self.name}>'
