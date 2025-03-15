@@ -80,14 +80,18 @@
 }
 @media (max-width: 879px) {
   .content-container {
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
+    overflow-y: visible;
+    -webkit-overflow-scrolling: auto;
+    height: auto !important;
+    max-height: none !important;
   }
 
   .experience-section {
     grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
     gap: 1rem;
     overflow-y: visible;
+    height: auto !important;
+    min-height: 0 !important;
   }
 
   .experience-section > * {
@@ -124,6 +128,7 @@
     padding: 1rem !important;
     transform: translateZ(0);
     -webkit-backface-visibility: hidden;
+    height: auto !important;
   }
   
   .experience-content, 

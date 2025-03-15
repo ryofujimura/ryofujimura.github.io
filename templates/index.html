@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <title>Ryo Fujimura</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/portfolio.css') }}">
@@ -12,6 +12,7 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='css/mobile.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/toothin.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/popup.css') }}">
+  <script src="{{ url_for('static', filename='js/ios-fix.js') }}"></script>
   
   <style>
     /* Global tooltip container and tooltip styles */
@@ -53,6 +54,20 @@
       border-width: 8px 8px 0;
       border-style: solid;
       border-color: rgba(0, 0, 0, 0.85) transparent transparent transparent;
+    }
+    
+    /* iOS-specific styles to prevent nested scrolling */
+    @supports (-webkit-touch-callout: none) {
+      .content-wrapper {
+        overflow: visible !important;
+        height: auto !important;
+        min-height: 100%;
+      }
+      
+      .experience-section-container {
+        height: auto !important;
+        overflow: visible !important;
+      }
     }
   </style>
 </head>

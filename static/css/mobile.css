@@ -1,16 +1,28 @@
 /* Updated CSS for Mobile View */
 
-
 @media (max-width: 879px) {
   .content-container {
     border-radius: 15px;
-    overflow-y: auto;
+    overflow-y: visible;
+    height: auto !important;
+    max-height: none !important;
     -webkit-overflow-scrolling: touch;
   }
+  
+  .experience-section-container {
+    padding: 20px;
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+  
   .experience-section {
     max-width: 100%;
     overflow-x: hidden;
     overflow-y: visible;
+    display: grid;
+    height: auto !important;
+    min-height: 0 !important;
   }
   
   .project-item {
@@ -136,9 +148,11 @@
   
   .main-section {
     margin: auto;
-    max-width: 537.312px ;
+    max-width: 537.312px;
     padding: 0 5% 5% 5%;
     background-color: #FCFCFC;
+    height: auto !important;
+    overflow: visible !important;
   }
 
   .filter-section {
@@ -153,4 +167,41 @@
     margin: 0px;
     /* justify-content: center; */
   }  
+}
+
+/* Fix for nested scrolling on iOS specifically */
+@supports (-webkit-touch-callout: none) {
+  /* CSS specific to iOS devices */ 
+  body, html {
+    height: 100%;
+    position: relative;
+    overflow-x: hidden;
+  }
+  
+  .content-wrapper {
+    min-height: 100%;
+    height: auto !important;
+    overflow: visible !important;
+  }
+  
+  .layout-container {
+    height: auto !important;
+    overflow: visible !important;
+  }
+  
+  .content-container {
+    height: auto !important;
+    overflow: visible !important;
+    -webkit-overflow-scrolling: auto !important;
+  }
+  
+  .experience-section-container {
+    height: auto !important;
+    overflow: visible !important;
+  }
+  
+  .experience-section {
+    height: auto !important;
+    overflow: visible !important;
+  }
 }
