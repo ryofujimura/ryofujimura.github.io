@@ -4,11 +4,28 @@
 @media (max-width: 879px) {
   .content-container {
     border-radius: 15px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
   .experience-section {
     max-width: 100%;
     overflow-x: hidden;
+    overflow-y: visible;
   }
+  
+  .project-item {
+    overflow: visible !important;
+    height: auto !important;
+    min-height: 0 !important;
+  }
+  
+  .outer {
+    overflow: visible !important;
+    position: relative !important;
+    transform: translateZ(0);
+    -webkit-backface-visibility: hidden;
+  }
+
   .layout-container {
     flex-direction: column;
     height: auto;

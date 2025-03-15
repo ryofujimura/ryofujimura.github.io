@@ -80,20 +80,23 @@
 }
 @media (max-width: 879px) {
   .content-container {
-    overflow-y: hidden;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
 
   .experience-section {
     grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
     gap: 1rem;
+    overflow-y: visible;
   }
 
   .experience-section > * {
     aspect-ratio: 1 / 1;
+    overflow: visible !important;
   }
 
   .experience-image-container {
-    display: block !important; /* Force display on mobile */
+    display: block !important;
     position: absolute !important;
     top: 0 !important;
     left: 0 !important;
@@ -106,23 +109,23 @@
     margin: 0 !important;
     padding: 0 !important;
     border: none !important;
-    opacity: 0.08; /* Very low opacity as requested - adjusted for better visibility */
-    object-fit: cover !important; /* Cover the entire tile */
+    opacity: 0.08;
+    object-fit: cover !important;
     object-position: center !important;
-    z-index: 0; /* Behind the content */
+    z-index: 0;
     box-sizing: border-box !important;
   }
   
-  /* Ensure the outer container properly displays the content and background */
   .outer {
     position: relative !important;
     box-sizing: border-box !important;
     border-radius: 15px !important;
-    overflow: hidden !important;
-    padding: 1rem !important; /* Add padding for content spacing */
+    overflow: visible !important;
+    padding: 1rem !important;
+    transform: translateZ(0);
+    -webkit-backface-visibility: hidden;
   }
   
-  /* Make sure content appears on top of the background image */
   .experience-content, 
   .experience-type, 
   .experience-shortdes, 
