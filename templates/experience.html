@@ -5,11 +5,18 @@
       {% if experiences %}
       {% for exp in experiences %}
       <div id="project-{{ loop.index }}" class="outer project-item" data-project-id="{{ exp.id }}">
-        <div class="experience-image-container">
+        {% if exp.images and exp.images.split(',') | length > 1 %}
+          <!-- Display the second image if available -->
+          <img 
+            class="experience-image-container"
+            src="{{ url_for('static', filename='images/' + exp.images.split(',')[1]) }}" 
+            alt="Experience Image">
+        {% else %}
+          <!-- Fall back to main image if no second image -->
           <img 
             src="{{ url_for('static', filename='images/' + (exp.main_image or 'default_image.png')) }}" 
             alt="Experience Image">
-        </div>
+        {% endif %}
         <div class="experience-content">
           <div class="experience-title">{{ exp.title }}</div>
           <div class="experience-subtitle">{{ exp.subtitle }}</div>
@@ -88,7 +95,7 @@
 
 <script>
   // Store experience data in a JavaScript object for easy access
-  const projectsData = [
+  window.projectsData = [
     {% for exp in experiences %}
     {
       id: {{ exp.id }},
@@ -106,6 +113,9 @@
     }{% if not loop.last %},{% endif %}
     {% endfor %}
   ];
+
+  // Initialize filtering state
+  window.activeTag = null;
 
   // Get the modal
   const modal = document.getElementById("projectModal");
@@ -142,10 +152,58 @@
       closeModal(false); // don't update URL as it's already changed
     }
   });
+
+  // Function to filter projects by tag
+  window.filterByTag = function(tagName) {
+    const experienceSection = document.querySelector('.experience-section');
+    
+    // If clicking the already active tag, deactivate it
+    if (window.activeTag === tagName) {
+      window.activeTag = null;
+      // Remove active class from all tag buttons
+      document.querySelectorAll('.tag-button').forEach(btn => {
+        btn.classList.remove('active-filter');
+      });
+      // Show all projects
+      projectItems.forEach(item => {
+        item.classList.remove('filtered-hidden');
+      });
+      // Remove filtering-active class
+      experienceSection.classList.remove('filtering-active');
+      return;
+    }
+    
+    // Set the new active tag
+    window.activeTag = tagName;
+    
+    // Update active state on filter buttons
+    document.querySelectorAll('.tag-button').forEach(btn => {
+      if (btn.getAttribute('data-tag') === tagName) {
+        btn.classList.add('active-filter');
+      } else {
+        btn.classList.remove('active-filter');
+      }
+    });
+    
+    // Add filtering-active class
+    experienceSection.classList.add('filtering-active');
+    
+    // Filter the project items based on the tag
+    projectItems.forEach(item => {
+      const projectId = item.getAttribute('data-project-id');
+      const project = window.projectsData.find(p => p.id == projectId);
+      
+      if (project && project.tags.includes(tagName)) {
+        item.classList.remove('filtered-hidden');
+      } else {
+        item.classList.add('filtered-hidden');
+      }
+    });
+  }
   
   function openModal(projectId, updateURL) {
     // Find the project data
-    const project = projectsData.find(p => p.id == projectId);
+    const project = window.projectsData.find(p => p.id == projectId);
     if (!project) return;
     
     // Update URL if requested
@@ -158,11 +216,6 @@
     document.getElementById("modal-subtitle").textContent = project.subtitle;
     document.getElementById("modal-term").textContent = project.term;
     document.getElementById("modal-description").innerHTML = `<p>${project.longDescription}</p>`;
-    
-    // // Main image
-    // document.getElementById("modal-main-image").innerHTML = `
-    //   <img src="/static/images/${project.mainImage}" alt="${project.title}">
-    // `;
     
     // Description
     document.getElementById("modal-description").innerHTML = `

@@ -34,6 +34,41 @@
   aspect-ratio: 1 / 1;
 }
 
+#project-1:hover .experience-content,
+#project-1:hover .experience-type,
+#project-1:hover .experience-shortdes,
+#project-1:hover .experience-link-images,
+#project-1:hover .experience-images,
+#project-1:hover .experience-links {
+  display: none;
+}
+
+#project-1:hover {
+  display: unset;
+  grid-template-rows: 1fr;
+  grid-template-columns: 1fr;
+  padding: unset;
+  gap: unset;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+}
+
+#project-1:hover .experience-image-container {
+  display: unset;
+  grid-template-rows: unset;
+  grid-template-columns: unset;
+  height: auto;
+  object-fit: contain;
+  overflow: hidden;
+  align-items: center;
+}
+#project-1:hover .experience-section img {
+  aspect-ratio: original;
+  max-width: unset;
+  height: unset;
+}
+
 
 @media (max-width: 571px) {
   .experience-section {
@@ -81,11 +116,11 @@
   border: 2px solid #0d9118;
 }
 
-.experience-image-container img {
+/* .experience-image-container img {
   width: 100%;
   height: auto;
   object-fit: contain;
-}
+} */
 
 .experience-term {
   font-size: 1rem;
