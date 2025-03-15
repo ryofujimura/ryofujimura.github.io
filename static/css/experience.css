@@ -29,7 +29,6 @@
   gap: 1rem;
 }
 
-
 .experience-section > * {
   aspect-ratio: 1 / 1;
 }
@@ -69,7 +68,6 @@
   height: unset;
 }
 
-
 @media (max-width: 571px) {
   .experience-section {
     grid-template-columns: repeat(auto-fit, minmax(50px, 1fr));
@@ -93,12 +91,56 @@
   .experience-section > * {
     aspect-ratio: 1 / 1;
   }
+
+  .experience-image-container {
+    display: block !important; /* Force display on mobile */
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    max-width: 100% !important;
+    max-height: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    opacity: 0.08; /* Very low opacity as requested - adjusted for better visibility */
+    object-fit: cover !important; /* Cover the entire tile */
+    object-position: center !important;
+    z-index: 0; /* Behind the content */
+    box-sizing: border-box !important;
+  }
+  
+  /* Ensure the outer container properly displays the content and background */
+  .outer {
+    position: relative !important;
+    box-sizing: border-box !important;
+    border-radius: 15px !important;
+    overflow: hidden !important;
+    padding: 1rem !important; /* Add padding for content spacing */
+  }
+  
+  /* Make sure content appears on top of the background image */
+  .experience-content, 
+  .experience-type, 
+  .experience-shortdes, 
+  .experience-link-images, 
+  .experience-images,
+  .experience-links,
+  .experience-tags {
+    position: relative;
+    z-index: 1;
+  }
 }
 
 .outer {
   /* aspect-ratio: 1; */
   overflow-y: clip;
   overflow-x: clip;
+  position: relative;
+  transition: all 0.3s ease;
 }
 
 .work {
@@ -1097,3 +1139,78 @@
   #project-10 .experience-images {
     display: none;
   }
+
+/* ===================== HOVER AND MOBILE EFFECTS ===================== */
+
+/* Style for background image on mobile with low opacity */
+.experience-image-container {
+  display: none; /* Hidden by default on desktop */
+  transition: opacity 0.3s ease;
+  /* Set explicit box-sizing */
+  box-sizing: border-box;
+}
+
+/* Hover effect styles for all projects - Override ALL padding/styling */
+/* Hide regular content on hover */
+.outer:hover .experience-content,
+.outer:hover .experience-type,
+.outer:hover .experience-shortdes,
+.outer:hover .experience-link-images,
+.outer:hover .experience-images,
+.outer:hover .experience-links,
+.outer:hover .experience-tags {
+  display: none !important; /* Use !important to override specific project styles */
+}
+
+.outer:hover {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  overflow: hidden !important;
+  padding: 0 !important; /* Remove any padding */
+  margin: 0 !important; /* Remove any margins */
+  border-radius: 15px; /* Maintain the rounded corners */
+  /* Reset grid settings that might be interfering */
+  grid-template-rows: unset !important;
+  grid-template-columns: unset !important;
+  gap: 0 !important;
+  /* Ensure position and size */
+  position: relative !important;
+  width: 100% !important;
+  height: 100% !important;
+  /* Force box-sizing */
+  box-sizing: border-box !important;
+}
+
+/* Add a clear rule for ALL project-specific hover styling to ensure it's overridden */
+[id^="project-"]:hover {
+  padding: 0 !important;
+  margin: 0 !important;
+  grid-template-rows: unset !important;
+  grid-template-columns: unset !important;
+  gap: 0 !important;
+  display: flex !important;
+  position: relative !important;
+}
+
+/* Make sure the image has no constraints */
+.outer:hover .experience-image-container {
+  display: block !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  opacity: 1 !important;
+  object-fit: cover !important;
+  object-position: center !important;
+  z-index: 2 !important;
+  box-sizing: border-box !important;
+}
