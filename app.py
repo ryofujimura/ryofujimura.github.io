@@ -1,15 +1,42 @@
-import os, requests
-from flask import Flask, render_template
+import os, requests, json
+from flask import Flask, render_template, request, redirect, url_for, flash, session
 from models import db, Profile, Experience, Tag, ExperienceType
 from sqlalchemy import func
+from functools import wraps
+from pathlib import Path
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 app = Flask(__name__)
+
+# Secret key for sessions and flash messages
+app.secret_key = os.environ.get('SECRET_KEY', 'dev_key_for_development')
 
 # Configure SQLite database (relative path)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///local_database.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db.init_app(app)
+
+# Admin credentials - in production, use environment variables
+ADMIN_USERNAME = os.environ.get('ADMIN_USERNAME', 'admin')
+ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD', 'password')
+
+# Ensure data directory exists
+DATA_DIR = Path('data')
+DATA_DIR.mkdir(exist_ok=True)
+
+# Login required decorator
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'logged_in' not in session:
+            flash('Please log in to access this page', 'danger')
+            return redirect(url_for('admin_login'))
+        return f(*args, **kwargs)
+    return decorated_function
 
 def get_or_create_experience_type(name):
     """
@@ -33,6 +60,17 @@ def get_or_create_tag(tag_name):
         db.session.commit()
     return t
 
+def load_json_data(file_path):
+    """
+    Load data from a JSON file
+    """
+    try:
+        with open(file_path, 'r') as file:
+            return json.load(file)
+    except (FileNotFoundError, json.JSONDecodeError) as e:
+        print(f"Error loading JSON data from {file_path}: {e}")
+        return None
+
 @app.before_request
 def create_tables():
     """
@@ -46,175 +84,86 @@ def seed_data():
     Populates the database with initial data if it doesn't already exist.
     Prevents duplicate insertions by checking if records exist first.
     """
+    # Ensure JSON files exist
+    experiences_json = Path('data/experiences.json')
+    profile_json = Path('data/profile.json')
+    
+    if not experiences_json.exists():
+        with open(experiences_json, 'w') as f:
+            json.dump({"experiences": []}, f, indent=4)
+            
+    if not profile_json.exists():
+        with open(profile_json, 'w') as f:
+            json.dump({"profile": {
+                "name": "Ryo ",
+                "title": "Software Engineer",
+                "bio": "Aspiring CS student with expertise in AI, data engineering, and software solutions.",
+                "img_path": "/static/images/ryosketch-1.png"
+            }}, f, indent=4)
+    
+    # Seed Profile data
     if not Profile.query.first():
-        profile = Profile(
-            name="Ryo ",
-            title="Software Engineer",
-            bio="Aspiring CS student with expertise in AI, data engineering, and software solutions.",
-            img_path="/static/images/ryosketch-1.png"
-        )
-        db.session.add(profile)
-        db.session.commit()
+        profile_data = load_json_data('data/profile.json')
+        if profile_data and 'profile' in profile_data:
+            profile = Profile(
+                name=profile_data['profile'].get('name', ''),
+                title=profile_data['profile'].get('title', ''),
+                bio=profile_data['profile'].get('bio', ''),
+                img_path=profile_data['profile'].get('img_path', '')
+            )
+            db.session.add(profile)
+            db.session.commit()
 
+    # Skip if experiences already exist
     if Experience.query.first():
         return
 
-    data = {
-        "experiences": [
-            {
-                "experience_type": "Work",
-                "title": "Software Engineer Intern",
-                "subtitle": "American Honda Motor Company, Inc.",
-                "term": "June 2024 - August 2024",
-                "short_description": "Researched on-device generative AI for automotive applications. Developed and demonstrated AI features on an NVIDIA Jetson Orin Nano 8GB using Linux, CUDA, and Meta's Llama 3 model.",
-                    "long_description": (
-                    "Conducted comprehensive research on on-device generative AI, focusing on its potential applications within the automotive industry to enhance vehicle functionalities. Developed and demonstrated applications on an NVIDIA Jetson Orin Nano 8GB using Linux and CUDA, showcasing on-device generative AI capabilities with Meta's Llama 3 model."
-                ),
-                "links": [
-                    "/static/images/HondaDigitalServiceDevelopment-2024SummerInternProjectReport.pdf",
-                    "https://www.honda.com/"
-                ],
-                "link_images": [
-                    "resume.png",
-                    "honda.svg"
-                ],
-                "images": [
-                    "hondalogo.svg", "honda_1.jpg", "honda_2.jpg", "honda_3.jpg"
-                ],
-                "tags": ["honda", "hardware_and_systems", "ai_and_algorithms", "automotive", "profit", "cs_research", "team_collaboration"]
-            },
-            {
-                "experience_type": "Work",
-                "title": "Co-PM / Developer",
-                "subtitle": "Matcha Time",
-                "term": "March 2024 - April 2024",
-                "short_description": "Swift/SwiftUI project with multi-city sync.",
-                "long_description": (
-                    "Developed and created application functions with Swift/SwiftUI, implemented multi-city synchronization, designed and tested features, fixed bugs, and deployed solutions. Planned and completed the project in 4 weeks, launched the application on the Mac App Store."
-                ),
-                "links": [
-                    "https://apps.apple.com/us/app/matcha-time/id6497067918?mt=12",
-                    "https://www.moyaifujimura.com/work/matcha-time"
-                ],
-                "link_images": [
-                    "appstorelogo.svg",
-                    "moyai_1.jpeg"
-                ],
-                "images": [
-                    "matchatime.svg","matchatime_1.jpg", "matchatime_2.jpg", "matchatime_3.jpg"
-                ],
-                "tags": ["apple_development", "project_leadership", "product_deployment"]
-            },
-            {
-                "experience_type": "Publication",
-                "title": "Custom Input Device",
-                "subtitle": "Research Paper",
-                "term": "Febuary 2025",
-                "short_description": "Ergonomic mouse by reconfiguring a standard mouse's internal components and housing them in a custom 3D-printed shell tailored to the user's hand.",
-                "long_description": (
-                    "This project focuses on developing a customized input device by reengineering a standard mouse to better suit individual ergonomic needs. Using a BambuLab A1 Mini 3D printer and PLA filament, a lightweight and personalized mouse shell was designed and fabricated to precisely fit the user's hand. The work demonstrates the feasibility of adapting off-the-shelf hardware into bespoke solutions, offering potential applications in personalized ergonomics and robotic system integration. By combining 3D printing with hardware reconfiguration, this project highlights the possibilities for creating tailored, user-centric devices."
-                ),
-                "links": [
-                    "https://drive.google.com/file/d/1vRWFlfFa8N1zJt2LPrJAcNOIH81A1COB/view?usp=sharing"
-                ],
-                "link_images": [
-                    "resume.png",
-                ],
-                "images": [
-                    "3dprint.png", "3dprint_1.jpeg", "3dprint_2.jpeg", "3dprint_3.jpeg", "3dprint_4.jpeg", "3dprint_5.jpeg"
-                ],
-                "tags": ["cs_research", "3d_printing", "hardware", "ergonomics", "robotics"]
-            },
-            {
-                "experience_type": "Work",
-                "title": "Data Engineer",
-                "subtitle": "CUSCO USA Inc.",
-                "term": "October 2021 - Present",
-                "short_description": "Led a team to develop Python apps extracting data from thousands of PDFs.",
-                "long_description": (
-                    "Led a three-member team in developing a Python application that extracted data from 11,560 archived PDF files, utilizing advanced software development methodologies. Demonstrated proficiency in testing and development, including creation of comprehensive test cases to ensure software quality. Enhanced user access to historical data dating back to 1977, resulting in a 30% revenue increase by enabling retrieval of previously inaccessible info."
-                ),
-                "links": [
-                    "https://cuscousainc.com/support/vehicle-specific-catalogs"
-                ],
-                "link_images": [
-                    "cusco_c.svg",
-                ],
-                "images": [
-                    "cusco.svg", "cusco_1.jpg", "cusco_2.jpg", "cusco_3.jpg"
-                ],
-                "tags": ["python", "project_leadership", "adobe", "data_management", "profit", "google_drive", "automotive"]
-            },
-            {
-                "experience_type": "Project",
-                "title": "Developer",
-                "subtitle": "Poker Percentage",
-                "term": "January 2022 - April 2024",
-                "short_description": "WatchOS app for real-time poker odds.",
-                "long_description": (
-                    "Developed a poker percentage calculator application for watchOS using Swift and WatchKit, facilitating real-time calculation of odds and probabilities. Improved user decision-making by providing accurate insights into poker hands, resulting in a 15% increase in win rates."
-                ),
-                "links": [
-                    "https://apps.apple.com/us/app/poker-pocket-odds/id6499280318",
-                ],
-                "link_images": [
-                    "poker.png",
-                ],
-                "images": [
-                    "poker.png", "poker_1.jpg", "poker_2.jpg", "poker_3.jpg", "poker_4.jpg"
-                ],
-                "tags": ["apple_development", "project_leadership", "product_deployment", "ai_and_algorithms"]
-            },
-            {
-                # koko
-                "experience_type": "Project",
-                "title": "Project Leader",
-                "subtitle": "Shohei Home Ground",
-                "term": "March 2023 - November 2023",
-                "short_description": "Automated Instagram posting, grew 11k followers.",
-                "long_description": (
-                    "Engineered and deployed a streamlined content scheduling and posting process using Python and the Instagram API, achieving 685 posts and increasing followers by 11,000 in 8 months. Transformed the project from a non-revenue-generating initiative to a profitable venture."
-                ),
-                "links": [
-                    "https://www.instagram.com/shoheihomeground/"
-                ],
-                "link_images": [
-                    "shohei_icon.svg"
-                ],
-                "images": [
-                    "shoheihomeground.svg", "shoheihomeground_1.jpg", "shoheihomeground_2.jpg", "shoheihomeground_3.jpg"
-                ],
-                "tags": ["python", "project_leadership", "profit", "instagram", "api", "automation", "photography"]
-            },
-            {
-                "experience_type": "Publication",
-                "title": "6G and Blockchain",
-                "subtitle": "Research Paper",
-                "term": "September 2024",
-                "short_description": "Research on AWS & Blockchain for 6G networks.",
-                "long_description": (
-                    "Title: 6G Network and Data Management with Blockchain. Explored emerging paradigms in 6G networking and how blockchain can enhance data management and security. Evaluated AWS-based solutions for distributed infrastructures."
-                ),
-                "links": [
-                    "https://drive.google.com/file/d/1LTF__g_qyuyI3-H3hHJsZfPw10Vxv3v5/view?usp=sharing",
-                    "https://docs.google.com/document/d/1K49_6etVnN7hcCNUc1l-0wJpp3B-NT9J/edit?usp=sharing"
-                ],
-                "link_images": [
-                    "poster_icon.svg",
-                    "resume.png"
-                ],
-                "images": [
-                    "poster_icon.svg", "6GBlockchain_1.jpg", "6GBlockchain_2.jpg", "6GBlockchain_3.jpg"
-                ],
-                "tags": ["cs_research", "blockchain", "networking"]
-            }
-        ]
-    }
-
+    # Load experience data from JSON file
+    data = load_json_data('data/experiences.json')
+    if not data or 'experiences' not in data:
+        print("No experience data found or invalid data format.")
+        return
+    
+    if not data['experiences']:
+        print("No experiences in the JSON file.")
+        return
 
     # Insert the experiences from our data
     for item in data["experiences"]:
         etype = get_or_create_experience_type(item["experience_type"])
+        
+        # Properly handle links, link_images, and images from JSON
+        links = item.get("links", [])
+        # Flatten any lists that may contain newline-separated values
+        flattened_links = []
+        for link in links:
+            if '\n' in link or '\r' in link:
+                # Split by newlines and add each item
+                for sublink in link.replace('\r', '').split('\n'):
+                    if sublink.strip():
+                        flattened_links.append(sublink.strip())
+            else:
+                flattened_links.append(link.strip())
+        
+        link_images = item.get("link_images", [])
+        flattened_link_images = []
+        for img in link_images:
+            if '\n' in img or '\r' in img:
+                for subimg in img.replace('\r', '').split('\n'):
+                    if subimg.strip():
+                        flattened_link_images.append(subimg.strip())
+            else:
+                flattened_link_images.append(img.strip())
+        
+        images = item.get("images", [])
+        flattened_images = []
+        for img in images:
+            if '\n' in img or '\r' in img:
+                for subimg in img.replace('\r', '').split('\n'):
+                    if subimg.strip():
+                        flattened_images.append(subimg.strip())
+            else:
+                flattened_images.append(img.strip())
         
         exp = Experience(
             experience_type_id=etype.id,
@@ -224,9 +173,9 @@ def seed_data():
             short_description=item.get("short_description"),
             long_description=item.get("long_description"),
             # main_image=item.get("main_image", "default_image.png"),  # Use a default image if none is provided
-            links=",".join(item.get("links", [])),  # Convert list to comma-separated string
-            link_images=",".join(item.get("link_images", [])),
-            images=",".join(item.get("images", [])),
+            links=",".join(flattened_links),  # Use flattened list
+            link_images=",".join(flattened_link_images),  # Use flattened list
+            images=",".join(flattened_images),  # Use flattened list
         )
 
         db.session.add(exp)
@@ -353,6 +302,201 @@ def project_detail(project_id):
     # Pass the direct project ID to the template
     return render_template('index.html', profile=profile, experiences=experiences, 
                           tags=tags, direct_project_id=project_id)
+
+@app.route('/admin/login', methods=['GET', 'POST'])
+def admin_login():
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+        
+        if username == ADMIN_USERNAME and password == ADMIN_PASSWORD:
+            session['logged_in'] = True
+            flash('You are now logged in', 'success')
+            return redirect(url_for('admin_dashboard'))
+        else:
+            flash('Invalid credentials', 'danger')
+    
+    return render_template('admin/login.html')
+
+@app.route('/admin/logout')
+def admin_logout():
+    session.clear()
+    flash('You have been logged out', 'success')
+    return redirect(url_for('admin_login'))
+
+@app.route('/admin')
+@login_required
+def admin_dashboard():
+    experiences = Experience.query.all()
+    return render_template('admin/dashboard.html', experiences=experiences)
+
+@app.route('/admin/experience/new', methods=['GET', 'POST'])
+@login_required
+def admin_new_experience():
+    if request.method == 'POST':
+        # Get experience type or create new one
+        exp_type_name = request.form.get('experience_type')
+        exp_type = get_or_create_experience_type(exp_type_name)
+        
+        # Process links, link_images, and images - convert line breaks to commas
+        links = request.form.get('links', '').replace('\r', '').split('\n')
+        links = [link.strip() for link in links if link.strip()]
+        
+        link_images = request.form.get('link_images', '').replace('\r', '').split('\n')
+        link_images = [img.strip() for img in link_images if img.strip()]
+        
+        images = request.form.get('images', '').replace('\r', '').split('\n')
+        images = [img.strip() for img in images if img.strip()]
+        
+        # Create new experience
+        exp = Experience(
+            experience_type_id=exp_type.id,
+            title=request.form.get('title'),
+            subtitle=request.form.get('subtitle'),
+            term=request.form.get('term'),
+            short_description=request.form.get('short_description'),
+            long_description=request.form.get('long_description'),
+            links=','.join(links),
+            link_images=','.join(link_images),
+            images=','.join(images)
+        )
+        
+        db.session.add(exp)
+        db.session.flush()  # Get ID before committing
+        
+        # Handle tags
+        tags = request.form.get('tags', '').split(',')
+        tags = [tag.strip() for tag in tags if tag.strip()]
+        
+        for tag_name in tags:
+            tag_obj = get_or_create_tag(tag_name)
+            exp.tags.append(tag_obj)
+        
+        db.session.commit()
+        flash('Experience added successfully', 'success')
+        
+        # Update JSON file
+        save_experiences_to_json()
+        
+        return redirect(url_for('admin_dashboard'))
+    
+    # For GET request
+    experience_types = ExperienceType.query.all()
+    tags = Tag.query.all()
+    return render_template('admin/experience_form.html', 
+                          experience=None, 
+                          experience_types=experience_types,
+                          tags=tags)
+
+@app.route('/admin/experience/edit/<int:exp_id>', methods=['GET', 'POST'])
+@login_required
+def admin_edit_experience(exp_id):
+    exp = Experience.query.get_or_404(exp_id)
+    
+    if request.method == 'POST':
+        # Get experience type or create new one
+        exp_type_name = request.form.get('experience_type')
+        exp_type = get_or_create_experience_type(exp_type_name)
+        
+        # Process links, link_images, and images - convert line breaks to commas
+        links = request.form.get('links', '').replace('\r', '').split('\n')
+        links = [link.strip() for link in links if link.strip()]
+        
+        link_images = request.form.get('link_images', '').replace('\r', '').split('\n')
+        link_images = [img.strip() for img in link_images if img.strip()]
+        
+        images = request.form.get('images', '').replace('\r', '').split('\n')
+        images = [img.strip() for img in images if img.strip()]
+        
+        # Update experience
+        exp.experience_type_id = exp_type.id
+        exp.title = request.form.get('title')
+        exp.subtitle = request.form.get('subtitle')
+        exp.term = request.form.get('term')
+        exp.short_description = request.form.get('short_description')
+        exp.long_description = request.form.get('long_description')
+        exp.links = ','.join(links)
+        exp.link_images = ','.join(link_images)
+        exp.images = ','.join(images)
+        
+        # Clear existing tags
+        exp.tags = []
+        
+        # Handle tags
+        tags = request.form.get('tags', '').split(',')
+        tags = [tag.strip() for tag in tags if tag.strip()]
+        
+        for tag_name in tags:
+            tag_obj = get_or_create_tag(tag_name)
+            exp.tags.append(tag_obj)
+        
+        db.session.commit()
+        flash('Experience updated successfully', 'success')
+        
+        # Update JSON file
+        save_experiences_to_json()
+        
+        return redirect(url_for('admin_dashboard'))
+    
+    # For GET request
+    experience_types = ExperienceType.query.all()
+    tags = Tag.query.all()
+    current_tags = ','.join([tag.name for tag in exp.tags])
+    return render_template('admin/experience_form.html', 
+                          experience=exp, 
+                          experience_types=experience_types,
+                          tags=tags,
+                          current_tags=current_tags)
+
+@app.route('/admin/experience/delete/<int:exp_id>', methods=['POST'])
+@login_required
+def admin_delete_experience(exp_id):
+    exp = Experience.query.get_or_404(exp_id)
+    db.session.delete(exp)
+    db.session.commit()
+    flash('Experience deleted successfully', 'success')
+    
+    # Update JSON file
+    save_experiences_to_json()
+    
+    return redirect(url_for('admin_dashboard'))
+
+def save_experiences_to_json():
+    """Save all experiences from the database to the JSON file"""
+    experiences = Experience.query.all()
+    data = {"experiences": []}
+    
+    for exp in experiences:
+        # Handle comma-separated lists properly
+        links = exp.links.split(',') if exp.links else []
+        links = [link.strip() for link in links if link.strip()]
+        
+        link_images = exp.link_images.split(',') if exp.link_images else []
+        link_images = [img.strip() for img in link_images if img.strip()]
+        
+        images = exp.images.split(',') if exp.images else []
+        images = [img.strip() for img in images if img.strip()]
+        
+        experience_data = {
+            "experience_type": exp.experience_type.name,
+            "title": exp.title,
+            "subtitle": exp.subtitle,
+            "term": exp.term,
+            "short_description": exp.short_description,
+            "long_description": exp.long_description,
+            "links": links,
+            "link_images": link_images,
+            "images": images,
+            "tags": [tag.name for tag in exp.tags]
+        }
+        data["experiences"].append(experience_data)
+    
+    try:
+        with open('data/experiences.json', 'w') as f:
+            json.dump(data, f, indent=4)
+        print("Experiences saved to JSON file")
+    except Exception as e:
+        print(f"Error saving experiences to JSON: {e}")
 
 if __name__ == '__main__':
     # Ensure the DB file can exist

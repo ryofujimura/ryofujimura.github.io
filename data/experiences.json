@@ -1,0 +1,203 @@
+{
+    "experiences": [
+        {
+            "experience_type": "Work",
+            "title": "Software Engineer Intern",
+            "subtitle": "American Honda Motor Company, Inc.",
+            "term": "June 2024 - August 2024",
+            "short_description": "Researched on-device generative AI for automotive applications. Developed and demonstrated AI features on an NVIDIA Jetson Orin Nano 8GB using Linux, CUDA, and Meta's Llama 3 model.",
+            "long_description": "Conducted comprehensive research on on-device generative AI, focusing on its potential applications within the automotive industry to enhance vehicle functionalities. Developed and demonstrated applications on an NVIDIA Jetson Orin Nano 8GB using Linux and CUDA, showcasing on-device generative AI capabilities with Meta's Llama 3 model.",
+            "links": [
+                "/static/images/HondaDigitalServiceDevelopment-2024SummerInternProjectReport.pdf",
+                "https://www.honda.com/"
+            ],
+            "link_images": [
+                "resume.png",
+                "honda.svg"
+            ],
+            "images": [
+                "hondalogo.svg",
+                "honda_1.jpg",
+                "honda_2.jpg",
+                "honda_3.jpg"
+            ],
+            "tags": [
+                "honda",
+                "hardware_and_systems",
+                "ai_and_algorithms",
+                "automotive",
+                "profit",
+                "cs_research",
+                "team_collaboration"
+            ]
+        },
+        {
+            "experience_type": "Work",
+            "title": "Co-PM / Developer",
+            "subtitle": "Matcha Time",
+            "term": "March 2024 - April 2024",
+            "short_description": "Swift/SwiftUI project with multi-city sync.",
+            "long_description": "Developed and created application functions with Swift/SwiftUI, implemented multi-city synchronization, designed and tested features, fixed bugs, and deployed solutions. Planned and completed the project in 4 weeks, launched the application on the Mac App Store.",
+            "links": [
+                "https://apps.apple.com/us/app/matcha-time/id6497067918?mt=12",
+                "https://www.moyaifujimura.com/work/matcha-time"
+            ],
+            "link_images": [
+                "appstorelogo.svg",
+                "moyai_1.jpeg"
+            ],
+            "images": [
+                "matchatime.svg",
+                "matchatime_1.jpg",
+                "matchatime_2.jpg",
+                "matchatime_3.jpg"
+            ],
+            "tags": [
+                "apple_development",
+                "project_leadership",
+                "product_deployment"
+            ]
+        },
+        {
+            "experience_type": "Publication",
+            "title": "Custom Input Device",
+            "subtitle": "Research Paper",
+            "term": "Febuary 2025",
+            "short_description": "Ergonomic mouse by reconfiguring a standard mouse's internal components and housing them in a custom 3D-printed shell tailored to the user's hand.",
+            "long_description": "This project focuses on developing a customized input device by reengineering a standard mouse to better suit individual ergonomic needs. Using a BambuLab A1 Mini 3D printer and PLA filament, a lightweight and personalized mouse shell was designed and fabricated to precisely fit the user's hand. The work demonstrates the feasibility of adapting off-the-shelf hardware into bespoke solutions, offering potential applications in personalized ergonomics and robotic system integration. By combining 3D printing with hardware reconfiguration, this project highlights the possibilities for creating tailored, user-centric devices.",
+            "links": [
+                "https://drive.google.com/file/d/1vRWFlfFa8N1zJt2LPrJAcNOIH81A1COB/view?usp=sharing"
+            ],
+            "link_images": [
+                "resume.png"
+            ],
+            "images": [
+                "3dprint.png",
+                "3dprint_1.jpeg",
+                "3dprint_2.jpeg",
+                "3dprint_3.jpeg",
+                "3dprint_4.jpeg",
+                "3dprint_5.jpeg"
+            ],
+            "tags": [
+                "cs_research",
+                "3d_printing",
+                "hardware",
+                "ergonomics",
+                "robotics"
+            ]
+        },
+        {
+            "experience_type": "Work",
+            "title": "Data Engineer",
+            "subtitle": "CUSCO USA Inc.",
+            "term": "October 2021 - Present",
+            "short_description": "Led a team to develop Python apps extracting data from thousands of PDFs.",
+            "long_description": "Led a three-member team in developing a Python application that extracted data from 11,560 archived PDF files, utilizing advanced software development methodologies. Demonstrated proficiency in testing and development, including creation of comprehensive test cases to ensure software quality. Enhanced user access to historical data dating back to 1977, resulting in a 30% revenue increase by enabling retrieval of previously inaccessible info.",
+            "links": [
+                "https://cuscousainc.com/support/vehicle-specific-catalogs"
+            ],
+            "link_images": [
+                "cusco_c.svg"
+            ],
+            "images": [
+                "cusco.svg",
+                "cusco_1.jpg",
+                "cusco_2.jpg",
+                "cusco_3.jpg"
+            ],
+            "tags": [
+                "automotive",
+                "profit",
+                "project_leadership",
+                "python",
+                "adobe",
+                "data_management",
+                "google_drive"
+            ]
+        },
+        {
+            "experience_type": "Project",
+            "title": "Developer",
+            "subtitle": "Poker Percentage",
+            "term": "January 2022 - April 2024",
+            "short_description": "WatchOS app for real-time poker odds.",
+            "long_description": "Developed a poker percentage calculator application for watchOS using Swift and WatchKit, facilitating real-time calculation of odds and probabilities. Improved user decision-making by providing accurate insights into poker hands, resulting in a 15% increase in win rates.",
+            "links": [
+                "https://apps.apple.com/us/app/poker-pocket-odds/id6499280318"
+            ],
+            "link_images": [
+                "poker.png"
+            ],
+            "images": [
+                "poker.png",
+                "poker_1.jpg",
+                "poker_2.jpg",
+                "poker_3.jpg",
+                "poker_4.jpg"
+            ],
+            "tags": [
+                "ai_and_algorithms",
+                "apple_development",
+                "project_leadership",
+                "product_deployment"
+            ]
+        },
+        {
+            "experience_type": "Project",
+            "title": "Project Leader",
+            "subtitle": "Shohei Home Ground",
+            "term": "March 2023 - November 2023",
+            "short_description": "Automated Instagram posting, grew 11k followers.",
+            "long_description": "Engineered and deployed a streamlined content scheduling and posting process using Python and the Instagram API, achieving 685 posts and increasing followers by 11,000 in 8 months. Transformed the project from a non-revenue-generating initiative to a profitable venture.",
+            "links": [
+                "https://www.instagram.com/shoheihomeground/"
+            ],
+            "link_images": [
+                "shohei_icon.svg"
+            ],
+            "images": [
+                "shoheihomeground.svg",
+                "shoheihomeground_1.jpg",
+                "shoheihomeground_2.jpg",
+                "shoheihomeground_3.jpg"
+            ],
+            "tags": [
+                "profit",
+                "project_leadership",
+                "python",
+                "instagram",
+                "api",
+                "automation",
+                "photography"
+            ]
+        },
+        {
+            "experience_type": "Publication",
+            "title": "6G and Blockchain",
+            "subtitle": "Research Paper",
+            "term": "September 2024",
+            "short_description": "Research on AWS & Blockchain for 6G networks.",
+            "long_description": "Title: 6G Network and Data Management with Blockchain. Explored emerging paradigms in 6G networking and how blockchain can enhance data management and security. Evaluated AWS-based solutions for distributed infrastructures.",
+            "links": [
+                "https://drive.google.com/file/d/1LTF__g_qyuyI3-H3hHJsZfPw10Vxv3v5/view?usp=sharing",
+                "https://docs.google.com/document/d/1K49_6etVnN7hcCNUc1l-0wJpp3B-NT9J/edit?usp=sharing"
+            ],
+            "link_images": [
+                "poster_icon.svg",
+                "resume.png"
+            ],
+            "images": [
+                "poster_icon.svg",
+                "6GBlockchain_1.jpg",
+                "6GBlockchain_2.jpg",
+                "6GBlockchain_3.jpg"
+            ],
+            "tags": [
+                "cs_research",
+                "blockchain",
+                "networking"
+            ]
+        }
+    ]
+}
