@@ -498,6 +498,14 @@ def save_experiences_to_json():
     except Exception as e:
         print(f"Error saving experiences to JSON: {e}")
 
+@app.route('/project/githubrepocounter')
+def github_repo_counter():
+    """
+    Serves the GitHub Repository Counter application
+    This dynamically pulls content from the GitHub repo when accessed
+    """
+    return render_template('github.html')
+
 if __name__ == '__main__':
     # Ensure the DB file can exist
     if not os.path.exists('local_database.db'):
