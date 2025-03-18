@@ -198,6 +198,32 @@
                 "blockchain",
                 "networking"
             ]
+        },
+        {
+            "experience_type": "Project",
+            "title": "Github Repo Counter",
+            "subtitle": "repo counter",
+            "term": "March 2025",
+            "short_description": "Counter for number of repos on GitHub.",
+            "long_description": "Counter for number of repos on GitHub. With personal access token, shows private and public repository count.",
+            "links": [
+                "/project/portfolio",
+                "https://github.com/ryofujimura/githubrepocounter"
+            ],
+            "link_images": [
+                "ryologo.svg",
+                "github.png"
+            ],
+            "images": [
+                "ryologo.svg",
+                "github.png"
+            ],
+            "tags": [
+                "web_app",
+                "personal_project",
+                "flask",
+                "python"
+            ]
         }
     ]
 }
