@@ -152,12 +152,13 @@
     margin: 0 !important;
     padding: 0 !important;
     border: none !important;
-    opacity: 0.08;
+    opacity: 0;
     object-fit: cover !important;
     object-position: center !important;
     z-index: 0;
     box-sizing: border-box !important;
     border-radius: 15px;
+    transition: opacity 0.3s ease;
   }
   
   .outer {
@@ -1243,10 +1244,26 @@
 
 /* Style for background image on mobile with low opacity */
 .experience-image-container {
-  display: none; /* Hidden by default on desktop */
-  transition: opacity 0.3s ease;
-  /* Set explicit box-sizing */
-  box-sizing: border-box;
+  display: block !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  opacity: 0;
+  object-fit: cover !important;
+  object-position: center !important;
+  z-index: 0;
+  box-sizing: border-box !important;
+  border-radius: 15px;
+  transition: opacity 0.3s ease; /* Add transition for smooth opacity change */
 }
 
 /* Hover effect styles for all projects - Override ALL padding/styling */
@@ -1312,4 +1329,5 @@
   object-position: center !important;
   z-index: 2 !important;
   box-sizing: border-box !important;
+  transition: opacity 0.3s ease; /* Ensure transition is also applied here */
 }
