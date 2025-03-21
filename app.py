@@ -1,10 +1,13 @@
-import os, requests, json
-from flask import Flask, render_template, request, redirect, url_for, flash, session
+import os, requests, json, sys
+from flask import Flask, render_template, request, redirect, url_for, flash, session, Blueprint, jsonify
 from models import db, Profile, Experience, Tag, ExperienceType
 from sqlalchemy import func
 from functools import wraps
 from pathlib import Path
 from dotenv import load_dotenv
+from werkzeug.middleware.dispatcher import DispatcherMiddleware
+from werkzeug.exceptions import NotFound
+from importlib import import_module
 
 # Load environment variables from .env file
 load_dotenv()
@@ -462,44 +465,45 @@ def admin_delete_experience(exp_id):
     return redirect(url_for('admin_dashboard'))
 
 def save_experiences_to_json():
-    """Save all experiences from the database to the JSON file"""
-    experiences = Experience.query.all()
-    data = {"experiences": []}
-    
-    for exp in experiences:
-        # Handle comma-separated lists properly
-        links = exp.links.split(',') if exp.links else []
-        links = [link.strip() for link in links if link.strip()]
-        
-        link_images = exp.link_images.split(',') if exp.link_images else []
-        link_images = [img.strip() for img in link_images if img.strip()]
-        
-        images = exp.images.split(',') if exp.images else []
-        images = [img.strip() for img in images if img.strip()]
-        
-        experience_data = {
-            "experience_type": exp.experience_type.name,
-            "title": exp.title,
-            "subtitle": exp.subtitle,
-            "term": exp.term,
-            "short_description": exp.short_description,
-            "long_description": exp.long_description,
-            "links": links,
-            "link_images": link_images,
-            "images": images,
-            "tags": [tag.name for tag in exp.tags]
-        }
-        data["experiences"].append(experience_data)
-    
+    """
+    Save all experiences to the JSON file.
+    """
     try:
+        experiences = Experience.query.all()
+        data = {"experiences": []}
+        
+        for exp in experiences:
+            # Handle comma-separated lists properly
+            links = exp.links.split(',') if exp.links else []
+            links = [link.strip() for link in links if link.strip()]
+            
+            link_images = exp.link_images.split(',') if exp.link_images else []
+            link_images = [img.strip() for img in link_images if img.strip()]
+            
+            images = exp.images.split(',') if exp.images else []
+            images = [img.strip() for img in images if img.strip()]
+            
+            experience_data = {
+                "experience_type": exp.experience_type.name,
+                "title": exp.title,
+                "subtitle": exp.subtitle,
+                "term": exp.term,
+                "short_description": exp.short_description,
+                "long_description": exp.long_description,
+                "links": links,
+                "link_images": link_images,
+                "images": images,
+                "tags": [tag.name for tag in exp.tags]
+            }
+            data["experiences"].append(experience_data)
+        
         with open('data/experiences.json', 'w') as f:
             json.dump(data, f, indent=4)
         print("Experiences saved to JSON file")
     except Exception as e:
         print(f"Error saving experiences to JSON: {e}")
 
-# Import and register the ClassScheduler app
-class_scheduler_dir = Path('class_scheduler')
+class_scheduler_dir = Path('tmp_class_scheduler')
 if class_scheduler_dir.exists():
     # Add ClassScheduler directory to path for imports
     sys.path.insert(0, str(class_scheduler_dir))
@@ -520,4 +524,3 @@ if class_scheduler_dir.exists():
         print("ClassScheduler app mounted at /project/classscheduler")
     except Exception as e:
         print(f"Error mounting ClassScheduler app: {e}")
-

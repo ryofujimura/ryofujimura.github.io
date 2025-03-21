@@ -201,6 +201,32 @@
         },
         {
             "experience_type": "Project",
+            "title": "Class Scheduler",
+            "subtitle": "cartesian product",
+            "term": "March 2025",
+            "short_description": "Shows all possible class combinations.",
+            "long_description": "Shows all possible class combinations for a given semester. Uses cartesian product to generate all possible schedules.",
+            "links": [
+                "/project/classscheduler",
+                "https://github.com/ryofujimura/ClassScheduler"
+            ],
+            "link_images": [
+                "schedule.svg",
+                "github.png"
+            ],
+            "images": [
+                "schedule.svg",
+                "schedule1.svg"
+            ],
+            "tags": [
+                "web_app",
+                "personal_project",
+                "flask",
+                "python"
+            ]
+        },
+        {
+            "experience_type": "Project",
             "title": "Github Repo Counter",
             "subtitle": "repo counter",
             "term": "March 2025",
