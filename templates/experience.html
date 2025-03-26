@@ -270,7 +270,14 @@
   function openModal(projectId, updateURL) {
     // Find the project data
     const project = window.projectsData.find(p => p.id == projectId);
-    if (!project) return;
+    if (!project) {
+      console.error(`Project with ID ${projectId} not found`);
+      // If project not found and we're trying to update URL, redirect to home
+      if (updateURL) {
+        window.location.href = '/';
+      }
+      return;
+    }
     
     // Update URL if requested
     if (updateURL) {

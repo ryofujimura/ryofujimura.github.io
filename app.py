@@ -281,30 +281,39 @@ def project_detail(project_id):
     """
     Display a specific project with modal pre-opened
     """
-    profile = Profile.query.first()
-    experiences = Experience.query.all()
-    
-    # Get tags sorted by frequency (number of experiences using each tag)
-    tag_counts = db.session.query(
-        Tag, 
-        func.count(Experience.tags).label('tag_count')
-    ).join(
-        Experience.tags
-    ).group_by(
-        Tag.id
-    ).order_by(
-        func.count(Experience.tags).desc()
-    ).all()
-    
-    # Extract just the Tag objects from the results, maintaining order
-    tags = [tag for tag, count in tag_counts]
-    
-    # Get the specific project (or 404 if not found)
-    project = Experience.query.get_or_404(project_id)
-    
-    # Pass the direct project ID to the template
-    return render_template('index.html', profile=profile, experiences=experiences, 
-                          tags=tags, direct_project_id=project_id)
+    try:
+        profile = Profile.query.first()
+        experiences = Experience.query.all()
+        
+        # Get tags sorted by frequency (number of experiences using each tag)
+        tag_counts = db.session.query(
+            Tag, 
+            func.count(Experience.tags).label('tag_count')
+        ).join(
+            Experience.tags
+        ).group_by(
+            Tag.id
+        ).order_by(
+            func.count(Experience.tags).desc()
+        ).all()
+        
+        # Extract just the Tag objects from the results, maintaining order
+        tags = [tag for tag, count in tag_counts]
+        
+        # Check if the project exists
+        project = Experience.query.get(project_id)
+        if not project:
+            # If the project doesn't exist, redirect to the home page
+            flash('Project not found', 'warning')
+            return redirect(url_for('home'))
+        
+        # Pass the direct project ID to the template
+        return render_template('index.html', profile=profile, experiences=experiences, 
+                              tags=tags, direct_project_id=project_id)
+    except Exception as e:
+        app.logger.error(f"Error in project_detail route: {str(e)}")
+        flash('An error occurred while loading the project', 'danger')
+        return redirect(url_for('home'))
 
 @app.route('/admin/login', methods=['GET', 'POST'])
 def admin_login():
