@@ -503,24 +503,21 @@ def save_experiences_to_json():
     except Exception as e:
         print(f"Error saving experiences to JSON: {e}")
 
-class_scheduler_dir = Path('tmp_class_scheduler')
-if class_scheduler_dir.exists():
-    # Add ClassScheduler directory to path for imports
-    sys.path.insert(0, str(class_scheduler_dir))
-    
-    try:
-        # Import the app.py from ClassScheduler
-        from tmp_class_scheduler.app import app as class_scheduler_app
-        
-        # Configure the ClassScheduler app
-        class_scheduler_app.config['APPLICATION_ROOT'] = '/project/classscheduler'
-        
-        # Create a dispatcher middleware that mounts the ClassScheduler app
-        # at the /project/classscheduler URL
-        app.wsgi_app = DispatcherMiddleware(app.wsgi_app, {
-            '/project/classscheduler': class_scheduler_app.wsgi_app
-        })
-        
-        print("ClassScheduler app mounted at /project/classscheduler")
-    except Exception as e:
-        print(f"Error mounting ClassScheduler app: {e}")
+@app.route('/project/githubrepocounter')
+def github_repo_counter():
+    """
+    Serves the GitHub Repository Counter application
+    This dynamically pulls content from the GitHub repo when accessed
+    """
+    return render_template('github.html')
+
+if __name__ == '__main__':
+    # Ensure the DB file can exist
+    if not os.path.exists('local_database.db'):
+        open('local_database.db', 'a').close()
+
+    # Call create_tables() explicitly when the app starts
+    with app.app_context():
+        create_tables()
+
+    app.run(debug=True)
