@@ -193,7 +193,7 @@
   // Add click event to each project item
   projectItems.forEach(item => {
     item.addEventListener("click", function() {
-      const projectId = this.getAttribute("data-project-id");
+      const projectId = parseInt(this.getAttribute("data-project-id"), 10);
       openModal(projectId, true); // true = update URL
     });
   });
@@ -268,8 +268,11 @@
   }
   
   function openModal(projectId, updateURL) {
+    // Ensure projectId is treated as a number for comparison
+    projectId = parseInt(projectId, 10);
+    
     // Find the project data
-    const project = window.projectsData.find(p => p.id == projectId);
+    const project = window.projectsData.find(p => parseInt(p.id, 10) === projectId);
     if (!project) {
       console.error(`Project with ID ${projectId} not found`);
       // If project not found and we're trying to update URL, redirect to home
@@ -457,8 +460,19 @@
   // Check if a direct project ID was provided
   {% if direct_project_id %}
     // Open the modal with the provided project ID when the page loads
-    document.addEventListener("DOMContentLoaded", function() {
-      openModal({{ direct_project_id }}, false);
+    window.addEventListener("DOMContentLoaded", function() {
+      // Wait longer to ensure all project data is loaded
+      setTimeout(function() {
+        const projectId = {{ direct_project_id }};
+        // Double check project exists before opening
+        const project = window.projectsData.find(p => parseInt(p.id, 10) === projectId);
+        if (project) {
+          openModal(projectId, false);
+        } else {
+          console.error(`Unable to find project with ID ${projectId} for direct link`);
+          window.location.href = '/';
+        }
+      }, 300);
     });
   {% endif %}
 </script>
