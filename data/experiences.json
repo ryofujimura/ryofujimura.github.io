@@ -151,10 +151,12 @@
             "short_description": "Automated Instagram posting, grew 11k followers.",
             "long_description": "Engineered and deployed a streamlined content scheduling and posting process using Python and the Instagram API, achieving 685 posts and increasing followers by 11,000 in 8 months. Transformed the project from a non-revenue-generating initiative to a profitable venture.",
             "links": [
-                "https://www.instagram.com/shoheihomeground/"
+                "https://www.instagram.com/shoheihomeground/",
+                "https://www.youtube.com/@ShoheiHomeGround"
             ],
             "link_images": [
-                "shohei_icon.svg"
+                "instagram.svg",
+                "youtube.svg"
             ],
             "images": [
                 "shoheihomeground.svg",
