@@ -209,7 +209,7 @@
             "short_description": "Shows all possible class combinations.",
             "long_description": "Shows all possible class combinations for a given semester. Uses cartesian product to generate all possible schedules.",
             "links": [
-                "/project/classscheduler",
+                "https://classscheduler.replit.app/",
                 "https://github.com/ryofujimura/ClassScheduler"
             ],
             "link_images": [
