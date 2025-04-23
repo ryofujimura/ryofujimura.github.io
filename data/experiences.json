@@ -159,13 +159,14 @@
                 "github.png"
             ],
             "images": [
+                "whiteboardai.png",
                 "whiteboardai-1.jpg",
                 "whiteboardai-2.jpg"
             ],
             "tags": [
                 "project_leadership",
                 "python",
-                "ai",
+                "ai_and_algorithms",
                 "web_app"
             ]
         },
