@@ -144,7 +144,7 @@
             ]
         },
         {
-            "experience_type": "Project",
+            "experience_type": "Class Project",
             "title": "Project Leader",
             "subtitle": "Whiteboard-AI",
             "term": "January 2025 - May 2025",
@@ -167,6 +167,34 @@
                 "project_leadership",
                 "python",
                 "ai_and_algorithms",
+                "web_app"
+            ]
+        },
+        {
+            "experience_type": "Class Project",
+            "title": "Project Leader",
+            "subtitle": "CyberEdu",
+            "term": "January 2025 - May 2025",
+            "short_description": "Cyber Security Learning Platform",
+            "long_description": "An interactive cybersecurity education platform featuring defensive and offensive security topics, hands-on challenges, and personalized learning paths for all skill levels.",
+            "links": [
+                "https://cyberedu-rf.vercel.app/",
+                "https://github.com/ryofujimura/CyberEdu"
+            ],
+            "link_images": [
+                "CyberEdu.png"
+            ],
+            "images": [
+                "CyberEdu.png",
+                "CyberEdu-1.PNG",
+                "CyberEdu-2.PNG",
+                "CyberEdu-3.PNG",
+                "CyberEdu-4.PNG" 
+            ],
+            "tags": [
+                "Cybersecurity",
+                "apple_development",
+                "project_leadership",
                 "web_app"
             ]
         },
