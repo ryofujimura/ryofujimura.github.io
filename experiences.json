@@ -1,0 +1,378 @@
+{
+    "experiences": [
+        {
+            "experience_type": "Work",
+            "title": "Software Engineer Intern",
+            "subtitle": "American Honda Motor Company, Inc.",
+            "term": "June 2024 - August 2024",
+            "short_description": "Researched on-device generative AI for automotive applications. Developed and demonstrated AI features on an NVIDIA Jetson Orin Nano 8GB using Linux, CUDA, and Meta's Llama 3 model.",
+            "long_description": "Conducted comprehensive research on on-device generative AI, focusing on its potential applications within the automotive industry to enhance vehicle functionalities. Developed and demonstrated applications on an NVIDIA Jetson Orin Nano 8GB using Linux and CUDA, showcasing on-device generative AI capabilities with Meta's Llama 3 model.",
+            "highlights": [
+                "Implemented Meta's Llama 3 model on embedded hardware",
+                "Researched and developed automotive AI applications",
+                "Utilized Linux and CUDA for optimized performance",
+                "Created working demonstrations on NVIDIA Jetson platform"
+            ],
+            "links": [
+                "/static/images/HondaDigitalServiceDevelopment-2024SummerInternProjectReport.pdf",
+                "https://www.honda.com/"
+            ],
+            "link_images": [
+                "resume.png",
+                "honda.svg"
+            ],
+            "images": [
+                "hondalogo.svg",
+                "honda_1.jpg",
+                "honda_2.jpg",
+                "honda_3.jpg"
+            ],
+            "tags": [
+                "honda",
+                "hardware_and_systems",
+                "ai_and_algorithms",
+                "automotive",
+                "profit",
+                "cs_research",
+                "team_collaboration"
+            ]
+        },
+        {
+            "experience_type": "Work",
+            "title": "Co-PM / Developer",
+            "subtitle": "Matcha Time",
+            "term": "March 2024 - April 2024",
+            "short_description": "Swift/SwiftUI project with multi-city sync.",
+            "long_description": "Developed and created application functions with Swift/SwiftUI, implemented multi-city synchronization, designed and tested features, fixed bugs, and deployed solutions. Planned and completed the project in 4 weeks, launched the application on the Mac App Store.",
+            "highlights": [
+                "Developed complete macOS application using Swift/SwiftUI",
+                "Implemented real-time multi-city time synchronization",
+                "Successfully launched product on Mac App Store",
+                "Completed entire project in 4-week timeframe"
+            ],
+            "links": [
+                "https://apps.apple.com/us/app/matcha-time/id6497067918?mt=12",
+                "https://www.moyaifujimura.com/work/matcha-time"
+            ],
+            "link_images": [
+                "appstorelogo.svg",
+                "moyai_1.jpeg"
+            ],
+            "images": [
+                "matchatime.svg",
+                "matchatime_1.jpg",
+                "matchatime_2.jpg",
+                "matchatime_3.jpg"
+            ],
+            "tags": [
+                "apple_development",
+                "project_leadership",
+                "product_deployment"
+            ]
+        },
+        {
+            "experience_type": "Publication",
+            "title": "Custom Input Device",
+            "subtitle": "Research Paper",
+            "term": "Febuary 2025",
+            "short_description": "Ergonomic mouse by reconfiguring a standard mouse's internal components and housing them in a custom 3D-printed shell tailored to the user's hand.",
+            "long_description": "This project focuses on developing a customized input device by reengineering a standard mouse to better suit individual ergonomic needs. Using a BambuLab A1 Mini 3D printer and PLA filament, a lightweight and personalized mouse shell was designed and fabricated to precisely fit the user's hand. The work demonstrates the feasibility of adapting off-the-shelf hardware into bespoke solutions, offering potential applications in personalized ergonomics and robotic system integration. By combining 3D printing with hardware reconfiguration, this project highlights the possibilities for creating tailored, user-centric devices.",
+            "highlights": [
+                "Designed and 3D-printed custom ergonomic mouse shell",
+                "Reconfigured standard mouse components for improved ergonomics",
+                "Published research on personalized hardware solutions",
+                "Demonstrated applications in ergonomics and robotics"
+            ],
+            "links": [
+                "https://drive.google.com/file/d/1vRWFlfFa8N1zJt2LPrJAcNOIH81A1COB/view?usp=sharing"
+            ],
+            "link_images": [
+                "resume.png"
+            ],
+            "images": [
+                "3dprint.png",
+                "3dprint_1.jpeg",
+                "3dprint_2.jpeg",
+                "3dprint_3.jpeg",
+                "3dprint_4.jpeg",
+                "3dprint_5.jpeg"
+            ],
+            "tags": [
+                "cs_research",
+                "3d_printing",
+                "hardware",
+                "ergonomics",
+                "robotics"
+            ]
+        },
+        {
+            "experience_type": "Work",
+            "title": "Data Engineer",
+            "subtitle": "CUSCO USA Inc.",
+            "term": "October 2021 - Present",
+            "short_description": "Led a team to develop Python apps extracting data from thousands of PDFs.",
+            "long_description": "Led a three-member team in developing a Python application that extracted data from 11,560 archived PDF files, utilizing advanced software development methodologies. Demonstrated proficiency in testing and development, including creation of comprehensive test cases to ensure software quality. Enhanced user access to historical data dating back to 1977, resulting in a 30% revenue increase by enabling retrieval of previously inaccessible info.",
+            "highlights": [
+                "Led development team for enterprise data extraction solution",
+                "Processed over 11,560 archived PDF files dating back to 1977",
+                "Implemented comprehensive testing methodology",
+                "Generated 30% revenue increase through improved data access"
+            ],
+            "links": [
+                "https://cuscousainc.com/support/vehicle-specific-catalogs"
+            ],
+            "link_images": [
+                "cusco_c.svg"
+            ],
+            "images": [
+                "cusco.svg",
+                "cusco_1.jpg",
+                "cusco_2.jpg",
+                "cusco_3.jpg"
+            ],
+            "tags": [
+                "automotive",
+                "profit",
+                "project_leadership",
+                "python",
+                "adobe",
+                "data_management",
+                "google_drive"
+            ]
+        },
+        {
+            "experience_type": "Project",
+            "title": "Developer",
+            "subtitle": "Poker Percentage",
+            "term": "January 2022 - April 2024",
+            "short_description": "WatchOS app for real-time poker odds.",
+            "long_description": "Developed a poker percentage calculator application for watchOS using Swift and WatchKit, facilitating real-time calculation of odds and probabilities. Improved user decision-making by providing accurate insights into poker hands, resulting in a 15% increase in win rates.",
+            "highlights": [
+                "Built complete watchOS application using Swift and WatchKit",
+                "Implemented real-time poker odds calculations",
+                "Published application to Apple App Store",
+                "Demonstrated 15% user win rate improvement"
+            ],
+            "links": [
+                "https://apps.apple.com/us/app/poker-pocket-odds/id6499280318"
+            ],
+            "link_images": [
+                "poker.png"
+            ],
+            "images": [
+                "poker.png",
+                "poker_1.jpg",
+                "poker_2.jpg",
+                "poker_3.jpg",
+                "poker_4.jpg"
+            ],
+            "tags": [
+                "ai_and_algorithms",
+                "apple_development",
+                "project_leadership",
+                "product_deployment"
+            ]
+        },
+        {
+            "experience_type": "Class Project",
+            "title": "Project Leader",
+            "subtitle": "Whiteboard-AI",
+            "term": "January 2025 - May 2025",
+            "short_description": "AI-Powered Interactive Board.",
+            "long_description": "Our AI-integrated whiteboard lets you jot questions, ideas, and drawings directly on the board. AI analyzes your input in real time, annotating, answering queries, and enriching content inline—no separate AI chat required for smooth, immersive collaboration.",
+            "highlights": [
+                "Led development of AI-powered whiteboard interface",
+                "Implemented real-time handwriting and drawing recognition",
+                "Created natural language processing for question answering",
+                "Deployed production-ready web application"
+            ],
+            "links": [
+                "https://whiteboard-ai.vercel.app/",
+                "https://github.com/ryofujimura/whiteboard-ai"
+            ],
+            "link_images": [
+                "whiteboardai.png",
+                "github.png"
+            ],
+            "images": [
+                "whiteboardai.png",
+                "whiteboardai-1.jpg",
+                "whiteboardai-2.jpg"
+            ],
+            "tags": [
+                "project_leadership",
+                "python",
+                "ai_and_algorithms",
+                "web_app"
+            ]
+        },
+        {
+            "experience_type": "Class Project",
+            "title": "Project Leader",
+            "subtitle": "CyberEdu",
+            "term": "January 2025 - May 2025",
+            "short_description": "Cyber Security Learning Platform",
+            "long_description": "An interactive cybersecurity education platform featuring defensive and offensive security topics, hands-on challenges, and personalized learning paths for all skill levels.",
+            "highlights": [
+                "Led development of interactive cybersecurity education platform",
+                "Created hands-on security challenges and exercises",
+                "Designed personalized learning paths for different skill levels",
+                "Implemented both defensive and offensive security training modules"
+            ],
+            "links": [
+                "https://cyberedu-rf.vercel.app/",
+                "https://github.com/ryofujimura/CyberEdu"
+            ],
+            "link_images": [
+                "CyberEdu.png"
+            ],
+            "images": [
+                "CyberEdu.png",
+                "CyberEdu-1.PNG",
+                "CyberEdu-2.PNG",
+                "CyberEdu-3.PNG",
+                "CyberEdu-4.PNG" 
+            ],
+            "tags": [
+                "cybersecurity",
+                "apple_development",
+                "project_leadership",
+                "web_app"
+            ]
+        },
+        {
+            "experience_type": "Project",
+            "title": "Project Leader",
+            "subtitle": "Shohei Home Ground",
+            "term": "March 2023 - November 2023",
+            "short_description": "Automated Instagram posting, grew 11k followers.",
+            "long_description": "Engineered and deployed a streamlined content scheduling and posting process using Python and the Instagram API, achieving 685 posts and increasing followers by 11,000 in 8 months. Transformed the project from a non-revenue-generating initiative to a profitable venture.",
+            "highlights": [
+                "Developed automated content posting system using Python and Instagram API",
+                "Generated 685 posts in 8-month period",
+                "Grew account to 11,000 followers",
+                "Transformed project into profitable business venture"
+            ],
+            "links": [
+                "https://www.instagram.com/shoheihomeground/",
+                "https://www.youtube.com/@ShoheiHomeGround"
+            ],
+            "link_images": [
+                "instagram.svg",
+                "youtube.svg"
+            ],
+            "images": [
+                "shoheihomeground.svg",
+                "shoheihomeground_1.jpg",
+                "shoheihomeground_2.jpg",
+                "shoheihomeground_3.jpg"
+            ],
+            "tags": [
+                "profit",
+                "project_leadership",
+                "python",
+                "instagram",
+                "api",
+                "automation",
+                "photography"
+            ]
+        },
+        {
+            "experience_type": "Publication",
+            "title": "6G and Blockchain",
+            "subtitle": "Research Paper",
+            "term": "September 2024",
+            "short_description": "Research on AWS & Blockchain for 6G networks.",
+            "long_description": "Title: 6G Network and Data Management with Blockchain. Explored emerging paradigms in 6G networking and how blockchain can enhance data management and security. Evaluated AWS-based solutions for distributed infrastructures.",
+            "highlights": [
+                "Researched emerging 6G network technologies",
+                "Explored blockchain applications for network security",
+                "Evaluated AWS-based infrastructure solutions",
+                "Published findings on distributed network architectures"
+            ],
+            "links": [
+                "https://drive.google.com/file/d/1LTF__g_qyuyI3-H3hHJsZfPw10Vxv3v5/view?usp=sharing",
+                "https://docs.google.com/document/d/1K49_6etVnN7hcCNUc1l-0wJpp3B-NT9J/edit?usp=sharing"
+            ],
+            "link_images": [
+                "poster_icon.svg",
+                "resume.png"
+            ],
+            "images": [
+                "poster_icon.svg",
+                "6GBlockchain_1.jpg",
+                "6GBlockchain_2.jpg",
+                "6GBlockchain_3.jpg"
+            ],
+            "tags": [
+                "cs_research",
+                "blockchain",
+                "networking"
+            ]
+        },
+        {
+            "experience_type": "Project",
+            "title": "Class Scheduler",
+            "subtitle": "cartesian product",
+            "term": "March 2025",
+            "short_description": "Shows all possible class combinations.",
+            "long_description": "Shows all possible class combinations for a given semester. Uses cartesian product to generate all possible schedules.",
+            "highlights": [
+                "Developed web application for class schedule planning",
+                "Implemented cartesian product algorithm for schedule combinations",
+                "Created intuitive user interface for schedule visualization",
+                "Deployed solution as web application for student use"
+            ],
+            "links": [
+                "https://classscheduler.replit.app/",
+                "https://github.com/ryofujimura/ClassScheduler"
+            ],
+            "link_images": [
+                "schedule.svg",
+                "github.png"
+            ],
+            "images": [
+                "schedule.svg",
+                "schedule1.svg"
+            ],
+            "tags": [
+                "web_app",
+                "personal_project",
+                "flask",
+                "python"
+            ]
+        },
+        {
+            "experience_type": "Project",
+            "title": "Github Repo Counter",
+            "subtitle": "repo counter",
+            "term": "March 2025",
+            "short_description": "Counter for number of repos on GitHub.",
+            "long_description": "Counter for number of repos on GitHub. With personal access token, shows private and public repository count.",
+            "highlights": [
+                "Created GitHub repository analytics tool",
+                "Implemented GitHub API integration with personal access token",
+                "Developed tracking for both public and private repositories",
+                "Built simple web interface for data visualization"
+            ],
+            "links": [
+                "/project/githubrepocounter",
+                "https://github.com/ryofujimura/githubrepocounter"
+            ],
+            "link_images": [
+                "ryologo.svg",
+                "github.png"
+            ],
+            "images": [
+                "ryologo.svg",
+                "github.png"
+            ],
+            "tags": [
+                "web_app",
+                "personal_project",
+                "flask",
+                "python"
+            ]
+        }
+    ]
+}
