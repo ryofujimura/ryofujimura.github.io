@@ -1,1 +1,0 @@
-# This file will be used for drag and drop functionality 

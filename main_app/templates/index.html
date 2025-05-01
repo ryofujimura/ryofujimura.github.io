@@ -1,12 +1,53 @@
 <!DOCTYPE html>
 <html>
-<head><title>Main App</title></head>
-<body>
-  <h1>Main App Homepage</h1>
-  <ul>
-    <li><a href="/projects/project1/">Project 1</a></li>
-    <li><a href="/projects/project2/">Project 2</a></li>
-    <li><a href="/projects/ClassScheduler/">Class Scheduler</a></li>
-  </ul>
+<head>
+  <title>Ryo Fuji Projects Hub</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+</head>
+<body class="bg-gray-100 min-h-screen">
+  <header class="bg-gray-800 text-white p-6">
+    <h1 class="text-3xl font-bold">Ryo Fuji Projects Hub</h1>
+    <p class="text-xl">A collection of my web development projects</p>
+  </header>
+  
+  <main class="container mx-auto py-8 px-4">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div class="bg-white rounded-lg shadow-md overflow-hidden">
+        <div class="p-6">
+          <h2 class="text-xl font-bold mb-2">CyberEdu-Web</h2>
+          <p class="text-gray-700 mb-4">Cybersecurity education web application</p>
+          <a href="/Projects/CyberEdu-Web/" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">View Project</a>
+        </div>
+      </div>
+      
+      <div class="bg-white rounded-lg shadow-md overflow-hidden">
+        <div class="p-6">
+          <h2 class="text-xl font-bold mb-2">Whiteboard AI</h2>
+          <p class="text-gray-700 mb-4">AI-powered collaborative whiteboard</p>
+          <a href="/Projects/whiteboard-ai/" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">View Project</a>
+        </div>
+      </div>
+      
+      <div class="bg-white rounded-lg shadow-md overflow-hidden">
+        <div class="p-6">
+          <h2 class="text-xl font-bold mb-2">Tokai Shuttle</h2>
+          <p class="text-gray-700 mb-4">Shuttle service management application</p>
+          <a href="/Projects/tokaishuttle/" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">View Project</a>
+        </div>
+      </div>
+      
+      <div class="bg-white rounded-lg shadow-md overflow-hidden">
+        <div class="p-6">
+          <h2 class="text-xl font-bold mb-2">Class Scheduler</h2>
+          <p class="text-gray-700 mb-4">Academic class scheduling system</p>
+          <a href="/Projects/ClassScheduler/" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">View Project</a>
+        </div>
+      </div>
+    </div>
+  </main>
+  
+  <footer class="bg-gray-800 text-white p-6 mt-8">
+    <p>&copy; 2023 Ryo Fuji. All rights reserved.</p>
+  </footer>
 </body>
 </html> 

@@ -1,0 +1,180 @@
+course_code,course_title,units,section_number,class_number,type,days,start_time,end_time,building,room,instructor,comment
+CECS 80,FOUNDATIONS FOR DATA COMPUTING,1 Unit,01,11185,ACT,MW,3:30,4:20PM,ECS,405,Staff,Class instruction is: Face to Face - On Campus.
+CECS 80,FOUNDATIONS FOR DATA COMPUTING,1 Unit,02,11349,ACT,MW,6:30,7:20PM,ECS,407,Staff,Class instruction is: Face to Face - On Campus.
+CECS 105,INTRODUCTION TO CECS,1 Unit,01,8594,SEM,M,1,1:50PM,ECS,414,Nguyen K,Class instruction is: Face to Face - On Campus.Class offered with CECS-105H-01
+CECS 105,INTRODUCTION TO CECS,1 Unit,02,8596,SEM,W,1,1:50PM,ECS,414,Nguyen K,Class instruction is: Face to Face - On Campus.
+CECS 105H,INTRODUCTION TO CECS,1 Unit,01,8595,SEM,M,1,1:50PM,ECS,414,Nguyen K,Class instruction is: Face to Face - On Campus.Class offered with CECS-105-01
+CECS 174,INTRO PROG & PROBLEM SOLVING,3 Units,01,3206,SEM,MW,8,8:50AM,COB-139A,,Nguyen K,Class instruction is: Face to Face - On Campus.
+CECS 174,INTRO PROG & PROBLEM SOLVING,3 Units,02,3207,LAB,MW,9,10:15AM,VEC,331,Staff,Class instruction is: Face to Face - On Campus.
+CECS 174,INTRO PROG & PROBLEM SOLVING,3 Units,03,4112,LAB,MW,9,10:15AM,VEC,417,Staff,Class instruction is: Face to Face - On Campus.
+CECS 174,INTRO PROG & PROBLEM SOLVING,3 Units,04,4113,LAB,MW,10:30,11:45AM,ECS,403,Staff,Class instruction is: Face to Face - On Campus.
+CECS 174,INTRO PROG & PROBLEM SOLVING,3 Units,05,4494,LAB,MW,10:30,11:45AM,ECS,407,Staff,Class instruction is: Face to Face - On Campus.
+CECS 180,DATA COMPUTING FOR EVERYONE,3 Units,01,11184,SEM,MW,2,3:15PM,ECS,405,Zhang W,Class instruction is: Face to Face - On Campus.
+CECS 180,DATA COMPUTING FOR EVERYONE,3 Units,02,11307,SEM,MW,5,6:15PM,ECS,306,Yaghmaei E,Class instruction is: Face to Face - On Campus.
+CECS 201,COMPUTER LOGIC DESIGN I,3 Units,01,3437,SEM,MW,8,8:50AM,VEC,518,Trajkovic J,Class instruction is: Face to Face - On Campus.
+CECS 201,COMPUTER LOGIC DESIGN I,3 Units,02,3438,LAB,MW,9,10:15AM,ECS,413,Trajkovic J,Class instruction is: Face to Face - On Campus.
+CECS 201,COMPUTER LOGIC DESIGN I,3 Units,03,7341,LAB,MW,10:30,11:45AM,ECS,413,Trajkovic J,Class instruction is: Face to Face - On Campus.
+CECS 211,PRIN OF COMPUTER ENGINEERING I,3 Units,01,2920,SEM,TuTh,9:30,10:20AM,ECS,411,Hernandez E,Class instruction is: Face to Face - On Campus.
+CECS 211,PRIN OF COMPUTER ENGINEERING I,3 Units,02,2921,LAB,TuTh,10:30,11:45AM,ECS,411,Hernandez E,Class instruction is: Face to Face - On Campus.
+CECS 225,DIGITAL LOGIC AND ASSEMBLY PRO,3 Units,01,4830,SEM,TuTh,8,9:15AM,HC,120,Nachawati S,Class instruction is: Face to Face - On Campus.
+CECS 225,DIGITAL LOGIC AND ASSEMBLY PRO,3 Units,02,4831,SEM,MW,12:30,1:45PM,HC,120,Wu X,Class instruction is: Face to Face - On Campus.
+CECS 228,DISCRETE STRUC-COMPUTING APPL,3 Units,01,1129,SEM,Sa,1,3:45PM,ECS,105,Mehrnia A,Class instruction is: Face to Face - On Campus.
+CECS 228,DISCRETE STRUC-COMPUTING APPL,3 Units,02,1130,SEM,MW,8,9:15AM,HC,120,Maples T,Class instruction is: Face to Face - On Campus.Class offered with CECS-228H-01
+CECS 228,DISCRETE STRUC-COMPUTING APPL,3 Units,03,8578,SEM,TuTh,12:30,1:45PM,ECS,414,Hu D,Class instruction is: Face to Face - On Campus.
+CECS 228H,DISCRETE STRUC-COMPUTING APPL,3 Units,01,7059,SEM,MW,8,9:15AM,HC,120,Maples T,Class instruction is: Face to Face - On Campus.Class offered with CECS-228-02
+CECS 229,DISCRETE STRUCT COMP APPLIC II,3 Units,01,4828,SEM,F,12,2:45PM,COB,139,Ghasemkhani A,Class instruction is: Face to Face - On Campus.Class offered with CECS-229H-01
+CECS 229,DISCRETE STRUCT COMP APPLIC II,3 Units,02,4829,SEM,TuTh,2,3:15PM,COB-140A,,Varela K,Class instruction is: Face to Face - On Campus.
+CECS 229H,DISCRETE STRUCT COMP APPLIC II,3 Units,01,11332,SEM,F,12,2:45PM,COB,139,Ghasemkhani A,Class instruction is: Face to Face - On Campus.Class offered with CECS-229-01
+CECS 262,INTRO TO EMBEDDED SYST PROG,3 Units,01,3609,SEM,F,8,9:40AM,ECS,411,Hernandez E,Class instruction is: Face to Face - On Campus.
+CECS 262,INTRO TO EMBEDDED SYST PROG,3 Units,02,3610,LAB,F,10,12:30PM,ECS,411,Hernandez E,Class instruction is: Face to Face - On Campus.
+CECS 271,INTRO TO NUMERICAL METHODS,3 Units,01,2872,SEM,MW,2,3:15PM,ECS,412,Yaghmaei E,Class instruction is: Face to Face - On Campus.
+CECS 274,DATA STRUCTURES,3 Units,01,3208,SEM,F,8,9:40AM,ECS,105,Varela K,Class instruction is: Face to Face - On Campus.
+CECS 274,DATA STRUCTURES,3 Units,02,3209,LAB,F,10,12:30PM,ECS,413,Staff,Class instruction is: Face to Face - On Campus.
+CECS 274,DATA STRUCTURES,3 Units,03,3414,LAB,F,1,3:30PM,ECS,413,Staff,Class instruction is: Face to Face - On Campus.
+CECS 274,DATA STRUCTURES,3 Units,04,3415,LAB,F,1,3:30PM,ECS,405,Staff,Class instruction is: Face to Face - On Campus.
+CECS 274,DATA STRUCTURES,3 Units,05,4076,LAB,F,10,12:45PM,ECS,405,Staff,Class instruction is: Face to Face - On Campus.
+CECS 274,DATA STRUCTURES,3 Units,06,4077,SEM,TuTh,12:30,1:20PM,VEC,518,Varela K,Class instruction is: Face to Face - On Campus.
+CECS 274,DATA STRUCTURES,3 Units,07,4866,LAB,TuTh,1:30,2:45PM,ECS,308,Staff,Class instruction is: Face to Face - On Campus.
+CECS 274,DATA STRUCTURES,3 Units,08,11040,LAB,TuTh,1:30,2:45PM,ECS,416,Staff,Class instruction is: Face to Face - On Campus.
+CECS 275,PROGRAMMING AND DATA STRUCTURE,3 Units,01,6550,SEM,MW,5:30,6:20PM,ECS,308,Nguyen M,Class instruction is: Face to Face - On Campus.
+CECS 275,PROGRAMMING AND DATA STRUCTURE,3 Units,02,6551,LAB,MW,6:30,7:45PM,ECS,403,Nguyen M,Class instruction is: Face to Face - On Campus.
+CECS 277,OBJ ORIENTED APPL DEVELOPMENT,3 Units,01,2353,SEM,TuTh,9,9:50AM,ECS,105,Cleary S,Class instruction is: Face to Face - On Campus.
+CECS 277,OBJ ORIENTED APPL DEVELOPMENT,3 Units,02,2354,LAB,TuTh,10,11:15AM,ECS,405,Staff,Class instruction is: Face to Face - On Campus.
+CECS 277,OBJ ORIENTED APPL DEVELOPMENT,3 Units,03,2588,LAB,TuTh,10,11:15AM,ECS,416,Staff,Class instruction is: Face to Face - On Campus.
+CECS 277,OBJ ORIENTED APPL DEVELOPMENT,3 Units,04,2589,LAB,TuTh,12,1:15PM,ECS,416,Staff,Class instruction is: Face to Face - On Campus.
+CECS 277,OBJ ORIENTED APPL DEVELOPMENT,3 Units,05,3776,LAB,TuTh,12,1:15PM,ECS,405,Staff,Class instruction is: Face to Face - On Campus.
+CECS 301,COMPUTER LOGIC DESIGN II,3 Units,01,1131,SEM,TuTh,2,2:50PM,ECS,405,Rezaei A,Class instruction is: Face to Face - On Campus.Class offered with CECS-301H-01
+CECS 301,COMPUTER LOGIC DESIGN II,3 Units,02,2232,LAB,TuTh,3,4:15PM,ECS,405,Rezaei A,Class instruction is: Face to Face - On Campus.Class offered with CECS-301H-02
+CECS 301H,COMPUTER LOGIC DESIGN II,3 Units,01,11334,SEM,TuTh,2,2:50PM,ECS,405,Rezaei A,Class instruction is: Face to Face - On Campus.Class offered with CECS-301-01
+CECS 301H,COMPUTER LOGIC DESIGN II,3 Units,02,11336,LAB,TuTh,3,4:15PM,ECS,405,Rezaei A,Class instruction is: Face to Face - On Campus.Class offered with CECS-301-02
+CECS 302,INTRO TO COMPUTER FORENSICS,3 Units,03,10138,SEM,MW,7,7:50PM,VEC,330,Uuh L,Class instruction is: Face to Face - On Campus.
+CECS 302,INTRO TO COMPUTER FORENSICS,3 Units,04,10139,LAB,MW,8,9:15PM,VEC,330,Uuh L,Class instruction is: Face to Face - On Campus.
+CECS 303,NETWORKS AND NETWORK SECURITY,3 Units,03,7504,SEM,TuTh,5,5:50PM,ECS,413,Samayoa C,Class instruction is: Face to Face - On Campus.
+CECS 303,NETWORKS AND NETWORK SECURITY,3 Units,04,7505,LAB,TuTh,6,7:15PM,ECS,413,Samayoa C,Class instruction is: Face to Face - On Campus.
+CECS 311,PRIN OF COMPUTER ENGINEERNG II,3 Units,01,4090,SEM,MW,8,8:50AM,ECS,411,Hernandez E,Class instruction is: Face to Face - On Campus.
+CECS 311,PRIN OF COMPUTER ENGINEERNG II,3 Units,02,4495,LAB,MW,9,10:15AM,ECS,411,Hernandez E,Class instruction is: Face to Face - On Campus.
+CECS 323,DATABASE FUNDAMENTALS,3 Units,01,3781,SEM,MW,3:30,4:45PM,ECS,404,Brown D,Class instruction is: Face to Face - On Campus.
+CECS 323,DATABASE FUNDAMENTALS,3 Units,02,4091,SEM,TuTh,3:30,4:45PM,ECS,412,Terrell N,Class instruction is: Face to Face - On Campus.
+CECS 323,DATABASE FUNDAMENTALS,3 Units,03,4179,SEM,MW,12:30,1:45PM,ECS,302,Brown D,Class instruction is: Face to Face - On Campus.
+CECS 323,DATABASE FUNDAMENTALS,3 Units,04,6553,SEM,TuTh,2,3:15PM,ECS,412,Terrell N,Class instruction is: Face to Face - On Campus.
+CECS 323,DATABASE FUNDAMENTALS,3 Units,05,7467,SEM,MW,8,9:15AM,ECS,414,Brown D,Class instruction is: Face to Face - On Campus.
+CECS 325,SYSTEM PROGRAMMING,3 Units,01,7060,SEM,MW,6,7:15PM,HC,120,Gold S,Class instruction is: Face to Face - On Campus.
+CECS 325,SYSTEM PROGRAMMING,3 Units,02,7063,SEM,TuTh,5,6:15PM,HSCI,102,Gold S,Class instruction is: Face to Face - On Campus.
+CECS 326,OPERATING SYSTEMS,3 Units,01,1132,SEM,TuTh,5,6:15PM,HC,120,Luti M,Class instruction is: Face to Face - On Campus.
+CECS 326,OPERATING SYSTEMS,3 Units,02,4092,SEM,MW,3:30,4:45PM,HC,120,Xu H,Class instruction is: Face to Face - On Campus.
+CECS 327,INTRO NETWORKS & DIST COMPUT,3 Units,01,4093,SEM,MW,5,6:15PM,PSY,150,Xu H,Class instruction is: Face to Face - On Campus.
+CECS 327,INTRO NETWORKS & DIST COMPUT,3 Units,02,11273,SEM,TuTh,5,6:15PM,LA4,120,Morales Ponce O,Class instruction is: Face to Face - On Campus.Class offered with CECS-327H-01
+CECS 327H,INTRO NETWORKS & DIST COMPUT,3 Units,01,7399,SEM,TuTh,5,6:15PM,LA4,120,Morales Ponce O,Class instruction is: Face to Face - On Campus.Class offered with CECS-327-02
+CECS 328,ALGORITHMS,3 Units,01,1133,SEM,MW,2,3:15PM,DESN,112,Goldstein D,Class instruction is: Face to Face - On Campus.
+CECS 328,ALGORITHMS,3 Units,04,7325,SEM,MW,6:30,7:45PM,HC,100,Sharifian A,Class instruction is: Face to Face - On Campus.Class offered with CECS-328H-04
+CECS 328H,ALGORITHMS,3 Units,04,7326,SEM,MW,6:30,7:45PM,HC,100,Sharifian A,Class instruction is: Face to Face - On Campus.Class offered with CECS-328-04
+CECS 329,CONCEPTS COMPUTER SCI THEORY,3 Units,01,6554,SEM,TuTh,8,9:15AM,HC,100,Ebert T,Class instruction is: Face to Face - On Campus.
+CECS 329,CONCEPTS COMPUTER SCI THEORY,3 Units,02,6555,SEM,TuTh,5:30,6:45PM,VEC,418,Nguyen M,Class instruction is: Face to Face - On Campus.
+CECS 329,CONCEPTS COMPUTER SCI THEORY,3 Units,03,7466,SEM,MW,12:30,1:45PM,ECS,308,Jurgensen C,Class instruction is: Face to Face - On Campus.
+CECS 329,CONCEPTS COMPUTER SCI THEORY,3 Units,04,8579,SEM,MW,9:30,10:45AM,ECS,412,Jurgensen C,Class instruction is: Face to Face - On Campus.
+CECS 329,CONCEPTS COMPUTER SCI THEORY,3 Units,05,9936,SEM,MW,11,12:15PM,ECS,416,Qin X,Class instruction is: Face to Face - On Campus.
+CECS 329,CONCEPTS COMPUTER SCI THEORY,3 Units,06,10341,SEM,F,8,10:45AM,ECS,416,Ebert T,Class instruction is: Face to Face - On Campus.
+CECS 341,COMPUTER ARCHITECT ORGANIZATIN,3 Units,01,3782,SEM,F,1,3:45PM,ECS,105,Sayadi H,Class instruction is: Face to Face - On Campus.
+CECS 341,COMPUTER ARCHITECT ORGANIZATIN,3 Units,04,11824,SEM,MW,2,3:15PM,MM,100,Ghaforyfard P,Class instruction is: Face to Face - On Campus.
+CECS 342,PRINCPLE PROGRAMMING LANGUAGE,3 Units,01,6556,SEM,TuTh,12:30,1:45PM,ECS,302,Jurgensen C,Class instruction is: Face to Face - On Campus.
+CECS 342,PRINCPLE PROGRAMMING LANGUAGE,3 Units,02,6557,SEM,MW,2,3:15PM,ECS,411,Jurgensen C,Class instruction is: Face to Face - On Campus.
+CECS 342,PRINCPLE PROGRAMMING LANGUAGE,3 Units,03,6558,SEM,F,1,3:45PM,ECS,412,Terrell N,Class instruction is: Face to Face - On Campus.
+CECS 342,PRINCPLE PROGRAMMING LANGUAGE,3 Units,04,6559,SEM,MW,6,7:15PM,ECS,411,Nguyen P,Class instruction is: Face to Face - On Campus.
+CECS 342,PRINCPLE PROGRAMMING LANGUAGE,3 Units,05,6560,SEM,TuTh,9:30,10:45AM,ECS,302,Jurgensen C,Class instruction is: Face to Face - On Campus.
+CECS 342,PRINCPLE PROGRAMMING LANGUAGE,3 Units,06,10159,SEM,MW,9:30,10:45AM,ECS,405,Cleary S,Class instruction is: Face to Face - On Campus.
+CECS 343,INTRO TO SOFTWARE ENGINEERING,3 Units,01,2827,SEM,MW,5,6:15PM,HC,100,Murgolo F,Class instruction is: Face to Face - On Campus.
+CECS 343,INTRO TO SOFTWARE ENGINEERING,3 Units,02,8582,SEM,TuTh,5,6:15PM,VEC,518,Link D,Class instruction is: Face to Face - On Campus.
+CECS 343,INTRO TO SOFTWARE ENGINEERING,3 Units,03,10168,SEM,TuTh,12:30,1:45PM,ECS,404,Basit A,Class instruction is: Face to Face - On Campus.
+CECS 346,EMBEDDED SYSTEMS I,3 Units,03,9747,SEM,F,10,11:50AM,ECS,414,He M,Class instruction is: Face to Face - On Campus.Class offered with CECS-346H-03
+CECS 346,EMBEDDED SYSTEMS I,3 Units,04,9748,LAB,F,12,2:45PM,ECS,414,He M,Class instruction is: Face to Face - On Campus.Class offered with CECS-346H-04
+CECS 346H,EMBEDDED SYSTEMS I,3 Units,03,9749,SEM,F,10,11:50AM,ECS,414,He M,Class instruction is: Face to Face - On Campus.Class offered with CECS-346-03
+CECS 346H,EMBEDDED SYSTEMS I,3 Units,04,9750,LAB,F,12,2:45PM,ECS,414,He M,Class instruction is: Face to Face - On Campus.Class offered with CECS-346-04
+CECS 347,EMBEDDED SYSTEMS II,3 Units,01,5264,SEM,MW,10,10:50AM,ECS,414,He M,Class instruction is: Face to Face - On Campus.
+CECS 347,EMBEDDED SYSTEMS II,3 Units,02,5265,LAB,MW,11,12:15PM,ECS,414,He M,Class instruction is: Face to Face - On Campus.
+CECS 361,DIGITAL DESIGN TECH VERIFICATN,3 Units,03,7327,SEM,TuTh,11,11:50AM,ECS,412,Rezaei A,Class instruction is: Face to Face - On Campus.
+CECS 361,DIGITAL DESIGN TECH VERIFICATN,3 Units,04,7328,LAB,TuTh,12,1:15PM,ECS,412,Rezaei A,Class instruction is: Face to Face - On Campus.
+CECS 378,INTRO TO COMPUTER SECURITY PRI,3 Units,01,5109,SEM,TuTh,11,12:15PM,VEC,518,Giacalone A,Class instruction is: Face to Face - On Campus.
+CECS 378,INTRO TO COMPUTER SECURITY PRI,3 Units,02,5465,SEM,TuTh,5,6:15PM,ECS,404,Uuh L,Class instruction is: Face to Face - On Campus.
+CECS 378,INTRO TO COMPUTER SECURITY PRI,3 Units,03,6312,SEM,MW,5:30,6:45PM,VEC,518,Uuh L,Class instruction is: Face to Face - On Campus.
+CECS 378,INTRO TO COMPUTER SECURITY PRI,3 Units,04,8593,SEM,F,9,11:45AM,ECS,404,Addington S,Class instruction is: Face to Face - On Campus.
+CECS 381,STOCHASTIC COMPUTING,3 Units,02,11714,SEM,MW,12:30,1:45PM,ECS,404,Asgari S,Class instruction is: Face to Face - On Campus.
+CECS 427,DYNAMIC NETWORKS,3 Units,02,8580,SEM,TuTh,3:30,4:45PM,VEC,518,Morales Ponce O,Class instruction is: Face to Face - On Campus.
+CECS 428,ANALYSIS OF ALGORITHMS,3 Units,02,9935,SEM,MW,9:30,10:45AM,ECS,416,Goldstein D,Class instruction is: Face to Face - On Campus.
+CECS 429,SEARCH ENGINE TECHNOLOGY,3 Units,01,10118,SEM,TuTh,3:30,4:45PM,ECS,403,Qin X,Class instruction is: Face to Face - On Campus.
+CECS 440,COMPUTER ARCHITECTURE,3 Units,01,3196,SEM,TuTh,8,8:50AM,ECS,416,Trajkovic J,Class instruction is: Face to Face - On Campus.Class offered with CECS-440H-01
+CECS 440,COMPUTER ARCHITECTURE,3 Units,02,3197,LAB,TuTh,9,10:15AM,ECS,413,Trajkovic J,Class instruction is: Face to Face - On Campus.Class offered with CECS-440H-02
+CECS 440H,COMPUTER ARCHITECTURE,3 Units,01,4843,SEM,TuTh,8,8:50AM,ECS,416,Trajkovic J,Class instruction is: Face to Face - On Campus.Class offered with CECS-440-01
+CECS 440H,COMPUTER ARCHITECTURE,3 Units,02,4844,LAB,TuTh,9,10:15AM,ECS,413,Trajkovic J,Class instruction is: Face to Face - On Campus.Class offered with CECS-440-02
+CECS 443,SOFTWARE PROJ MGMT AND TESTING,3 Units,01,6567,SEM,TuTh,6:30,7:45PM,ECS,308,Link D,Class instruction is: Face to Face - On Campus.
+CECS 447,EMBEDDED SYSTEMS III,3 Units,03,7411,SEM,MW,2,2:50PM,ECS,414,He M,Class instruction is: Face to Face - On Campus.
+CECS 447,EMBEDDED SYSTEMS III,3 Units,04,7412,LAB,MW,3,4:15PM,ECS,414,He M,Class instruction is: Face to Face - On Campus.
+CECS 448,USER INTERFACE DESIGN,3 Units,01,4971,SEM,TuTh,11,12:15PM,ECS,302,Fu B,Class instruction is: Face to Face - On Campus.
+CECS 448,USER INTERFACE DESIGN,3 Units,02,11337,SEM,TuTh,12:30,1:45PM,ECS,407,Fahim A,Class instruction is: Face to Face - On Campus.
+CECS 449,COMPUTER GRAPHICS,3 Units,01,10162,SEM,MW,12:30,1:45PM,ECS,411,Terrell N,Class instruction is: Face to Face - On Campus.
+CECS 450,DATA VISUALIZATION,3 Units,01,11182,SEM,TuTh,9:30,10:45AM,ECS,407,Fu B,Class instruction is: Face to Face - On Campus.
+CECS 450,DATA VISUALIZATION,3 Units,02,11358,SEM,MW,3:30,4:45PM,PSY,150,Yaghmaei E,Class instruction is: Face to Face - On Campus.
+CECS 451,ARTIFICIAL INTELLIGENCE,3 Units,01,9933,SEM,F,9,11:45AM,ECS,407,Ghasemkhani A,Class instruction is: Face to Face - On Campus.
+CECS 451,ARTIFICIAL INTELLIGENCE,3 Units,02,8130,SEM,TuTh,9:30,10:45AM,ECS,308,Moon J,Class instruction is: Face to Face - On Campus.
+CECS 453,MOBILE APPLICATION DEVELOPMENT,3 Units,01,6568,SEM,MW,8,9:15AM,ECS,405,Nguyen P,Class instruction is: Face to Face - On Campus.
+CECS 455,INTRO TO GAME PROGRAMMING,3 Units,01,8444,SEM,MW,11,12:15PM,VEC,330,Goldstein D,Class instruction is: Face to Face - On Campus.
+CECS 456,MACHINE LEARNING,3 Units,01,7468,SEM,MW,12:30,1:45PM,VEC,518,Zhang W,Class instruction is: Face to Face - On Campus.
+CECS 456,MACHINE LEARNING,3 Units,02,11179,SEM,F,10,12:45PM,VEC,518,Sarshar A,Class instruction is: Face to Face - On Campus.
+CECS 460,SYSTEM ON CHIP DESIGN,3 Units,01,10120,SEM,MW,6,6:50PM,ECS,416,Cregg D,Class instruction is: Face to Face - On Campus.Class offered with CECS-460H-01
+CECS 460,SYSTEM ON CHIP DESIGN,3 Units,02,10121,LAB,MW,7,8:15PM,ECS,416,Cregg D,Class instruction is: Face to Face - On Campus.Class offered with CECS-460H-02
+CECS 460H,SYSTEM ON CHIP DESIGN,3 Units,01,11345,SEM,MW,6,6:50PM,ECS,416,Cregg D,Class instruction is: Face to Face - On Campus.Class offered with CECS-460-01
+CECS 460H,SYSTEM ON CHIP DESIGN,3 Units,02,11346,LAB,MW,7,8:15PM,ECS,416,Cregg D,Class instruction is: Face to Face - On Campus.Class offered with CECS-460-02
+CECS 463,DIGITAL SIGNAL PROCESS DESIGN,3 Units,01,11783,SEM,MW,11,11:50AM,ECS,412,Fahim A,Class instruction is: Face to Face - On Campus.
+CECS 463,DIGITAL SIGNAL PROCESS DESIGN,3 Units,02,11784,LAB,MW,12,1:15PM,ECS,412,Fahim A,Class instruction is: Face to Face - On Campus.
+CECS 470,WEB PROGRAMING & ACCESSIBILITY,3 Units,01,9931,SEM,MW,3:30,4:45PM,ECS,407,Nguyen P,Class instruction is: Face to Face - On Campus.
+CECS 475,SOFTWARE DVLPMNT WITH FRAMWRKS,3 Units,01,3843,SEM,MW,11,12:15PM,VEC,518,Nguyen P,Class instruction is: Face to Face - On Campus.
+CECS 475,SOFTWARE DVLPMNT WITH FRAMWRKS,3 Units,02,10158,SEM,TuTh,9:30,10:45AM,ECS,404,Terrell N,Class instruction is: Face to Face - On Campus.
+CECS 478,DATA SECURITY & PRIVACY,3 Units,01,4512,SEM,MW,11,12:15PM,ECS,308,Giacalone A,Class instruction is: Face to Face - On Campus.
+CECS 478,DATA SECURITY & PRIVACY,3 Units,02,7410,SEM,TuTh,12:30,1:45PM,HC,120,Giacalone A,Class instruction is: Face to Face - On Campus.
+CECS 490A,COMP ENGR SNR PRJCT I,3 Units,01,4845,SEM,MW,8:30,9:45PM,ECS,412,Cregg D,Class instruction is: Face to Face - On Campus.
+CECS 490B,COMPUTER ENGR SNR PROJECT II,3 Units,01,4498,SEM,MW,12:30,1:45PM,ECS,405,Hernandez E,Instructor Consent RequiredClass instruction is: Face to Face - On Campus.
+CECS 491A,COMPUTER SCI SENIOR PROJECT I,3 Units,01,4526,SEM,TuTh,11,12:15PM,ECS,407,Hoffman F,Class instruction is: Face to Face - On Campus.
+CECS 491A,COMPUTER SCI SENIOR PROJECT I,3 Units,02,4575,SEM,TuTh,2,3:15PM,VEC,330,Hoffman F,Class instruction is: Face to Face - On Campus.
+CECS 491A,COMPUTER SCI SENIOR PROJECT I,3 Units,03,5061,SEM,TuTh,5,6:15PM,ECS,308,Hoffman F,Class instruction is: Face to Face - On Campus.
+CECS 491A,COMPUTER SCI SENIOR PROJECT I,3 Units,04,7379,SEM,TuTh,3:30,4:45PM,ECS,302,Hoffman F,Class instruction is: Face to Face - On Campus.
+CECS 491A,COMPUTER SCI SENIOR PROJECT I,3 Units,05,9934,SEM,MW,9:30,10:45AM,ECS,308,Albinali F,Class instruction is: Face to Face - On Campus.
+CECS 491A,COMPUTER SCI SENIOR PROJECT I,3 Units,06,10050,SEM,MW,12:30,1:45PM,ECS,407,Albinali F,Class instruction is: Face to Face - On Campus.
+CECS 491B,COMPUTER SCI SENIOR PROJECT II,3 Units,01,5753,SEM,MW,2,3:15PM,ECS,308,Murgolo F,Instructor Consent RequiredClass instruction is: Face to Face - On Campus.
+CECS 491B,COMPUTER SCI SENIOR PROJECT II,3 Units,02,7097,SEM,TuTh,12:30,1:45PM,ECS,403,Hoffman F,Instructor Consent RequiredClass instruction is: Face to Face - On Campus.
+CECS 491B,COMPUTER SCI SENIOR PROJECT II,3 Units,03,8023,SEM,MW,11,12:15PM,VEC,331,Albinali F,Instructor Consent RequiredClass instruction is: Face to Face - On Campus.
+CECS 491B,COMPUTER SCI SENIOR PROJECT II,3 Units,04,9380,SEM,TuTh,6:30,7:45PM,ECS,404,Shahnawaz I,Instructor Consent RequiredClass instruction is: Face to Face - On Campus.
+CECS 491B,COMPUTER SCI SENIOR PROJECT II,3 Units,05,11291,SEM,MW,2,3:15PM,ECS,413,Albinali F,Instructor Consent RequiredClass instruction is: Face to Face - On Campus.
+CECS 497,DIRECTED STUDIES,1-3 Units,01,1134,SUP,TBA,NA,,NA,,Rezaei A,Instructor Consent RequiredClass instruction is: Face to Face - On Campus.
+CECS 497,DIRECTED STUDIES,1-3 Units,18,3205,SUP,TBA,NA,,NA,,Staff,Instructor Consent RequiredClass instruction is: Face to Face - On Campus.
+CECS 497,DIRECTED STUDIES,1-3 Units,19,6459,SUP,TBA,NA,,NA,,Staff,Instructor Consent RequiredClass instruction is: Face to Face - On Campus.
+CECS 497,DIRECTED STUDIES,1-3 Units,20,7449,SUP,TBA,NA,,NA,,Staff,Instructor Consent RequiredClass instruction is: Face to Face - On Campus.
+CECS 497,DIRECTED STUDIES,1-3 Units,21,7585,SUP,TBA,NA,,NA,,Staff,Instructor Consent RequiredClass instruction is: Face to Face - On Campus.
+CECS 524,ADV TOPICS IN PROGRAMMING LANG,3 Units,02,6260,SEM,F,12,2:45PM,HC,120,Hoffman M,Class instruction is: Hybrid (Face to Face & Synch).
+CECS 524,ADV TOPICS IN PROGRAMMING LANG,3 Units,02,,,F,12,2:45PM,ONLINE-ONLY,,Staff,additional meeting detail
+CECS 528,ADV ANALYSIS OF ALGORITHMS,3 Units,01,3912,SEM,MW,8,9:15AM,LA2,200,Ebert T,Class instruction is: Face to Face - On Campus.
+CECS 529,SEARCH ENGINE TECHNOLOGY,3 Units,01,10119,SEM,TuTh,3:30,4:45PM,ECS,403,Qin X,Class instruction is: Face to Face - On Campus.
+CECS 530,ADV COMPUTER ARCHITECTURE I,3 Units,01,7428,SEM,Sa,11,1:45PM,VEC,518,Yaghini P,Class instruction is: Face to Face - On Campus.
+CECS 532,MEMORY DESIGN IMPLEMENTATION,3 Units,01,6244,SEM,F,9,11:45AM,ECS,302,Wu X,Class instruction is: Hybrid (Face to Face & Synch).
+CECS 532,MEMORY DESIGN IMPLEMENTATION,3 Units,01,,,F,9,11:45AM,ONLINE-ONLY,,Staff,additional meeting detail
+CECS 543,ADVANCED SOFTWARE ENGINEERING,3 Units,02,6364,SEM,TuTh,9:30,10:45AM,HC,120,Basit A,Class instruction is: Face to Face - On Campus.
+CECS 546,FAULT TOLERANT COMPUTING SYSTS,3 Units,02,11766,SEM,F,1,3:45PM,ECS,404,Wu X,Department Consent RequiredClass instruction is: Hybrid (Face to Face & Synch).
+CECS 546,FAULT TOLERANT COMPUTING SYSTS,3 Units,02,,,F,1,3:45PM,ONLINE-ONLY,,Staff,additional meeting detail
+CECS 547,SOFTWARE MAINT REENGIN & REUSE,3 Units,01,7465,SEM,TuTh,2,3:15PM,ECS,414,Basit A,Class instruction is: Face to Face - On Campus.
+CECS 550,PATTERN RECOGNITION,3 Units,01,7409,SEM,MW,6:30,7:45PM,ECS,105,Ghazarian A,Class instruction is: Face to Face - On Campus.
+CECS 551,ADV ARTIFICIAL INTELLIGENCE,3 Units,01,7067,SEM,TuTh,12:30,1:45PM,ECS,411,Moon J,Class instruction is: Hybrid (Face to Face & Synch).
+CECS 551,ADV ARTIFICIAL INTELLIGENCE,3 Units,01,,,TuTh,12:30,1:45PM,ONLINE-ONLY,,Staff,additional meeting detail
+CECS 552,COMPUTER SIMULATION & MODELING,3 Units,01,7442,SEM,Sa,4,6:45PM,ECS,407,Mehrnia A,Class instruction is: Face to Face - On Campus.
+CECS 552,COMPUTER SIMULATION & MODELING,3 Units,02,11181,SEM,F,1,3:45PM,ECS,308,Sarshar A,Class instruction is: Face to Face - On Campus.
+CECS 553,MACHINE VISION,3 Units,01,9746,SEM,Sa,11,1:45PM,ECS,403,Sodagari S,Class instruction is: Face to Face - On Campus.
+CECS 574,TOPICS DISTRIBUTED COMPUTING,3 Units,02,7293,SEM,Sa,8,10:45AM,VEC,518,Yaghini P,Class instruction is: Face to Face - On Campus.
+CECS 579,INFORMATION SECURITY,3 Units,02,9648,SEM,Sa,8,10:45AM,ECS,403,Sodagari S,Class instruction is: Face to Face - On Campus.
+CECS 579,INFORMATION SECURITY,3 Units,03,9937,SEM,F,8,10:45AM,ECS,412,Sodagari S,Class instruction is: Face to Face - On Campus.
+CECS 697,DIRECTED RESEARCH,1-3 Units,14,3444,SUP,TBA,NA,,NA,,Staff,Instructor Consent RequiredClass instruction is: Face to Face - On Campus.
+CECS 697,DIRECTED RESEARCH,1-3 Units,15,4588,SUP,TBA,NA,,NA,,Staff,Instructor Consent RequiredClass instruction is: Face to Face - On Campus.
+CECS 697,DIRECTED RESEARCH,1-3 Units,16,4680,SUP,TBA,NA,,NA,,Staff,Instructor Consent RequiredClass instruction is: Face to Face - On Campus.
+CECS 697,DIRECTED RESEARCH,1-3 Units,17,5070,SUP,TBA,NA,,NA,,Staff,Instructor Consent RequiredClass instruction is: Face to Face - On Campus.
+CECS 697,DIRECTED RESEARCH,1-3 Units,18,8644,SUP,TBA,NA,,NA,,Staff,Instructor Consent RequiredClass instruction is: Face to Face - On Campus.
+CECS 698,THESIS OR INDUSTRIAL PROJECT,3-6 Units,01,1142,SUP,TBA,NA,,NA,,Staff,Department Consent RequiredClass instruction is: Face to Face - On Campus.
+CECS 698,THESIS OR INDUSTRIAL PROJECT,3-6 Units,04,8698,SUP,TBA,NA,,NA,,Staff,Department Consent RequiredClass instruction is: Face to Face - On Campus.
+CECS 698,THESIS OR INDUSTRIAL PROJECT,3-6 Units,17,3443,SUP,TBA,NA,,NA,,Staff,Department Consent RequiredClass instruction is: Face to Face - On Campus.
+CECS 698,THESIS OR INDUSTRIAL PROJECT,3-6 Units,18,5669,SUP,TBA,NA,,NA,,Staff,Department Consent RequiredClass instruction is: Face to Face - On Campus.
+CECS 698,THESIS OR INDUSTRIAL PROJECT,3-6 Units,19,8756,SUP,TBA,NA,,NA,,Staff,Department Consent RequiredClass instruction is: Face to Face - On Campus.
