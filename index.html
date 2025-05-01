@@ -1,12 +1,119 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="refresh" content="0; URL='https://ryofujimura.pythonanywhere.com/'" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Redirecting...</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ChatGPT Hero + Banners</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
 </head>
-<body>
-    <p>If you are not redirected automatically, <a href="https://ryofujimura.pythonanywhere.com/">click here</a>.</p>
+<body class="bg-black text-white overflow-x-hidden">
+
+  <!-- Mobile Sidebar Menu -->
+  <div id="mobile-menu" class="fixed top-0 left-0 w-64 h-full bg-gray-900 z-50 transform -translate-x-full transition-transform duration-300 ease-in-out">
+    <div class="p-6">
+      <div class="flex justify-between items-center mb-8">
+        <div class="text-xl font-bold">OpenAI</div>
+        <button id="close-menu" class="text-2xl">&times;</button>
+      </div>
+      <nav class="flex flex-col space-y-4">
+        <a href="#" class="hover:underline">Research</a>
+        <a href="#" class="hover:underline">Product</a>
+        <a href="#" class="hover:underline">Safety</a>
+        <a href="#" class="hover:underline">Company</a>
+      </nav>
+    </div>
+  </div>
+
+  <!-- Overlay -->
+  <div id="overlay" class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden"></div>
+
+  <!-- Header -->
+  <header class="absolute top-0 left-0 w-full flex items-center justify-between p-6 z-10">
+    <div class="text-xl font-bold">OpenAI</div>
+    <!-- Hamburger Menu Button - Visible only on small screens -->
+    <button id="menu-button" class="lg:hidden z-20">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+      </svg>
+    </button>
+    <!-- Desktop Navigation - Hidden on small screens -->
+    <nav class="hidden lg:flex space-x-6">
+      <a href="#" class="hover:underline">Research</a>
+      <a href="#" class="hover:underline">Product</a>
+      <a href="#" class="hover:underline">Safety</a>
+      <a href="#" class="hover:underline">Company</a>
+    </nav>
+  </header>
+
+  <section class="relative h-screen flex items-center justify-center text-center overflow-hidden">
+    <video autoplay muted loop class="absolute w-full h-full object-cover opacity-50">
+      <source src="your-video.mp4" type="video/mp4" />
+    </video>
+    <div class="relative z-10 px-4">
+      <h1 class="text-4xl md:text-6xl font-bold mb-6">Get answers. Find inspiration. Be more productive.</h1>
+      <p class="text-lg md:text-xl mb-8">Free to use. Easy to try. Just ask and ChatGPT can help with writing, learning, brainstorming, and more.</p>
+      <div class="space-x-4">
+        <a href="#" class="bg-white text-black px-6 py-3 rounded-md font-medium hover:bg-gray-200">Start now</a>
+        <a href="#" class="border border-white px-6 py-3 rounded-md font-medium hover:bg-white hover:text-black">Download the app</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Horizontal Banners Section -->
+  <section class="relative py-16 bg-black">
+    <div class="overflow-hidden">
+      <div class="flex space-x-8 animate-scroll">
+        <div class="flex-shrink-0 w-64 h-40 bg-gray-800 rounded-lg flex items-center justify-center text-white text-xl">Banner 1</div>
+        <div class="flex-shrink-0 w-64 h-40 bg-gray-700 rounded-lg flex items-center justify-center text-white text-xl">Banner 2</div>
+        <div class="flex-shrink-0 w-64 h-40 bg-gray-600 rounded-lg flex items-center justify-center text-white text-xl">Banner 3</div>
+        <div class="flex-shrink-0 w-64 h-40 bg-gray-500 rounded-lg flex items-center justify-center text-white text-xl">Banner 4</div>
+        <!-- Duplicate banners for seamless loop -->
+        <div class="flex-shrink-0 w-64 h-40 bg-gray-800 rounded-lg flex items-center justify-center text-white text-xl">Banner 1</div>
+        <div class="flex-shrink-0 w-64 h-40 bg-gray-700 rounded-lg flex items-center justify-center text-white text-xl">Banner 2</div>
+        <div class="flex-shrink-0 w-64 h-40 bg-gray-600 rounded-lg flex items-center justify-center text-white text-xl">Banner 3</div>
+        <div class="flex-shrink-0 w-64 h-40 bg-gray-500 rounded-lg flex items-center justify-center text-white text-xl">Banner 4</div>
+      </div>
+    </div>
+  </section>
+
+  <style>
+    @keyframes scroll {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+    .animate-scroll {
+      display: flex;
+      width: max-content;
+      animation: scroll 20s linear infinite;
+    }
+  </style>
+
+  <script>
+    // Mobile menu functionality
+    document.addEventListener('DOMContentLoaded', function() {
+      const menuButton = document.getElementById('menu-button');
+      const closeButton = document.getElementById('close-menu');
+      const mobileMenu = document.getElementById('mobile-menu');
+      const overlay = document.getElementById('overlay');
+      
+      // Open menu
+      menuButton.addEventListener('click', function() {
+        mobileMenu.classList.remove('-translate-x-full');
+        overlay.classList.remove('hidden');
+      });
+      
+      // Close menu
+      function closeMenu() {
+        mobileMenu.classList.add('-translate-x-full');
+        overlay.classList.add('hidden');
+      }
+      
+      closeButton.addEventListener('click', closeMenu);
+      overlay.addEventListener('click', closeMenu);
+    });
+  </script>
+
 </body>
 </html>
