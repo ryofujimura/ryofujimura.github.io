@@ -224,8 +224,8 @@
         /* Resume line animations */
         .resume-line {
             opacity: 0;
-            transform: translateY(15px);
-            transition: all 0.5s ease-out;
+            transform: translateY(20px);
+            transition: all 0.6s ease-out;
             will-change: opacity, transform;
             cursor: pointer;
             text-decoration: none;
@@ -450,8 +450,8 @@
             
             // Scroll-based animation observer
             const observerOptions = {
-                threshold: 0.2,
-                rootMargin: '0px 0px -100px 0px'
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
             };
 
             const observer = new IntersectionObserver((entries) => {
@@ -489,12 +489,7 @@
             
             if (!resumeContainer || !outerContainer) return;
 
-            // Animate resume lines with staggered delays
-            resumeLines.forEach((line, index) => {
-                setTimeout(() => {
-                    line.classList.add('animated');
-                }, index * 100); // 100ms delay between each line
-            });
+            // Resume lines will be animated by the main observer when scrolled into view
 
             // Handle resume lift and outer container reveal on scroll
             const resumeObserver = new IntersectionObserver((entries) => {
