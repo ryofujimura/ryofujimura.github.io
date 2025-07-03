@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Animated Text Blocks</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes scaleIn {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes rotateIn {
+            from {
+                opacity: 0;
+                transform: rotate(-10deg) scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: rotate(0deg) scale(1);
+            }
+        }
+
+        @keyframes bounceIn {
+            0% {
+                opacity: 0;
+                transform: scale(0.3);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1.05);
+            }
+            70% {
+                transform: scale(0.9);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        /* Animation classes */
+        .animate-fade-in-up {
+            animation: fadeInUp 0.8s ease-out forwards;
+        }
+
+        .animate-slide-in-left {
+            animation: slideInLeft 0.8s ease-out forwards;
+        }
+
+        .animate-scale-in {
+            animation: scaleIn 0.6s ease-out forwards;
+        }
+
+        .animate-rotate-in {
+            animation: rotateIn 0.8s ease-out forwards;
+        }
+
+        .animate-bounce-in {
+            animation: bounceIn 1s ease-out forwards;
+        }
+
+        /* Staggered animation delays */
+        .stagger-1 { animation-delay: 0.1s; }
+        .stagger-2 { animation-delay: 0.2s; }
+        .stagger-3 { animation-delay: 0.3s; }
+        .stagger-4 { animation-delay: 0.4s; }
+        .stagger-5 { animation-delay: 0.5s; }
+        .stagger-6 { animation-delay: 0.6s; }
+        .stagger-7 { animation-delay: 0.7s; }
+        .stagger-8 { animation-delay: 0.8s; }
+        .stagger-9 { animation-delay: 0.9s; }
+        .stagger-10 { animation-delay: 1.0s; }
+
+        /* Scroll reveal animation */
+        .scroll-reveal {
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 0.8s ease-out;
+        }
+
+        .scroll-reveal.revealed {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Sequential load animation */
+        .sequential-load {
+            opacity: 0;
+            transform: translateX(-100px);
+            transition: all 0.6s ease-out;
+        }
+
+        .sequential-load.loaded {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        /* Transition on mount */
+        .mount-transition {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.5s ease-out;
+        }
+
+        .mount-transition.mounted {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Animation delay loop */
+        .delay-loop {
+            animation: fadeInUp 1.2s ease-out infinite;
+            animation-delay: 0s;
+        }
+
+        .delay-loop:nth-child(2) { animation-delay: 0.2s; }
+        .delay-loop:nth-child(3) { animation-delay: 0.4s; }
+        .delay-loop:nth-child(4) { animation-delay: 0.6s; }
+        .delay-loop:nth-child(5) { animation-delay: 0.8s; }
+
+        /* Opacity & transform combined */
+        .opacity-transform {
+            opacity: 0;
+            transform: translateY(30px) scale(0.9);
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .opacity-transform.combined {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
+    <div class="container mx-auto px-4 py-12">
+        <h1 class="text-4xl font-bold text-center text-gray-800 mb-12 animate-fade-in-up">
+            Animated Text Blocks
+        </h1>
+
+        <!-- Block 1: Staggered Animation -->
+        <div class="mb-16">
+            <h2 class="text-2xl font-semibold text-gray-700 mb-6 animate-fade-in-up">1. Staggered Animation</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="bg-white p-6 rounded-lg shadow-md animate-fade-in-up stagger-1">
+                    <h3 class="text-lg font-medium text-gray-800 mb-2">Placeholder Text 1</h3>
+                    <p class="text-gray-600">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md animate-fade-in-up stagger-2">
+                    <h3 class="text-lg font-medium text-gray-800 mb-2">Placeholder Text 2</h3>
+                    <p class="text-gray-600">Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md animate-fade-in-up stagger-3">
+                    <h3 class="text-lg font-medium text-gray-800 mb-2">Placeholder Text 3</h3>
+                    <p class="text-gray-600">Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Block 2: Fade-In Up -->
+        <div class="mb-16">
+            <h2 class="text-2xl font-semibold text-gray-700 mb-6 animate-fade-in-up">2. Fade-In Up Animation</h2>
+            <div class="bg-white p-8 rounded-lg shadow-lg animate-fade-in-up">
+                <h3 class="text-xl font-medium text-gray-800 mb-4">Placeholder Text 4</h3>
+                <p class="text-gray-600 leading-relaxed">Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium.</p>
+            </div>
+        </div>
+
+        <!-- Block 3: Scroll Reveal Animation -->
+        <div class="mb-16">
+            <h2 class="text-2xl font-semibold text-gray-700 mb-6">3. Scroll Reveal Animation</h2>
+            <div class="bg-white p-8 rounded-lg shadow-lg scroll-reveal">
+                <h3 class="text-xl font-medium text-gray-800 mb-4">Placeholder Text 5</h3>
+                <p class="text-gray-600 leading-relaxed">Totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit.</p>
+            </div>
+        </div>
+
+        <!-- Block 4: Keyframe Animation with Delay -->
+        <div class="mb-16">
+            <h2 class="text-2xl font-semibold text-gray-700 mb-6">4. Keyframe Animation with Delay</h2>
+            <div class="bg-white p-8 rounded-lg shadow-lg animate-slide-in-left" style="animation-delay: 0.3s;">
+                <h3 class="text-xl font-medium text-gray-800 mb-4">Placeholder Text 6</h3>
+                <p class="text-gray-600 leading-relaxed">Sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit.</p>
+            </div>
+        </div>
+
+        <!-- Block 5: Sequential Load Animation -->
+        <div class="mb-16">
+            <h2 class="text-2xl font-semibold text-gray-700 mb-6">5. Sequential Load Animation</h2>
+            <div class="space-y-4">
+                <div class="bg-white p-6 rounded-lg shadow-md sequential-load">
+                    <h3 class="text-lg font-medium text-gray-800 mb-2">Placeholder Text 7</h3>
+                    <p class="text-gray-600">First sequential block with custom timing and easing.</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md sequential-load">
+                    <h3 class="text-lg font-medium text-gray-800 mb-2">Placeholder Text 8</h3>
+                    <p class="text-gray-600">Second sequential block with smooth transitions.</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md sequential-load">
+                    <h3 class="text-lg font-medium text-gray-800 mb-2">Placeholder Text 9</h3>
+                    <p class="text-gray-600">Third sequential block with progressive loading effect.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Block 6: Transition on Mount -->
+        <div class="mb-16">
+            <h2 class="text-2xl font-semibold text-gray-700 mb-6">6. Transition on Mount</h2>
+            <div class="bg-white p-8 rounded-lg shadow-lg mount-transition">
+                <h3 class="text-xl font-medium text-gray-800 mb-4">Placeholder Text 10</h3>
+                <p class="text-gray-600 leading-relaxed">This block animates when the component mounts, using CSS transitions for smooth entrance effects. The animation combines opacity and transform properties for a polished look.</p>
+            </div>
+        </div>
+
+        <!-- Block 7: Animation Delay Loop -->
+        <div class="mb-16">
+            <h2 class="text-2xl font-semibold text-gray-700 mb-6">7. Animation Delay Loop</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+                <div class="bg-white p-4 rounded-lg shadow-md delay-loop">
+                    <h3 class="text-sm font-medium text-gray-800 mb-2">Loop 1</h3>
+                    <p class="text-xs text-gray-600">Repeating animation</p>
+                </div>
+                <div class="bg-white p-4 rounded-lg shadow-md delay-loop">
+                    <h3 class="text-sm font-medium text-gray-800 mb-2">Loop 2</h3>
+                    <p class="text-xs text-gray-600">With staggered delays</p>
+                </div>
+                <div class="bg-white p-4 rounded-lg shadow-md delay-loop">
+                    <h3 class="text-sm font-medium text-gray-800 mb-2">Loop 3</h3>
+                    <p class="text-xs text-gray-600">Continuous motion</p>
+                </div>
+                <div class="bg-white p-4 rounded-lg shadow-md delay-loop">
+                    <h3 class="text-sm font-medium text-gray-800 mb-2">Loop 4</h3>
+                    <p class="text-xs text-gray-600">Smooth transitions</p>
+                </div>
+                <div class="bg-white p-4 rounded-lg shadow-md delay-loop">
+                    <h3 class="text-sm font-medium text-gray-800 mb-2">Loop 5</h3>
+                    <p class="text-xs text-gray-600">Endless cycle</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Block 8: Opacity & Transform Combined -->
+        <div class="mb-16">
+            <h2 class="text-2xl font-semibold text-gray-700 mb-6">8. Opacity & Transform Combined</h2>
+            <div class="bg-white p-8 rounded-lg shadow-lg opacity-transform">
+                <h3 class="text-xl font-medium text-gray-800 mb-4">Placeholder Text 11</h3>
+                <p class="text-gray-600 leading-relaxed">This block combines opacity and transform animations using cubic-bezier easing for a sophisticated entrance effect. The animation includes both scaling and vertical movement.</p>
+            </div>
+        </div>
+
+        <!-- Block 9: Scale In Animation -->
+        <div class="mb-16">
+            <h2 class="text-2xl font-semibold text-gray-700 mb-6">9. Scale In Animation</h2>
+            <div class="bg-white p-8 rounded-lg shadow-lg animate-scale-in">
+                <h3 class="text-xl font-medium text-gray-800 mb-4">Placeholder Text 12</h3>
+                <p class="text-gray-600 leading-relaxed">A smooth scale-in animation that starts from 80% size and scales to full size with opacity transition. This creates a subtle but effective entrance effect.</p>
+            </div>
+        </div>
+
+        <!-- Block 10: Rotate In Animation -->
+        <div class="mb-16">
+            <h2 class="text-2xl font-semibold text-gray-700 mb-6">10. Rotate In Animation</h2>
+            <div class="bg-white p-8 rounded-lg shadow-lg animate-rotate-in">
+                <h3 class="text-xl font-medium text-gray-800 mb-4">Placeholder Text 13</h3>
+                <p class="text-gray-600 leading-relaxed">Combines rotation and scaling for a dynamic entrance effect. The block starts rotated and scaled down, then smoothly transitions to its final position.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Scroll reveal functionality
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('revealed');
+                }
+            });
+        }, observerOptions);
+
+        // Observe scroll reveal elements
+        document.querySelectorAll('.scroll-reveal').forEach(el => {
+            observer.observe(el);
+        });
+
+        // Sequential load animation
+        const sequentialElements = document.querySelectorAll('.sequential-load');
+        sequentialElements.forEach((el, index) => {
+            setTimeout(() => {
+                el.classList.add('loaded');
+            }, index * 200);
+        });
+
+        // Mount transition
+        const mountElements = document.querySelectorAll('.mount-transition');
+        mountElements.forEach((el, index) => {
+            setTimeout(() => {
+                el.classList.add('mounted');
+            }, index * 300);
+        });
+
+        // Opacity & transform combined
+        const combinedElements = document.querySelectorAll('.opacity-transform');
+        combinedElements.forEach((el, index) => {
+            setTimeout(() => {
+                el.classList.add('combined');
+            }, index * 400);
+        });
+    </script>
+</body>
+</html> 
