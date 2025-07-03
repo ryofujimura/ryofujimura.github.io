@@ -256,24 +256,102 @@
             transform: translateY(0);
         }
 
-        /* Resume container lift animation */
-        .resume-container .absolute.inset-0.bg-white {
-            transform: translateY(0);
-            transition: transform 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+        /* Outer container animation */
+        .outer-container {
+            transition: transform 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+            will-change: transform;
         }
 
-        .resume-container.lifted .absolute.inset-0.bg-white {
-            transform: translateY(-100%);
+        .outer-container.revealed {
+            transform: translateY(0) !important;
+        }
+
+        /* Resume container lift animation */
+        .resume-container {
+            transition: transform 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+            will-change: transform;
+        }
+
+        .resume-container.lifted {
+            transform: translateY(-100vh);
         }
     </style>
 </head>
 <body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
     <div class="container mx-auto px-4 py-12">
-        <!-- Resume Container -->
-        <div class="relative bg-white rounded-xl shadow-2xl overflow-hidden resume-container" style="min-height: 100vh;">
-            
-            <!-- Top Layer - Plain Text Resume -->
-            <div class="absolute inset-0 bg-white p-12 z-10 transition-transform duration-1000 ease-out">
+        <!-- Outer Container (Hidden Initially) -->
+        <div class="outer-container bg-gradient-to-br from-blue-900 to-indigo-900 rounded-xl shadow-2xl overflow-hidden" style="min-height: 100vh; transform: translateY(100vh);">
+            <div class="p-12">
+                <div class="max-w-6xl mx-auto text-white">
+                    <h2 class="text-4xl font-bold mb-8 detailed-content">Detailed Portfolio & Achievements</h2>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <div>
+                            <h3 class="text-2xl font-semibold mb-4 detailed-content">Technical Achievements</h3>
+                            <div class="space-y-4">
+                                <div class="detailed-content">
+                                    <h4 class="text-lg font-medium">Performance Optimization</h4>
+                                    <p class="text-blue-200">Improved application load times by 60% through code splitting and lazy loading</p>
+                                </div>
+                                <div class="detailed-content">
+                                    <h4 class="text-lg font-medium">Scalability Solutions</h4>
+                                    <p class="text-blue-200">Designed microservices architecture supporting 1M+ daily users</p>
+                                </div>
+                                <div class="detailed-content">
+                                    <h4 class="text-lg font-medium">Security Implementation</h4>
+                                    <p class="text-blue-200">Implemented OAuth 2.0 and JWT authentication for enterprise applications</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <h3 class="text-2xl font-semibold mb-4 detailed-content">Leadership & Impact</h3>
+                            <div class="space-y-4">
+                                <div class="detailed-content">
+                                    <h4 class="text-lg font-medium">Team Leadership</h4>
+                                    <p class="text-blue-200">Led 8-person development team delivering 15+ features per quarter</p>
+                                </div>
+                                <div class="detailed-content">
+                                    <h4 class="text-lg font-medium">Mentorship</h4>
+                                    <p class="text-blue-200">Mentored 12 junior developers, 8 of whom were promoted within 18 months</p>
+                                </div>
+                                <div class="detailed-content">
+                                    <h4 class="text-lg font-medium">Process Improvement</h4>
+                                    <p class="text-blue-200">Reduced deployment time by 70% through CI/CD pipeline optimization</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-8">
+                        <h3 class="text-2xl font-semibold mb-4 detailed-content">Featured Projects</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div class="bg-blue-800 p-6 rounded-lg detailed-content">
+                                <h4 class="text-lg font-medium mb-2">AI-Powered Analytics Dashboard</h4>
+                                <p class="text-blue-200 text-sm">Built real-time analytics platform processing 10TB+ data daily</p>
+                            </div>
+                            <div class="bg-blue-800 p-6 rounded-lg detailed-content">
+                                <h4 class="text-lg font-medium mb-2">Mobile Banking App</h4>
+                                <p class="text-blue-200 text-sm">Developed secure mobile banking solution with biometric authentication</p>
+                            </div>
+                            <div class="bg-blue-800 p-6 rounded-lg detailed-content">
+                                <h4 class="text-lg font-medium mb-2">IoT Smart Home System</h4>
+                                <p class="text-blue-200 text-sm">Created IoT platform managing 50+ connected devices with real-time monitoring</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-8 text-center">
+                        <p class="text-blue-200 detailed-content">Ready to bring innovation to your next project</p>
+                        <p class="text-sm text-blue-300 mt-2 detailed-content">Contact: john.doe@email.com | Portfolio: johndoe.dev</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Resume Container (Initially Visible) -->
+        <div class="resume-container bg-white rounded-xl shadow-2xl overflow-hidden" style="min-height: 100vh;">
+            <div class="p-12">
                 <div class="max-w-4xl mx-auto space-y-4 font-mono text-gray-800">
                     <h1 class="text-3xl font-bold mb-8 resume-line">JOHN DOE</h1>
                     <p class="text-lg resume-line">Software Engineer & Full-Stack Developer</p>
@@ -350,74 +428,6 @@
                     </div>
                     
                     <p class="text-sm text-gray-500 mt-12 resume-line">Scroll to the end to reveal detailed portfolio...</p>
-                </div>
-            </div>
-            
-            <!-- Bottom Layer - Detailed Content -->
-            <div class="absolute inset-0 bg-gradient-to-br from-blue-900 to-indigo-900 p-12 flex items-center justify-center z-0">
-                <div class="max-w-6xl mx-auto text-white">
-                    <h2 class="text-4xl font-bold mb-8 detailed-content">Detailed Portfolio & Achievements</h2>
-                    
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                        <div>
-                            <h3 class="text-2xl font-semibold mb-4 detailed-content">Technical Achievements</h3>
-                            <div class="space-y-4">
-                                <div class="detailed-content">
-                                    <h4 class="text-lg font-medium">Performance Optimization</h4>
-                                    <p class="text-blue-200">Improved application load times by 60% through code splitting and lazy loading</p>
-                                </div>
-                                <div class="detailed-content">
-                                    <h4 class="text-lg font-medium">Scalability Solutions</h4>
-                                    <p class="text-blue-200">Designed microservices architecture supporting 1M+ daily users</p>
-                                </div>
-                                <div class="detailed-content">
-                                    <h4 class="text-lg font-medium">Security Implementation</h4>
-                                    <p class="text-blue-200">Implemented OAuth 2.0 and JWT authentication for enterprise applications</p>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div>
-                            <h3 class="text-2xl font-semibold mb-4 detailed-content">Leadership & Impact</h3>
-                            <div class="space-y-4">
-                                <div class="detailed-content">
-                                    <h4 class="text-lg font-medium">Team Leadership</h4>
-                                    <p class="text-blue-200">Led 8-person development team delivering 15+ features per quarter</p>
-                                </div>
-                                <div class="detailed-content">
-                                    <h4 class="text-lg font-medium">Mentorship</h4>
-                                    <p class="text-blue-200">Mentored 12 junior developers, 8 of whom were promoted within 18 months</p>
-                                </div>
-                                <div class="detailed-content">
-                                    <h4 class="text-lg font-medium">Process Improvement</h4>
-                                    <p class="text-blue-200">Reduced deployment time by 70% through CI/CD pipeline optimization</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="mt-8">
-                        <h3 class="text-2xl font-semibold mb-4 detailed-content">Featured Projects</h3>
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            <div class="bg-blue-800 p-6 rounded-lg detailed-content">
-                                <h4 class="text-lg font-medium mb-2">AI-Powered Analytics Dashboard</h4>
-                                <p class="text-blue-200 text-sm">Built real-time analytics platform processing 10TB+ data daily</p>
-                            </div>
-                            <div class="bg-blue-800 p-6 rounded-lg detailed-content">
-                                <h4 class="text-lg font-medium mb-2">Mobile Banking App</h4>
-                                <p class="text-blue-200 text-sm">Developed secure mobile banking solution with biometric authentication</p>
-                            </div>
-                            <div class="bg-blue-800 p-6 rounded-lg detailed-content">
-                                <h4 class="text-lg font-medium mb-2">IoT Smart Home System</h4>
-                                <p class="text-blue-200 text-sm">Created IoT platform managing 50+ connected devices with real-time monitoring</p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="mt-8 text-center">
-                        <p class="text-blue-200 detailed-content">Ready to bring innovation to your next project</p>
-                        <p class="text-sm text-blue-300 mt-2 detailed-content">Contact: john.doe@email.com | Portfolio: johndoe.dev</p>
-                    </div>
                 </div>
             </div>
         </div>
@@ -613,10 +623,11 @@
 
         function initializeResume() {
             const resumeContainer = document.querySelector('.resume-container');
+            const outerContainer = document.querySelector('.outer-container');
             const resumeLines = document.querySelectorAll('.resume-line');
             const detailedContents = document.querySelectorAll('.detailed-content');
             
-            if (!resumeContainer) return;
+            if (!resumeContainer || !outerContainer) return;
 
             // Animate resume lines with staggered delays
             resumeLines.forEach((line, index) => {
@@ -625,7 +636,7 @@
                 }, index * 100); // 100ms delay between each line
             });
 
-            // Handle resume lift on scroll
+            // Handle resume lift and outer container reveal on scroll
             const resumeObserver = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
@@ -633,19 +644,23 @@
                         const rect = entry.boundingClientRect;
                         const windowHeight = window.innerHeight;
                         
-                        // If the bottom of the resume is visible, trigger lift
+                        // If the bottom of the resume is visible, trigger lift and reveal
                         if (rect.bottom <= windowHeight * 0.3) {
                             setTimeout(() => {
+                                // Lift the resume container
                                 resumeContainer.classList.add('lifted');
                                 
-                                // Animate detailed content after resume lifts
+                                // Reveal the outer container
+                                outerContainer.classList.add('revealed');
+                                
+                                // Animate detailed content after containers move
                                 setTimeout(() => {
                                     detailedContents.forEach((content, index) => {
                                         setTimeout(() => {
                                             content.classList.add('animated');
                                         }, index * 150); // 150ms delay between each content
                                     });
-                                }, 800); // Wait for resume lift animation
+                                }, 1000); // Wait for container animations
                             }, 500); // Wait before lifting
                         }
                     }
