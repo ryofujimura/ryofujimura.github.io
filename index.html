@@ -220,29 +220,101 @@
             opacity: 1;
             transform: translateY(0) scale(1);
         }
+
+        /* Layered text animations */
+        .layered-text {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.6s ease-out;
+            will-change: opacity, transform;
+        }
+
+        .layered-text.animated {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Hidden info animations */
+        .hidden-info {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease-out;
+            will-change: opacity, transform;
+        }
+
+        .hidden-info.animated {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Box lift animation */
+        .layered-box .absolute.inset-0.bg-gradient-to-b {
+            transform: translateY(0);
+            transition: transform 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .layered-box.lifted .absolute.inset-0.bg-gradient-to-b {
+            transform: translateY(-100%);
+        }
     </style>
 </head>
 <body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
     <div class="container mx-auto px-4 py-12">
         <h1 class="text-4xl font-bold text-center text-gray-800 mb-12 animate-fade-in-up">
-            Animated Text Blocks
+            Layered Text Reveal
         </h1>
 
-        <!-- Block 1: Staggered Animation -->
-        <div class="mb-16">
-            <h2 class="text-2xl font-semibold text-gray-700 mb-6 animate-fade-in-up">1. Staggered Animation</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <div class="bg-white p-6 rounded-lg shadow-md animate-fade-in-up stagger-1">
-                    <h3 class="text-lg font-medium text-gray-800 mb-2">Placeholder Text 1</h3>
-                    <p class="text-gray-600">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+        <!-- Layered Text Box with Reveal -->
+        <div class="mb-16 relative">
+            <h2 class="text-2xl font-semibold text-gray-700 mb-6 animate-fade-in-up">Layered Text Box with Reveal</h2>
+            
+            <!-- Main Box Container -->
+            <div class="relative bg-white rounded-xl shadow-2xl overflow-hidden layered-box" style="height: 600px;">
+                
+                <!-- Top Layer - Multiple Text Lines -->
+                <div class="absolute inset-0 bg-gradient-to-b from-blue-50 to-indigo-100 p-8 z-10 transition-transform duration-1000 ease-out">
+                    <div class="space-y-6 text-center">
+                        <h3 class="text-3xl font-bold text-gray-800 layered-text">Welcome to the Future</h3>
+                        <p class="text-xl text-gray-700 layered-text">Where innovation meets creativity</p>
+                        <p class="text-lg text-gray-600 layered-text">Discover amazing possibilities</p>
+                        <p class="text-lg text-gray-600 layered-text">Explore new horizons</p>
+                        <p class="text-lg text-gray-600 layered-text">Unlock your potential</p>
+                        <p class="text-lg text-gray-600 layered-text">Create something extraordinary</p>
+                        <p class="text-lg text-gray-600 layered-text">Build the impossible</p>
+                        <p class="text-lg text-gray-600 layered-text">Dream big, achieve bigger</p>
+                        <p class="text-lg text-gray-600 layered-text">Transform ideas into reality</p>
+                        <p class="text-lg text-gray-600 layered-text">Push beyond boundaries</p>
+                        <p class="text-lg text-gray-600 layered-text">Innovate without limits</p>
+                        <p class="text-lg text-gray-600 layered-text">Design the future today</p>
+                        <p class="text-lg text-gray-600 layered-text">Embrace the unknown</p>
+                        <p class="text-lg text-gray-600 layered-text">Challenge conventional thinking</p>
+                        <p class="text-lg text-gray-600 layered-text">Break through barriers</p>
+                        <p class="text-lg text-gray-600 layered-text">Inspire change</p>
+                        <p class="text-lg text-gray-600 layered-text">Lead with vision</p>
+                        <p class="text-lg text-gray-600 layered-text">Create lasting impact</p>
+                        <p class="text-lg text-gray-600 layered-text">Shape tomorrow's world</p>
+                        <p class="text-lg text-gray-600 layered-text">Reach for the stars</p>
+                        <p class="text-lg text-gray-600 layered-text">Make history</p>
+                        <p class="text-lg text-gray-600 layered-text">Leave your mark</p>
+                        <p class="text-lg text-gray-600 layered-text">Scroll to reveal more...</p>
+                    </div>
                 </div>
-                <div class="bg-white p-6 rounded-lg shadow-md animate-fade-in-up stagger-2">
-                    <h3 class="text-lg font-medium text-gray-800 mb-2">Placeholder Text 2</h3>
-                    <p class="text-gray-600">Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
-                </div>
-                <div class="bg-white p-6 rounded-lg shadow-md animate-fade-in-up stagger-3">
-                    <h3 class="text-lg font-medium text-gray-800 mb-2">Placeholder Text 3</h3>
-                    <p class="text-gray-600">Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
+                
+                <!-- Bottom Layer - Hidden Information -->
+                <div class="absolute inset-0 bg-gradient-to-br from-purple-600 to-indigo-800 p-8 flex items-center justify-center z-0">
+                    <div class="text-center text-white">
+                        <h3 class="text-4xl font-bold mb-6 hidden-info">🎉 Congratulations!</h3>
+                        <p class="text-xl mb-4 hidden-info">You've reached the hidden layer</p>
+                        <p class="text-lg mb-4 hidden-info">This is where the magic happens</p>
+                        <p class="text-lg mb-4 hidden-info">Special content awaits you</p>
+                        <p class="text-lg mb-4 hidden-info">Exclusive information revealed</p>
+                        <p class="text-lg mb-4 hidden-info">You've unlocked premium content</p>
+                        <p class="text-lg mb-4 hidden-info">Welcome to the inner circle</p>
+                        <p class="text-lg mb-4 hidden-info">This is just the beginning</p>
+                        <p class="text-lg mb-4 hidden-info">More surprises await below</p>
+                        <p class="text-lg mb-4 hidden-info">Keep scrolling to discover more</p>
+                        <p class="text-lg mb-4 hidden-info">The journey continues...</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -402,6 +474,10 @@
                             entry.target.classList.add('animated');
                         } else if (entry.target.classList.contains('animate-bounce-in')) {
                             entry.target.classList.add('animated');
+                        } else if (entry.target.classList.contains('layered-text')) {
+                            entry.target.classList.add('animated');
+                        } else if (entry.target.classList.contains('hidden-info')) {
+                            entry.target.classList.add('animated');
                         }
                     }
                 });
@@ -418,12 +494,64 @@
                 .animate-slide-in-left,
                 .animate-scale-in,
                 .animate-rotate-in,
-                .animate-bounce-in
+                .animate-bounce-in,
+                .layered-text,
+                .hidden-info
             `);
 
             animatedElements.forEach(el => {
                 observer.observe(el);
             });
+
+            // Handle layered box animations
+            initializeLayeredBox();
+        }
+
+        function initializeLayeredBox() {
+            const layeredBox = document.querySelector('.layered-box');
+            const layeredTexts = document.querySelectorAll('.layered-text');
+            const hiddenInfos = document.querySelectorAll('.hidden-info');
+            
+            if (!layeredBox) return;
+
+            // Animate layered texts with staggered delays
+            layeredTexts.forEach((text, index) => {
+                setTimeout(() => {
+                    text.classList.add('animated');
+                }, index * 150); // 150ms delay between each text
+            });
+
+            // Handle box lift on scroll
+            const boxObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        // Check if we're near the bottom of the box
+                        const rect = entry.boundingClientRect;
+                        const windowHeight = window.innerHeight;
+                        
+                        // If the bottom of the box is visible, trigger lift
+                        if (rect.bottom <= windowHeight * 0.8) {
+                            setTimeout(() => {
+                                layeredBox.classList.add('lifted');
+                                
+                                // Animate hidden info after box lifts
+                                setTimeout(() => {
+                                    hiddenInfos.forEach((info, index) => {
+                                        setTimeout(() => {
+                                            info.classList.add('animated');
+                                        }, index * 200); // 200ms delay between each hidden info
+                                    });
+                                }, 600); // Wait for box lift animation
+                            }, 1000); // Wait before lifting
+                        }
+                    }
+                });
+            }, {
+                threshold: [0, 0.25, 0.5, 0.75, 1],
+                rootMargin: '0px 0px -200px 0px'
+            });
+
+            boxObserver.observe(layeredBox);
         }
     </script>
 </body>
