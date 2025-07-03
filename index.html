@@ -22,6 +22,18 @@
             opacity: 1;
             transform: translateY(0);
         }
+
+        /* Sentence fade-in animation */
+        .resume-sentence {
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 0.6s cubic-bezier(0.4,0,0.2,1), transform 0.6s cubic-bezier(0.4,0,0.2,1);
+            display: inline-block;
+        }
+        .resume-sentence.animated {
+            opacity: 1;
+            transform: translateY(0);
+        }
     </style>
 </head>
 <body class="bg-gray-50 min-h-screen">
@@ -36,9 +48,9 @@
             <section class="resume-line bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
                 <h2 class="text-2xl font-semibold text-gray-800 mb-3">Professional Summary</h2>
                 <p class="text-gray-600 leading-relaxed">
-                    Experienced software developer with 5+ years of expertise in full-stack development, 
-                    specializing in modern web technologies and agile methodologies. Passionate about 
-                    creating scalable solutions and mentoring junior developers.
+                    <span class="resume-sentence">Experienced software developer with 5+ years of expertise in full-stack development.</span> 
+                    <span class="resume-sentence">Specializing in modern web technologies and agile methodologies.</span> 
+                    <span class="resume-sentence">Passionate about creating scalable solutions and mentoring junior developers.</span>
                 </p>
             </section>
 
@@ -46,9 +58,8 @@
             <section class="resume-line bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
                 <h2 class="text-2xl font-semibold text-gray-800 mb-3">Technical Skills</h2>
                 <p class="text-gray-600 leading-relaxed">
-                    Proficient in JavaScript, TypeScript, React, Node.js, Python, and SQL. 
-                    Experience with cloud platforms (AWS, Azure), CI/CD pipelines, and 
-                    containerization technologies including Docker and Kubernetes.
+                    <span class="resume-sentence">Proficient in JavaScript, TypeScript, React, Node.js, Python, and SQL.</span> 
+                    <span class="resume-sentence">Experience with cloud platforms (AWS, Azure), CI/CD pipelines, and containerization technologies including Docker and Kubernetes.</span>
                 </p>
             </section>
 
@@ -56,9 +67,7 @@
             <section class="resume-line bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
                 <h2 class="text-2xl font-semibold text-gray-800 mb-3">Work Experience</h2>
                 <p class="text-gray-600 leading-relaxed">
-                    Senior Developer at TechCorp (2020-2023): Led development of enterprise 
-                    applications, managed team of 8 developers, and implemented best practices 
-                    that improved code quality by 40%.
+                    <span class="resume-sentence">Senior Developer at TechCorp (2020-2023): Led development of enterprise applications, managed team of 8 developers, and implemented best practices that improved code quality by 40%.</span>
                 </p>
             </section>
 
@@ -66,9 +75,8 @@
             <section class="resume-line bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
                 <h2 class="text-2xl font-semibold text-gray-800 mb-3">Education</h2>
                 <p class="text-gray-600 leading-relaxed">
-                    Bachelor of Science in Computer Science from University of Technology (2018). 
-                    Graduated with honors and completed capstone project on machine learning 
-                    applications in healthcare.
+                    <span class="resume-sentence">Bachelor of Science in Computer Science from University of Technology (2018).</span> 
+                    <span class="resume-sentence">Graduated with honors and completed capstone project on machine learning applications in healthcare.</span>
                 </p>
             </section>
 
@@ -76,9 +84,8 @@
             <section class="resume-line bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
                 <h2 class="text-2xl font-semibold text-gray-800 mb-3">Certifications</h2>
                 <p class="text-gray-600 leading-relaxed">
-                    AWS Certified Solutions Architect, Google Cloud Professional Developer, 
-                    and Certified Scrum Master (CSM). Continuously pursuing professional 
-                    development through online courses and industry conferences.
+                    <span class="resume-sentence">AWS Certified Solutions Architect, Google Cloud Professional Developer, and Certified Scrum Master (CSM).</span> 
+                    <span class="resume-sentence">Continuously pursuing professional development through online courses and industry conferences.</span>
                 </p>
             </section>
 
@@ -86,9 +93,9 @@
             <section class="resume-line bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
                 <h2 class="text-2xl font-semibold text-gray-800 mb-3">Projects</h2>
                 <p class="text-gray-600 leading-relaxed">
-                    Developed open-source library with 10K+ downloads, created e-commerce 
-                    platform processing $2M+ in transactions, and built real-time analytics 
-                    dashboard for manufacturing operations.
+                    <span class="resume-sentence">Developed open-source library with 10K+ downloads.</span> 
+                    <span class="resume-sentence">Created e-commerce platform processing $2M+ in transactions.</span> 
+                    <span class="resume-sentence">Built real-time analytics dashboard for manufacturing operations.</span>
                 </p>
             </section>
 
@@ -96,9 +103,8 @@
             <section class="resume-line bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
                 <h2 class="text-2xl font-semibold text-gray-800 mb-3">Leadership</h2>
                 <p class="text-gray-600 leading-relaxed">
-                    Led cross-functional teams of 12+ members, mentored 15+ junior developers, 
-                    and established coding standards that reduced bug reports by 60%. 
-                    Organized monthly tech talks and hackathons.
+                    <span class="resume-sentence">Led cross-functional teams of 12+ members, mentored 15+ junior developers, and established coding standards that reduced bug reports by 60%.</span> 
+                    <span class="resume-sentence">Organized monthly tech talks and hackathons.</span>
                 </p>
             </section>
 
@@ -106,9 +112,9 @@
             <section class="resume-line bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
                 <h2 class="text-2xl font-semibold text-gray-800 mb-3">Achievements</h2>
                 <p class="text-gray-600 leading-relaxed">
-                    Received "Developer of the Year" award in 2022, published 3 technical 
-                    articles on Medium, and spoke at 5 industry conferences. Contributed 
-                    to 20+ open source projects.
+                    <span class="resume-sentence">Received "Developer of the Year" award in 2022.</span> 
+                    <span class="resume-sentence">Published 3 technical articles on Medium, and spoke at 5 industry conferences.</span> 
+                    <span class="resume-sentence">Contributed to 20+ open source projects.</span>
                 </p>
             </section>
 
@@ -116,9 +122,8 @@
             <section class="resume-line bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
                 <h2 class="text-2xl font-semibold text-gray-800 mb-3">Languages</h2>
                 <p class="text-gray-600 leading-relaxed">
-                    Fluent in English and Japanese, with intermediate proficiency in Spanish. 
-                    Experience working with international teams and clients across different 
-                    time zones and cultural backgrounds.
+                    <span class="resume-sentence">Fluent in English and Japanese, with intermediate proficiency in Spanish.</span> 
+                    <span class="resume-sentence">Experience working with international teams and clients across different time zones and cultural backgrounds.</span>
                 </p>
             </section>
 
@@ -126,9 +131,8 @@
             <section class="resume-line bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
                 <h2 class="text-2xl font-semibold text-gray-800 mb-3">Interests</h2>
                 <p class="text-gray-600 leading-relaxed">
-                    Passionate about emerging technologies including AI/ML, blockchain, and 
-                    IoT. Enjoys contributing to open source, attending tech meetups, and 
-                    staying current with industry trends through continuous learning.
+                    <span class="resume-sentence">Passionate about emerging technologies including AI/ML, blockchain, and IoT.</span> 
+                    <span class="resume-sentence">Enjoys contributing to open source, attending tech meetups, and staying current with industry trends through continuous learning.</span>
                 </p>
             </section>
         </main>
@@ -149,6 +153,13 @@
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
                     entry.target.classList.add('animated');
+                    // Animate sentences with stagger
+                    const sentences = entry.target.querySelectorAll('.resume-sentence');
+                    sentences.forEach((sentence, idx) => {
+                        setTimeout(() => {
+                            sentence.classList.add('animated');
+                        }, idx * 120);
+                    });
                 }
             });
         }, observerOptions);
