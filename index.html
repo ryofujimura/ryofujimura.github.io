@@ -221,103 +221,207 @@
             transform: translateY(0) scale(1);
         }
 
-        /* Layered text animations */
-        .layered-text {
+        /* Resume line animations */
+        .resume-line {
             opacity: 0;
-            transform: translateY(20px);
-            transition: all 0.6s ease-out;
+            transform: translateY(15px);
+            transition: all 0.5s ease-out;
             will-change: opacity, transform;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            display: block;
         }
 
-        .layered-text.animated {
+        .resume-line:hover {
+            color: #3b82f6;
+            transform: translateY(0) scale(1.02);
+        }
+
+        .resume-line.animated {
             opacity: 1;
             transform: translateY(0);
         }
 
-        /* Hidden info animations */
-        .hidden-info {
+        /* Detailed content animations */
+        .detailed-content {
             opacity: 0;
             transform: translateY(30px);
             transition: all 0.8s ease-out;
             will-change: opacity, transform;
         }
 
-        .hidden-info.animated {
+        .detailed-content.animated {
             opacity: 1;
             transform: translateY(0);
         }
 
-        /* Box lift animation */
-        .layered-box .absolute.inset-0.bg-gradient-to-b {
+        /* Resume container lift animation */
+        .resume-container .absolute.inset-0.bg-white {
             transform: translateY(0);
             transition: transform 1.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .layered-box.lifted .absolute.inset-0.bg-gradient-to-b {
+        .resume-container.lifted .absolute.inset-0.bg-white {
             transform: translateY(-100%);
         }
     </style>
 </head>
 <body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
     <div class="container mx-auto px-4 py-12">
-        <h1 class="text-4xl font-bold text-center text-gray-800 mb-12 animate-fade-in-up">
-            Layered Text Reveal
-        </h1>
-
-        <!-- Layered Text Box with Reveal -->
-        <div class="mb-16 relative">
-            <h2 class="text-2xl font-semibold text-gray-700 mb-6 animate-fade-in-up">Layered Text Box with Reveal</h2>
+        <!-- Resume Container -->
+        <div class="relative bg-white rounded-xl shadow-2xl overflow-hidden resume-container" style="min-height: 100vh;">
             
-            <!-- Main Box Container -->
-            <div class="relative bg-white rounded-xl shadow-2xl overflow-hidden layered-box" style="height: 600px;">
-                
-                <!-- Top Layer - Multiple Text Lines -->
-                <div class="absolute inset-0 bg-gradient-to-b from-blue-50 to-indigo-100 p-8 z-10 transition-transform duration-1000 ease-out">
-                    <div class="space-y-6 text-center">
-                        <h3 class="text-3xl font-bold text-gray-800 layered-text">Welcome to the Future</h3>
-                        <p class="text-xl text-gray-700 layered-text">Where innovation meets creativity</p>
-                        <p class="text-lg text-gray-600 layered-text">Discover amazing possibilities</p>
-                        <p class="text-lg text-gray-600 layered-text">Explore new horizons</p>
-                        <p class="text-lg text-gray-600 layered-text">Unlock your potential</p>
-                        <p class="text-lg text-gray-600 layered-text">Create something extraordinary</p>
-                        <p class="text-lg text-gray-600 layered-text">Build the impossible</p>
-                        <p class="text-lg text-gray-600 layered-text">Dream big, achieve bigger</p>
-                        <p class="text-lg text-gray-600 layered-text">Transform ideas into reality</p>
-                        <p class="text-lg text-gray-600 layered-text">Push beyond boundaries</p>
-                        <p class="text-lg text-gray-600 layered-text">Innovate without limits</p>
-                        <p class="text-lg text-gray-600 layered-text">Design the future today</p>
-                        <p class="text-lg text-gray-600 layered-text">Embrace the unknown</p>
-                        <p class="text-lg text-gray-600 layered-text">Challenge conventional thinking</p>
-                        <p class="text-lg text-gray-600 layered-text">Break through barriers</p>
-                        <p class="text-lg text-gray-600 layered-text">Inspire change</p>
-                        <p class="text-lg text-gray-600 layered-text">Lead with vision</p>
-                        <p class="text-lg text-gray-600 layered-text">Create lasting impact</p>
-                        <p class="text-lg text-gray-600 layered-text">Shape tomorrow's world</p>
-                        <p class="text-lg text-gray-600 layered-text">Reach for the stars</p>
-                        <p class="text-lg text-gray-600 layered-text">Make history</p>
-                        <p class="text-lg text-gray-600 layered-text">Leave your mark</p>
-                        <p class="text-lg text-gray-600 layered-text">Scroll to reveal more...</p>
+            <!-- Top Layer - Plain Text Resume -->
+            <div class="absolute inset-0 bg-white p-12 z-10 transition-transform duration-1000 ease-out">
+                <div class="max-w-4xl mx-auto space-y-4 font-mono text-gray-800">
+                    <h1 class="text-3xl font-bold mb-8 resume-line">JOHN DOE</h1>
+                    <p class="text-lg resume-line">Software Engineer & Full-Stack Developer</p>
+                    <p class="text-sm text-gray-600 resume-line">john.doe@email.com | (555) 123-4567 | linkedin.com/in/johndoe</p>
+                    
+                    <div class="mt-8">
+                        <h2 class="text-xl font-bold mb-4 resume-line">PROFESSIONAL SUMMARY</h2>
+                        <p class="resume-line">Experienced software engineer with 5+ years developing scalable web applications</p>
+                        <p class="resume-line">Expert in JavaScript, React, Node.js, and cloud technologies</p>
+                        <p class="resume-line">Led development teams and delivered projects on time and within budget</p>
                     </div>
+                    
+                    <div class="mt-8">
+                        <h2 class="text-xl font-bold mb-4 resume-line">WORK EXPERIENCE</h2>
+                        <div class="mb-6">
+                            <h3 class="text-lg font-semibold resume-line">Senior Software Engineer - TechCorp Inc.</h3>
+                            <p class="text-sm text-gray-600 resume-line">January 2022 - Present</p>
+                            <p class="resume-line">• Developed and maintained React-based frontend applications</p>
+                            <p class="resume-line">• Implemented RESTful APIs using Node.js and Express</p>
+                            <p class="resume-line">• Collaborated with cross-functional teams to deliver features</p>
+                        </div>
+                        <div class="mb-6">
+                            <h3 class="text-lg font-semibold resume-line">Full-Stack Developer - StartupXYZ</h3>
+                            <p class="text-sm text-gray-600 resume-line">March 2020 - December 2021</p>
+                            <p class="resume-line">• Built complete web applications from concept to deployment</p>
+                            <p class="resume-line">• Managed AWS infrastructure and CI/CD pipelines</p>
+                            <p class="resume-line">• Mentored junior developers and conducted code reviews</p>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-8">
+                        <h2 class="text-xl font-bold mb-4 resume-line">EDUCATION</h2>
+                        <h3 class="text-lg font-semibold resume-line">Bachelor of Science in Computer Science</h3>
+                        <p class="text-sm text-gray-600 resume-line">University of Technology - Graduated 2020</p>
+                        <p class="resume-line">• GPA: 3.8/4.0</p>
+                        <p class="resume-line">• Dean's List: 2018-2020</p>
+                    </div>
+                    
+                    <div class="mt-8">
+                        <h2 class="text-xl font-bold mb-4 resume-line">TECHNICAL SKILLS</h2>
+                        <p class="resume-line">• Frontend: React, Vue.js, HTML5, CSS3, JavaScript (ES6+)</p>
+                        <p class="resume-line">• Backend: Node.js, Python, Express, Django, REST APIs</p>
+                        <p class="resume-line">• Database: MongoDB, PostgreSQL, Redis, MySQL</p>
+                        <p class="resume-line">• DevOps: AWS, Docker, Kubernetes, CI/CD, Git</p>
+                        <p class="resume-line">• Tools: VS Code, Postman, Jira, Figma, Adobe Creative Suite</p>
+                    </div>
+                    
+                    <div class="mt-8">
+                        <h2 class="text-xl font-bold mb-4 resume-line">PROJECTS</h2>
+                        <div class="mb-4">
+                            <h3 class="text-lg font-semibold resume-line">E-Commerce Platform</h3>
+                            <p class="resume-line">• Built full-stack e-commerce solution with React and Node.js</p>
+                            <p class="resume-line">• Integrated payment processing and inventory management</p>
+                        </div>
+                        <div class="mb-4">
+                            <h3 class="text-lg font-semibold resume-line">Task Management App</h3>
+                            <p class="resume-line">• Developed collaborative task management tool with real-time updates</p>
+                            <p class="resume-line">• Implemented user authentication and role-based permissions</p>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-8">
+                        <h2 class="text-xl font-bold mb-4 resume-line">CERTIFICATIONS</h2>
+                        <p class="resume-line">• AWS Certified Solutions Architect</p>
+                        <p class="resume-line">• Google Cloud Professional Developer</p>
+                        <p class="resume-line">• Certified Scrum Master (CSM)</p>
+                    </div>
+                    
+                    <div class="mt-8">
+                        <h2 class="text-xl font-bold mb-4 resume-line">LANGUAGES</h2>
+                        <p class="resume-line">• English (Native)</p>
+                        <p class="resume-line">• Spanish (Fluent)</p>
+                        <p class="resume-line">• French (Conversational)</p>
+                    </div>
+                    
+                    <p class="text-sm text-gray-500 mt-12 resume-line">Scroll to the end to reveal detailed portfolio...</p>
                 </div>
-                
-                <!-- Bottom Layer - Hidden Information -->
-                <div class="absolute inset-0 bg-gradient-to-br from-purple-600 to-indigo-800 p-8 flex items-center justify-center z-0">
-                    <div class="text-center text-white">
-                        <h3 class="text-4xl font-bold mb-6 hidden-info">🎉 Congratulations!</h3>
-                        <p class="text-xl mb-4 hidden-info">You've reached the hidden layer</p>
-                        <p class="text-lg mb-4 hidden-info">This is where the magic happens</p>
-                        <p class="text-lg mb-4 hidden-info">Special content awaits you</p>
-                        <p class="text-lg mb-4 hidden-info">Exclusive information revealed</p>
-                        <p class="text-lg mb-4 hidden-info">You've unlocked premium content</p>
-                        <p class="text-lg mb-4 hidden-info">Welcome to the inner circle</p>
-                        <p class="text-lg mb-4 hidden-info">This is just the beginning</p>
-                        <p class="text-lg mb-4 hidden-info">More surprises await below</p>
-                        <p class="text-lg mb-4 hidden-info">Keep scrolling to discover more</p>
-                        <p class="text-lg mb-4 hidden-info">The journey continues...</p>
+            </div>
+            
+            <!-- Bottom Layer - Detailed Content -->
+            <div class="absolute inset-0 bg-gradient-to-br from-blue-900 to-indigo-900 p-12 flex items-center justify-center z-0">
+                <div class="max-w-6xl mx-auto text-white">
+                    <h2 class="text-4xl font-bold mb-8 detailed-content">Detailed Portfolio & Achievements</h2>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <div>
+                            <h3 class="text-2xl font-semibold mb-4 detailed-content">Technical Achievements</h3>
+                            <div class="space-y-4">
+                                <div class="detailed-content">
+                                    <h4 class="text-lg font-medium">Performance Optimization</h4>
+                                    <p class="text-blue-200">Improved application load times by 60% through code splitting and lazy loading</p>
+                                </div>
+                                <div class="detailed-content">
+                                    <h4 class="text-lg font-medium">Scalability Solutions</h4>
+                                    <p class="text-blue-200">Designed microservices architecture supporting 1M+ daily users</p>
+                                </div>
+                                <div class="detailed-content">
+                                    <h4 class="text-lg font-medium">Security Implementation</h4>
+                                    <p class="text-blue-200">Implemented OAuth 2.0 and JWT authentication for enterprise applications</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <h3 class="text-2xl font-semibold mb-4 detailed-content">Leadership & Impact</h3>
+                            <div class="space-y-4">
+                                <div class="detailed-content">
+                                    <h4 class="text-lg font-medium">Team Leadership</h4>
+                                    <p class="text-blue-200">Led 8-person development team delivering 15+ features per quarter</p>
+                                </div>
+                                <div class="detailed-content">
+                                    <h4 class="text-lg font-medium">Mentorship</h4>
+                                    <p class="text-blue-200">Mentored 12 junior developers, 8 of whom were promoted within 18 months</p>
+                                </div>
+                                <div class="detailed-content">
+                                    <h4 class="text-lg font-medium">Process Improvement</h4>
+                                    <p class="text-blue-200">Reduced deployment time by 70% through CI/CD pipeline optimization</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-8">
+                        <h3 class="text-2xl font-semibold mb-4 detailed-content">Featured Projects</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div class="bg-blue-800 p-6 rounded-lg detailed-content">
+                                <h4 class="text-lg font-medium mb-2">AI-Powered Analytics Dashboard</h4>
+                                <p class="text-blue-200 text-sm">Built real-time analytics platform processing 10TB+ data daily</p>
+                            </div>
+                            <div class="bg-blue-800 p-6 rounded-lg detailed-content">
+                                <h4 class="text-lg font-medium mb-2">Mobile Banking App</h4>
+                                <p class="text-blue-200 text-sm">Developed secure mobile banking solution with biometric authentication</p>
+                            </div>
+                            <div class="bg-blue-800 p-6 rounded-lg detailed-content">
+                                <h4 class="text-lg font-medium mb-2">IoT Smart Home System</h4>
+                                <p class="text-blue-200 text-sm">Created IoT platform managing 50+ connected devices with real-time monitoring</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-8 text-center">
+                        <p class="text-blue-200 detailed-content">Ready to bring innovation to your next project</p>
+                        <p class="text-sm text-blue-300 mt-2 detailed-content">Contact: john.doe@email.com | Portfolio: johndoe.dev</p>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
 
         <!-- Block 2: Fade-In Up -->
         <div class="mb-16">
@@ -474,9 +578,9 @@
                             entry.target.classList.add('animated');
                         } else if (entry.target.classList.contains('animate-bounce-in')) {
                             entry.target.classList.add('animated');
-                        } else if (entry.target.classList.contains('layered-text')) {
+                        } else if (entry.target.classList.contains('resume-line')) {
                             entry.target.classList.add('animated');
-                        } else if (entry.target.classList.contains('hidden-info')) {
+                        } else if (entry.target.classList.contains('detailed-content')) {
                             entry.target.classList.add('animated');
                         }
                     }
@@ -495,63 +599,74 @@
                 .animate-scale-in,
                 .animate-rotate-in,
                 .animate-bounce-in,
-                .layered-text,
-                .hidden-info
+                .resume-line,
+                .detailed-content
             `);
 
             animatedElements.forEach(el => {
                 observer.observe(el);
             });
 
-            // Handle layered box animations
-            initializeLayeredBox();
+            // Handle resume animations
+            initializeResume();
         }
 
-        function initializeLayeredBox() {
-            const layeredBox = document.querySelector('.layered-box');
-            const layeredTexts = document.querySelectorAll('.layered-text');
-            const hiddenInfos = document.querySelectorAll('.hidden-info');
+        function initializeResume() {
+            const resumeContainer = document.querySelector('.resume-container');
+            const resumeLines = document.querySelectorAll('.resume-line');
+            const detailedContents = document.querySelectorAll('.detailed-content');
             
-            if (!layeredBox) return;
+            if (!resumeContainer) return;
 
-            // Animate layered texts with staggered delays
-            layeredTexts.forEach((text, index) => {
+            // Animate resume lines with staggered delays
+            resumeLines.forEach((line, index) => {
                 setTimeout(() => {
-                    text.classList.add('animated');
-                }, index * 150); // 150ms delay between each text
+                    line.classList.add('animated');
+                }, index * 100); // 100ms delay between each line
             });
 
-            // Handle box lift on scroll
-            const boxObserver = new IntersectionObserver((entries) => {
+            // Handle resume lift on scroll
+            const resumeObserver = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
-                        // Check if we're near the bottom of the box
+                        // Check if we're near the bottom of the resume
                         const rect = entry.boundingClientRect;
                         const windowHeight = window.innerHeight;
                         
-                        // If the bottom of the box is visible, trigger lift
-                        if (rect.bottom <= windowHeight * 0.8) {
+                        // If the bottom of the resume is visible, trigger lift
+                        if (rect.bottom <= windowHeight * 0.3) {
                             setTimeout(() => {
-                                layeredBox.classList.add('lifted');
+                                resumeContainer.classList.add('lifted');
                                 
-                                // Animate hidden info after box lifts
+                                // Animate detailed content after resume lifts
                                 setTimeout(() => {
-                                    hiddenInfos.forEach((info, index) => {
+                                    detailedContents.forEach((content, index) => {
                                         setTimeout(() => {
-                                            info.classList.add('animated');
-                                        }, index * 200); // 200ms delay between each hidden info
+                                            content.classList.add('animated');
+                                        }, index * 150); // 150ms delay between each content
                                     });
-                                }, 600); // Wait for box lift animation
-                            }, 1000); // Wait before lifting
+                                }, 800); // Wait for resume lift animation
+                            }, 500); // Wait before lifting
                         }
                     }
                 });
             }, {
                 threshold: [0, 0.25, 0.5, 0.75, 1],
-                rootMargin: '0px 0px -200px 0px'
+                rootMargin: '0px 0px -300px 0px'
             });
 
-            boxObserver.observe(layeredBox);
+            resumeObserver.observe(resumeContainer);
+
+            // Add click handlers for resume lines (optional - for demo purposes)
+            resumeLines.forEach(line => {
+                line.addEventListener('click', function() {
+                    // Add a subtle click effect
+                    this.style.transform = 'scale(0.98)';
+                    setTimeout(() => {
+                        this.style.transform = '';
+                    }, 150);
+                });
+            });
         }
     </script>
 </body>
