@@ -4,16 +4,16 @@ A modern website showcasing various CSS animations with Tailwind CSS. Features 1
 
 ## Features
 
-- **Staggered Animation**: Multiple blocks animate in sequence with delays
-- **Fade-In Up**: Smooth upward fade-in effect
-- **Scroll Reveal**: Elements animate when scrolled into view
-- **Keyframe Animation with Delay**: Custom keyframes with timing delays
-- **Sequential Load**: Progressive loading animation
-- **Transition on Mount**: CSS transitions for component mounting
-- **Animation Delay Loop**: Continuous looping animations
-- **Opacity & Transform Combined**: Sophisticated combined effects
-- **Scale In**: Smooth scaling entrance
-- **Rotate In**: Dynamic rotation and scaling
+- **Staggered Animation**: Multiple blocks animate in sequence when scrolled into view
+- **Fade-In Up**: Smooth upward fade-in effect triggered by scroll
+- **Scroll Reveal**: Elements animate when scrolled into viewport
+- **Keyframe Animation with Delay**: Custom animations with scroll-based timing delays
+- **Sequential Load**: Progressive loading animation on scroll
+- **Transition on Mount**: CSS transitions triggered when elements enter viewport
+- **Animation Delay Loop**: Staggered animations with scroll-based delays
+- **Opacity & Transform Combined**: Sophisticated combined effects on scroll
+- **Scale In**: Smooth scaling entrance triggered by scroll
+- **Rotate In**: Dynamic rotation and scaling on scroll entry
 
 ## Technologies Used
 
@@ -31,34 +31,34 @@ A modern website showcasing various CSS animations with Tailwind CSS. Features 1
 ## Animation Types
 
 ### 1. Staggered Animation
-Three cards animate in sequence with 0.1s delays between each.
+Three cards animate in sequence when scrolled into view with 0.1s delays between each.
 
 ### 2. Fade-In Up
-Single block with smooth upward fade-in effect.
+Single block with smooth upward fade-in effect triggered by scroll position.
 
 ### 3. Scroll Reveal
-Uses Intersection Observer API to trigger animations on scroll.
+Uses Intersection Observer API to trigger animations when elements enter viewport.
 
 ### 4. Keyframe Animation with Delay
-Custom slide-in animation with 0.3s delay.
+Custom slide-in animation with 0.3s delay, triggered on scroll.
 
 ### 5. Sequential Load
-Three blocks load progressively with 200ms intervals.
+Three blocks load progressively when scrolled into view with staggered timing.
 
 ### 6. Transition on Mount
-CSS transitions triggered on component mount.
+CSS transitions triggered when elements enter the viewport.
 
 ### 7. Animation Delay Loop
-Five blocks with continuous looping animations.
+Five blocks with staggered animations triggered by scroll position.
 
 ### 8. Opacity & Transform Combined
-Sophisticated entrance using cubic-bezier easing.
+Sophisticated entrance using cubic-bezier easing, activated on scroll.
 
 ### 9. Scale In
-Smooth scaling from 80% to 100% size.
+Smooth scaling from 80% to 100% size when scrolled into view.
 
 ### 10. Rotate In
-Combines rotation and scaling for dynamic effect.
+Combines rotation and scaling for dynamic effect triggered by scroll.
 
 ## Browser Support
 

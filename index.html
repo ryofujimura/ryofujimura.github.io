@@ -69,38 +69,73 @@
             }
         }
 
-        /* Animation classes */
+        /* Animation classes - initially hidden */
         .animate-fade-in-up {
-            animation: fadeInUp 0.8s ease-out forwards;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease-out;
+        }
+
+        .animate-fade-in-up.animated {
+            opacity: 1;
+            transform: translateY(0);
         }
 
         .animate-slide-in-left {
-            animation: slideInLeft 0.8s ease-out forwards;
+            opacity: 0;
+            transform: translateX(-50px);
+            transition: all 0.8s ease-out;
+        }
+
+        .animate-slide-in-left.animated {
+            opacity: 1;
+            transform: translateX(0);
         }
 
         .animate-scale-in {
-            animation: scaleIn 0.6s ease-out forwards;
+            opacity: 0;
+            transform: scale(0.8);
+            transition: all 0.6s ease-out;
+        }
+
+        .animate-scale-in.animated {
+            opacity: 1;
+            transform: scale(1);
         }
 
         .animate-rotate-in {
-            animation: rotateIn 0.8s ease-out forwards;
+            opacity: 0;
+            transform: rotate(-10deg) scale(0.8);
+            transition: all 0.8s ease-out;
+        }
+
+        .animate-rotate-in.animated {
+            opacity: 1;
+            transform: rotate(0deg) scale(1);
         }
 
         .animate-bounce-in {
-            animation: bounceIn 1s ease-out forwards;
+            opacity: 0;
+            transform: scale(0.3);
+            transition: all 1s ease-out;
         }
 
-        /* Staggered animation delays */
-        .stagger-1 { animation-delay: 0.1s; }
-        .stagger-2 { animation-delay: 0.2s; }
-        .stagger-3 { animation-delay: 0.3s; }
-        .stagger-4 { animation-delay: 0.4s; }
-        .stagger-5 { animation-delay: 0.5s; }
-        .stagger-6 { animation-delay: 0.6s; }
-        .stagger-7 { animation-delay: 0.7s; }
-        .stagger-8 { animation-delay: 0.8s; }
-        .stagger-9 { animation-delay: 0.9s; }
-        .stagger-10 { animation-delay: 1.0s; }
+        .animate-bounce-in.animated {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        /* Staggered animation delays - for scroll-based triggers */
+        .stagger-1 { transition-delay: 0.1s; }
+        .stagger-2 { transition-delay: 0.2s; }
+        .stagger-3 { transition-delay: 0.3s; }
+        .stagger-4 { transition-delay: 0.4s; }
+        .stagger-5 { transition-delay: 0.5s; }
+        .stagger-6 { transition-delay: 0.6s; }
+        .stagger-7 { transition-delay: 0.7s; }
+        .stagger-8 { transition-delay: 0.8s; }
+        .stagger-9 { transition-delay: 0.9s; }
+        .stagger-10 { transition-delay: 1.0s; }
 
         /* Scroll reveal animation */
         .scroll-reveal {
@@ -138,16 +173,22 @@
             transform: translateY(0);
         }
 
-        /* Animation delay loop */
+        /* Animation delay loop - scroll-based */
         .delay-loop {
-            animation: fadeInUp 1.2s ease-out infinite;
-            animation-delay: 0s;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 1.2s ease-out;
         }
 
-        .delay-loop:nth-child(2) { animation-delay: 0.2s; }
-        .delay-loop:nth-child(3) { animation-delay: 0.4s; }
-        .delay-loop:nth-child(4) { animation-delay: 0.6s; }
-        .delay-loop:nth-child(5) { animation-delay: 0.8s; }
+        .delay-loop.animated {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .delay-loop:nth-child(2) { transition-delay: 0.2s; }
+        .delay-loop:nth-child(3) { transition-delay: 0.4s; }
+        .delay-loop:nth-child(4) { transition-delay: 0.6s; }
+        .delay-loop:nth-child(5) { transition-delay: 0.8s; }
 
         /* Opacity & transform combined */
         .opacity-transform {
@@ -208,7 +249,7 @@
         <!-- Block 4: Keyframe Animation with Delay -->
         <div class="mb-16">
             <h2 class="text-2xl font-semibold text-gray-700 mb-6">4. Keyframe Animation with Delay</h2>
-            <div class="bg-white p-8 rounded-lg shadow-lg animate-slide-in-left" style="animation-delay: 0.3s;">
+            <div class="bg-white p-8 rounded-lg shadow-lg animate-slide-in-left" style="transition-delay: 0.3s;">
                 <h3 class="text-xl font-medium text-gray-800 mb-4">Placeholder Text 6</h3>
                 <p class="text-gray-600 leading-relaxed">Sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit.</p>
             </div>
@@ -298,47 +339,57 @@
     </div>
 
     <script>
-        // Scroll reveal functionality
+        // Scroll-based animation observer
         const observerOptions = {
-            threshold: 0.1,
-            rootMargin: '0px 0px -50px 0px'
+            threshold: 0.2,
+            rootMargin: '0px 0px -100px 0px'
         };
 
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
-                    entry.target.classList.add('revealed');
+                    // Add appropriate animation class based on element type
+                    if (entry.target.classList.contains('scroll-reveal')) {
+                        entry.target.classList.add('revealed');
+                    } else if (entry.target.classList.contains('sequential-load')) {
+                        entry.target.classList.add('loaded');
+                    } else if (entry.target.classList.contains('mount-transition')) {
+                        entry.target.classList.add('mounted');
+                    } else if (entry.target.classList.contains('opacity-transform')) {
+                        entry.target.classList.add('combined');
+                    } else if (entry.target.classList.contains('delay-loop')) {
+                        entry.target.classList.add('animated');
+                    } else if (entry.target.classList.contains('animate-fade-in-up')) {
+                        entry.target.classList.add('animated');
+                    } else if (entry.target.classList.contains('animate-slide-in-left')) {
+                        entry.target.classList.add('animated');
+                    } else if (entry.target.classList.contains('animate-scale-in')) {
+                        entry.target.classList.add('animated');
+                    } else if (entry.target.classList.contains('animate-rotate-in')) {
+                        entry.target.classList.add('animated');
+                    } else if (entry.target.classList.contains('animate-bounce-in')) {
+                        entry.target.classList.add('animated');
+                    }
                 }
             });
         }, observerOptions);
 
-        // Observe scroll reveal elements
-        document.querySelectorAll('.scroll-reveal').forEach(el => {
+        // Observe all animated elements
+        const animatedElements = document.querySelectorAll(`
+            .scroll-reveal,
+            .sequential-load,
+            .mount-transition,
+            .opacity-transform,
+            .delay-loop,
+            .animate-fade-in-up,
+            .animate-slide-in-left,
+            .animate-scale-in,
+            .animate-rotate-in,
+            .animate-bounce-in
+        `);
+
+        animatedElements.forEach(el => {
             observer.observe(el);
-        });
-
-        // Sequential load animation
-        const sequentialElements = document.querySelectorAll('.sequential-load');
-        sequentialElements.forEach((el, index) => {
-            setTimeout(() => {
-                el.classList.add('loaded');
-            }, index * 200);
-        });
-
-        // Mount transition
-        const mountElements = document.querySelectorAll('.mount-transition');
-        mountElements.forEach((el, index) => {
-            setTimeout(() => {
-                el.classList.add('mounted');
-            }, index * 300);
-        });
-
-        // Opacity & transform combined
-        const combinedElements = document.querySelectorAll('.opacity-transform');
-        combinedElements.forEach((el, index) => {
-            setTimeout(() => {
-                el.classList.add('combined');
-            }, index * 400);
         });
     </script>
 </body>
