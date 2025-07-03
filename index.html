@@ -6,6 +6,15 @@
     <title>Animated Text Blocks</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
+        /* Prevent layout shifts and ensure smooth loading */
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        body {
+            overflow-x: hidden;
+        }
+
         /* Custom animations */
         @keyframes fadeInUp {
             from {
@@ -69,11 +78,12 @@
             }
         }
 
-        /* Animation classes - initially hidden */
+        /* Animation classes - initially hidden with will-change for performance */
         .animate-fade-in-up {
             opacity: 0;
             transform: translateY(30px);
             transition: all 0.8s ease-out;
+            will-change: opacity, transform;
         }
 
         .animate-fade-in-up.animated {
@@ -85,6 +95,7 @@
             opacity: 0;
             transform: translateX(-50px);
             transition: all 0.8s ease-out;
+            will-change: opacity, transform;
         }
 
         .animate-slide-in-left.animated {
@@ -96,6 +107,7 @@
             opacity: 0;
             transform: scale(0.8);
             transition: all 0.6s ease-out;
+            will-change: opacity, transform;
         }
 
         .animate-scale-in.animated {
@@ -107,6 +119,7 @@
             opacity: 0;
             transform: rotate(-10deg) scale(0.8);
             transition: all 0.8s ease-out;
+            will-change: opacity, transform;
         }
 
         .animate-rotate-in.animated {
@@ -118,6 +131,7 @@
             opacity: 0;
             transform: scale(0.3);
             transition: all 1s ease-out;
+            will-change: opacity, transform;
         }
 
         .animate-bounce-in.animated {
@@ -142,6 +156,7 @@
             opacity: 0;
             transform: translateY(50px);
             transition: all 0.8s ease-out;
+            will-change: opacity, transform;
         }
 
         .scroll-reveal.revealed {
@@ -154,6 +169,7 @@
             opacity: 0;
             transform: translateX(-100px);
             transition: all 0.6s ease-out;
+            will-change: opacity, transform;
         }
 
         .sequential-load.loaded {
@@ -166,6 +182,7 @@
             opacity: 0;
             transform: translateY(20px);
             transition: all 0.5s ease-out;
+            will-change: opacity, transform;
         }
 
         .mount-transition.mounted {
@@ -178,6 +195,7 @@
             opacity: 0;
             transform: translateY(30px);
             transition: all 1.2s ease-out;
+            will-change: opacity, transform;
         }
 
         .delay-loop.animated {
@@ -195,6 +213,7 @@
             opacity: 0;
             transform: translateY(30px) scale(0.9);
             transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            will-change: opacity, transform;
         }
 
         .opacity-transform.combined {
@@ -339,58 +358,73 @@
     </div>
 
     <script>
-        // Scroll-based animation observer
-        const observerOptions = {
-            threshold: 0.2,
-            rootMargin: '0px 0px -100px 0px'
-        };
-
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    // Add appropriate animation class based on element type
-                    if (entry.target.classList.contains('scroll-reveal')) {
-                        entry.target.classList.add('revealed');
-                    } else if (entry.target.classList.contains('sequential-load')) {
-                        entry.target.classList.add('loaded');
-                    } else if (entry.target.classList.contains('mount-transition')) {
-                        entry.target.classList.add('mounted');
-                    } else if (entry.target.classList.contains('opacity-transform')) {
-                        entry.target.classList.add('combined');
-                    } else if (entry.target.classList.contains('delay-loop')) {
-                        entry.target.classList.add('animated');
-                    } else if (entry.target.classList.contains('animate-fade-in-up')) {
-                        entry.target.classList.add('animated');
-                    } else if (entry.target.classList.contains('animate-slide-in-left')) {
-                        entry.target.classList.add('animated');
-                    } else if (entry.target.classList.contains('animate-scale-in')) {
-                        entry.target.classList.add('animated');
-                    } else if (entry.target.classList.contains('animate-rotate-in')) {
-                        entry.target.classList.add('animated');
-                    } else if (entry.target.classList.contains('animate-bounce-in')) {
-                        entry.target.classList.add('animated');
-                    }
-                }
-            });
-        }, observerOptions);
-
-        // Observe all animated elements
-        const animatedElements = document.querySelectorAll(`
-            .scroll-reveal,
-            .sequential-load,
-            .mount-transition,
-            .opacity-transform,
-            .delay-loop,
-            .animate-fade-in-up,
-            .animate-slide-in-left,
-            .animate-scale-in,
-            .animate-rotate-in,
-            .animate-bounce-in
-        `);
-
-        animatedElements.forEach(el => {
-            observer.observe(el);
+        // Prevent initial scroll jump by ensuring page is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            // Small delay to ensure all elements are properly rendered
+            setTimeout(() => {
+                initializeAnimations();
+            }, 50);
         });
+
+        function initializeAnimations() {
+            // Ensure page starts at top to prevent scroll jump
+            if (window.scrollY === 0) {
+                window.scrollTo(0, 0);
+            }
+            
+            // Scroll-based animation observer
+            const observerOptions = {
+                threshold: 0.2,
+                rootMargin: '0px 0px -100px 0px'
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        // Add appropriate animation class based on element type
+                        if (entry.target.classList.contains('scroll-reveal')) {
+                            entry.target.classList.add('revealed');
+                        } else if (entry.target.classList.contains('sequential-load')) {
+                            entry.target.classList.add('loaded');
+                        } else if (entry.target.classList.contains('mount-transition')) {
+                            entry.target.classList.add('mounted');
+                        } else if (entry.target.classList.contains('opacity-transform')) {
+                            entry.target.classList.add('combined');
+                        } else if (entry.target.classList.contains('delay-loop')) {
+                            entry.target.classList.add('animated');
+                        } else if (entry.target.classList.contains('animate-fade-in-up')) {
+                            entry.target.classList.add('animated');
+                        } else if (entry.target.classList.contains('animate-slide-in-left')) {
+                            entry.target.classList.add('animated');
+                        } else if (entry.target.classList.contains('animate-scale-in')) {
+                            entry.target.classList.add('animated');
+                        } else if (entry.target.classList.contains('animate-rotate-in')) {
+                            entry.target.classList.add('animated');
+                        } else if (entry.target.classList.contains('animate-bounce-in')) {
+                            entry.target.classList.add('animated');
+                        }
+                    }
+                });
+            }, observerOptions);
+
+            // Observe all animated elements
+            const animatedElements = document.querySelectorAll(`
+                .scroll-reveal,
+                .sequential-load,
+                .mount-transition,
+                .opacity-transform,
+                .delay-loop,
+                .animate-fade-in-up,
+                .animate-slide-in-left,
+                .animate-scale-in,
+                .animate-rotate-in,
+                .animate-bounce-in
+            `);
+
+            animatedElements.forEach(el => {
+                observer.observe(el);
+            });
+        }
     </script>
 </body>
 </html> 
