@@ -3,224 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Animated Text Blocks</title>
+    <title>Resume Website</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Prevent layout shifts and ensure smooth loading */
-        html {
-            scroll-behavior: smooth;
-        }
-        
-        body {
-            overflow-x: hidden;
-        }
-
-        /* Custom animations */
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @keyframes slideInLeft {
-            from {
-                opacity: 0;
-                transform: translateX(-50px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-
-        @keyframes scaleIn {
-            from {
-                opacity: 0;
-                transform: scale(0.8);
-            }
-            to {
-                opacity: 1;
-                transform: scale(1);
-            }
-        }
-
-        @keyframes rotateIn {
-            from {
-                opacity: 0;
-                transform: rotate(-10deg) scale(0.8);
-            }
-            to {
-                opacity: 1;
-                transform: rotate(0deg) scale(1);
-            }
-        }
-
-        @keyframes bounceIn {
-            0% {
-                opacity: 0;
-                transform: scale(0.3);
-            }
-            50% {
-                opacity: 1;
-                transform: scale(1.05);
-            }
-            70% {
-                transform: scale(0.9);
-            }
-            100% {
-                opacity: 1;
-                transform: scale(1);
-            }
-        }
-
-        /* Animation classes - initially hidden with will-change for performance */
-        .animate-fade-in-up {
-            opacity: 0;
-            transform: translateY(30px);
-            transition: all 0.8s ease-out;
-            will-change: opacity, transform;
-        }
-
-        .animate-fade-in-up.animated {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .animate-slide-in-left {
-            opacity: 0;
-            transform: translateX(-50px);
-            transition: all 0.8s ease-out;
-            will-change: opacity, transform;
-        }
-
-        .animate-slide-in-left.animated {
-            opacity: 1;
-            transform: translateX(0);
-        }
-
-        .animate-scale-in {
-            opacity: 0;
-            transform: scale(0.8);
-            transition: all 0.6s ease-out;
-            will-change: opacity, transform;
-        }
-
-        .animate-scale-in.animated {
-            opacity: 1;
-            transform: scale(1);
-        }
-
-        .animate-rotate-in {
-            opacity: 0;
-            transform: rotate(-10deg) scale(0.8);
-            transition: all 0.8s ease-out;
-            will-change: opacity, transform;
-        }
-
-        .animate-rotate-in.animated {
-            opacity: 1;
-            transform: rotate(0deg) scale(1);
-        }
-
-        .animate-bounce-in {
-            opacity: 0;
-            transform: scale(0.3);
-            transition: all 1s ease-out;
-            will-change: opacity, transform;
-        }
-
-        .animate-bounce-in.animated {
-            opacity: 1;
-            transform: scale(1);
-        }
-
-        /* Staggered animation delays - for scroll-based triggers */
-        .stagger-1 { transition-delay: 0.1s; }
-        .stagger-2 { transition-delay: 0.2s; }
-        .stagger-3 { transition-delay: 0.3s; }
-        .stagger-4 { transition-delay: 0.4s; }
-        .stagger-5 { transition-delay: 0.5s; }
-        .stagger-6 { transition-delay: 0.6s; }
-        .stagger-7 { transition-delay: 0.7s; }
-        .stagger-8 { transition-delay: 0.8s; }
-        .stagger-9 { transition-delay: 0.9s; }
-        .stagger-10 { transition-delay: 1.0s; }
-
-        /* Scroll reveal animation */
-        .scroll-reveal {
-            opacity: 0;
-            transform: translateY(50px);
-            transition: all 0.8s ease-out;
-            will-change: opacity, transform;
-        }
-
-        .scroll-reveal.revealed {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        /* Sequential load animation */
-        .sequential-load {
-            opacity: 0;
-            transform: translateX(-100px);
-            transition: all 0.6s ease-out;
-            will-change: opacity, transform;
-        }
-
-        .sequential-load.loaded {
-            opacity: 1;
-            transform: translateX(0);
-        }
-
-        /* Transition on mount */
-        .mount-transition {
-            opacity: 0;
-            transform: translateY(20px);
-            transition: all 0.5s ease-out;
-            will-change: opacity, transform;
-        }
-
-        .mount-transition.mounted {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        /* Animation delay loop - scroll-based */
-        .delay-loop {
-            opacity: 0;
-            transform: translateY(30px);
-            transition: all 1.2s ease-out;
-            will-change: opacity, transform;
-        }
-
-        .delay-loop.animated {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .delay-loop:nth-child(2) { transition-delay: 0.2s; }
-        .delay-loop:nth-child(3) { transition-delay: 0.4s; }
-        .delay-loop:nth-child(4) { transition-delay: 0.6s; }
-        .delay-loop:nth-child(5) { transition-delay: 0.8s; }
-
-        /* Opacity & transform combined */
-        .opacity-transform {
-            opacity: 0;
-            transform: translateY(30px) scale(0.9);
-            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-            will-change: opacity, transform;
-        }
-
-        .opacity-transform.combined {
-            opacity: 1;
-            transform: translateY(0) scale(1);
-        }
-
         /* Resume line animations */
         .resume-line {
             opacity: 0;
@@ -233,311 +18,155 @@
             display: block;
         }
 
-        .resume-line:hover {
-            color: #3b82f6;
-            transform: translateY(0) scale(1.02);
-        }
-
         .resume-line.animated {
             opacity: 1;
             transform: translateY(0);
         }
-
-        /* Detailed content animations */
-        .detailed-content {
-            opacity: 0;
-            transform: translateY(30px);
-            transition: all 0.8s ease-out;
-            will-change: opacity, transform;
-        }
-
-        .detailed-content.animated {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        /* Outer container animation */
-        .outer-container {
-            transition: transform 1.5s cubic-bezier(0.4, 0, 0.2, 1);
-            will-change: transform;
-        }
-
-        .outer-container.revealed {
-            transform: translateY(0) !important;
-        }
-
-        /* Resume container lift animation */
-        .resume-container {
-            transition: transform 1.5s cubic-bezier(0.4, 0, 0.2, 1);
-            will-change: transform;
-        }
-
-        .resume-container.lifted {
-            transform: translateY(-100vh);
-        }
     </style>
 </head>
-<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
-    <div class="container mx-auto px-4">
-        <!-- Outer Container (Hidden Initially) -->
-        <div class="outer-container bg-gradient-to-br from-blue-900 to-indigo-900 rounded-xl shadow-2xl overflow-hidden" style="min-height: 100vh; transform: translateY(100vh);">
-            <div class="p-12">
-                <div class="max-w-6xl mx-auto text-white">
-                    <h2 class="text-4xl font-bold mb-8 detailed-content">Detailed Portfolio & Achievements</h2>
-                    
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                        <div>
-                            <h3 class="text-2xl font-semibold mb-4 detailed-content">Technical Achievements</h3>
-                            <div class="space-y-4">
-                                <div class="detailed-content">
-                                    <h4 class="text-lg font-medium">Performance Optimization</h4>
-                                    <p class="text-blue-200">Improved application load times by 60% through code splitting and lazy loading</p>
-                                </div>
-                                <div class="detailed-content">
-                                    <h4 class="text-lg font-medium">Scalability Solutions</h4>
-                                    <p class="text-blue-200">Designed microservices architecture supporting 1M+ daily users</p>
-                                </div>
-                                <div class="detailed-content">
-                                    <h4 class="text-lg font-medium">Security Implementation</h4>
-                                    <p class="text-blue-200">Implemented OAuth 2.0 and JWT authentication for enterprise applications</p>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div>
-                            <h3 class="text-2xl font-semibold mb-4 detailed-content">Leadership & Impact</h3>
-                            <div class="space-y-4">
-                                <div class="detailed-content">
-                                    <h4 class="text-lg font-medium">Team Leadership</h4>
-                                    <p class="text-blue-200">Led 8-person development team delivering 15+ features per quarter</p>
-                                </div>
-                                <div class="detailed-content">
-                                    <h4 class="text-lg font-medium">Mentorship</h4>
-                                    <p class="text-blue-200">Mentored 12 junior developers, 8 of whom were promoted within 18 months</p>
-                                </div>
-                                <div class="detailed-content">
-                                    <h4 class="text-lg font-medium">Process Improvement</h4>
-                                    <p class="text-blue-200">Reduced deployment time by 70% through CI/CD pipeline optimization</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="mt-8">
-                        <h3 class="text-2xl font-semibold mb-4 detailed-content">Featured Projects</h3>
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            <div class="bg-blue-800 p-6 rounded-lg detailed-content">
-                                <h4 class="text-lg font-medium mb-2">AI-Powered Analytics Dashboard</h4>
-                                <p class="text-blue-200 text-sm">Built real-time analytics platform processing 10TB+ data daily</p>
-                            </div>
-                            <div class="bg-blue-800 p-6 rounded-lg detailed-content">
-                                <h4 class="text-lg font-medium mb-2">Mobile Banking App</h4>
-                                <p class="text-blue-200 text-sm">Developed secure mobile banking solution with biometric authentication</p>
-                            </div>
-                            <div class="bg-blue-800 p-6 rounded-lg detailed-content">
-                                <h4 class="text-lg font-medium mb-2">IoT Smart Home System</h4>
-                                <p class="text-blue-200 text-sm">Created IoT platform managing 50+ connected devices with real-time monitoring</p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="mt-8 text-center">
-                        <p class="text-blue-200 detailed-content">Ready to bring innovation to your next project</p>
-                        <p class="text-sm text-blue-300 mt-2 detailed-content">Contact: john.doe@email.com | Portfolio: johndoe.dev</p>
-                    </div>
-                </div>
-            </div>
-        </div>
+<body class="bg-gray-50 min-h-screen">
+    <div class="container mx-auto px-4 py-8 max-w-4xl">
+        <header class="text-center mb-12">
+            <h1 class="text-4xl font-bold text-gray-800 mb-4">My Resume</h1>
+            <p class="text-lg text-gray-600">Professional experience and skills</p>
+        </header>
 
-        <!-- Resume Container (Initially Visible) -->
-        <div class="resume-container bg-white rounded-xl shadow-2xl overflow-hidden" style="min-height: 100vh;">
-            <div class="p-12">
-                <div class="max-w-4xl mx-auto space-y-4 font-mono text-gray-800">
-                    <h1 class="text-3xl font-bold mb-8 resume-line">JOHN DOE</h1>
-                    <p class="text-lg resume-line">Software Engineer & Full-Stack Developer</p>
-                    <p class="text-sm text-gray-600 resume-line">john.doe@email.com | (555) 123-4567 | linkedin.com/in/johndoe</p>
-                    
-                    <div class="mt-8">
-                        <h2 class="text-xl font-bold mb-4 resume-line">PROFESSIONAL SUMMARY</h2>
-                        <p class="resume-line">Experienced software engineer with 5+ years developing scalable web applications</p>
-                        <p class="resume-line">Expert in JavaScript, React, Node.js, and cloud technologies</p>
-                        <p class="resume-line">Led development teams and delivered projects on time and within budget</p>
-                    </div>
-                    
-                    <div class="mt-8">
-                        <h2 class="text-xl font-bold mb-4 resume-line">WORK EXPERIENCE</h2>
-                        <div class="mb-6">
-                            <h3 class="text-lg font-semibold resume-line">Senior Software Engineer - TechCorp Inc.</h3>
-                            <p class="text-sm text-gray-600 resume-line">January 2022 - Present</p>
-                            <p class="resume-line">• Developed and maintained React-based frontend applications</p>
-                            <p class="resume-line">• Implemented RESTful APIs using Node.js and Express</p>
-                            <p class="resume-line">• Collaborated with cross-functional teams to deliver features</p>
-                        </div>
-                        <div class="mb-6">
-                            <h3 class="text-lg font-semibold resume-line">Full-Stack Developer - StartupXYZ</h3>
-                            <p class="text-sm text-gray-600 resume-line">March 2020 - December 2021</p>
-                            <p class="resume-line">• Built complete web applications from concept to deployment</p>
-                            <p class="resume-line">• Managed AWS infrastructure and CI/CD pipelines</p>
-                            <p class="resume-line">• Mentored junior developers and conducted code reviews</p>
-                        </div>
-                    </div>
-                    
-                    <div class="mt-8">
-                        <h2 class="text-xl font-bold mb-4 resume-line">EDUCATION</h2>
-                        <h3 class="text-lg font-semibold resume-line">Bachelor of Science in Computer Science</h3>
-                        <p class="text-sm text-gray-600 resume-line">University of Technology - Graduated 2020</p>
-                        <p class="resume-line">• GPA: 3.8/4.0</p>
-                        <p class="resume-line">• Dean's List: 2018-2020</p>
-                    </div>
-                    
-                    <div class="mt-8">
-                        <h2 class="text-xl font-bold mb-4 resume-line">TECHNICAL SKILLS</h2>
-                        <p class="resume-line">• Frontend: React, Vue.js, HTML5, CSS3, JavaScript (ES6+)</p>
-                        <p class="resume-line">• Backend: Node.js, Python, Express, Django, REST APIs</p>
-                        <p class="resume-line">• Database: MongoDB, PostgreSQL, Redis, MySQL</p>
-                        <p class="resume-line">• DevOps: AWS, Docker, Kubernetes, CI/CD, Git</p>
-                        <p class="resume-line">• Tools: VS Code, Postman, Jira, Figma, Adobe Creative Suite</p>
-                    </div>
-                    
-                    <div class="mt-8">
-                        <h2 class="text-xl font-bold mb-4 resume-line">PROJECTS</h2>
-                        <div class="mb-4">
-                            <h3 class="text-lg font-semibold resume-line">E-Commerce Platform</h3>
-                            <p class="resume-line">• Built full-stack e-commerce solution with React and Node.js</p>
-                            <p class="resume-line">• Integrated payment processing and inventory management</p>
-                        </div>
-                        <div class="mb-4">
-                            <h3 class="text-lg font-semibold resume-line">Task Management App</h3>
-                            <p class="resume-line">• Developed collaborative task management tool with real-time updates</p>
-                            <p class="resume-line">• Implemented user authentication and role-based permissions</p>
-                        </div>
-                    </div>
-                    
-                    <div class="mt-8">
-                        <h2 class="text-xl font-bold mb-4 resume-line">CERTIFICATIONS</h2>
-                        <p class="resume-line">• AWS Certified Solutions Architect</p>
-                        <p class="resume-line">• Google Cloud Professional Developer</p>
-                        <p class="resume-line">• Certified Scrum Master (CSM)</p>
-                    </div>
-                    
-                    <div class="mt-8">
-                        <h2 class="text-xl font-bold mb-4 resume-line">LANGUAGES</h2>
-                        <p class="resume-line">• English (Native)</p>
-                        <p class="resume-line">• Spanish (Fluent)</p>
-                        <p class="resume-line">• French (Conversational)</p>
-                    </div>
-                    
-                    <p class="text-sm text-gray-500 mt-12 resume-line">Scroll to the end to reveal detailed portfolio...</p>
-                </div>
-            </div>
-        </div>
+        <main class="space-y-8">
+            <!-- Text Block 1 -->
+            <section class="resume-line bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-3">Professional Summary</h2>
+                <p class="text-gray-600 leading-relaxed">
+                    Experienced software developer with 5+ years of expertise in full-stack development, 
+                    specializing in modern web technologies and agile methodologies. Passionate about 
+                    creating scalable solutions and mentoring junior developers.
+                </p>
+            </section>
+
+            <!-- Text Block 2 -->
+            <section class="resume-line bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-3">Technical Skills</h2>
+                <p class="text-gray-600 leading-relaxed">
+                    Proficient in JavaScript, TypeScript, React, Node.js, Python, and SQL. 
+                    Experience with cloud platforms (AWS, Azure), CI/CD pipelines, and 
+                    containerization technologies including Docker and Kubernetes.
+                </p>
+            </section>
+
+            <!-- Text Block 3 -->
+            <section class="resume-line bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-3">Work Experience</h2>
+                <p class="text-gray-600 leading-relaxed">
+                    Senior Developer at TechCorp (2020-2023): Led development of enterprise 
+                    applications, managed team of 8 developers, and implemented best practices 
+                    that improved code quality by 40%.
+                </p>
+            </section>
+
+            <!-- Text Block 4 -->
+            <section class="resume-line bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-3">Education</h2>
+                <p class="text-gray-600 leading-relaxed">
+                    Bachelor of Science in Computer Science from University of Technology (2018). 
+                    Graduated with honors and completed capstone project on machine learning 
+                    applications in healthcare.
+                </p>
+            </section>
+
+            <!-- Text Block 5 -->
+            <section class="resume-line bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-3">Certifications</h2>
+                <p class="text-gray-600 leading-relaxed">
+                    AWS Certified Solutions Architect, Google Cloud Professional Developer, 
+                    and Certified Scrum Master (CSM). Continuously pursuing professional 
+                    development through online courses and industry conferences.
+                </p>
+            </section>
+
+            <!-- Text Block 6 -->
+            <section class="resume-line bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-3">Projects</h2>
+                <p class="text-gray-600 leading-relaxed">
+                    Developed open-source library with 10K+ downloads, created e-commerce 
+                    platform processing $2M+ in transactions, and built real-time analytics 
+                    dashboard for manufacturing operations.
+                </p>
+            </section>
+
+            <!-- Text Block 7 -->
+            <section class="resume-line bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-3">Leadership</h2>
+                <p class="text-gray-600 leading-relaxed">
+                    Led cross-functional teams of 12+ members, mentored 15+ junior developers, 
+                    and established coding standards that reduced bug reports by 60%. 
+                    Organized monthly tech talks and hackathons.
+                </p>
+            </section>
+
+            <!-- Text Block 8 -->
+            <section class="resume-line bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-3">Achievements</h2>
+                <p class="text-gray-600 leading-relaxed">
+                    Received "Developer of the Year" award in 2022, published 3 technical 
+                    articles on Medium, and spoke at 5 industry conferences. Contributed 
+                    to 20+ open source projects.
+                </p>
+            </section>
+
+            <!-- Text Block 9 -->
+            <section class="resume-line bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-3">Languages</h2>
+                <p class="text-gray-600 leading-relaxed">
+                    Fluent in English and Japanese, with intermediate proficiency in Spanish. 
+                    Experience working with international teams and clients across different 
+                    time zones and cultural backgrounds.
+                </p>
+            </section>
+
+            <!-- Text Block 10 -->
+            <section class="resume-line bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-3">Interests</h2>
+                <p class="text-gray-600 leading-relaxed">
+                    Passionate about emerging technologies including AI/ML, blockchain, and 
+                    IoT. Enjoys contributing to open source, attending tech meetups, and 
+                    staying current with industry trends through continuous learning.
+                </p>
+            </section>
+        </main>
+
+        <footer class="text-center mt-12 text-gray-500">
+            <p>&copy; 2024 My Resume. All rights reserved.</p>
+        </footer>
     </div>
 
     <script>
-        // Prevent initial scroll jump by ensuring page is ready
-        document.addEventListener('DOMContentLoaded', function() {
-            // Small delay to ensure all elements are properly rendered
-            setTimeout(() => {
-                initializeAnimations();
-            }, 50);
+        // Animation trigger on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('animated');
+                }
+            });
+        }, observerOptions);
+
+        // Observe all resume lines
+        document.querySelectorAll('.resume-line').forEach(line => {
+            observer.observe(line);
         });
 
-        function initializeAnimations() {
-            // Ensure page starts at top to prevent scroll jump
-            if (window.scrollY === 0) {
-                window.scrollTo(0, 0);
-            }
-            
-            // Scroll-based animation observer
-            const observerOptions = {
-                threshold: 0.1,
-                rootMargin: '0px 0px -50px 0px'
-            };
-
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        // Add appropriate animation class based on element type
-                        if (entry.target.classList.contains('resume-line')) {
-                            entry.target.classList.add('animated');
-                        } else if (entry.target.classList.contains('detailed-content')) {
-                            entry.target.classList.add('animated');
-                        }
-                    }
-                });
-            }, observerOptions);
-
-            // Observe all animated elements
-            const animatedElements = document.querySelectorAll(`
-                .resume-line,
-                .detailed-content
-            `);
-
-            animatedElements.forEach(el => {
-                observer.observe(el);
+        // Optional: Add click animation
+        document.querySelectorAll('.resume-line').forEach(line => {
+            line.addEventListener('click', function() {
+                this.style.transform = 'scale(1.02)';
+                setTimeout(() => {
+                    this.style.transform = 'scale(1)';
+                }, 200);
             });
-
-            // Handle resume animations
-            initializeResume();
-        }
-
-        function initializeResume() {
-            const resumeContainer = document.querySelector('.resume-container');
-            const outerContainer = document.querySelector('.outer-container');
-            const resumeLines = document.querySelectorAll('.resume-line');
-            const detailedContents = document.querySelectorAll('.detailed-content');
-            
-            if (!resumeContainer || !outerContainer) return;
-
-            // Resume lines will be animated by the main observer when scrolled into view
-
-            // Handle resume lift and outer container reveal on scroll
-            const resumeObserver = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        // Check if we're near the bottom of the resume
-                        const rect = entry.boundingClientRect;
-                        const windowHeight = window.innerHeight;
-                        
-                        // If the bottom of the resume is visible, trigger lift and reveal
-                        if (rect.bottom <= windowHeight * 0.3) {
-                            setTimeout(() => {
-                                // Lift the resume container
-                                resumeContainer.classList.add('lifted');
-                                
-                                // Reveal the outer container
-                                outerContainer.classList.add('revealed');
-                                
-                                // Animate detailed content after containers move
-                                setTimeout(() => {
-                                    detailedContents.forEach((content, index) => {
-                                        setTimeout(() => {
-                                            content.classList.add('animated');
-                                        }, index * 150); // 150ms delay between each content
-                                    });
-                                }, 1000); // Wait for container animations
-                            }, 500); // Wait before lifting
-                        }
-                    }
-                });
-            }, {
-                threshold: [0, 0.25, 0.5, 0.75, 1],
-                rootMargin: '0px 0px -300px 0px'
-            });
-
-            resumeObserver.observe(resumeContainer);
-
-            // Add click handlers for resume lines (optional - for demo purposes)
-            resumeLines.forEach(line => {
-                line.addEventListener('click', function() {
-                    // Add a subtle click effect
-                    this.style.transform = 'scale(0.98)';
-                    setTimeout(() => {
-                        this.style.transform = '';
-                    }, 150);
-                });
-            });
-        }
+        });
     </script>
 </body>
 </html> 
