@@ -31,30 +31,19 @@
     justify-content: center;
     align-items: center;
     gap: 8px;
-    position: relative;
   }
   
   .logo-section img {
     aspect-ratio: 1/auto;
     width: auto;
     height: 32px;
-    transition: all 0.3s ease;
-    cursor: pointer;
   }
   
-  /* Icon swapping hover effects */
-  .logo-section img {
-    transition: all 0.3s ease;
-    cursor: pointer;
-  }
-  
-  /* Profile photo swap effect */
   .profile-photo {
     /* aspect-ratio: 1/1; */
     /* height: 120px; */
     max-width: 120px;
     padding: 20px 0 0 0;
-    transition: all 0.3s ease;
   }
 
   .profile-content h2 {
