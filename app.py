@@ -74,6 +74,10 @@ def load_json_data(file_path):
         # Convert to Path object if it's a string
         if isinstance(file_path, str):
             file_path = Path(file_path)
+        
+        # Ensure the path is absolute and resolve any symlinks
+        file_path = file_path.resolve()
+        
         with open(file_path, 'r') as file:
             return json.load(file)
     except (FileNotFoundError, json.JSONDecodeError) as e:
@@ -512,7 +516,8 @@ def save_experiences_to_json():
             }
             data["experiences"].append(experience_data)
         
-        with open(DATA_DIR / 'experiences.json', 'w') as f:
+        experiences_file = DATA_DIR / 'experiences.json'
+        with open(experiences_file, 'w') as f:
             json.dump(data, f, indent=4)
         print("Experiences saved to JSON file")
     except Exception as e:
