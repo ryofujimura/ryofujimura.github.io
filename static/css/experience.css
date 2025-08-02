@@ -118,6 +118,144 @@
   object-position: center !important;
 }
 
+/* Project 4 hover rules for 2x1 layout */
+#project-4:hover {
+  display: flex !important;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  padding: 0 !important;
+  margin: 0 !important;
+  /* Maintain 2x1 aspect ratio for horizontal layouts */
+  aspect-ratio: 2/1 !important;
+  /* Reset grid settings */
+  grid-template-rows: unset !important;
+  grid-template-columns: unset !important;
+  gap: 0 !important;
+}
+
+#project-4:hover .experience-image-container {
+  display: block !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  opacity: 1 !important;
+  object-fit: cover !important;
+  object-position: center !important;
+  z-index: 2 !important;
+  box-sizing: border-box !important;
+  border-radius: 15px;
+  transition: opacity 0.3s ease;
+}
+
+#project-4:hover .experience-section img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  object-position: center !important;
+}
+
+/* Project 6 hover rules for 2x1 layout */
+#project-6:hover {
+  display: flex !important;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  padding: 0 !important;
+  margin: 0 !important;
+  /* Maintain 2x1 aspect ratio for horizontal layouts */
+  aspect-ratio: 2/1 !important;
+  /* Reset grid settings */
+  grid-template-rows: unset !important;
+  grid-template-columns: unset !important;
+  gap: 0 !important;
+}
+
+#project-6:hover .experience-image-container {
+  display: block !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  opacity: 1 !important;
+  object-fit: cover !important;
+  object-position: center !important;
+  z-index: 2 !important;
+  box-sizing: border-box !important;
+  border-radius: 15px;
+  transition: opacity 0.3s ease;
+}
+
+#project-6:hover .experience-section img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  object-position: center !important;
+}
+
+/* Project 7 hover rules for 2x1 layout */
+#project-7:hover {
+  display: flex !important;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  padding: 0 !important;
+  margin: 0 !important;
+  /* Maintain 2x1 aspect ratio for horizontal layouts */
+  aspect-ratio: 2/1 !important;
+  /* Reset grid settings */
+  grid-template-rows: unset !important;
+  grid-template-columns: unset !important;
+  gap: 0 !important;
+}
+
+#project-7:hover .experience-image-container {
+  display: block !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  opacity: 1 !important;
+  object-fit: cover !important;
+  object-position: center !important;
+  z-index: 2 !important;
+  box-sizing: border-box !important;
+  border-radius: 15px;
+  transition: opacity 0.3s ease;
+}
+
+#project-7:hover .experience-section img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  object-position: center !important;
+}
+
 @media (max-width: 571px) {
   .experience-section {
     grid-template-columns: repeat(auto-fit, minmax(50px, 1fr));
