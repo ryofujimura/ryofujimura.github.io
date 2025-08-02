@@ -27,10 +27,41 @@
   grid-auto-flow: dense;
   grid-auto-columns: 1fr;
   gap: 1rem;
+  /* Ensure consistent grid behavior */
+  align-items: start;
+  justify-items: stretch;
 }
 
 .experience-section > * {
   aspect-ratio: 1 / 1;
+  /* Ensure consistent sizing */
+  min-height: 0;
+  min-width: 0;
+}
+
+/* Fix for bottom row hover issues */
+.experience-section:last-child .outer:hover,
+.experience-section .outer:last-child:hover,
+.experience-section .outer:nth-last-child(-n+2):hover,
+.experience-section .outer:nth-last-child(-n+3):hover,
+.experience-section .outer:nth-last-child(-n+4):hover {
+  /* Ensure consistent hover behavior for bottom row items */
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  overflow: hidden !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border-radius: 15px;
+  grid-template-rows: unset !important;
+  grid-template-columns: unset !important;
+  gap: 0 !important;
+  position: relative !important;
+  width: 100% !important;
+  height: 100% !important;
+  box-sizing: border-box !important;
+  /* Force aspect ratio maintenance during hover */
+  aspect-ratio: 1 / 1 !important;
 }
 
 #project-1:hover .experience-content,
@@ -1240,6 +1271,48 @@
     display: none;
   }
 
+/* Project 11 */
+#project-11 { 
+  grid-column: span 1;
+  grid-row: span 1;
+  /* background-color: #ffff99; */
+  aspect-ratio: 1;
+
+  display: grid;
+  grid-template-rows: 0.1fr 1fr ;
+  padding: 1rem;
+  gap: 1rem;  
+}
+#project-11 .experience-type {
+  grid-row: 1;
+  overflow:visible;
+}
+
+#project-11 .experience-content {
+  grid-row: 2;
+  padding: 15px;
+  margin: auto 0 0 0;
+}
+/* hidden items */
+#project-11 .experience-image-container {
+  display: none;
+}
+#project-11 .experience-links {
+  display: none;
+}
+#project-11 .experience-tags {
+  display: none;
+}
+#project-11 .experience-link-images {
+  display: none;
+}
+#project-11 .experience-shortdes {
+  display: none;
+}
+#project-11 .experience-images {
+  display: none;
+}
+
 /* ===================== HOVER AND MOBILE EFFECTS ===================== */
 
 /* Style for background image on mobile with low opacity */
@@ -1296,6 +1369,11 @@
   height: 100% !important;
   /* Force box-sizing */
   box-sizing: border-box !important;
+  /* Force aspect ratio maintenance during hover */
+  aspect-ratio: 1 / 1 !important;
+  /* Ensure consistent behavior across all grid layouts */
+  min-height: 0 !important;
+  min-width: 0 !important;
 }
 
 /* Add a clear rule for ALL project-specific hover styling to ensure it's overridden */
@@ -1307,6 +1385,11 @@
   gap: 0 !important;
   display: flex !important;
   position: relative !important;
+  /* Force aspect ratio maintenance during hover */
+  aspect-ratio: 1 / 1 !important;
+  /* Ensure consistent behavior across all grid layouts */
+  min-height: 0 !important;
+  min-width: 0 !important;
 }
 
 /* Make sure the image has no constraints */
