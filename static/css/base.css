@@ -11,4 +11,5 @@
 
 .too-thin {
   display: none;
+  /* Will be overridden by toothin.css at 371px and below */
 }
