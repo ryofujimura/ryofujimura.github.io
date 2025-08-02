@@ -22,72 +22,76 @@
       
       if (logoSection && profilePhoto) {
         const logos = logoSection.querySelectorAll('img');
-        const firstLogo = logos[0]; // A
-        const middleLogo = logos[1]; // B (staple)
-        const lastLogo = logos[2];   // C
+        const iconA = logos[0]; // First icon (A)
+        const iconB = logos[1]; // Middle icon (B) - staple
+        const iconC = logos[2]; // Last icon (C)
         
-        // Get profile photo URL
-        const profilePhotoUrl = profilePhoto.src;
+        // Store original sources
+        const originalA = iconA.src;
+        const originalB = iconB.src;
+        const originalC = iconC.src;
+        const originalD = profilePhoto.src;
         
-        // Add hover effects for icon swapping
-        firstLogo.addEventListener('mouseenter', function() {
-          // Swap first with middle
-          firstLogo.style.transform = 'translateX(8px)';
-          middleLogo.style.transform = 'translateX(-8px)';
+        // Store icon D sources for each position
+        const iconDSources = {
+          'A': '/static/images/ryosketch-1.png',
+          'B': originalD,
+          'C': '/static/images/ryosketch-3.png'
+        };
+        
+        let currentMiddleIcon = 'B'; // Track which icon is currently in the middle
+        
+        // Function to swap icons
+        function swapIcons(icon1, icon2) {
+          const tempSrc = icon1.src;
+          icon1.src = icon2.src;
+          icon2.src = tempSrc;
+        }
+        
+        // Function to update portfolio icon based on middle position
+        function updatePortfolioIcon() {
+          profilePhoto.src = iconDSources[currentMiddleIcon];
+        }
+        
+        // Icon A hover effects
+        iconA.addEventListener('mouseenter', function() {
+          // Swap A with B
+          swapIcons(iconA, iconB);
+          currentMiddleIcon = 'A';
+          updatePortfolioIcon();
         });
         
-        firstLogo.addEventListener('mouseleave', function() {
-          // Reset positions
-          firstLogo.style.transform = '';
-          middleLogo.style.transform = '';
+        iconA.addEventListener('mouseleave', function() {
+          // Swap back
+          swapIcons(iconA, iconB);
+          currentMiddleIcon = 'B';
+          updatePortfolioIcon();
         });
         
-        lastLogo.addEventListener('mouseenter', function() {
-          // Swap last with middle
-          lastLogo.style.transform = 'translateX(-8px)';
-          middleLogo.style.transform = 'translateX(8px)';
+        // Icon C hover effects
+        iconC.addEventListener('mouseenter', function() {
+          // Swap C with B
+          swapIcons(iconC, iconB);
+          currentMiddleIcon = 'C';
+          updatePortfolioIcon();
         });
         
-        lastLogo.addEventListener('mouseleave', function() {
-          // Reset positions
-          lastLogo.style.transform = '';
-          middleLogo.style.transform = '';
+        iconC.addEventListener('mouseleave', function() {
+          // Swap back
+          swapIcons(iconC, iconB);
+          currentMiddleIcon = 'B';
+          updatePortfolioIcon();
         });
         
-        // Middle icon hover effect - show profile photo
-        middleLogo.addEventListener('mouseenter', function() {
-          // Create a temporary profile photo element
-          const tempProfilePhoto = document.createElement('img');
-          tempProfilePhoto.src = profilePhotoUrl;
-          tempProfilePhoto.style.cssText = `
-            position: absolute;
-            top: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 32px;
-            height: 32px;
-            object-fit: contain;
-            z-index: 20;
-            border-radius: 50%;
-          `;
-          tempProfilePhoto.className = 'temp-profile-photo';
-          
-          // Hide original middle logo
-          middleLogo.style.opacity = '0';
-          
-          // Add temporary profile photo
-          logoSection.appendChild(tempProfilePhoto);
+        // Icon B hover effects (middle icon)
+        iconB.addEventListener('mouseenter', function() {
+          // Show the corresponding portfolio icon
+          updatePortfolioIcon();
         });
         
-        middleLogo.addEventListener('mouseleave', function() {
-          // Remove temporary profile photo
-          const tempPhoto = logoSection.querySelector('.temp-profile-photo');
-          if (tempPhoto) {
-            tempPhoto.remove();
-          }
-          
-          // Show original middle logo
-          middleLogo.style.opacity = '1';
+        iconB.addEventListener('mouseleave', function() {
+          // Reset to original portfolio icon
+          profilePhoto.src = originalD;
         });
       }
     });
