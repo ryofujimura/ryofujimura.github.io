@@ -532,10 +532,15 @@ def github_repo_counter():
     return render_template('github.html')
 
 if __name__ == '__main__':
-    # Ensure the DB file can exist
+    # Delete the database file if it exists to start fresh
     db_path = BASE_DIR / 'local_database.db'
-    if not db_path.exists():
-        db_path.touch()
+    if db_path.exists():
+        print(f"Deleting existing database: {db_path}")
+        db_path.unlink()
+    
+    # Create a new database file
+    print(f"Creating new database: {db_path}")
+    db_path.touch()
 
     # Call create_tables() explicitly when the app starts
     with app.app_context():
