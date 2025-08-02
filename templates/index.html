@@ -70,6 +70,51 @@
         overflow: visible !important;
       }
     }
+    
+    /* Too thin message styles - ensure they work */
+    @media (max-width: 371px) {
+      .layout-container {
+        display: none !important;
+      }
+      
+      .too-thin {
+        display: flex !important;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        width: 100vw;
+        margin: 0;
+        padding: 1rem;
+        background: white;
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 99999;
+        visibility: visible !important;
+        opacity: 1 !important;
+      }
+      
+      .too-thin-content {
+        text-align: center;
+        max-width: 300px;
+        display: block !important;
+      }
+      
+      .too-thin h1 {
+        font-size: 2.5rem;
+        color: #333;
+        margin-bottom: 1rem;
+        display: block !important;
+      }
+      
+      .too-thin p {
+        padding: 0;
+        font-size: 1.5rem;
+        color: #777;
+        line-height: 1.4;
+        display: block !important;
+      }
+    }
   </style>
 </head>
 <body>

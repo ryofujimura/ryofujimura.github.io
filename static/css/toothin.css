@@ -3,7 +3,9 @@
     .layout-container {
         display: none !important;
     }
-    .too-thin {
+    
+    /* Force the too-thin message to show with maximum specificity */
+    body .content-wrapper .too-thin {
         display: flex !important;
         align-items: center;
         justify-content: center;
@@ -15,22 +17,30 @@
         position: fixed;
         top: 0;
         left: 0;
-        z-index: 9999;
+        z-index: 99999;
+        visibility: visible !important;
+        opacity: 1 !important;
     }
-    .too-thin-content {
+    
+    body .content-wrapper .too-thin .too-thin-content {
         text-align: center;
         max-width: 300px;
+        display: block !important;
     }
-    .too-thin h1 {
+    
+    body .content-wrapper .too-thin h1 {
         font-size: 2.5rem;
         color: #333;
         margin-bottom: 1rem;
+        display: block !important;
     }
-    .too-thin p {
+    
+    body .content-wrapper .too-thin p {
         padding: 0;
         font-size: 1.5rem;
         color: #777;
         line-height: 1.4;
+        display: block !important;
     }
 
 }
