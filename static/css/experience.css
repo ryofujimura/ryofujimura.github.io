@@ -1603,8 +1603,8 @@
   gap: 0 !important;
   display: flex !important;
   position: relative !important;
-  /* Force aspect ratio maintenance during hover */
-  aspect-ratio: 1 / 1 !important;
+  /* Force aspect ratio maintenance during hover - but don't override specific 2x1 rules */
+  /* aspect-ratio: 1 / 1 !important; - Removed to allow specific project rules to work */
   /* Ensure consistent behavior across all grid layouts */
   min-height: 0 !important;
   min-width: 0 !important;
