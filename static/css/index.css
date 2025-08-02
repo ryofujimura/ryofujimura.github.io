@@ -627,7 +627,7 @@ transform: scale(1.05);
 
 /* Updated CSS for Mobile View */
 
-@media (max-width: 474px) {
+@media (max-width: 853px) {
   .layout-container {
     flex-direction: column;
     height: auto;
