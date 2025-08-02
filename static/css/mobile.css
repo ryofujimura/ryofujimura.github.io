@@ -153,6 +153,9 @@
     max-height: 150px;
     max-width: 150px;
     margin: auto;
+    border-radius: 50%;
+    overflow: hidden;
+    object-fit: cover;
   }
   .profile-name {
     grid-area: profile-name;

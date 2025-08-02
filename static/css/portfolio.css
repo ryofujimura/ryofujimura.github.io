@@ -44,6 +44,10 @@
     /* height: 120px; */
     max-width: 120px;
     padding: 20px 0 0 0;
+    border-radius: 50%;
+    overflow: hidden;
+    aspect-ratio: 1/1;
+    object-fit: cover;
   }
 
   .profile-content h2 {
