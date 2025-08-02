@@ -74,29 +74,48 @@
 }
 
 #project-1:hover {
-  display: unset;
-  grid-template-rows: 1fr;
-  grid-template-columns: 1fr;
-  padding: unset;
-  gap: unset;
-  overflow: hidden;
-  display: flex;
+  display: flex !important;
   justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  padding: 0 !important;
+  margin: 0 !important;
+  /* Maintain 2x1 aspect ratio for horizontal layouts */
+  aspect-ratio: 2/1 !important;
+  /* Reset grid settings */
+  grid-template-rows: unset !important;
+  grid-template-columns: unset !important;
+  gap: 0 !important;
 }
 
 #project-1:hover .experience-image-container {
-  display: unset;
-  grid-template-rows: unset;
-  grid-template-columns: unset;
-  height: auto;
-  object-fit: contain;
-  overflow: hidden;
-  align-items: center;
+  display: block !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  opacity: 1 !important;
+  object-fit: cover !important;
+  object-position: center !important;
+  z-index: 2 !important;
+  box-sizing: border-box !important;
+  border-radius: 15px;
+  transition: opacity 0.3s ease;
 }
+
 #project-1:hover .experience-section img {
-  aspect-ratio: original;
-  max-width: unset;
-  height: unset;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  object-position: center !important;
 }
 
 @media (max-width: 571px) {
