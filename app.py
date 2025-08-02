@@ -12,13 +12,16 @@ from importlib import import_module
 # Load environment variables from .env file
 load_dotenv()
 
+# Get the directory where this script is located
+BASE_DIR = Path(__file__).parent.absolute()
+
 app = Flask(__name__)
 
 # Secret key for sessions and flash messages
 app.secret_key = os.environ.get('SECRET_KEY', 'dev_key_for_development')
 
-# Configure SQLite database (relative path)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///local_database.db'
+# Configure SQLite database (relative to script location)
+app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{BASE_DIR}/local_database.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db.init_app(app)
@@ -28,7 +31,7 @@ ADMIN_USERNAME = os.environ.get('ADMIN_USERNAME', 'admin')
 ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD', 'password')
 
 # Ensure data directory exists
-DATA_DIR = Path('data')
+DATA_DIR = BASE_DIR / 'data'
 DATA_DIR.mkdir(exist_ok=True)
 
 # Login required decorator
@@ -68,6 +71,9 @@ def load_json_data(file_path):
     Load data from a JSON file
     """
     try:
+        # Convert to Path object if it's a string
+        if isinstance(file_path, str):
+            file_path = Path(file_path)
         with open(file_path, 'r') as file:
             return json.load(file)
     except (FileNotFoundError, json.JSONDecodeError) as e:
@@ -88,8 +94,8 @@ def seed_data():
     Prevents duplicate insertions by checking if records exist first.
     """
     # Ensure JSON files exist
-    experiences_json = Path('data/experiences.json')
-    profile_json = Path('data/profile.json')
+    experiences_json = DATA_DIR / 'experiences.json'
+    profile_json = DATA_DIR / 'profile.json'
     
     if not experiences_json.exists():
         with open(experiences_json, 'w') as f:
@@ -106,7 +112,7 @@ def seed_data():
     
     # Seed Profile data
     if not Profile.query.first():
-        profile_data = load_json_data('data/profile.json')
+        profile_data = load_json_data(profile_json)
         if profile_data and 'profile' in profile_data:
             profile = Profile(
                 name=profile_data['profile'].get('name', ''),
@@ -122,7 +128,7 @@ def seed_data():
         return
 
     # Load experience data from JSON file
-    data = load_json_data('data/experiences.json')
+    data = load_json_data(experiences_json)
     if not data or 'experiences' not in data:
         print("No experience data found or invalid data format.")
         return
@@ -506,7 +512,7 @@ def save_experiences_to_json():
             }
             data["experiences"].append(experience_data)
         
-        with open('data/experiences.json', 'w') as f:
+        with open(DATA_DIR / 'experiences.json', 'w') as f:
             json.dump(data, f, indent=4)
         print("Experiences saved to JSON file")
     except Exception as e:
@@ -522,8 +528,9 @@ def github_repo_counter():
 
 if __name__ == '__main__':
     # Ensure the DB file can exist
-    if not os.path.exists('local_database.db'):
-        open('local_database.db', 'a').close()
+    db_path = BASE_DIR / 'local_database.db'
+    if not db_path.exists():
+        db_path.touch()
 
     # Call create_tables() explicitly when the app starts
     with app.app_context():
