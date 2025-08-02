@@ -12,3 +12,4 @@ node_modules
 .netlify/
 local_database.db
 *.db
+*.pyc
