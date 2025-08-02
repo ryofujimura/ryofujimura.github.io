@@ -140,9 +140,9 @@
         }
       }
       
-      // Update tooltip position on scroll
-      window.addEventListener('scroll', updateTooltipPosition);
-      window.addEventListener('resize', updateTooltipPosition);
+      // Add scroll and resize event listeners to update tooltip position
+      window.addEventListener('scroll', updateTooltipPosition, { passive: true });
+      window.addEventListener('resize', updateTooltipPosition, { passive: true });
       
       // Add click event for filtering
       button.addEventListener('click', function() {
@@ -285,7 +285,7 @@
     position: relative;
   }
   
-  /* Tooltip container and tooltip styling */
+  /* Tooltip container and tooltip styles */
   .tooltip-container {
     position: fixed;
     top: 0;
@@ -300,15 +300,26 @@
     position: absolute;
     background: rgba(0, 0, 0, 0.8);
     color: white;
-    padding: 4px 8px;
-    border-radius: 4px;
+    padding: 8px 12px;
+    border-radius: 6px;
     font-size: 12px;
     white-space: nowrap;
     opacity: 0;
     visibility: hidden;
-    transition: opacity 0.2s ease, visibility 0.2s ease, transform 0.2s ease;
+    transform: translateX(-50%) scale(0.8);
+    transition: opacity 0.2s ease, transform 0.2s ease;
     pointer-events: none;
     z-index: 10001;
+  }
+  
+  .tag-tooltip::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 5px solid transparent;
+    border-top-color: rgba(0, 0, 0, 0.8);
   }
   
   /* Filtering active class - applied to the experience-section container */
