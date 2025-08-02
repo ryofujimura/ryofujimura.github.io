@@ -280,7 +280,7 @@ def home():
 
     # Get GitHub stats (if configured)
     username = "ryofujimura"
-    access_token = ""
+    access_token = os.environ.get('GITHUB_ACCESS_TOKEN', '')
     
     github_stats = get_github_stats(username, access_token)
     
