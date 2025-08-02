@@ -1,8 +1,8 @@
 {
     "profile": {
-        "name": "Ryo ",
+        "name": "Ryo",
         "title": "Software Engineer",
-        "bio": "Aspiring CS student with expertise in AI, data engineering, and software solutions.",
+        "bio": "Aspiring CS student with expertise in AI, Mobile Development, and Software Solutions.",
         "img_path": "/static/images/profile.png"
     }
-} 
+}
