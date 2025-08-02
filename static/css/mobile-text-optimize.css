@@ -84,7 +84,7 @@
 }
 
 /* Apply these styles only on mobile */
-@media (max-width: 879px) {
+@media (max-width: 474px) {
   .experience-title.mobile-optimize {
     font-size: clamp(0.95rem, 3vw, 1.1rem) !important;
     white-space: normal !important;
@@ -202,7 +202,7 @@
 }
 
 /* Prevent overflow for long text in tags and terms */
-@media (max-width: 879px) {
+@media (max-width: 474px) {
   .experience-term {
     max-width: 100%;
     word-break: break-word;

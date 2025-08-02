@@ -109,7 +109,7 @@
     aspect-ratio: 1 / 1;
   }
 }
-@media (max-width: 879px) {
+@media (max-width: 474px) {
   .content-container {
     overflow-y: visible;
     -webkit-overflow-scrolling: auto;
