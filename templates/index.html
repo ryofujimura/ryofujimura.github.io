@@ -14,6 +14,84 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='css/toothin.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/popup.css') }}">
   <script src="{{ url_for('static', filename='js/ios-fix.js') }}"></script>
+  <script>
+    // Icon swapping functionality
+    document.addEventListener('DOMContentLoaded', function() {
+      const logoSection = document.querySelector('.logo-section');
+      const profilePhoto = document.querySelector('.profile-photo');
+      
+      if (logoSection && profilePhoto) {
+        const logos = logoSection.querySelectorAll('img');
+        const firstLogo = logos[0]; // A
+        const middleLogo = logos[1]; // B (staple)
+        const lastLogo = logos[2];   // C
+        
+        // Get profile photo URL
+        const profilePhotoUrl = profilePhoto.src;
+        
+        // Add hover effects for icon swapping
+        firstLogo.addEventListener('mouseenter', function() {
+          // Swap first with middle
+          firstLogo.style.transform = 'translateX(8px)';
+          middleLogo.style.transform = 'translateX(-8px)';
+        });
+        
+        firstLogo.addEventListener('mouseleave', function() {
+          // Reset positions
+          firstLogo.style.transform = '';
+          middleLogo.style.transform = '';
+        });
+        
+        lastLogo.addEventListener('mouseenter', function() {
+          // Swap last with middle
+          lastLogo.style.transform = 'translateX(-8px)';
+          middleLogo.style.transform = 'translateX(8px)';
+        });
+        
+        lastLogo.addEventListener('mouseleave', function() {
+          // Reset positions
+          lastLogo.style.transform = '';
+          middleLogo.style.transform = '';
+        });
+        
+        // Middle icon hover effect - show profile photo
+        middleLogo.addEventListener('mouseenter', function() {
+          // Create a temporary profile photo element
+          const tempProfilePhoto = document.createElement('img');
+          tempProfilePhoto.src = profilePhotoUrl;
+          tempProfilePhoto.style.cssText = `
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 32px;
+            height: 32px;
+            object-fit: contain;
+            z-index: 20;
+            border-radius: 50%;
+          `;
+          tempProfilePhoto.className = 'temp-profile-photo';
+          
+          // Hide original middle logo
+          middleLogo.style.opacity = '0';
+          
+          // Add temporary profile photo
+          logoSection.appendChild(tempProfilePhoto);
+        });
+        
+        middleLogo.addEventListener('mouseleave', function() {
+          // Remove temporary profile photo
+          const tempPhoto = logoSection.querySelector('.temp-profile-photo');
+          if (tempPhoto) {
+            tempPhoto.remove();
+          }
+          
+          // Show original middle logo
+          middleLogo.style.opacity = '1';
+        });
+      }
+    });
+  </script>
   
   <style>
     /* Global tooltip container and tooltip styles */
