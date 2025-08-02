@@ -111,20 +111,38 @@
       button.classList.add('missing-image');
       
       // Add hover events for tooltip
+      let isHovering = false;
+      let currentButton = null;
+      
       button.addEventListener('mouseenter', function() {
-        const rect = this.getBoundingClientRect();
+        isHovering = true;
+        currentButton = this;
+        updateTooltipPosition();
         tooltip.textContent = tagName;
-        tooltip.style.left = rect.left + (rect.width / 2) + 'px';
-        tooltip.style.top = rect.top - 40 + 'px';
         tooltip.style.opacity = '1';
         tooltip.style.visibility = 'visible';
         tooltip.style.transform = 'translateX(-50%) scale(1)';
       });
       
       button.addEventListener('mouseleave', function() {
+        isHovering = false;
+        currentButton = null;
         tooltip.style.opacity = '0';
         tooltip.style.visibility = 'hidden';
       });
+      
+      // Function to update tooltip position
+      function updateTooltipPosition() {
+        if (isHovering && currentButton) {
+          const rect = currentButton.getBoundingClientRect();
+          tooltip.style.left = rect.left + (rect.width / 2) + 'px';
+          tooltip.style.top = rect.top - 40 + 'px';
+        }
+      }
+      
+      // Update tooltip position on scroll
+      window.addEventListener('scroll', updateTooltipPosition);
+      window.addEventListener('resize', updateTooltipPosition);
       
       // Add click event for filtering
       button.addEventListener('click', function() {
@@ -265,6 +283,32 @@
   /* Tooltip styles for tag buttons */
   .tag-button {
     position: relative;
+  }
+  
+  /* Tooltip container and tooltip styling */
+  .tooltip-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 10000;
+  }
+  
+  .tag-tooltip {
+    position: absolute;
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease, visibility 0.2s ease, transform 0.2s ease;
+    pointer-events: none;
+    z-index: 10001;
   }
   
   /* Filtering active class - applied to the experience-section container */
