@@ -10,3 +10,5 @@ node_modules
 .vscode/
 
 .netlify/
+local_database.db
+*.db
