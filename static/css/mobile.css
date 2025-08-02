@@ -1,12 +1,16 @@
 /* Updated CSS for Mobile View */
 
-@media (max-width: 473px) {
+@media (max-width: 853px) {
   .content-container {
     border-radius: 15px;
     overflow-y: visible;
     height: auto !important;
     max-height: none !important;
     -webkit-overflow-scrolling: touch;
+    /* Add white padding on sides until 852px */
+    max-width: 473px;
+    margin: 0 auto;
+    background: white;
   }
   
   .experience-section-container {
@@ -23,6 +27,15 @@
     display: grid;
     height: auto !important;
     min-height: 0 !important;
+  }
+  
+  /* Remove white padding and max-width constraint at 852px and below */
+  @media (max-width: 852px) {
+    .content-container {
+      max-width: none;
+      margin: 0;
+      background: transparent;
+    }
   }
   
   .project-item {
