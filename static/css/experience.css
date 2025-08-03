@@ -7,6 +7,7 @@
 }
 
 .experience-section-container {
+  background: #f8f9fa;
   padding: 20px;
 }
 
@@ -14,7 +15,6 @@
   border-radius: 15px;
   min-height: 100px;
   height: 100%;
-  background: white;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -22,6 +22,7 @@
 
 .experience-section {
   display: grid;
+  background: #ffffff;
   width: 100%;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   grid-auto-flow: dense;
@@ -327,6 +328,16 @@
     aspect-ratio: 1 / 1;
   }
 }
+/* iPad/Tablet specific styles */
+@media (min-width: 854px) and (max-width: 1024px) {
+  .content-container {
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    height: 100vh;
+    max-height: 100vh;
+  }
+}
+
 @media (max-width: 853px) {
   .content-container {
     overflow-y: visible;
@@ -1587,8 +1598,8 @@
   height: 100% !important;
   /* Force box-sizing */
   box-sizing: border-box !important;
-  /* Force aspect ratio maintenance during hover */
-  aspect-ratio: 1 / 1 !important;
+  /* Force aspect ratio maintenance during hover - but allow specific project overrides */
+  aspect-ratio: 1 / 1;
   /* Ensure consistent behavior across all grid layouts */
   min-height: 0 !important;
   min-width: 0 !important;
@@ -1608,6 +1619,18 @@
   /* Ensure consistent behavior across all grid layouts */
   min-height: 0 !important;
   min-width: 0 !important;
+}
+
+/* Ensure regular tiles maintain 1:1 aspect ratio on hover */
+#project-2:hover,
+#project-4:hover,
+#project-5:hover,
+#project-7:hover,
+#project-8:hover,
+#project-9:hover,
+#project-10:hover,
+#project-11:hover {
+  aspect-ratio: 1 / 1 !important;
 }
 
 /* Make sure the image has no constraints */
