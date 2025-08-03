@@ -330,11 +330,17 @@
 }
 /* iPad/Tablet specific styles */
 @media (min-width: 854px) and (max-width: 1024px) {
+  .main-section {
+    overflow: auto !important;
+    height: auto !important;
+    min-height: 100vh;
+  }
+  
   .content-container {
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
-    height: 100vh;
-    max-height: 100vh;
+    height: auto;
+    max-height: none;
   }
 }
 
