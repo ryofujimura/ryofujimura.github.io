@@ -2,6 +2,31 @@
     "experiences": [
         {
             "experience_type": "Work",
+            "title": "Mobile Application Developer Intern",
+            "subtitle": "Bose Corporation",
+            "term": "June 2025 - August 2025",
+            "short_description": "Strengthened mobile development skills using iOS, Android, and full-stack tools while improving debugging, problem-solving, and system integration",
+            "long_description": "Enhanced technical expertise in mobile and full-stack development through hands-on use of iOS, Android, APIs, and debugging tools. Gained experience in system integration, software pipelines, and collaborative development while sharpening problem-scoping, adaptability, and accountability in delivering production-ready solutions",
+            "links": [
+                "https://www.bose.com/apps/bose-app"
+            ],
+            "link_images": [
+                "bose_1.svg"
+            ],
+            "images": [
+                "bose_1.svg",
+                "bose_2.JPG",
+                "bose_3.JPG"
+            ],
+            "tags": [
+                "debug",
+                "team_collaboration",
+                "apple_development",
+                "android_development"
+            ]
+        },
+        {
+            "experience_type": "Work",
             "title": "Software Engineer Intern",
             "subtitle": "American Honda Motor Company, Inc.",
             "term": "June 2024 - August 2024",
@@ -196,6 +221,7 @@
             "tags": [
                 "cybersecurity",
                 "apple_development",
+                "android_development",
                 "project_leadership",
                 "web_app"
             ]
