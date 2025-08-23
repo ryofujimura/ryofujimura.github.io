@@ -1548,6 +1548,48 @@
   display: none;
 }
 
+/* Project 12 */
+#project-12 { 
+  grid-column: span 1;
+  grid-row: span 1;
+  /* background-color: #ffff99; */
+  aspect-ratio: 1;
+
+  display: grid;
+  grid-template-rows: 0.1fr 1fr ;
+  padding: 1rem;
+  gap: 1rem;  
+}
+#project-12 .experience-type {
+  grid-row: 1;
+  overflow:visible;
+}
+
+#project-12 .experience-content {
+  grid-row: 2;
+  padding: 15px;
+  margin: auto 0 0 0;
+}
+/* hidden items */
+#project-12 .experience-image-container {
+  display: none;
+}
+#project-12 .experience-links {
+  display: none;
+}
+#project-12 .experience-tags {
+  display: none;
+}
+#project-12 .experience-link-images {
+  display: none;
+}
+#project-12 .experience-shortdes {
+  display: none;
+}
+#project-12 .experience-images {
+  display: none;
+}
+
 /* ===================== HOVER AND MOBILE EFFECTS ===================== */
 
 /* Style for background image on mobile with low opacity */
@@ -1635,7 +1677,8 @@
 #project-8:hover,
 #project-9:hover,
 #project-10:hover,
-#project-11:hover {
+#project-11:hover,
+#project-12:hover {
   aspect-ratio: 1 / 1 !important;
 }
 
