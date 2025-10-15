@@ -1,4 +1,0 @@
-Flask
-SQLAlchemy
-Flask-SQLAlchemy
-python-dotenv
