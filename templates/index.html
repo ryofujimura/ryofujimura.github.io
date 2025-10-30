@@ -14,6 +14,30 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='css/toothin.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/popup.css') }}">
   <script src="{{ url_for('static', filename='js/ios-fix.js') }}"></script>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getAnalytics, isSupported } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDjfmsodqZW5VknlN98QPNA71yg8bCKlM0",
+      authDomain: "ryofujimura-181bc.firebaseapp.com",
+      projectId: "ryofujimura-181bc",
+      storageBucket: "ryofujimura-181bc.firebasestorage.app",
+      messagingSenderId: "347833216953",
+      appId: "1:347833216953:web:b5c6eee15dec937f969068",
+      measurementId: "G-PQ1DJYGVWB"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    // Only initialize Analytics when supported (avoids errors on unsupported environments)
+    try {
+      if (await isSupported()) {
+        getAnalytics(app);
+      }
+    } catch (e) {
+      // no-op
+    }
+  </script>
   
   <style>
     /* Global tooltip container and tooltip styles */
