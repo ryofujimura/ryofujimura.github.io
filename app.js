@@ -23,6 +23,12 @@ let raycaster = null;
 let mouse = null;
 let animationId = null;
 
+// Fixed position on the panorama where the object is pinned
+// These coordinates correspond to a specific point on the equirectangular image
+const OBJECT_PIN_PITCH = 0;   // 0 = horizon level (degrees)
+const OBJECT_PIN_YAW = 0;     // 0 = straight ahead (degrees)
+const OBJECT_SPHERE_RADIUS = 0.99; // Slightly inside the sphere surface to ensure visibility
+
 function initPanorama() {
     viewer = pannellum.viewer('panorama', {
         type: 'equirectangular',
@@ -155,24 +161,34 @@ function load3DObject() {
             // Center the object
             object.position.sub(center.multiplyScalar(scale));
             
-            // Position object at a fixed location in the panorama (like a pin)
-            // This position stays fixed as the user pans around
-            // pitch: 0 = horizon, positive = up, negative = down
-            // yaw: 0 = forward, positive = right, negative = left
-            const objectPitch = 0;   // Eye level
-            const objectYaw = 30;    // 30 degrees to the right
-            const objectRadius = 1.5; // Distance from center (inside the sphere)
+            // Pin object to a fixed point on the panorama sphere
+            // This position is fixed in world space and corresponds to a specific point on the image
+            // As the camera rotates, the object will appear to move with the panorama
+            const pitch = OBJECT_PIN_PITCH;
+            const yaw = OBJECT_PIN_YAW;
+            const radius = OBJECT_SPHERE_RADIUS;
             
-            // Convert pitch/yaw to 3D position in world space
-            // Pannellum uses: pitch (vertical), yaw (horizontal)
-            const phi = (90 - objectPitch) * (Math.PI / 180);
-            const theta = (objectYaw + 90) * (Math.PI / 180);
+            // Convert pitch/yaw to 3D position on the sphere
+            // Pannellum: pitch (vertical angle, 0 = horizon), yaw (horizontal angle, 0 = forward)
+            // Three.js spherical coordinates: phi (from +Y axis), theta (around Y axis)
+            const phi = (90 - pitch) * (Math.PI / 180);  // Convert pitch to phi
+            const theta = (yaw + 90) * (Math.PI / 180);  // Convert yaw to theta (offset by 90 for forward direction)
             
-            const x = objectRadius * Math.sin(phi) * Math.cos(theta);
-            const y = objectRadius * Math.cos(phi);
-            const z = objectRadius * Math.sin(phi) * Math.sin(theta);
+            // Calculate position on sphere surface
+            const x = radius * Math.sin(phi) * Math.cos(theta);
+            const y = radius * Math.cos(phi);
+            const z = radius * Math.sin(phi) * Math.sin(theta);
             
             object.position.set(x, y, z);
+            
+            // Orient object to face outward from sphere center (toward camera when at that point)
+            // The object should face the direction from sphere center to its position
+            const lookDirection = new THREE.Vector3(x, y, z).normalize();
+            const lookTarget = new THREE.Vector3().addVectors(
+                object.position,
+                lookDirection.multiplyScalar(1)
+            );
+            object.lookAt(lookTarget);
             
             // Add material to make it visible
             object.traverse((child) => {
