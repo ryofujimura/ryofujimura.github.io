@@ -194,14 +194,14 @@ body {
     z-index: 10;
     border-radius: 8px;
     overflow: hidden;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-    transition: transform 0.2s, box-shadow 0.2s;
+    border: 2px solid transparent;
+    transition: transform 0.2s, border-color 0.2s;
     background: transparent;
 }
 
 .obj-3d-container:hover {
     transform: scale(1.1);
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+    border-color: #4CAF50;
 }
 
 .obj-3d-container canvas {
