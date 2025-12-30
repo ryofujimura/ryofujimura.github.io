@@ -208,30 +208,37 @@ body {
 }
 
 /* Custom Hotspot Styling */
-.custom-hotspot {
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    background-color: #ff4444;
-    border: 3px solid white;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-    cursor: pointer;
-    transition: transform 0.2s;
+.pnlm-hotspot.custom-hotspot {
+    width: 30px !important;
+    height: 30px !important;
+    border-radius: 50% !important;
+    background-color: #ff4444 !important;
+    border: 3px solid white !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+    cursor: pointer !important;
+    transition: transform 0.2s !important;
+    display: block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
 }
 
-.custom-hotspot:hover {
-    transform: scale(1.2);
+.pnlm-hotspot.custom-hotspot:hover {
+    transform: scale(1.2) !important;
 }
 
-.custom-hotspot::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 0;
-    height: 0;
-    border-left: 6px solid transparent;
-    border-right: 6px solid transparent;
-    border-bottom: 10px solid white;
+.pnlm-hotspot.custom-hotspot::before {
+    content: '' !important;
+    position: absolute !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    width: 0 !important;
+    height: 0 !important;
+    border-left: 6px solid transparent !important;
+    border-right: 6px solid transparent !important;
+    border-bottom: 10px solid white !important;
+}
+
+.pnlm-hotspot.custom-hotspot .pnlm-info {
+    display: none !important;
 }
