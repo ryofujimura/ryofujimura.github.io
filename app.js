@@ -21,7 +21,7 @@ function initPanorama() {
         panorama: 'images/room-360.jpg',
         autoLoad: true,
         autoRotate: 0,
-        compass: true,
+        compass: false,
         showControls: true,
         hfov: 100,
         minHfov: 100,
