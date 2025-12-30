@@ -24,9 +24,9 @@ function initPanorama() {
         compass: false,
         showControls: true,
         hfov: 100,
-        minHfov: 100,
-        maxHfov: 100,
-        mouseZoom: false
+        minHfov: 50,
+        maxHfov: 120,
+        mouseZoom: true
     });
 }
 
