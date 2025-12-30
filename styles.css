@@ -46,18 +46,6 @@ body {
 #panorama {
     width: 100%;
     height: 100vh;
-    position: relative;
-}
-
-/* Three.js Canvas Overlay */
-#threejs-canvas {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: auto;
-    z-index: 100;
 }
 
 /* Hide zoom buttons */
@@ -106,7 +94,8 @@ body {
     }
 }
 
-.close {
+.close,
+.close-object {
     position: absolute;
     right: 15px;
     top: 15px;
@@ -117,7 +106,8 @@ body {
     line-height: 20px;
 }
 
-.close:hover {
+.close:hover,
+.close-object:hover {
     color: #000;
 }
 
@@ -193,27 +183,7 @@ body {
     min-height: 20px;
 }
 
-/* Object Info Popup */
-.close-object {
-    position: absolute;
-    right: 15px;
-    top: 15px;
-    font-size: 28px;
-    font-weight: bold;
-    color: #aaa;
-    cursor: pointer;
-    line-height: 20px;
-}
-
-.close-object:hover {
-    color: #000;
-}
-
-.object-info {
-    color: #333;
+#objectContent {
+    color: #666;
     line-height: 1.6;
-}
-
-.object-info p {
-    margin-bottom: 10px;
 }

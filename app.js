@@ -15,6 +15,10 @@ const auth = firebase.auth();
 
 // Initialize Pannellum Viewer
 let viewer;
+let object3D = null;
+let raycaster = null;
+let mouse = new THREE.Vector2();
+
 function initPanorama() {
     viewer = pannellum.viewer('panorama', {
         type: 'equirectangular',
@@ -28,15 +32,125 @@ function initPanorama() {
         maxHfov: 120,
         mouseZoom: true
     });
+
+    // Wait for viewer to load, then add 3D object
+    viewer.on('load', () => {
+        setTimeout(() => {
+            load3DObject();
+            setupObjectClick();
+        }, 500);
+    });
+}
+
+// Load and position 3D object
+function load3DObject() {
+    // Access Pannellum's internal Three.js renderer and scene
+    const renderer = viewer.renderer;
+    const scene = viewer.scene;
     
-    // Make viewer globally accessible for Three.js integration
-    window.viewer = viewer;
+    if (!renderer || !scene) {
+        console.error('Could not access Pannellum renderer or scene');
+        return;
+    }
+
+    // Initialize raycaster for click detection
+    raycaster = new THREE.Raycaster();
+
+    // Load OBJ file
+    const loader = new OBJLoader();
+    loader.load(
+        'objects/Bose soundslink handle.obj',
+        (object) => {
+            // Calculate bounding box to center and scale object
+            const box = new THREE.Box3().setFromObject(object);
+            const center = box.getCenter(new THREE.Vector3());
+            const size = box.getSize(new THREE.Vector3());
+            const maxDim = Math.max(size.x, size.y, size.z);
+            
+            // Scale to moderate size (adjust scale factor as needed)
+            const scale = 0.3 / maxDim;
+            object.scale.multiplyScalar(scale);
+            
+            // Center the object
+            object.position.sub(center.multiplyScalar(scale));
+            
+            // Position in front of camera (center of view)
+            // In spherical coordinates: radius, theta (horizontal), phi (vertical)
+            // Position at center: radius = 1.5, theta = 0 (straight ahead), phi = 0 (eye level)
+            const radius = 1.5;
+            object.position.set(radius, 0, 0);
+            
+            // Add material to make it visible
+            object.traverse((child) => {
+                if (child.isMesh) {
+                    child.material = new THREE.MeshStandardMaterial({
+                        color: 0x888888,
+                        metalness: 0.7,
+                        roughness: 0.3
+                    });
+                    // Make object clickable
+                    child.userData.clickable = true;
+                }
+            });
+            
+            object3D = object;
+            scene.add(object);
+            
+            // Add lighting for better visibility
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+            scene.add(ambientLight);
+            
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+            directionalLight.position.set(1, 1, 1);
+            scene.add(directionalLight);
+            
+            console.log('3D object loaded and positioned');
+        },
+        (progress) => {
+            console.log('Loading progress:', (progress.loaded / progress.total * 100) + '%');
+        },
+        (error) => {
+            console.error('Error loading OBJ file:', error);
+        }
+    );
+}
+
+// Setup click detection for 3D object
+function setupObjectClick() {
+    const panoramaElement = document.getElementById('panorama');
+    
+    panoramaElement.addEventListener('click', (event) => {
+        if (!object3D || !raycaster) return;
+        
+        const renderer = viewer.renderer;
+        const scene = viewer.scene;
+        const camera = viewer.camera;
+        
+        if (!renderer || !scene || !camera) return;
+        
+        // Get mouse position in normalized device coordinates
+        const rect = panoramaElement.getBoundingClientRect();
+        mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+        mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+        
+        // Update raycaster with current camera
+        raycaster.setFromCamera(mouse, camera);
+        
+        // Check for intersections with the object
+        const intersects = raycaster.intersectObject(object3D, true);
+        
+        if (intersects.length > 0) {
+            showObjectPopup();
+        }
+    });
 }
 
 // DOM Elements
 const authButton = document.getElementById('authButton');
 const authModal = document.getElementById('authModal');
+const objectModal = document.getElementById('objectModal');
 const closeModal = document.querySelector('.close');
+const closeObjectModal = document.querySelector('.close-object');
 const modalTitle = document.getElementById('modalTitle');
 const loginForm = document.getElementById('loginForm');
 const signupForm = document.getElementById('signupForm');
@@ -92,7 +206,19 @@ window.addEventListener('click', (e) => {
         clearError();
         clearForms();
     }
+    if (e.target === objectModal) {
+        objectModal.classList.remove('show');
+    }
 });
+
+// Object Modal
+closeObjectModal.addEventListener('click', () => {
+    objectModal.classList.remove('show');
+});
+
+function showObjectPopup() {
+    objectModal.classList.add('show');
+}
 
 // Switch between Login and Signup
 switchToSignup.addEventListener('click', (e) => {
