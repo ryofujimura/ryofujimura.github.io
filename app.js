@@ -155,10 +155,24 @@ function load3DObject() {
             // Center the object
             object.position.sub(center.multiplyScalar(scale));
             
-            // Position in front of camera (center of view)
-            // Position at center: radius = 1.5, straight ahead
-            const radius = 1.5;
-            object.position.set(radius, 0, 0);
+            // Position object at a specific location in the panorama
+            // Using pitch and yaw coordinates (in degrees)
+            // pitch: 0 = horizon, positive = up, negative = down
+            // yaw: 0 = forward, positive = right, negative = left
+            const objectPitch = 0;  // Eye level
+            const objectYaw = 0;    // Straight ahead
+            const objectRadius = 1.5; // Distance from center (inside the sphere)
+            
+            // Convert pitch/yaw to 3D position
+            // Pannellum uses: pitch (vertical), yaw (horizontal)
+            const phi = (90 - objectPitch) * (Math.PI / 180);
+            const theta = (objectYaw + 90) * (Math.PI / 180);
+            
+            const x = objectRadius * Math.sin(phi) * Math.cos(theta);
+            const y = objectRadius * Math.cos(phi);
+            const z = objectRadius * Math.sin(phi) * Math.sin(theta);
+            
+            object.position.set(x, y, z);
             
             // Add material to make it visible
             object.traverse((child) => {
