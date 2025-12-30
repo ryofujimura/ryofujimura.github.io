@@ -13,9 +13,6 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 
-// Global function for hotspot click handler
-window.handleHotspotClick = (hotspot) => showPinPopup(hotspot);
-
 // Initialize Pannellum Viewer
 let viewer;
 let pinCounter = 0;
@@ -27,7 +24,9 @@ function createPin(pitch, yaw) {
         text: 'Click to view',
         cssClass: 'custom-pin',
         id: `pin-${pinCounter++}`,
-        clickHandlerFunc: 'handleHotspotClick'
+        clickHandlerFunc: function(hotspot) {
+            showPinPopup(hotspot);
+        }
     });
 }
 
@@ -46,6 +45,11 @@ function initPanorama() {
     });
 
     viewer.on('load', () => createPin(0, 0));
+
+    // Handle hotspot click - backup handler
+    viewer.on('hotspotclick', (hotspot) => {
+        showPinPopup(hotspot);
+    });
 
     // Add pin on Ctrl/Cmd+Click
     let isDragging = false;
@@ -73,11 +77,14 @@ function initPanorama() {
         mouseDownPos = null;
     });
 
-    // Disable right-click context menu
+    // Disable right-click context menu (but allow left clicks on pins)
     const panoramaElement = document.getElementById('panorama');
     panoramaElement.addEventListener('contextmenu', (e) => {
-        e.preventDefault();
-        return false;
+        // Only prevent if not clicking on a pin/hotspot
+        if (!e.target.closest('.custom-pin') && !e.target.closest('.pnlm-hotspot')) {
+            e.preventDefault();
+            return false;
+        }
     });
 }
 
