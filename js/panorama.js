@@ -137,7 +137,7 @@ function showPinPopup(hotspot) {
     // Load object in popup with interactive controls
     createObjectRenderer('popup-obj-container', 'objects/Bose soundslink handle.obj', { 
         //   uses default settings
-    }, 300);
+    });
     
     const pinModal = document.getElementById('pinModal');
     pinModal.classList.add('show');
