@@ -15,9 +15,13 @@ const auth = firebase.auth();
 
 // Initialize Pannellum Viewer
 let viewer;
+let threeScene = null;
+let threeRenderer = null;
+let threeCamera = null;
 let object3D = null;
 let raycaster = null;
-let mouse = new THREE.Vector2();
+let mouse = null;
+let animationId = null;
 
 function initPanorama() {
     viewer = pannellum.viewer('panorama', {
@@ -33,171 +37,111 @@ function initPanorama() {
         mouseZoom: true
     });
 
-    // Wait for viewer to load, then add 3D object
+    // Wait for viewer to load, then initialize Three.js overlay
     viewer.on('load', () => {
         setTimeout(() => {
+            initThreeJSScene();
             load3DObject();
             setupObjectClick();
+            animate();
         }, 500);
     });
+
+    // Sync camera when Pannellum view changes
+    viewer.on('animate', () => {
+        syncCamera();
+    });
+}
+
+// Initialize separate Three.js scene as overlay
+function initThreeJSScene() {
+    if (!window.THREE) {
+        console.error('Three.js not loaded yet');
+        return;
+    }
+
+    const overlay = document.getElementById('threejs-overlay');
+    const panoramaElement = document.getElementById('panorama');
+    const rect = panoramaElement.getBoundingClientRect();
+
+    // Create scene
+    threeScene = new THREE.Scene();
+
+    // Create camera matching Pannellum's perspective
+    const hfov = viewer.getHfov();
+    const aspect = rect.width / rect.height;
+    threeCamera = new THREE.PerspectiveCamera(hfov, aspect, 0.1, 1000);
+
+    // Create renderer
+    threeRenderer = new THREE.WebGLRenderer({
+        canvas: overlay,
+        alpha: true,
+        antialias: true
+    });
+    threeRenderer.setSize(rect.width, rect.height);
+    threeRenderer.setPixelRatio(window.devicePixelRatio);
+
+    // Initialize raycaster and mouse
+    raycaster = new THREE.Raycaster();
+    mouse = new THREE.Vector2();
+
+    // Add lighting
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+    threeScene.add(ambientLight);
+    
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+    directionalLight.position.set(1, 1, 1);
+    threeScene.add(directionalLight);
+
+    // Handle window resize
+    window.addEventListener('resize', () => {
+        const rect = panoramaElement.getBoundingClientRect();
+        threeCamera.aspect = rect.width / rect.height;
+        threeCamera.updateProjectionMatrix();
+        threeRenderer.setSize(rect.width, rect.height);
+    });
+
+    console.log('Three.js scene initialized');
+}
+
+// Sync Three.js camera with Pannellum camera
+function syncCamera() {
+    if (!threeCamera || !viewer) return;
+
+    const pitch = viewer.getPitch();
+    const yaw = viewer.getYaw();
+    const hfov = viewer.getHfov();
+    
+    // Update FOV
+    threeCamera.fov = hfov;
+    threeCamera.updateProjectionMatrix();
+
+    // Convert spherical coordinates to Cartesian
+    const phi = (90 - pitch) * (Math.PI / 180);
+    const theta = (yaw + 90) * (Math.PI / 180);
+
+    // Camera position (looking from inside sphere outward)
+    const radius = 1;
+    const x = Math.sin(phi) * Math.cos(theta);
+    const y = Math.cos(phi);
+    const z = Math.sin(phi) * Math.sin(theta);
+
+    threeCamera.position.set(x, y, z);
+    threeCamera.lookAt(0, 0, 0);
 }
 
 // Load and position 3D object
 function load3DObject() {
-    console.log('Attempting to load 3D object...');
-    console.log('Viewer object:', viewer);
-    
-    // Try different ways to access Pannellum's Three.js scene
-    let renderer, scene, camera;
-    
-    // Method 1: Direct property access
-    if (viewer.renderer) {
-        renderer = viewer.renderer;
-        scene = viewer.scene;
-        camera = viewer.camera;
-        console.log('Found renderer/scene via direct properties');
-    }
-    // Method 2: Access through data property
-    else if (viewer.data && viewer.data.renderer) {
-        renderer = viewer.data.renderer;
-        scene = viewer.data.scene;
-        camera = viewer.data.camera;
-        console.log('Found renderer/scene via data property');
-    }
-    // Method 3: Access through viewer's internal structure
-    else if (viewer._renderer) {
-        renderer = viewer._renderer;
-        scene = viewer._scene;
-        camera = viewer._camera;
-        console.log('Found renderer/scene via underscore properties');
-    }
-    // Method 4: Try to get from the panorama container
-    else {
-        const panoramaEl = document.getElementById('panorama');
-        const canvas = panoramaEl.querySelector('canvas');
-        if (canvas && canvas.__threeRenderer) {
-            renderer = canvas.__threeRenderer;
-            console.log('Found renderer via canvas');
-        }
-    }
-    
-    if (!renderer || !scene) {
-        console.error('Could not access Pannellum renderer or scene');
-        console.log('Available viewer properties:', Object.keys(viewer));
-        // Try creating overlay approach instead
-        createOverlay3DObject();
+    if (!window.THREE || !window.OBJLoader || !threeScene) {
+        console.error('Three.js or OBJLoader not available');
+        setTimeout(() => load3DObject(), 100);
         return;
     }
 
-    console.log('Renderer and scene found, loading OBJ...');
-
-    // Initialize raycaster for click detection
-    raycaster = new THREE.Raycaster();
-
-    // Check if OBJLoader is available
-    if (typeof OBJLoader === 'undefined') {
-        console.error('OBJLoader is not defined. Check if the script is loaded correctly.');
-        return;
-    }
-
-    // Load OBJ file
-    const loader = new OBJLoader();
-    console.log('OBJLoader created, starting to load file...');
+    const loader = new window.OBJLoader();
     loader.load(
         'objects/Bose soundslink handle.obj',
         (object) => {
-            console.log('OBJ file loaded successfully');
-            // Calculate bounding box to center and scale object
-            const box = new THREE.Box3().setFromObject(object);
-            const center = box.getCenter(new THREE.Vector3());
-            const size = box.getSize(new THREE.Vector3());
-            const maxDim = Math.max(size.x, size.y, size.z);
-            
-            console.log('Object dimensions:', size, 'Max dimension:', maxDim);
-            
-            // Scale to moderate size (adjust scale factor as needed)
-            const scale = 0.3 / maxDim;
-            object.scale.multiplyScalar(scale);
-            
-            // Center the object
-            object.position.sub(center.multiplyScalar(scale));
-            
-            // Position in front of camera (center of view)
-            // In spherical coordinates: radius, theta (horizontal), phi (vertical)
-            // Position at center: radius = 1.5, theta = 0 (straight ahead), phi = 0 (eye level)
-            const radius = 1.5;
-            object.position.set(radius, 0, 0);
-            
-            console.log('Object positioned at:', object.position);
-            
-            // Add material to make it visible
-            object.traverse((child) => {
-                if (child.isMesh) {
-                    child.material = new THREE.MeshStandardMaterial({
-                        color: 0x888888,
-                        metalness: 0.7,
-                        roughness: 0.3
-                    });
-                    // Make object clickable
-                    child.userData.clickable = true;
-                }
-            });
-            
-            object3D = object;
-            scene.add(object);
-            
-            // Add lighting for better visibility
-            const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
-            scene.add(ambientLight);
-            
-            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
-            directionalLight.position.set(1, 1, 1);
-            scene.add(directionalLight);
-            
-            console.log('3D object loaded and positioned in scene');
-        },
-        (progress) => {
-            if (progress.lengthComputable) {
-                console.log('Loading progress:', (progress.loaded / progress.total * 100) + '%');
-            }
-        },
-        (error) => {
-            console.error('Error loading OBJ file:', error);
-        }
-    );
-}
-
-// Fallback: Create overlay Three.js scene
-function createOverlay3DObject() {
-    console.log('Creating overlay 3D scene...');
-    
-    const panoramaEl = document.getElementById('panorama');
-    
-    // Create separate Three.js scene as overlay
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setPixelRatio(window.devicePixelRatio);
-    renderer.domElement.style.position = 'absolute';
-    renderer.domElement.style.top = '0';
-    renderer.domElement.style.left = '0';
-    renderer.domElement.style.pointerEvents = 'auto';
-    renderer.domElement.style.zIndex = '100';
-    panoramaEl.appendChild(renderer.domElement);
-    
-    // Position camera to match Pannellum's view
-    camera.position.set(0, 0, 0);
-    
-    // Initialize raycaster
-    raycaster = new THREE.Raycaster();
-    
-    // Load OBJ file
-    const loader = new OBJLoader();
-    loader.load(
-        'objects/Bose soundslink handle.obj',
-        (object) => {
-            console.log('OBJ file loaded in overlay scene');
             // Calculate bounding box to center and scale object
             const box = new THREE.Box3().setFromObject(object);
             const center = box.getCenter(new THREE.Vector3());
@@ -207,12 +151,16 @@ function createOverlay3DObject() {
             // Scale to moderate size
             const scale = 0.3 / maxDim;
             object.scale.multiplyScalar(scale);
+            
+            // Center the object
             object.position.sub(center.multiplyScalar(scale));
             
-            // Position in front of camera
-            object.position.set(0, 0, -1.5);
+            // Position in front of camera (center of view)
+            // Position at center: radius = 1.5, straight ahead
+            const radius = 1.5;
+            object.position.set(radius, 0, 0);
             
-            // Add material
+            // Add material to make it visible
             object.traverse((child) => {
                 if (child.isMesh) {
                     child.material = new THREE.MeshStandardMaterial({
@@ -220,47 +168,20 @@ function createOverlay3DObject() {
                         metalness: 0.7,
                         roughness: 0.3
                     });
+                    child.userData.clickable = true;
                 }
             });
             
             object3D = object;
-            scene.add(object);
+            threeScene.add(object);
             
-            // Add lighting
-            const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
-            scene.add(ambientLight);
-            
-            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
-            directionalLight.position.set(1, 1, 1);
-            scene.add(directionalLight);
-            
-            // Store references for click detection
-            overlayCamera = camera;
-            overlayRenderer = renderer;
-            
-            // Sync camera with Pannellum view
-            function syncCamera() {
-                if (viewer) {
-                    const pitch = viewer.getPitch();
-                    const yaw = viewer.getYaw();
-                    const hfov = viewer.getHfov();
-                    
-                    // Convert to Three.js camera rotation
-                    camera.rotation.order = 'YXZ';
-                    camera.rotation.y = (yaw * Math.PI) / 180;
-                    camera.rotation.x = (-pitch * Math.PI) / 180;
-                }
-                renderer.render(scene, camera);
-                requestAnimationFrame(syncCamera);
-            }
-            
-            // Listen to Pannellum view changes
-            viewer.on('animate', syncCamera);
-            syncCamera();
-            
-            console.log('Overlay 3D scene created and rendering');
+            console.log('3D object loaded and positioned');
         },
-        undefined,
+        (progress) => {
+            if (progress.total > 0) {
+                console.log('Loading progress:', (progress.loaded / progress.total * 100) + '%');
+            }
+        },
         (error) => {
             console.error('Error loading OBJ file:', error);
         }
@@ -268,43 +189,35 @@ function createOverlay3DObject() {
 }
 
 // Setup click detection for 3D object
-let overlayCamera = null;
-let overlayRenderer = null;
-
 function setupObjectClick() {
-    const panoramaElement = document.getElementById('panorama');
+    const overlay = document.getElementById('threejs-overlay');
     
-    panoramaElement.addEventListener('click', (event) => {
-        if (!object3D || !raycaster) return;
+    overlay.addEventListener('click', (event) => {
+        if (!object3D || !raycaster || !threeCamera) return;
         
-        // Try to get camera from overlay or viewer
-        let camera = overlayCamera;
-        if (!camera) {
-            // Try to get from viewer
-            camera = viewer.camera || viewer._camera || (viewer.data && viewer.data.camera);
-        }
-        
-        if (!camera) {
-            console.log('No camera available for raycasting');
-            return;
-        }
-        
-        // Get mouse position in normalized device coordinates
-        const rect = panoramaElement.getBoundingClientRect();
+        const rect = overlay.getBoundingClientRect();
         mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
         mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
         
-        // Update raycaster with current camera
-        raycaster.setFromCamera(mouse, camera);
+        // Update raycaster
+        raycaster.setFromCamera(mouse, threeCamera);
         
-        // Check for intersections with the object
+        // Check for intersections
         const intersects = raycaster.intersectObject(object3D, true);
         
         if (intersects.length > 0) {
-            console.log('Object clicked!');
             showObjectPopup();
         }
     });
+}
+
+// Animation loop
+function animate() {
+    if (!threeRenderer || !threeScene || !threeCamera) return;
+    
+    syncCamera();
+    threeRenderer.render(threeScene, threeCamera);
+    animationId = requestAnimationFrame(animate);
 }
 
 // DOM Elements
@@ -523,7 +436,20 @@ function getErrorMessage(error) {
     }
 }
 
-// Initialize on page load
-window.addEventListener('DOMContentLoaded', () => {
-    initPanorama();
-});
+// Initialize app after Three.js is loaded
+window.initApp = function() {
+    // Wait a bit for Three.js to be fully available
+    setTimeout(() => {
+        initPanorama();
+    }, 100);
+};
+
+// Initialize on page load if Three.js is already loaded
+if (window.THREE) {
+    window.initApp();
+} else {
+    // Wait for Three.js to load
+    window.addEventListener('DOMContentLoaded', () => {
+        // threejs-loader.js will call initApp when ready
+    });
+}
