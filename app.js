@@ -13,6 +13,11 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 
+// Global function for hotspot click handler (needed for Pannellum)
+window.handleHotspotClick = function(hotspot) {
+    showPinPopup(hotspot);
+};
+
 // Initialize Pannellum Viewer
 let viewer;
 function initPanorama() {
@@ -36,13 +41,14 @@ function initPanorama() {
             pitch: 0,
             yaw: 0,
             type: 'info',
-            text: 'Click to view details',
+            text: 'Click to view',
             cssClass: 'custom-pin',
-            id: 'pin-' + pinCounter++
+            id: 'pin-' + pinCounter++,
+            clickHandlerFunc: 'handleHotspotClick'
         });
     });
 
-    // Handle hotspot click - show popup
+    // Handle hotspot click - show popup (backup handler)
     viewer.on('hotspotclick', function(hotspot) {
         showPinPopup(hotspot);
     });
@@ -84,9 +90,10 @@ function initPanorama() {
                     pitch: pitch,
                     yaw: yaw,
                     type: 'info',
-                    text: 'Click to view details',
+                    text: 'Click to view',
                     cssClass: 'custom-pin',
-                    id: 'pin-' + pinCounter++
+                    id: 'pin-' + pinCounter++,
+                    clickHandlerFunc: 'handleHotspotClick'
                 });
             }
         }
