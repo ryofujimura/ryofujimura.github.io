@@ -150,7 +150,7 @@ function showPinPopup(hotspot) {
             <p>Pitch: ${pitch.toFixed(2)}°</p>
             <p>Yaw: ${yaw.toFixed(2)}°</p>
             <p style="margin-top: 15px; color: #666; font-size: 14px;">
-                💡 Tip: Hold Ctrl (or Cmd on Mac) and click anywhere on the panorama to add more pins.
+                panorama viewer by ryofujimura.
             </p>
         </div>
     `;
@@ -161,14 +161,10 @@ function showPinPopup(hotspot) {
     }
     
     // Load object in popup with interactive controls
-    setTimeout(() => {
-        createObjectRenderer('popup-obj-container', 'objects/Bose soundslink handle.obj', { 
-            width: 300, 
-            height: 300,
-            autoRotate: false,
-            interactive: true  // Enable drag controls
-        });
-    }, 300);
+    createObjectRenderer('popup-obj-container', 'objects/Bose soundslink handle.obj', { 
+          
+           
+    });
     
     const pinModal = document.getElementById('pinModal');
     pinModal.classList.add('show');
