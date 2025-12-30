@@ -21,7 +21,7 @@ const objectScenes = new Map(); // Store Three.js scenes for each object
 // Create 3D object renderer
 function createObjectRenderer(containerId, objPath) {
     const container = document.getElementById(containerId);
-    if (!container || typeof THREE === 'undefined') {
+    if (!container || typeof THREE === 'undefined' || typeof OBJLoader === 'undefined') {
         console.warn('Three.js not loaded yet, retrying...');
         setTimeout(() => createObjectRenderer(containerId, objPath), 200);
         return null;
@@ -45,7 +45,8 @@ function createObjectRenderer(containerId, objPath) {
     scene.add(directionalLight);
 
     // Load OBJ
-    const loader = new THREE.OBJLoader();
+    const OBJLoaderClass = window.OBJLoader || OBJLoader;
+    const loader = new OBJLoaderClass();
     loader.load(
         objPath,
         (object) => {
