@@ -155,15 +155,15 @@ function load3DObject() {
             // Center the object
             object.position.sub(center.multiplyScalar(scale));
             
-            // Position object at a specific location in the panorama
-            // Using pitch and yaw coordinates (in degrees)
+            // Position object at a fixed location in the panorama (like a pin)
+            // This position stays fixed as the user pans around
             // pitch: 0 = horizon, positive = up, negative = down
             // yaw: 0 = forward, positive = right, negative = left
-            const objectPitch = 0;  // Eye level
-            const objectYaw = 0;    // Straight ahead
+            const objectPitch = 0;   // Eye level
+            const objectYaw = 30;    // 30 degrees to the right
             const objectRadius = 1.5; // Distance from center (inside the sphere)
             
-            // Convert pitch/yaw to 3D position
+            // Convert pitch/yaw to 3D position in world space
             // Pannellum uses: pitch (vertical), yaw (horizontal)
             const phi = (90 - objectPitch) * (Math.PI / 180);
             const theta = (objectYaw + 90) * (Math.PI / 180);
