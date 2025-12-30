@@ -16,18 +16,167 @@ const auth = firebase.auth();
 // Initialize Pannellum Viewer
 let viewer;
 let pinCounter = 0;
+let threeScene, threeCamera, threeRenderer;
+let objectMeshes = [];
+let raycaster, mouse;
+
+// Initialize Three.js for 3D objects
+function initThreeJS() {
+    const canvas = document.getElementById('objectsCanvas');
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+
+    threeScene = new THREE.Scene();
+    threeCamera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
+    threeRenderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+    threeRenderer.setSize(width, height);
+    threeRenderer.setPixelRatio(window.devicePixelRatio);
+
+    // Lighting
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+    threeScene.add(ambientLight);
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+    directionalLight.position.set(1, 1, 1);
+    threeScene.add(directionalLight);
+
+    raycaster = new THREE.Raycaster();
+    mouse = new THREE.Vector2();
+
+    // Handle window resize
+    window.addEventListener('resize', () => {
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+        threeCamera.aspect = width / height;
+        threeCamera.updateProjectionMatrix();
+        threeRenderer.setSize(width, height);
+    });
+
+    // Handle clicks on 3D objects
+    canvas.addEventListener('click', onCanvasClick);
+    canvas.style.pointerEvents = 'auto';
+    
+    animate();
+}
+
+function animate() {
+    requestAnimationFrame(animate);
+    if (threeRenderer && threeScene && threeCamera) {
+        updateObjectPositions();
+        threeRenderer.render(threeScene, threeCamera);
+    }
+}
+
+function updateObjectPositions() {
+    if (!viewer || !threeCamera) return;
+    
+    const hfov = viewer.getHfov();
+    const pitch = viewer.getPitch();
+    const yaw = viewer.getYaw();
+    
+    // Update camera to match panorama view
+    threeCamera.fov = hfov;
+    threeCamera.updateProjectionMatrix();
+    
+    // Position camera at center
+    threeCamera.position.set(0, 0, 0);
+    threeCamera.rotation.set(0, 0, 0);
+    
+    objectMeshes.forEach((mesh) => {
+        const pinData = mesh.userData.pinData;
+        if (!pinData) return;
+        
+        // Convert panorama coordinates to 3D position (spherical coordinates)
+        const distance = 3; // Distance from camera
+        const pitchRad = THREE.MathUtils.degToRad(pinData.pitch);
+        const yawRad = THREE.MathUtils.degToRad(pinData.yaw);
+        
+        // Calculate position relative to current view
+        const relativeYaw = THREE.MathUtils.degToRad(pinData.yaw - yaw);
+        const relativePitch = THREE.MathUtils.degToRad(pinData.pitch - pitch);
+        
+        mesh.position.x = Math.sin(relativeYaw) * Math.cos(relativePitch) * distance;
+        mesh.position.y = Math.sin(relativePitch) * distance;
+        mesh.position.z = Math.cos(relativeYaw) * Math.cos(relativePitch) * distance;
+        
+        // Rotate to face camera
+        mesh.lookAt(threeCamera.position);
+    });
+}
+
+function onCanvasClick(event) {
+    if (!viewer || !raycaster) return;
+    
+    const rect = event.target.getBoundingClientRect();
+    mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+    mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+    
+    raycaster.setFromCamera(mouse, threeCamera);
+    const intersects = raycaster.intersectObjects(objectMeshes);
+    
+    if (intersects.length > 0) {
+        const clickedMesh = intersects[0].object;
+        const pinData = clickedMesh.userData.pinData;
+        if (pinData) {
+            showPinPopup({ pitch: pinData.pitch, yaw: pinData.yaw });
+        }
+    }
+}
+
+function loadObject(pitch, yaw) {
+    if (typeof THREE === 'undefined' || typeof OBJLoader === 'undefined') {
+        console.error('Three.js or OBJLoader not loaded');
+        return;
+    }
+    const loader = new OBJLoader();
+    loader.load(
+        'objects/Bose soundslink handle.obj',
+        (object) => {
+            // Scale and position the object
+            object.scale.set(0.1, 0.1, 0.1);
+            object.position.set(0, 0, 0);
+            
+            // Add material
+            object.traverse((child) => {
+                if (child.isMesh) {
+                    child.material = new THREE.MeshStandardMaterial({
+                        color: 0x888888,
+                        metalness: 0.7,
+                        roughness: 0.3
+                    });
+                }
+            });
+            
+            // Store pin data
+            object.userData.pinData = { pitch, yaw };
+            objectMeshes.push(object);
+            threeScene.add(object);
+        },
+        (progress) => {
+            console.log('Loading progress:', progress);
+        },
+        (error) => {
+            console.error('Error loading object:', error);
+        }
+    );
+}
 
 function createPin(pitch, yaw) {
+    // Create invisible hotspot for click detection
     viewer.addHotSpot({
         pitch, yaw,
         type: 'info',
-        text: 'Click to view',
-        cssClass: 'custom-pin',
+        text: '',
+        cssClass: 'invisible-hotspot',
         id: `pin-${pinCounter++}`,
         clickHandlerFunc: function(hotspot) {
             showPinPopup(hotspot);
         }
     });
+    
+    // Load 3D object at this location
+    if (threeScene) {
+        loadObject(pitch, yaw);
+    }
 }
 
 function initPanorama() {
@@ -44,7 +193,10 @@ function initPanorama() {
         mouseZoom: true
     });
 
-    viewer.on('load', () => createPin(0, 0));
+    viewer.on('load', () => {
+        initThreeJS();
+        createPin(0, 0);
+    });
 
     // Handle hotspot click - backup handler
     viewer.on('hotspotclick', (hotspot) => {
