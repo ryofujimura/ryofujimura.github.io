@@ -26,19 +26,47 @@ function initPanorama() {
         hfov: 100,
         minHfov: 50,
         maxHfov: 120,
-        mouseZoom: true
+        mouseZoom: true,
+        hotspots: [
+            {
+                pitch: 0,
+                yaw: 0,
+                type: 'info',
+                text: 'Click to view details',
+                cssClass: 'custom-hotspot'
+            }
+        ]
     });
 
-    // Add hotspot after panorama loads
+    // Ensure hotspot is added (fallback in case config doesn't work)
+    function ensureHotspot() {
+        try {
+            const config = viewer.getConfig();
+            const hasHotspot = config.hotspots && config.hotspots.some(h => 
+                h.pitch === 0 && h.yaw === 0
+            );
+            
+            if (!hasHotspot) {
+                viewer.addHotSpot({
+                    pitch: 0,
+                    yaw: 0,
+                    type: 'info',
+                    text: 'Click to view details',
+                    cssClass: 'custom-hotspot'
+                });
+            }
+        } catch (e) {
+            console.log('Error ensuring hotspot:', e);
+        }
+    }
+
+    // Add hotspot after panorama loads (with timeout fallback)
     viewer.on('load', function() {
-        viewer.addHotSpot({
-            pitch: 0,
-            yaw: 0,
-            type: 'info',
-            text: 'Click to view details',
-            cssClass: 'custom-hotspot'
-        });
+        setTimeout(ensureHotspot, 100);
     });
+
+    // Also try after a short delay in case load event already fired
+    setTimeout(ensureHotspot, 500);
 
     // Add click handler for hotspot
     viewer.on('hotspotclick', function(hotspot) {
