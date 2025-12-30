@@ -190,12 +190,18 @@ function load3DObject() {
 
 // Setup click detection for 3D object
 function setupObjectClick() {
+    const panoramaElement = document.getElementById('panorama');
     const overlay = document.getElementById('threejs-overlay');
+    let isOverObject = false;
     
-    overlay.addEventListener('click', (event) => {
-        if (!object3D || !raycaster || !threeCamera) return;
+    // Check if mouse is over the object on mousemove
+    panoramaElement.addEventListener('mousemove', (event) => {
+        if (!object3D || !raycaster || !threeCamera) {
+            overlay.style.pointerEvents = 'none';
+            return;
+        }
         
-        const rect = overlay.getBoundingClientRect();
+        const rect = panoramaElement.getBoundingClientRect();
         mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
         mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
         
@@ -206,6 +212,36 @@ function setupObjectClick() {
         const intersects = raycaster.intersectObject(object3D, true);
         
         if (intersects.length > 0) {
+            if (!isOverObject) {
+                overlay.style.pointerEvents = 'auto';
+                overlay.style.cursor = 'pointer';
+                isOverObject = true;
+            }
+        } else {
+            if (isOverObject) {
+                overlay.style.pointerEvents = 'none';
+                overlay.style.cursor = 'default';
+                isOverObject = false;
+            }
+        }
+    });
+    
+    // Handle click on the panorama (will work when over object)
+    panoramaElement.addEventListener('click', (event) => {
+        if (!object3D || !raycaster || !threeCamera) return;
+        
+        const rect = panoramaElement.getBoundingClientRect();
+        mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+        mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+        
+        // Update raycaster
+        raycaster.setFromCamera(mouse, threeCamera);
+        
+        // Check for intersections
+        const intersects = raycaster.intersectObject(object3D, true);
+        
+        if (intersects.length > 0) {
+            event.stopPropagation();
             showObjectPopup();
         }
     });
