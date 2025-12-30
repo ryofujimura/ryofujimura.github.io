@@ -75,6 +75,7 @@ function initPanorama() {
 function animateToPopup(sourceContainer, targetModal) {
     if (!sourceContainer) return;
     
+    // model-viewer uses the element directly, not canvas
     const modelViewer = sourceContainer.querySelector('model-viewer');
     if (!modelViewer) return;
     
@@ -143,7 +144,7 @@ function showPinPopup(hotspot) {
         width: 300,
         height: 300,
         cameraControls: true,
-        interactive: true
+        autoRotate: false
     });
     
     const pinModal = document.getElementById('pinModal');
