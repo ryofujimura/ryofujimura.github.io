@@ -56,32 +56,6 @@ function initPanorama() {
         showPinPopup(hotspot);
     });
 
-    // Add pin on Ctrl/Cmd+Click
-    let isDragging = false;
-    let mouseDownPos = null;
-    
-    viewer.on('mousedown', (e) => {
-        isDragging = false;
-        mouseDownPos = { x: e.clientX, y: e.clientY };
-    });
-
-    viewer.on('mousemove', (e) => {
-        if (mouseDownPos) {
-            const dx = Math.abs(e.clientX - mouseDownPos.x);
-            const dy = Math.abs(e.clientY - mouseDownPos.y);
-            if (dx > 5 || dy > 5) isDragging = true;
-        }
-    });
-
-    viewer.on('mouseup', (e) => {
-        if (!isDragging && (e.ctrlKey || e.metaKey)) {
-            const coords = viewer.mouseEventToCoords(e);
-            if (coords) createPin(coords.pitch, coords.yaw);
-        }
-        isDragging = false;
-        mouseDownPos = null;
-    });
-
     // Disable right-click context menu (but allow left clicks on pins)
     const panoramaElement = document.getElementById('panorama');
     panoramaElement.addEventListener('contextmenu', (e) => {
@@ -162,9 +136,8 @@ function showPinPopup(hotspot) {
     
     // Load object in popup with interactive controls
     createObjectRenderer('popup-obj-container', 'objects/Bose soundslink handle.obj', { 
-          
-           
-    });
+        //   uses default settings
+    }, 300);
     
     const pinModal = document.getElementById('pinModal');
     pinModal.classList.add('show');
