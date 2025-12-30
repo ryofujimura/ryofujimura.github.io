@@ -88,11 +88,18 @@ function createObjectRenderer(containerId, objPath, options = {}) {
         camera.lookAt(objectCenter);
     }
 
-    // Mouse controls for interactive mode
+    // Mouse and touch controls for interactive mode
     if (interactive) {
         const canvas = renderer.domElement;
         
+        // Prevent context menu on right-click
+        canvas.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+        });
+        
+        // Mouse controls
         canvas.addEventListener('mousedown', (e) => {
+            e.preventDefault();
             isDragging = true;
             previousMousePosition = { x: e.clientX, y: e.clientY };
             canvas.style.cursor = 'grabbing';
@@ -100,6 +107,7 @@ function createObjectRenderer(containerId, objPath, options = {}) {
 
         canvas.addEventListener('mousemove', (e) => {
             if (!isDragging) return;
+            e.preventDefault();
             
             const deltaX = e.clientX - previousMousePosition.x;
             const deltaY = e.clientY - previousMousePosition.y;
@@ -115,7 +123,8 @@ function createObjectRenderer(containerId, objPath, options = {}) {
             previousMousePosition = { x: e.clientX, y: e.clientY };
         });
 
-        canvas.addEventListener('mouseup', () => {
+        canvas.addEventListener('mouseup', (e) => {
+            e.preventDefault();
             isDragging = false;
             canvas.style.cursor = 'grab';
         });
@@ -125,7 +134,45 @@ function createObjectRenderer(containerId, objPath, options = {}) {
             canvas.style.cursor = 'grab';
         });
 
+        // Touch controls for mobile devices
+        canvas.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            if (e.touches.length === 1) {
+                isDragging = true;
+                previousMousePosition = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+            }
+        });
+
+        canvas.addEventListener('touchmove', (e) => {
+            if (!isDragging || e.touches.length !== 1) return;
+            e.preventDefault();
+            
+            const deltaX = e.touches[0].clientX - previousMousePosition.x;
+            const deltaY = e.touches[0].clientY - previousMousePosition.y;
+            
+            // Rotate camera around object
+            cameraAngleY += deltaX * 0.01;
+            cameraAngleX += deltaY * 0.01;
+            
+            // Limit vertical rotation
+            cameraAngleX = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, cameraAngleX));
+            
+            updateCameraPosition();
+            previousMousePosition = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+        });
+
+        canvas.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            isDragging = false;
+        });
+
+        canvas.addEventListener('touchcancel', () => {
+            isDragging = false;
+        });
+
+        // Set initial cursor style
         canvas.style.cursor = 'grab';
+        canvas.style.touchAction = 'none'; // Prevent default touch behaviors
     }
 
     // Animation loop
