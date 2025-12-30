@@ -328,6 +328,27 @@ closeModal.addEventListener('click', () => {
     clearForms();
 });
 
+// Reset overlay pointer events when modal is closed
+function resetOverlayPointerEvents() {
+    const overlay = document.getElementById('threejs-overlay');
+    const panoramaElement = document.getElementById('panorama');
+    
+    // Reset to default state
+    overlay.style.pointerEvents = 'none';
+    overlay.style.cursor = 'default';
+    panoramaElement.style.cursor = 'default';
+    
+    // Trigger a mousemove event to re-check if we're over the object
+    setTimeout(() => {
+        const event = new MouseEvent('mousemove', {
+            bubbles: true,
+            cancelable: true,
+            view: window
+        });
+        panoramaElement.dispatchEvent(event);
+    }, 10);
+}
+
 window.addEventListener('click', (e) => {
     if (e.target === authModal) {
         authModal.classList.remove('show');
@@ -336,12 +357,14 @@ window.addEventListener('click', (e) => {
     }
     if (e.target === objectModal) {
         objectModal.classList.remove('show');
+        resetOverlayPointerEvents();
     }
 });
 
 // Object Modal
 closeObjectModal.addEventListener('click', () => {
     objectModal.classList.remove('show');
+    resetOverlayPointerEvents();
 });
 
 function showObjectPopup() {
