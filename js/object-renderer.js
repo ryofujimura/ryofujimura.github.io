@@ -3,17 +3,7 @@ const objectScenes = new Map(); // Store Three.js scenes for each object
 
 // Create 3D object renderer
 function createObjectRenderer(containerId, objPath, options = {}) {
-    const { 
-        width = 200, 
-        height = 200, 
-        autoRotate = false, 
-        interactive = false,
-        rotationX = 0,      // Initial rotation around X axis (in radians)
-        rotationY = 0,      // Initial rotation around Y axis (in radians)
-        rotationZ = 0,      // Initial rotation around Z axis (in radians)
-        initialCameraAngleX = 0,  // Initial camera vertical angle (in radians)
-        initialCameraAngleY = 0   // Initial camera horizontal angle (in radians)
-    } = options;
+    const { width = 200, height = 200, autoRotate = false, interactive = false } = options;
     const container = document.getElementById(containerId);
     if (!container || typeof THREE === 'undefined' || typeof OBJLoader === 'undefined') {
         console.warn('Three.js not loaded yet, retrying...');
@@ -43,8 +33,8 @@ function createObjectRenderer(containerId, objPath, options = {}) {
     
     // Camera orbit parameters (for interactive mode)
     let cameraDistance = 3;
-    let cameraAngleX = initialCameraAngleX;
-    let cameraAngleY = initialCameraAngleY;
+    let cameraAngleX = 0;
+    let cameraAngleY = 0;
 
     // Load OBJ
     const OBJLoaderClass = window.OBJLoader || OBJLoader;
@@ -68,10 +58,10 @@ function createObjectRenderer(containerId, objPath, options = {}) {
             // Center object at origin
             object.position.set(-center.x * scale, -center.y * scale, -center.z * scale);
             
-            // Apply initial rotation to object
-            if (rotationX !== 0) object.rotation.x = rotationX;
-            if (rotationY !== 0) object.rotation.y = rotationY;
-            if (rotationZ !== 0) object.rotation.z = rotationZ;
+            // Rotate object (adjust these values as needed)
+            object.rotation.x = 0; // Rotate around X axis (in radians)
+            object.rotation.y = 0; // Rotate around Y axis (in radians)
+            object.rotation.z = 0; // Rotate around Z axis (in radians)
             
             // Add directly to scene (centered at origin)
             scene.add(object);
@@ -141,12 +131,6 @@ function createObjectRenderer(containerId, objPath, options = {}) {
     // Animation loop
     function animate() {
         requestAnimationFrame(animate);
-        
-        // Auto-rotate object if enabled
-        if (autoRotate && objectGroup) {
-            objectGroup.rotation.y += 0.01; // Rotate around Y axis
-        }
-        
         renderer.render(scene, camera);
     }
     animate();
