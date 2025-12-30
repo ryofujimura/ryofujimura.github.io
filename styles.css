@@ -83,6 +83,10 @@ body {
     animation: slideIn 0.3s ease-out;
 }
 
+#pinModal .modal-content {
+    max-width: 500px;
+}
+
 @keyframes slideIn {
     from {
         transform: translateY(-50px);
@@ -204,6 +208,29 @@ body {
     width: 100% !important;
     height: 100% !important;
     display: block;
+    object-fit: contain;
+}
+
+/* Popup 3D Object Container */
+.popup-obj-container {
+    width: 300px;
+    height: 300px;
+    margin: 0 auto 20px;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    background: #f5f5f5;
+}
+
+.popup-obj-container canvas {
+    width: 100% !important;
+    height: 100% !important;
+    display: block;
+    object-fit: contain;
+}
+
+.pin-info {
+    text-align: center;
 }
 
 /* Custom hotspot styling */

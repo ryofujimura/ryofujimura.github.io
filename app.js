@@ -17,18 +17,18 @@ const auth = firebase.auth();
 let viewer;
 let pinCounter = 0;
 const objectScenes = new Map(); // Store Three.js scenes for each object
+let currentObjectData = null; // Store current object for popup
 
 // Create 3D object renderer
-function createObjectRenderer(containerId, objPath) {
+function createObjectRenderer(containerId, objPath, options = {}) {
+    const { width = 200, height = 200, autoRotate = true } = options;
     const container = document.getElementById(containerId);
     if (!container || typeof THREE === 'undefined' || typeof OBJLoader === 'undefined') {
         console.warn('Three.js not loaded yet, retrying...');
-        setTimeout(() => createObjectRenderer(containerId, objPath), 200);
+        setTimeout(() => createObjectRenderer(containerId, objPath, options), 200);
         return null;
     }
 
-    const width = 200;
-    const height = 200;
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
     const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
@@ -44,25 +44,30 @@ function createObjectRenderer(containerId, objPath) {
     directionalLight.position.set(1, 1, 1);
     scene.add(directionalLight);
 
+    let objectGroup = null;
+
     // Load OBJ
     const OBJLoaderClass = window.OBJLoader || OBJLoader;
     const loader = new OBJLoaderClass();
     loader.load(
         objPath,
         (object) => {
-            // Center and scale object
+            // Center and scale object properly
             const box = new THREE.Box3().setFromObject(object);
             const center = box.getCenter(new THREE.Vector3());
             const size = box.getSize(new THREE.Vector3());
             const maxDim = Math.max(size.x, size.y, size.z);
             const scale = 1.5 / maxDim;
             
+            // Create a group to hold the object and keep it centered
+            objectGroup = new THREE.Group();
+            object.position.sub(center);
             object.scale.multiplyScalar(scale);
-            object.position.sub(center.multiplyScalar(scale));
+            objectGroup.add(object);
             
-            scene.add(object);
+            scene.add(objectGroup);
             
-            // Position camera
+            // Position camera to keep object centered and visible
             camera.position.set(0, 0, 3);
             camera.lookAt(0, 0, 0);
         },
@@ -77,18 +82,16 @@ function createObjectRenderer(containerId, objPath) {
     // Animation loop
     function animate() {
         requestAnimationFrame(animate);
-        if (scene.children.length > 2) { // More than just lights
-            scene.children.forEach(child => {
-                if (child.type === 'Group' || child.isGroup) {
-                    child.rotation.y += 0.01; // Slow rotation
-                }
-            });
+        if (autoRotate && objectGroup) {
+            // Rotate around Y axis, keeping object centered
+            objectGroup.rotation.y += 0.01;
         }
+        // Always render to keep object visible
         renderer.render(scene, camera);
     }
     animate();
 
-    return { scene, camera, renderer };
+    return { scene, camera, renderer, objectGroup };
 }
 
 function createPin(pitch, yaw) {
@@ -106,9 +109,15 @@ function createPin(pitch, yaw) {
             container.className = 'obj-3d-container';
             hotspotDiv.appendChild(container);
             
+            // Store container reference for animation
+            container.dataset.pinId = pinId;
+            
             // Load and render 3D object
             setTimeout(() => {
-                createObjectRenderer(containerId, 'objects/Bose soundslink handle.obj');
+                const rendererData = createObjectRenderer(containerId, 'objects/Bose soundslink handle.obj');
+                if (rendererData) {
+                    objectScenes.set(pinId, { container, rendererData, hotspotDiv });
+                }
             }, 100);
         },
         clickHandlerFunc: function(hotspot) {
@@ -230,18 +239,79 @@ window.addEventListener('click', (e) => {
 // Pin Popup
 function showPinPopup(hotspot) {
     const pinContent = document.getElementById('pinContent');
+    const pinModalContent = document.querySelector('#pinModal .modal-content');
     const pitch = hotspot?.pitch || 0;
     const yaw = hotspot?.yaw || 0;
     
+    // Find the hotspot container for animation
+    const pinId = hotspot.id || Object.keys(objectScenes)[0];
+    const objectData = objectScenes.get(pinId);
+    
+    // Create popup content with 3D object
     pinContent.innerHTML = `
-        <p><strong>Pin Location:</strong></p>
-        <p>Pitch: ${pitch.toFixed(2)}°</p>
-        <p>Yaw: ${yaw.toFixed(2)}°</p>
-        <p style="margin-top: 15px; color: #666; font-size: 14px;">
-            💡 Tip: Hold Ctrl (or Cmd on Mac) and click anywhere on the panorama to add more pins.
-        </p>
+        <div id="popup-obj-container" class="popup-obj-container"></div>
+        <div class="pin-info">
+            <p><strong>Pin Location:</strong></p>
+            <p>Pitch: ${pitch.toFixed(2)}°</p>
+            <p>Yaw: ${yaw.toFixed(2)}°</p>
+            <p style="margin-top: 15px; color: #666; font-size: 14px;">
+                💡 Tip: Hold Ctrl (or Cmd on Mac) and click anywhere on the panorama to add more pins.
+            </p>
+        </div>
     `;
+    
+    // Animate transition
+    if (objectData) {
+        animateToPopup(objectData.container, pinModalContent);
+    }
+    
+    // Load object in popup
+    setTimeout(() => {
+        createObjectRenderer('popup-obj-container', 'objects/Bose soundslink handle.obj', { 
+            width: 300, 
+            height: 300,
+            autoRotate: true 
+        });
+    }, 300);
+    
     pinModal.classList.add('show');
+}
+
+// Animate object from hotspot to popup
+function animateToPopup(sourceContainer, targetModal) {
+    if (!sourceContainer) return;
+    
+    const canvas = sourceContainer.querySelector('canvas');
+    if (!canvas) return;
+    
+    const rect = canvas.getBoundingClientRect();
+    const targetRect = targetModal.getBoundingClientRect();
+    
+    // Create clone for animation
+    const clone = canvas.cloneNode(true);
+    clone.style.position = 'fixed';
+    clone.style.left = rect.left + 'px';
+    clone.style.top = rect.top + 'px';
+    clone.style.width = rect.width + 'px';
+    clone.style.height = rect.height + 'px';
+    clone.style.zIndex = '10000';
+    clone.style.pointerEvents = 'none';
+    clone.style.transition = 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
+    document.body.appendChild(clone);
+    
+    // Trigger animation
+    requestAnimationFrame(() => {
+        clone.style.left = (targetRect.left + targetRect.width / 2 - 150) + 'px';
+        clone.style.top = (targetRect.top + 60) + 'px';
+        clone.style.width = '300px';
+        clone.style.height = '300px';
+        clone.style.opacity = '0.8';
+    });
+    
+    // Remove clone after animation
+    setTimeout(() => {
+        clone.remove();
+    }, 500);
 }
 
 // Form Switching
