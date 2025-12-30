@@ -194,12 +194,9 @@ function setupObjectClick() {
     const overlay = document.getElementById('threejs-overlay');
     let isOverObject = false;
     
-    // Check if mouse is over the object on mousemove
-    panoramaElement.addEventListener('mousemove', (event) => {
-        if (!object3D || !raycaster || !threeCamera) {
-            overlay.style.pointerEvents = 'none';
-            return;
-        }
+    // Function to check if mouse is over object
+    function checkObjectIntersection(event) {
+        if (!object3D || !raycaster || !threeCamera) return false;
         
         const rect = panoramaElement.getBoundingClientRect();
         mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
@@ -210,27 +207,35 @@ function setupObjectClick() {
         
         // Check for intersections
         const intersects = raycaster.intersectObject(object3D, true);
+        return intersects.length > 0;
+    }
+    
+    // Check if mouse is over the object on mousemove
+    panoramaElement.addEventListener('mousemove', (event) => {
+        const overObject = checkObjectIntersection(event);
         
-        if (intersects.length > 0) {
+        if (overObject) {
             if (!isOverObject) {
                 overlay.style.pointerEvents = 'auto';
                 overlay.style.cursor = 'pointer';
+                panoramaElement.style.cursor = 'pointer';
                 isOverObject = true;
             }
         } else {
             if (isOverObject) {
                 overlay.style.pointerEvents = 'none';
                 overlay.style.cursor = 'default';
+                panoramaElement.style.cursor = 'default';
                 isOverObject = false;
             }
         }
     });
     
-    // Handle click on the panorama (will work when over object)
-    panoramaElement.addEventListener('click', (event) => {
+    // Handle click on the overlay when pointer events are enabled
+    overlay.addEventListener('click', (event) => {
         if (!object3D || !raycaster || !threeCamera) return;
         
-        const rect = panoramaElement.getBoundingClientRect();
+        const rect = overlay.getBoundingClientRect();
         mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
         mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
         
@@ -242,6 +247,18 @@ function setupObjectClick() {
         
         if (intersects.length > 0) {
             event.stopPropagation();
+            event.preventDefault();
+            console.log('Object clicked!');
+            showObjectPopup();
+        }
+    });
+    
+    // Also handle click on panorama as fallback
+    panoramaElement.addEventListener('click', (event) => {
+        if (checkObjectIntersection(event)) {
+            event.stopPropagation();
+            event.preventDefault();
+            console.log('Object clicked via panorama!');
             showObjectPopup();
         }
     });
