@@ -72,6 +72,13 @@ function initPanorama() {
         isDragging = false;
         mouseDownPos = null;
     });
+
+    // Disable right-click context menu
+    const panoramaElement = document.getElementById('panorama');
+    panoramaElement.addEventListener('contextmenu', (e) => {
+        e.preventDefault();
+        return false;
+    });
 }
 
 // DOM Elements
