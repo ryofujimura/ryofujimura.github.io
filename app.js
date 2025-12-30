@@ -52,24 +52,37 @@ function createObjectRenderer(containerId, objPath, options = {}) {
     loader.load(
         objPath,
         (object) => {
-            // Center and scale object properly
+            // Calculate bounding box
             const box = new THREE.Box3().setFromObject(object);
             const center = box.getCenter(new THREE.Vector3());
             const size = box.getSize(new THREE.Vector3());
             const maxDim = Math.max(size.x, size.y, size.z);
-            const scale = 1.5 / maxDim;
             
-            // Create a group to hold the object and keep it centered
+            // Scale to fit nicely in view (adjust scale factor as needed)
+            const scale = 2.0 / maxDim;
+            
+            // Create a group to hold the object
             objectGroup = new THREE.Group();
-            object.position.sub(center);
-            object.scale.multiplyScalar(scale);
+            
+            // Center the object by moving it to origin
+            object.position.x = -center.x;
+            object.position.y = -center.y;
+            object.position.z = -center.z;
+            
+            // Apply scale
+            object.scale.set(scale, scale, scale);
+            
+            // Add object to group
             objectGroup.add(object);
             
+            // Add group to scene (group is already at origin 0,0,0)
             scene.add(objectGroup);
             
-            // Position camera to keep object centered and visible
-            camera.position.set(0, 0, 3);
+            // Position camera to view centered object
+            // Camera looks at origin where object is now centered
+            camera.position.set(0, 0, 4);
             camera.lookAt(0, 0, 0);
+            camera.updateProjectionMatrix();
         },
         (progress) => {
             if (progress.lengthComputable) {
