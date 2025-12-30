@@ -22,6 +22,12 @@ let raycaster, mouse;
 
 // Initialize Three.js for 3D objects
 function initThreeJS() {
+    if (typeof THREE === 'undefined') {
+        console.error('Three.js not loaded yet, retrying...');
+        setTimeout(initThreeJS, 100);
+        return;
+    }
+    
     const canvas = document.getElementById('objectsCanvas');
     const width = window.innerWidth;
     const height = window.innerHeight;
@@ -123,11 +129,30 @@ function onCanvasClick(event) {
 }
 
 function loadObject(pitch, yaw) {
-    if (typeof THREE === 'undefined' || typeof OBJLoader === 'undefined') {
-        console.error('Three.js or OBJLoader not loaded');
+    // Wait for Three.js to be available
+    if (typeof THREE === 'undefined') {
+        console.log('Waiting for Three.js...');
+        setTimeout(() => loadObject(pitch, yaw), 100);
         return;
     }
-    const loader = new OBJLoader();
+    
+    // Check for OBJLoader in different possible locations
+    let OBJLoaderClass = null;
+    if (typeof OBJLoader !== 'undefined') {
+        OBJLoaderClass = OBJLoader;
+    } else if (typeof window.OBJLoader !== 'undefined') {
+        OBJLoaderClass = window.OBJLoader;
+    } else if (typeof THREE.OBJLoader !== 'undefined') {
+        OBJLoaderClass = THREE.OBJLoader;
+    }
+    
+    if (!OBJLoaderClass) {
+        console.log('Waiting for OBJLoader...');
+        setTimeout(() => loadObject(pitch, yaw), 100);
+        return;
+    }
+    
+    const loader = new OBJLoaderClass();
     loader.load(
         'objects/Bose soundslink handle.obj',
         (object) => {
