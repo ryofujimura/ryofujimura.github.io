@@ -46,18 +46,6 @@ body {
 #panorama {
     width: 100%;
     height: 100vh;
-    position: relative;
-}
-
-/* Three.js Overlay */
-#threejs-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    z-index: 100;
 }
 
 /* Hide zoom buttons */
@@ -106,8 +94,7 @@ body {
     }
 }
 
-.close,
-.close-object {
+.close {
     position: absolute;
     right: 15px;
     top: 15px;
@@ -118,8 +105,7 @@ body {
     line-height: 20px;
 }
 
-.close:hover,
-.close-object:hover {
+.close:hover {
     color: #000;
 }
 
@@ -195,7 +181,57 @@ body {
     min-height: 20px;
 }
 
-#objectContent {
-    color: #666;
+/* Pin Content */
+.pin-content {
+    padding: 10px 0;
+    color: #333;
     line-height: 1.6;
+}
+
+.pin-content p {
+    margin-bottom: 10px;
+}
+
+.close-pin {
+    position: absolute;
+    right: 15px;
+    top: 15px;
+    font-size: 28px;
+    font-weight: bold;
+    color: #aaa;
+    cursor: pointer;
+    line-height: 20px;
+}
+
+.close-pin:hover {
+    color: #000;
+}
+
+/* Custom Hotspot Styling */
+.custom-hotspot {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background-color: #ff4444;
+    border: 3px solid white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.custom-hotspot:hover {
+    transform: scale(1.2);
+}
+
+.custom-hotspot::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 0;
+    height: 0;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-bottom: 10px solid white;
 }

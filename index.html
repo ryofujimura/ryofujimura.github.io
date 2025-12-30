@@ -15,8 +15,6 @@
 
     <!-- 360 Panorama Viewer -->
     <div id="panorama"></div>
-    <!-- Three.js Overlay for 3D Objects -->
-    <canvas id="threejs-overlay"></canvas>
 
     <!-- Auth Popup Modal -->
     <div id="authModal" class="modal">
@@ -43,13 +41,13 @@
         </div>
     </div>
 
-    <!-- Object Popup Modal -->
-    <div id="objectModal" class="modal">
+    <!-- Pin Popup Modal -->
+    <div id="pinModal" class="modal">
         <div class="modal-content">
-            <span class="close-object">&times;</span>
-            <h2 id="objectTitle">Bose SoundLink Handle</h2>
-            <div id="objectContent">
-                <p>This is a 3D model of the Bose SoundLink Handle.</p>
+            <span class="close-pin">&times;</span>
+            <h2 id="pinTitle">Pin Information</h2>
+            <div id="pinContent" class="pin-content">
+                <p>This is a clickable pin on the panorama.</p>
             </div>
         </div>
     </div>
@@ -57,16 +55,6 @@
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-    <!-- Three.js ES Modules -->
-    <script type="importmap">
-    {
-        "imports": {
-            "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
-            "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
-        }
-    }
-    </script>
-    <script type="module" src="threejs-loader.js"></script>
     <!-- Pannellum -->
     <script src="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.js"></script>
     <!-- App Script -->
