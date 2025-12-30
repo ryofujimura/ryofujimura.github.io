@@ -88,33 +88,35 @@ function updateObjectPositions() {
     if (!viewer || !threeCamera) return;
     
     const hfov = viewer.getHfov();
-    const pitch = viewer.getPitch();
-    const yaw = viewer.getYaw();
+    const currentPitch = viewer.getPitch();
+    const currentYaw = viewer.getYaw();
     
     // Update camera to match panorama view
     threeCamera.fov = hfov;
     threeCamera.updateProjectionMatrix();
     
-    // Position camera at center, looking forward
+    // Position camera at center, looking forward (along Z axis)
     threeCamera.position.set(0, 0, 0);
     threeCamera.rotation.set(0, 0, 0);
+    
+    const degToRad = THREE.MathUtils ? THREE.MathUtils.degToRad : THREE.Math.degToRad;
     
     objectMeshes.forEach((mesh) => {
         const pinData = mesh.userData.pinData;
         if (!pinData) return;
         
-        // Convert panorama coordinates to 3D position (spherical coordinates)
-        // Distance from center
+        // Distance from camera (inside the sphere)
         const distance = 2.5;
         
-        // Calculate relative position based on current view
-        const degToRad = THREE.MathUtils ? THREE.MathUtils.degToRad : THREE.Math.degToRad;
-        const relativeYaw = degToRad(pinData.yaw - yaw);
-        const relativePitch = degToRad(pinData.pitch - pitch);
+        // Calculate relative angles (how far from current view)
+        const relativeYaw = degToRad(pinData.yaw - currentYaw);
+        const relativePitch = degToRad(pinData.pitch - currentPitch);
         
-        // Spherical to Cartesian conversion
+        // Convert to 3D position relative to camera
+        // In Three.js: X is right, Y is up, Z is forward
+        // For panorama: yaw rotates around Y, pitch rotates around X
         const x = Math.sin(relativeYaw) * Math.cos(relativePitch) * distance;
-        const y = Math.sin(relativePitch) * distance;
+        const y = -Math.sin(relativePitch) * distance; // Negative because pitch up is negative Y in screen space
         const z = Math.cos(relativeYaw) * Math.cos(relativePitch) * distance;
         
         mesh.position.set(x, y, z);
