@@ -26,16 +26,18 @@ function initPanorama() {
         hfov: 100,
         minHfov: 50,
         maxHfov: 120,
-        mouseZoom: true,
-        hotspots: [
-            {
-                pitch: 0,
-                yaw: 0,
-                type: 'info',
-                text: 'Click to view details',
-                cssClass: 'custom-hotspot'
-            }
-        ]
+        mouseZoom: true
+    });
+
+    // Add hotspot after panorama loads
+    viewer.on('load', function() {
+        viewer.addHotSpot({
+            pitch: 0,
+            yaw: 0,
+            type: 'info',
+            text: 'Click to view details',
+            cssClass: 'custom-hotspot'
+        });
     });
 
     // Add click handler for hotspot
