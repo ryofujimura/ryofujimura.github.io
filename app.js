@@ -57,9 +57,21 @@ function initThreeJS() {
         threeRenderer.setSize(width, height);
     });
 
-    // Handle clicks on 3D objects
+    // Handle clicks on 3D objects - only enable pointer events when hovering
+    canvas.addEventListener('mousemove', (e) => {
+        const rect = canvas.getBoundingClientRect();
+        mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+        mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+        
+        raycaster.setFromCamera(mouse, threeCamera);
+        const intersects = raycaster.intersectObjects(objectMeshes);
+        
+        // Only enable pointer events if hovering over an object
+        canvas.style.pointerEvents = intersects.length > 0 ? 'auto' : 'none';
+        canvas.style.cursor = intersects.length > 0 ? 'pointer' : 'default';
+    });
+    
     canvas.addEventListener('click', onCanvasClick);
-    canvas.style.pointerEvents = 'auto';
     
     animate();
 }
@@ -83,7 +95,7 @@ function updateObjectPositions() {
     threeCamera.fov = hfov;
     threeCamera.updateProjectionMatrix();
     
-    // Position camera at center
+    // Position camera at center, looking forward
     threeCamera.position.set(0, 0, 0);
     threeCamera.rotation.set(0, 0, 0);
     
@@ -92,19 +104,22 @@ function updateObjectPositions() {
         if (!pinData) return;
         
         // Convert panorama coordinates to 3D position (spherical coordinates)
-        const distance = 3; // Distance from camera
-        const pitchRad = THREE.MathUtils.degToRad(pinData.pitch);
-        const yawRad = THREE.MathUtils.degToRad(pinData.yaw);
+        // Distance from center
+        const distance = 2.5;
         
-        // Calculate position relative to current view
-        const relativeYaw = THREE.MathUtils.degToRad(pinData.yaw - yaw);
-        const relativePitch = THREE.MathUtils.degToRad(pinData.pitch - pitch);
+        // Calculate relative position based on current view
+        const degToRad = THREE.MathUtils ? THREE.MathUtils.degToRad : THREE.Math.degToRad;
+        const relativeYaw = degToRad(pinData.yaw - yaw);
+        const relativePitch = degToRad(pinData.pitch - pitch);
         
-        mesh.position.x = Math.sin(relativeYaw) * Math.cos(relativePitch) * distance;
-        mesh.position.y = Math.sin(relativePitch) * distance;
-        mesh.position.z = Math.cos(relativeYaw) * Math.cos(relativePitch) * distance;
+        // Spherical to Cartesian conversion
+        const x = Math.sin(relativeYaw) * Math.cos(relativePitch) * distance;
+        const y = Math.sin(relativePitch) * distance;
+        const z = Math.cos(relativeYaw) * Math.cos(relativePitch) * distance;
         
-        // Rotate to face camera
+        mesh.position.set(x, y, z);
+        
+        // Make object face camera
         mesh.lookAt(threeCamera.position);
     });
 }
@@ -156,17 +171,27 @@ function loadObject(pitch, yaw) {
     loader.load(
         'objects/Bose soundslink handle.obj',
         (object) => {
-            // Scale and position the object
-            object.scale.set(0.1, 0.1, 0.1);
-            object.position.set(0, 0, 0);
+            console.log('Object loaded:', object);
+            
+            // Calculate bounding box to center the object
+            const box = new THREE.Box3().setFromObject(object);
+            const center = box.getCenter(new THREE.Vector3());
+            object.position.sub(center);
+            
+            // Scale the object appropriately
+            const size = box.getSize(new THREE.Vector3());
+            const maxDim = Math.max(size.x, size.y, size.z);
+            const scale = 0.3 / maxDim;
+            object.scale.set(scale, scale, scale);
             
             // Add material
             object.traverse((child) => {
                 if (child.isMesh) {
                     child.material = new THREE.MeshStandardMaterial({
-                        color: 0x888888,
-                        metalness: 0.7,
-                        roughness: 0.3
+                        color: 0xcccccc,
+                        metalness: 0.8,
+                        roughness: 0.2,
+                        emissive: 0x000000
                     });
                 }
             });
@@ -175,6 +200,8 @@ function loadObject(pitch, yaw) {
             object.userData.pinData = { pitch, yaw };
             objectMeshes.push(object);
             threeScene.add(object);
+            
+            console.log('Object added to scene at pitch:', pitch, 'yaw:', yaw);
         },
         (progress) => {
             console.log('Loading progress:', progress);
