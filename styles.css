@@ -195,6 +195,10 @@ body {
     border-radius: 8px;
     overflow: hidden;
     background: transparent;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
 }
 
 .obj-3d-container canvas {
@@ -243,6 +247,7 @@ body {
 .pnlm-hotspot {
     border: none !important;
     background: transparent !important;
+    position: relative !important;
 }
 
 /* Hide default info popup */
