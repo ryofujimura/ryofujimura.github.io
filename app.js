@@ -21,7 +21,7 @@ let currentObjectData = null; // Store current object for popup
 
 // Create 3D object renderer
 function createObjectRenderer(containerId, objPath, options = {}) {
-    const { width = 200, height = 200, autoRotate = true } = options;
+    const { width = 200, height = 200, autoRotate = false } = options;
     const container = document.getElementById(containerId);
     if (!container || typeof THREE === 'undefined' || typeof OBJLoader === 'undefined') {
         console.warn('Three.js not loaded yet, retrying...');
@@ -81,13 +81,9 @@ function createObjectRenderer(containerId, objPath, options = {}) {
         (error) => console.error('Error loading OBJ:', error)
     );
 
-    // Animation loop
+    // Animation loop - just render, no rotation
     function animate() {
         requestAnimationFrame(animate);
-        if (autoRotate && objectGroup) {
-            // Rotate around Y axis at origin
-            objectGroup.rotation.y += 0.01;
-        }
         renderer.render(scene, camera);
     }
     animate();
@@ -271,7 +267,7 @@ function showPinPopup(hotspot) {
         createObjectRenderer('popup-obj-container', 'objects/Bose soundslink handle.obj', { 
             width: 300, 
             height: 300,
-            autoRotate: true 
+            autoRotate: false 
         });
     }, 300);
     
