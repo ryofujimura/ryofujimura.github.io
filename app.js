@@ -68,17 +68,21 @@ function createObjectRenderer(containerId, objPath, options = {}) {
             
             // Scale to fit in view
             const scale = 2.0 / maxDim;
+            
+            // Center object at origin by moving it
+            object.position.sub(center);
             object.scale.set(scale, scale, scale);
             
-            // Store object center (after scaling)
-            objectCenter.set(0, 0, 0); // Object is centered at origin
-            
-            // Center object at origin
-            object.position.set(-center.x * scale, -center.y * scale, -center.z * scale);
+            // Object is now centered at origin (0, 0, 0)
+            objectCenter.set(0, 0, 0);
             
             // Add directly to scene (centered at origin)
             scene.add(object);
             objectGroup = object;
+            
+            // Initialize camera angles for good starting view
+            cameraAngleY = 0;
+            cameraAngleX = 0;
             
             // Camera positioned to view centered object
             updateCameraPosition();
@@ -91,14 +95,20 @@ function createObjectRenderer(containerId, objPath, options = {}) {
         (error) => console.error('Error loading OBJ:', error)
     );
 
-    // Update camera position (orbits around object center)
+    // Update camera position (orbits around object center using spherical coordinates)
     function updateCameraPosition() {
-        const x = objectCenter.x + cameraDistance * Math.sin(cameraAngleY) * Math.cos(cameraAngleX);
-        const y = objectCenter.y + cameraDistance * Math.sin(cameraAngleX);
-        const z = objectCenter.z + cameraDistance * Math.cos(cameraAngleY) * Math.cos(cameraAngleX);
+        // Spherical coordinates: theta (horizontal), phi (vertical)
+        const theta = cameraAngleY; // Horizontal rotation
+        const phi = Math.PI / 2 + cameraAngleX; // Vertical rotation (0 to PI)
+        
+        // Calculate camera position in spherical coordinates
+        const x = objectCenter.x + cameraDistance * Math.sin(phi) * Math.cos(theta);
+        const y = objectCenter.y + cameraDistance * Math.cos(phi);
+        const z = objectCenter.z + cameraDistance * Math.sin(phi) * Math.sin(theta);
         
         camera.position.set(x, y, z);
         camera.lookAt(objectCenter);
+        camera.updateProjectionMatrix();
     }
 
     // Mouse controls for interactive mode
@@ -117,12 +127,12 @@ function createObjectRenderer(containerId, objPath, options = {}) {
             const deltaX = e.clientX - previousMousePosition.x;
             const deltaY = e.clientY - previousMousePosition.y;
             
-            // Rotate camera around object
-            cameraAngleY += deltaX * 0.01;
-            cameraAngleX += deltaY * 0.01;
+            // Rotate camera around object center
+            cameraAngleY += deltaX * 0.01; // Horizontal rotation
+            cameraAngleX -= deltaY * 0.01; // Vertical rotation (inverted for natural feel)
             
-            // Limit vertical rotation
-            cameraAngleX = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, cameraAngleX));
+            // Limit vertical rotation to prevent flipping
+            cameraAngleX = Math.max(-Math.PI / 3, Math.min(Math.PI / 3, cameraAngleX));
             
             updateCameraPosition();
             previousMousePosition = { x: e.clientX, y: e.clientY };
