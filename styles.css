@@ -194,14 +194,7 @@ body {
     z-index: 10;
     border-radius: 8px;
     overflow: hidden;
-    border: 2px solid transparent;
-    transition: transform 0.2s, border-color 0.2s;
     background: transparent;
-}
-
-.obj-3d-container:hover {
-    transform: scale(1.1);
-    border-color: #4CAF50;
 }
 
 .obj-3d-container canvas {
@@ -209,6 +202,13 @@ body {
     height: 100% !important;
     display: block;
     object-fit: contain;
+    border: 2px solid transparent;
+    border-radius: 8px;
+    transition: border-color 0.2s ease;
+}
+
+.obj-3d-container:hover canvas {
+    border-color: #4CAF50;
 }
 
 /* Popup 3D Object Container */
