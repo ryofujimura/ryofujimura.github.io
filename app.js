@@ -52,37 +52,26 @@ function createObjectRenderer(containerId, objPath, options = {}) {
     loader.load(
         objPath,
         (object) => {
-            // Calculate bounding box
+            // Calculate bounding box to center and scale
             const box = new THREE.Box3().setFromObject(object);
             const center = box.getCenter(new THREE.Vector3());
             const size = box.getSize(new THREE.Vector3());
             const maxDim = Math.max(size.x, size.y, size.z);
             
-            // Scale to fit nicely in view (adjust scale factor as needed)
+            // Scale to fit in view
             const scale = 2.0 / maxDim;
-            
-            // Create a group to hold the object
-            objectGroup = new THREE.Group();
-            
-            // Center the object by moving it to origin
-            object.position.x = -center.x;
-            object.position.y = -center.y;
-            object.position.z = -center.z;
-            
-            // Apply scale
             object.scale.set(scale, scale, scale);
             
-            // Add object to group
-            objectGroup.add(object);
+            // Center object at origin
+            object.position.set(-center.x * scale, -center.y * scale, -center.z * scale);
             
-            // Add group to scene (group is already at origin 0,0,0)
-            scene.add(objectGroup);
+            // Add directly to scene (centered at origin)
+            scene.add(object);
+            objectGroup = object;
             
-            // Position camera to view centered object
-            // Camera looks at origin where object is now centered
-            camera.position.set(0, 0, 4);
+            // Camera positioned to view centered object
+            camera.position.set(0, 0, 3);
             camera.lookAt(0, 0, 0);
-            camera.updateProjectionMatrix();
         },
         (progress) => {
             if (progress.lengthComputable) {
@@ -96,10 +85,9 @@ function createObjectRenderer(containerId, objPath, options = {}) {
     function animate() {
         requestAnimationFrame(animate);
         if (autoRotate && objectGroup) {
-            // Rotate around Y axis, keeping object centered
+            // Rotate around Y axis at origin
             objectGroup.rotation.y += 0.01;
         }
-        // Always render to keep object visible
         renderer.render(scene, camera);
     }
     animate();
