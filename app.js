@@ -21,7 +21,7 @@ let currentObjectData = null; // Store current object for popup
 
 // Create 3D object renderer
 function createObjectRenderer(containerId, objPath, options = {}) {
-    const { width = 200, height = 200, autoRotate = false } = options;
+    const { width = 200, height = 200, autoRotate = false, interactive = false } = options;
     const container = document.getElementById(containerId);
     if (!container || typeof THREE === 'undefined' || typeof OBJLoader === 'undefined') {
         console.warn('Three.js not loaded yet, retrying...');
@@ -45,6 +45,14 @@ function createObjectRenderer(containerId, objPath, options = {}) {
     scene.add(directionalLight);
 
     let objectGroup = null;
+    let objectCenter = new THREE.Vector3(0, 0, 0);
+    let isDragging = false;
+    let previousMousePosition = { x: 0, y: 0 };
+    
+    // Camera orbit parameters (for interactive mode)
+    let cameraDistance = 3;
+    let cameraAngleX = 0;
+    let cameraAngleY = 0;
 
     // Load OBJ
     const OBJLoaderClass = window.OBJLoader || OBJLoader;
@@ -62,6 +70,9 @@ function createObjectRenderer(containerId, objPath, options = {}) {
             const scale = 2.0 / maxDim;
             object.scale.set(scale, scale, scale);
             
+            // Store object center (after scaling)
+            objectCenter.set(0, 0, 0); // Object is centered at origin
+            
             // Center object at origin
             object.position.set(-center.x * scale, -center.y * scale, -center.z * scale);
             
@@ -70,8 +81,7 @@ function createObjectRenderer(containerId, objPath, options = {}) {
             objectGroup = object;
             
             // Camera positioned to view centered object
-            camera.position.set(0, 0, 3);
-            camera.lookAt(0, 0, 0);
+            updateCameraPosition();
         },
         (progress) => {
             if (progress.lengthComputable) {
@@ -81,14 +91,64 @@ function createObjectRenderer(containerId, objPath, options = {}) {
         (error) => console.error('Error loading OBJ:', error)
     );
 
-    // Animation loop - just render, no rotation
+    // Update camera position (orbits around object center)
+    function updateCameraPosition() {
+        const x = objectCenter.x + cameraDistance * Math.sin(cameraAngleY) * Math.cos(cameraAngleX);
+        const y = objectCenter.y + cameraDistance * Math.sin(cameraAngleX);
+        const z = objectCenter.z + cameraDistance * Math.cos(cameraAngleY) * Math.cos(cameraAngleX);
+        
+        camera.position.set(x, y, z);
+        camera.lookAt(objectCenter);
+    }
+
+    // Mouse controls for interactive mode
+    if (interactive) {
+        const canvas = renderer.domElement;
+        
+        canvas.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            previousMousePosition = { x: e.clientX, y: e.clientY };
+            canvas.style.cursor = 'grabbing';
+        });
+
+        canvas.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            
+            const deltaX = e.clientX - previousMousePosition.x;
+            const deltaY = e.clientY - previousMousePosition.y;
+            
+            // Rotate camera around object
+            cameraAngleY += deltaX * 0.01;
+            cameraAngleX += deltaY * 0.01;
+            
+            // Limit vertical rotation
+            cameraAngleX = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, cameraAngleX));
+            
+            updateCameraPosition();
+            previousMousePosition = { x: e.clientX, y: e.clientY };
+        });
+
+        canvas.addEventListener('mouseup', () => {
+            isDragging = false;
+            canvas.style.cursor = 'grab';
+        });
+
+        canvas.addEventListener('mouseleave', () => {
+            isDragging = false;
+            canvas.style.cursor = 'grab';
+        });
+
+        canvas.style.cursor = 'grab';
+    }
+
+    // Animation loop
     function animate() {
         requestAnimationFrame(animate);
         renderer.render(scene, camera);
     }
     animate();
 
-    return { scene, camera, renderer, objectGroup };
+    return { scene, camera, renderer, objectGroup, objectCenter };
 }
 
 function createPin(pitch, yaw) {
@@ -262,12 +322,13 @@ function showPinPopup(hotspot) {
         animateToPopup(objectData.container, pinModalContent);
     }
     
-    // Load object in popup
+    // Load object in popup with interactive controls
     setTimeout(() => {
         createObjectRenderer('popup-obj-container', 'objects/Bose soundslink handle.obj', { 
             width: 300, 
             height: 300,
-            autoRotate: false 
+            autoRotate: false,
+            interactive: true  // Enable drag controls
         });
     }, 300);
     

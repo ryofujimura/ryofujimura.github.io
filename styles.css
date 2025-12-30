@@ -220,6 +220,7 @@ body {
     overflow: hidden;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     background: #f5f5f5;
+    position: relative;
 }
 
 .popup-obj-container canvas {
@@ -227,6 +228,11 @@ body {
     height: 100% !important;
     display: block;
     object-fit: contain;
+    cursor: grab;
+}
+
+.popup-obj-container canvas:active {
+    cursor: grabbing;
 }
 
 .pin-info {
