@@ -40,9 +40,13 @@ function createPin(pitch, yaw) {
 }
 
 function initPanorama() {
+    // Note: Pannellum doesn't natively support dual fisheye
+    // For dual fisheye images, you need to convert them to equirectangular first
+    // Tools: Hugin, PTGui, or online converters like https://www.360toolkit.co/convert-dual-fisheye-to-equirectangular
+    // Alternatively, switch to Photo Sphere Viewer library which has native dual fisheye support
     viewer = pannellum.viewer('panorama', {
-        type: 'equirectangular',
-        panorama: 'images/room-360.jpg',
+        type: 'equirectangular', // Pannellum only supports equirectangular, cubemap, or multires
+        panorama: 'images/room-360.jpg', // Use equirectangular format (convert from dual fisheye if needed)
         autoLoad: true,
         autoRotate: 0,
         compass: false,
