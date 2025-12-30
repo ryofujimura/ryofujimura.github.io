@@ -13,13 +13,24 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 
-// Global function for hotspot click handler (needed for Pannellum)
-window.handleHotspotClick = function(hotspot) {
-    showPinPopup(hotspot);
-};
+// Global function for hotspot click handler
+window.handleHotspotClick = (hotspot) => showPinPopup(hotspot);
 
 // Initialize Pannellum Viewer
 let viewer;
+let pinCounter = 0;
+
+function createPin(pitch, yaw) {
+    viewer.addHotSpot({
+        pitch, yaw,
+        type: 'info',
+        text: 'Click to view',
+        cssClass: 'custom-pin',
+        id: `pin-${pinCounter++}`,
+        clickHandlerFunc: 'handleHotspotClick'
+    });
+}
+
 function initPanorama() {
     viewer = pannellum.viewer('panorama', {
         type: 'equirectangular',
@@ -34,71 +45,31 @@ function initPanorama() {
         mouseZoom: true
     });
 
-    // Add pin/hotspot after panorama loads
-    let pinCounter = 0;
-    viewer.on('load', function() {
-        viewer.addHotSpot({
-            pitch: 0,
-            yaw: 0,
-            type: 'info',
-            text: 'Click to view',
-            cssClass: 'custom-pin',
-            id: 'pin-' + pinCounter++,
-            clickHandlerFunc: 'handleHotspotClick'
-        });
-    });
+    viewer.on('load', () => createPin(0, 0));
 
-    // Handle hotspot click - show popup (backup handler)
-    viewer.on('hotspotclick', function(hotspot) {
-        showPinPopup(hotspot);
-    });
-
-    // Allow clicking on panorama to add new pins (Ctrl+Click or Cmd+Click)
+    // Add pin on Ctrl/Cmd+Click
     let isDragging = false;
-    let mouseDownTime = 0;
     let mouseDownPos = null;
     
-    viewer.on('mousedown', function(event) {
+    viewer.on('mousedown', (e) => {
         isDragging = false;
-        mouseDownTime = Date.now();
-        mouseDownPos = { x: event.clientX, y: event.clientY };
+        mouseDownPos = { x: e.clientX, y: e.clientY };
     });
 
-    viewer.on('mousemove', function(event) {
+    viewer.on('mousemove', (e) => {
         if (mouseDownPos) {
-            const dx = Math.abs(event.clientX - mouseDownPos.x);
-            const dy = Math.abs(event.clientY - mouseDownPos.y);
-            if (dx > 5 || dy > 5) {
-                isDragging = true;
-            }
+            const dx = Math.abs(e.clientX - mouseDownPos.x);
+            const dy = Math.abs(e.clientY - mouseDownPos.y);
+            if (dx > 5 || dy > 5) isDragging = true;
         }
     });
 
-    viewer.on('mouseup', function(event) {
-        // Only add pin if it was a quick click (not a drag) and modifier key is pressed
-        const isModifierPressed = event.ctrlKey || event.metaKey;
-        const clickDuration = Date.now() - mouseDownTime;
-        
-        if (!isDragging && clickDuration < 300 && isModifierPressed) {
-            const coords = viewer.mouseEventToCoords(event);
-            if (coords) {
-                const pitch = coords.pitch;
-                const yaw = coords.yaw;
-                
-                // Add new pin at clicked location
-                viewer.addHotSpot({
-                    pitch: pitch,
-                    yaw: yaw,
-                    type: 'info',
-                    text: 'Click to view',
-                    cssClass: 'custom-pin',
-                    id: 'pin-' + pinCounter++,
-                    clickHandlerFunc: 'handleHotspotClick'
-                });
-            }
+    viewer.on('mouseup', (e) => {
+        if (!isDragging && (e.ctrlKey || e.metaKey)) {
+            const coords = viewer.mouseEventToCoords(e);
+            if (coords) createPin(coords.pitch, coords.yaw);
         }
         isDragging = false;
-        mouseDownTime = 0;
         mouseDownPos = null;
     });
 }
@@ -112,8 +83,6 @@ const closePinModal = document.querySelector('.close-pin');
 const modalTitle = document.getElementById('modalTitle');
 const loginForm = document.getElementById('loginForm');
 const signupForm = document.getElementById('signupForm');
-const switchToSignup = document.getElementById('switchToSignup');
-const switchToLogin = document.getElementById('switchToLogin');
 const loginEmail = document.getElementById('loginEmail');
 const loginPassword = document.getElementById('loginPassword');
 const signupEmail = document.getElementById('signupEmail');
@@ -125,90 +94,70 @@ const authError = document.getElementById('authError');
 
 // Auth State Management
 auth.onAuthStateChanged((user) => {
-    if (user) {
-        authButton.textContent = 'Logout';
-        authButton.classList.add('logged-in');
-    } else {
-        authButton.textContent = 'Login';
-        authButton.classList.remove('logged-in');
-    }
+    authButton.textContent = user ? 'Logout' : 'Login';
+    authButton.classList.toggle('logged-in', !!user);
 });
 
-// Open Modal
+// Auth Button
 authButton.addEventListener('click', () => {
-    const user = auth.currentUser;
-    if (user) {
-        // Logout
-        auth.signOut().then(() => {
-            console.log('User signed out');
-        }).catch((error) => {
-            showError('Error signing out: ' + error.message);
-        });
+    if (auth.currentUser) {
+        auth.signOut().catch(e => showError('Error signing out: ' + e.message));
     } else {
-        // Show login form
         showLoginForm();
         authModal.classList.add('show');
     }
 });
 
-// Close Modal
-closeModal.addEventListener('click', () => {
-    authModal.classList.remove('show');
-    clearError();
-    clearForms();
-});
-
-window.addEventListener('click', (e) => {
-    if (e.target === authModal) {
-        authModal.classList.remove('show');
+// Modal Close Handlers
+const closeModalHandler = (modal) => {
+    modal.classList.remove('show');
+    if (modal === authModal) {
         clearError();
         clearForms();
     }
-    if (e.target === pinModal) {
-        pinModal.classList.remove('show');
+};
+
+closeModal.addEventListener('click', () => closeModalHandler(authModal));
+closePinModal.addEventListener('click', () => closeModalHandler(pinModal));
+
+window.addEventListener('click', (e) => {
+    if (e.target === authModal || e.target === pinModal) {
+        closeModalHandler(e.target);
     }
 });
 
-// Pin Modal handlers
-closePinModal.addEventListener('click', () => {
-    pinModal.classList.remove('show');
-});
-
+// Pin Popup
 function showPinPopup(hotspot) {
-    // Update popup content with pin location if available
     const pinContent = document.getElementById('pinContent');
-    if (hotspot && pinContent) {
-        const pitch = hotspot.pitch || 0;
-        const yaw = hotspot.yaw || 0;
-        pinContent.innerHTML = `
-            <p><strong>Pin Location:</strong></p>
-            <p>Pitch: ${pitch.toFixed(2)}°</p>
-            <p>Yaw: ${yaw.toFixed(2)}°</p>
-            <p style="margin-top: 15px; color: #666; font-size: 14px;">
-                💡 Tip: Hold Ctrl (or Cmd on Mac) and click anywhere on the panorama to add more pins.
-            </p>
-        `;
-    } else if (pinContent) {
-        pinContent.innerHTML = `
-            <p>This is a clickable pin on the panorama.</p>
-            <p>You can add more information here.</p>
-            <p style="margin-top: 15px; color: #666; font-size: 14px;">
-                💡 Tip: Hold Ctrl (or Cmd on Mac) and click anywhere on the panorama to add more pins.
-            </p>
-        `;
-    }
+    const pitch = hotspot?.pitch || 0;
+    const yaw = hotspot?.yaw || 0;
+    
+    pinContent.innerHTML = `
+        <p><strong>Pin Location:</strong></p>
+        <p>Pitch: ${pitch.toFixed(2)}°</p>
+        <p>Yaw: ${yaw.toFixed(2)}°</p>
+        <p style="margin-top: 15px; color: #666; font-size: 14px;">
+            💡 Tip: Hold Ctrl (or Cmd on Mac) and click anywhere on the panorama to add more pins.
+        </p>
+    `;
     pinModal.classList.add('show');
 }
 
-// Switch between Login and Signup
-switchToSignup.addEventListener('click', (e) => {
+// Form Switching
+document.getElementById('switchToSignup').addEventListener('click', (e) => {
     e.preventDefault();
-    showSignupForm();
+    loginForm.style.display = 'none';
+    signupForm.style.display = 'flex';
+    modalTitle.textContent = 'Sign Up';
+    clearError();
 });
 
-switchToLogin.addEventListener('click', (e) => {
+document.getElementById('switchToLogin').addEventListener('click', (e) => {
     e.preventDefault();
-    showLoginForm();
+    loginForm.style.display = 'flex';
+    signupForm.style.display = 'none';
+    modalTitle.textContent = 'Login';
+    clearError();
 });
 
 function showLoginForm() {
@@ -218,51 +167,14 @@ function showLoginForm() {
     clearError();
 }
 
-function showSignupForm() {
-    loginForm.style.display = 'none';
-    signupForm.style.display = 'flex';
-    modalTitle.textContent = 'Sign Up';
-    clearError();
-}
-
-// Login
-loginSubmit.addEventListener('click', async () => {
-    const email = loginEmail.value.trim();
-    const password = loginPassword.value;
-
-    if (!email || !password) {
+// Auth Form Submission
+async function handleAuth(action, email, password, passwordConfirm = null) {
+    if (!email || !password || (passwordConfirm !== null && !passwordConfirm)) {
         showError('Please fill in all fields');
         return;
     }
 
-    loginSubmit.disabled = true;
-    loginSubmit.textContent = 'Logging in...';
-    clearError();
-
-    try {
-        await auth.signInWithEmailAndPassword(email, password);
-        authModal.classList.remove('show');
-        clearForms();
-    } catch (error) {
-        showError(getErrorMessage(error));
-    } finally {
-        loginSubmit.disabled = false;
-        loginSubmit.textContent = 'Login';
-    }
-});
-
-// Signup
-signupSubmit.addEventListener('click', async () => {
-    const email = signupEmail.value.trim();
-    const password = signupPassword.value;
-    const passwordConfirm = signupPasswordConfirm.value;
-
-    if (!email || !password || !passwordConfirm) {
-        showError('Please fill in all fields');
-        return;
-    }
-
-    if (password !== passwordConfirm) {
+    if (passwordConfirm !== null && password !== passwordConfirm) {
         showError('Passwords do not match');
         return;
     }
@@ -272,38 +184,48 @@ signupSubmit.addEventListener('click', async () => {
         return;
     }
 
-    signupSubmit.disabled = true;
-    signupSubmit.textContent = 'Signing up...';
+    const submitButton = action === 'login' ? loginSubmit : signupSubmit;
+    const originalText = submitButton.textContent;
+    
+    submitButton.disabled = true;
+    submitButton.textContent = action === 'login' ? 'Logging in...' : 'Signing up...';
     clearError();
 
     try {
-        await auth.createUserWithEmailAndPassword(email, password);
+        if (action === 'login') {
+            await auth.signInWithEmailAndPassword(email, password);
+        } else {
+            await auth.createUserWithEmailAndPassword(email, password);
+        }
         authModal.classList.remove('show');
         clearForms();
     } catch (error) {
         showError(getErrorMessage(error));
     } finally {
-        signupSubmit.disabled = false;
-        signupSubmit.textContent = 'Sign Up';
+        submitButton.disabled = false;
+        submitButton.textContent = originalText;
     }
+}
+
+loginSubmit.addEventListener('click', () => {
+    handleAuth('login', loginEmail.value.trim(), loginPassword.value);
+});
+
+signupSubmit.addEventListener('click', () => {
+    handleAuth('signup', signupEmail.value.trim(), signupPassword.value, signupPasswordConfirm.value);
 });
 
 // Enter key support
-[loginEmail, loginPassword].forEach(input => {
-    input.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-            loginSubmit.click();
-        }
+const handleEnterKey = (inputs, submitButton) => {
+    inputs.forEach(input => {
+        input.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') submitButton.click();
+        });
     });
-});
+};
 
-[signupEmail, signupPassword, signupPasswordConfirm].forEach(input => {
-    input.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-            signupSubmit.click();
-        }
-    });
-});
+handleEnterKey([loginEmail, loginPassword], loginSubmit);
+handleEnterKey([signupEmail, signupPassword, signupPasswordConfirm], signupSubmit);
 
 // Helper Functions
 function showError(message) {
@@ -323,25 +245,16 @@ function clearForms() {
 }
 
 function getErrorMessage(error) {
-    switch (error.code) {
-        case 'auth/user-not-found':
-            return 'No account found with this email';
-        case 'auth/wrong-password':
-            return 'Incorrect password';
-        case 'auth/email-already-in-use':
-            return 'Email already in use';
-        case 'auth/invalid-email':
-            return 'Invalid email address';
-        case 'auth/weak-password':
-            return 'Password is too weak';
-        case 'auth/network-request-failed':
-            return 'Network error. Please check your connection';
-        default:
-            return error.message || 'An error occurred';
-    }
+    const messages = {
+        'auth/user-not-found': 'No account found with this email',
+        'auth/wrong-password': 'Incorrect password',
+        'auth/email-already-in-use': 'Email already in use',
+        'auth/invalid-email': 'Invalid email address',
+        'auth/weak-password': 'Password is too weak',
+        'auth/network-request-failed': 'Network error. Please check your connection'
+    };
+    return messages[error.code] || error.message || 'An error occurred';
 }
 
-// Initialize on page load
-window.addEventListener('DOMContentLoaded', () => {
-    initPanorama();
-});
+// Initialize
+window.addEventListener('DOMContentLoaded', initPanorama);
