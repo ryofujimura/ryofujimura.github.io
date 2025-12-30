@@ -30,19 +30,69 @@ function initPanorama() {
     });
 
     // Add pin/hotspot after panorama loads
+    let pinCounter = 0;
     viewer.on('load', function() {
         viewer.addHotSpot({
             pitch: 0,
             yaw: 0,
             type: 'info',
             text: 'Click to view details',
-            cssClass: 'custom-pin'
+            cssClass: 'custom-pin',
+            id: 'pin-' + pinCounter++
         });
     });
 
-    // Handle hotspot click
+    // Handle hotspot click - show popup
     viewer.on('hotspotclick', function(hotspot) {
-        showPinPopup();
+        showPinPopup(hotspot);
+    });
+
+    // Allow clicking on panorama to add new pins (Ctrl+Click or Cmd+Click)
+    let isDragging = false;
+    let mouseDownTime = 0;
+    let mouseDownPos = null;
+    
+    viewer.on('mousedown', function(event) {
+        isDragging = false;
+        mouseDownTime = Date.now();
+        mouseDownPos = { x: event.clientX, y: event.clientY };
+    });
+
+    viewer.on('mousemove', function(event) {
+        if (mouseDownPos) {
+            const dx = Math.abs(event.clientX - mouseDownPos.x);
+            const dy = Math.abs(event.clientY - mouseDownPos.y);
+            if (dx > 5 || dy > 5) {
+                isDragging = true;
+            }
+        }
+    });
+
+    viewer.on('mouseup', function(event) {
+        // Only add pin if it was a quick click (not a drag) and modifier key is pressed
+        const isModifierPressed = event.ctrlKey || event.metaKey;
+        const clickDuration = Date.now() - mouseDownTime;
+        
+        if (!isDragging && clickDuration < 300 && isModifierPressed) {
+            const coords = viewer.mouseEventToCoords(event);
+            if (coords) {
+                const pitch = coords.pitch;
+                const yaw = coords.yaw;
+                
+                // Add new pin at clicked location
+                viewer.addHotSpot({
+                    pitch: pitch,
+                    yaw: yaw,
+                    type: 'info',
+                    text: 'Click to view details',
+                    cssClass: 'custom-pin',
+                    id: 'pin-' + pinCounter++
+                });
+            }
+        }
+        isDragging = false;
+        mouseDownTime = 0;
+        mouseDownPos = null;
     });
 }
 
@@ -117,7 +167,29 @@ closePinModal.addEventListener('click', () => {
     pinModal.classList.remove('show');
 });
 
-function showPinPopup() {
+function showPinPopup(hotspot) {
+    // Update popup content with pin location if available
+    const pinContent = document.getElementById('pinContent');
+    if (hotspot && pinContent) {
+        const pitch = hotspot.pitch || 0;
+        const yaw = hotspot.yaw || 0;
+        pinContent.innerHTML = `
+            <p><strong>Pin Location:</strong></p>
+            <p>Pitch: ${pitch.toFixed(2)}°</p>
+            <p>Yaw: ${yaw.toFixed(2)}°</p>
+            <p style="margin-top: 15px; color: #666; font-size: 14px;">
+                💡 Tip: Hold Ctrl (or Cmd on Mac) and click anywhere on the panorama to add more pins.
+            </p>
+        `;
+    } else if (pinContent) {
+        pinContent.innerHTML = `
+            <p>This is a clickable pin on the panorama.</p>
+            <p>You can add more information here.</p>
+            <p style="margin-top: 15px; color: #666; font-size: 14px;">
+                💡 Tip: Hold Ctrl (or Cmd on Mac) and click anywhere on the panorama to add more pins.
+            </p>
+        `;
+    }
     pinModal.classList.add('show');
 }
 
