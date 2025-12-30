@@ -29,18 +29,18 @@ function initPanorama() {
         mouseZoom: true
     });
 
-    // Add hotspot after panorama loads
+    // Add pin/hotspot after panorama loads
     viewer.on('load', function() {
         viewer.addHotSpot({
             pitch: 0,
             yaw: 0,
             type: 'info',
             text: 'Click to view details',
-            cssClass: 'custom-hotspot'
+            cssClass: 'custom-pin'
         });
     });
 
-    // Add click handler for hotspot
+    // Handle hotspot click
     viewer.on('hotspotclick', function(hotspot) {
         showPinPopup();
     });

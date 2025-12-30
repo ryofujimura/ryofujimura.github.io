@@ -181,50 +181,33 @@ body {
     min-height: 20px;
 }
 
-/* Custom Hotspot Pin */
-.pnlm-hotspot.custom-hotspot {
-    width: 30px !important;
-    height: 30px !important;
-    border-radius: 50% !important;
-    background-color: #f44336 !important;
-    border: 3px solid white !important;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
-    cursor: pointer !important;
-    transition: transform 0.2s !important;
-    margin-left: -15px !important;
-    margin-top: -15px !important;
+/* Pin/Hotspot Styles */
+.custom-pin {
+    background-color: #f44336;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 3px solid white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    cursor: pointer;
+    transition: transform 0.2s;
 }
 
-.pnlm-hotspot.custom-hotspot:hover {
-    transform: scale(1.2) !important;
+.custom-pin:hover {
+    transform: scale(1.2);
 }
 
-.pnlm-hotspot.custom-hotspot::before {
-    content: '' !important;
-    position: absolute !important;
-    width: 0 !important;
-    height: 0 !important;
-    border-left: 6px solid transparent !important;
-    border-right: 6px solid transparent !important;
-    border-top: 8px solid #f44336 !important;
-    bottom: -8px !important;
-    left: 50% !important;
-    transform: translateX(-50%) !important;
-}
-
-.pnlm-hotspot.custom-hotspot .pnlm-hotspot-base {
-    display: none !important;
-}
-
-/* Pin Modal Content */
-#pinContent {
-    padding: 10px 0;
-    color: #333;
-    line-height: 1.6;
-}
-
-#pinContent p {
-    margin: 10px 0;
+.custom-pin::before {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-top: 8px solid #f44336;
 }
 
 .close-pin {
@@ -240,4 +223,14 @@ body {
 
 .close-pin:hover {
     color: #000;
+}
+
+#pinContent {
+    margin-top: 20px;
+    line-height: 1.6;
+    color: #333;
+}
+
+#pinContent p {
+    margin-bottom: 10px;
 }
