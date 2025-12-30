@@ -23,7 +23,11 @@ function createPin(pitch, yaw) {
             
             // Load and render 3D object
             setTimeout(() => {
-                const rendererData = createObjectRenderer(containerId, 'objects/Bose soundslink handle.obj');
+                const rendererData = createObjectRenderer(containerId, 'objects/Bose soundslink handle.glb', {
+                    width: 200,
+                    height: 200,
+                    cameraControls: true
+                });
                 if (rendererData) {
                     objectScenes.set(pinId, { container, rendererData, hotspotDiv });
                 }
@@ -71,14 +75,14 @@ function initPanorama() {
 function animateToPopup(sourceContainer, targetModal) {
     if (!sourceContainer) return;
     
-    const canvas = sourceContainer.querySelector('canvas');
-    if (!canvas) return;
+    const modelViewer = sourceContainer.querySelector('model-viewer');
+    if (!modelViewer) return;
     
-    const rect = canvas.getBoundingClientRect();
+    const rect = modelViewer.getBoundingClientRect();
     const targetRect = targetModal.getBoundingClientRect();
     
     // Create clone for animation
-    const clone = canvas.cloneNode(true);
+    const clone = modelViewer.cloneNode(true);
     clone.style.position = 'fixed';
     clone.style.left = rect.left + 'px';
     clone.style.top = rect.top + 'px';
@@ -135,8 +139,11 @@ function showPinPopup(hotspot) {
     }
     
     // Load object in popup with interactive controls
-    createObjectRenderer('popup-obj-container', 'objects/Bose soundslink handle.obj', { 
-        //   uses default settings
+    createObjectRenderer('popup-obj-container', 'objects/Bose soundslink handle.glb', { 
+        width: 300,
+        height: 300,
+        cameraControls: true,
+        interactive: true
     });
     
     const pinModal = document.getElementById('pinModal');
