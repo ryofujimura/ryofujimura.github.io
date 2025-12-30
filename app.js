@@ -28,6 +28,9 @@ function initPanorama() {
         maxHfov: 120,
         mouseZoom: true
     });
+    
+    // Make viewer globally accessible for Three.js integration
+    window.viewer = viewer;
 }
 
 // DOM Elements

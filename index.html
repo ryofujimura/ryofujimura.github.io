@@ -15,6 +15,8 @@
 
     <!-- 360 Panorama Viewer -->
     <div id="panorama"></div>
+    <!-- Three.js Canvas Overlay -->
+    <canvas id="threejs-canvas"></canvas>
 
     <!-- Auth Popup Modal -->
     <div id="authModal" class="modal">
@@ -41,9 +43,25 @@
         </div>
     </div>
 
+    <!-- Object Info Popup Modal -->
+    <div id="objectModal" class="modal">
+        <div class="modal-content">
+            <span class="close-object">&times;</span>
+            <h2>Bose SoundLink Handle</h2>
+            <div class="object-info">
+                <p>This is a Bose SoundLink portable speaker handle.</p>
+                <p>Click outside or the X button to close.</p>
+            </div>
+        </div>
+    </div>
+
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <!-- Three.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/mrdoob/three.js@r128/examples/js/loaders/OBJLoader.js"></script>
+    <script src="threejs-integration.js"></script>
     <!-- Pannellum -->
     <script src="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.js"></script>
     <!-- App Script -->
