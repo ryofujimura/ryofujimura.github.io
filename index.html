@@ -1,355 +1,52 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>360 Photo Viewer</title>
-
-  <!-- Photo Sphere Viewer (CDN) -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@photo-sphere-viewer/core/index.css" />
-  
-  <!-- Firebase SDK -->
-  <script type="module">
-    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyDjfmsodqZW5VknlN98QPNA71yg8bCKlM0",
-      authDomain: "ryofujimura-181bc.firebaseapp.com",
-      projectId: "ryofujimura-181bc",
-      storageBucket: "ryofujimura-181bc.firebasestorage.app",
-      messagingSenderId: "347833216953",
-      appId: "1:347833216953:web:25ad6906b865110c969068",
-      measurementId: "G-PL472TJC9Z"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-
-    const styles = `
-      html, body { 
-        height: 100%; 
-        margin: 0; 
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-      }
-      #viewer { 
-        width: 100%; 
-        height: 100vh; 
-        background: #000; 
-      }
-      #auth-button {
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        z-index: 1000;
-        padding: 12px 24px;
-        background: rgba(255, 255, 255, 0.9);
-        border: none;
-        border-radius: 8px;
-        cursor: pointer;
-        font-size: 16px;
-        font-weight: 500;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-        transition: all 0.3s ease;
-      }
-      #auth-button:hover {
-        background: rgba(255, 255, 255, 1);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-      }
-      .modal-overlay {
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.6);
-        z-index: 2000;
-        justify-content: center;
-        align-items: center;
-      }
-      .modal-overlay.active {
-        display: flex;
-      }
-      .modal-content {
-        background: white;
-        border-radius: 12px;
-        padding: 32px;
-        width: 90%;
-        max-width: 400px;
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-      }
-      .modal-header {
-        margin-bottom: 24px;
-      }
-      .modal-header h2 {
-        margin: 0 0 8px 0;
-        font-size: 24px;
-        color: #333;
-      }
-      .modal-header p {
-        margin: 0;
-        color: #666;
-        font-size: 14px;
-      }
-      .form-group {
-        margin-bottom: 20px;
-      }
-      .form-group label {
-        display: block;
-        margin-bottom: 8px;
-        color: #333;
-        font-size: 14px;
-        font-weight: 500;
-      }
-      .form-group input {
-        width: 100%;
-        padding: 12px;
-        border: 1px solid #ddd;
-        border-radius: 6px;
-        font-size: 16px;
-        box-sizing: border-box;
-      }
-      .form-group input:focus {
-        outline: none;
-        border-color: #4285f4;
-      }
-      .button-group {
-        display: flex;
-        gap: 12px;
-        margin-top: 24px;
-      }
-      .btn {
-        flex: 1;
-        padding: 12px;
-        border: none;
-        border-radius: 6px;
-        font-size: 16px;
-        font-weight: 500;
-        cursor: pointer;
-        transition: all 0.2s ease;
-      }
-      .btn-primary {
-        background: #4285f4;
-        color: white;
-      }
-      .btn-primary:hover {
-        background: #357ae8;
-      }
-      .btn-secondary {
-        background: #f1f1f1;
-        color: #333;
-      }
-      .btn-secondary:hover {
-        background: #e0e0e0;
-      }
-      .error-message {
-        color: #d32f2f;
-        font-size: 14px;
-        margin-top: 8px;
-        display: none;
-      }
-      .error-message.show {
-        display: block;
-      }
-      .auth-tabs {
-        display: flex;
-        gap: 8px;
-        margin-bottom: 24px;
-        border-bottom: 2px solid #f0f0f0;
-      }
-      .auth-tab {
-        flex: 1;
-        padding: 12px;
-        background: none;
-        border: none;
-        cursor: pointer;
-        font-size: 16px;
-        color: #666;
-        border-bottom: 2px solid transparent;
-        margin-bottom: -2px;
-        transition: all 0.2s ease;
-      }
-      .auth-tab.active {
-        color: #4285f4;
-        border-bottom-color: #4285f4;
-        font-weight: 500;
-      }
-      .close-button {
-        position: absolute;
-        top: 16px;
-        right: 16px;
-        background: none;
-        border: none;
-        font-size: 24px;
-        cursor: pointer;
-        color: #666;
-        width: 32px;
-        height: 32px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 50%;
-        transition: all 0.2s ease;
-      }
-      .close-button:hover {
-        background: #f0f0f0;
-        color: #333;
-      }
-      .modal-content {
-        position: relative;
-      }
-    `;
-
-    const styleSheet = document.createElement('style');
-    styleSheet.textContent = styles;
-    document.head.appendChild(styleSheet);
-
-    // Create modal HTML
-    const modalHTML = `
-      <div id="auth-modal" class="modal-overlay">
-        <div class="modal-content">
-          <button class="close-button" id="close-modal">&times;</button>
-          <div class="modal-header">
-            <div class="auth-tabs">
-              <button class="auth-tab active" id="login-tab">Login</button>
-              <button class="auth-tab" id="signup-tab">Sign Up</button>
-            </div>
-          </div>
-          <form id="auth-form">
-            <div class="form-group">
-              <label for="email">Email</label>
-              <input type="email" id="email" required autocomplete="email">
-            </div>
-            <div class="form-group">
-              <label for="password">Password</label>
-              <input type="password" id="password" required autocomplete="current-password">
-            </div>
-            <div class="error-message" id="error-message"></div>
-            <div class="button-group">
-              <button type="submit" class="btn btn-primary" id="submit-btn">Login</button>
-              <button type="button" class="btn btn-secondary" id="cancel-btn">Cancel</button>
-            </div>
-          </form>
-        </div>
-      </div>
-    `;
-
-    document.body.insertAdjacentHTML('beforeend', modalHTML);
-
-    // Initialize Photo Sphere Viewer
-    import { Viewer } from "https://cdn.jsdelivr.net/npm/@photo-sphere-viewer/core/index.module.js";
-
-    const viewer = new Viewer({
-      container: document.querySelector("#viewer"),
-      panorama: "/images/room-360.jpg",
-      navbar: [
-        "zoom",
-        "fullscreen"
-      ],
-      defaultZoomLvl: 0,
-      mousewheel: true,
-      touchmoveTwoFingers: false,
-    });
-
-    // Auth state management
-    let isLoginMode = true;
-    const authButton = document.getElementById('auth-button');
-    const authModal = document.getElementById('auth-modal');
-    const closeModal = document.getElementById('close-modal');
-    const loginTab = document.getElementById('login-tab');
-    const signupTab = document.getElementById('signup-tab');
-    const authForm = document.getElementById('auth-form');
-    const emailInput = document.getElementById('email');
-    const passwordInput = document.getElementById('password');
-    const submitBtn = document.getElementById('submit-btn');
-    const cancelBtn = document.getElementById('cancel-btn');
-    const errorMessage = document.getElementById('error-message');
-
-    // Update auth button text based on auth state
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        authButton.textContent = 'Logout';
-      } else {
-        authButton.textContent = 'Login';
-      }
-    });
-
-    // Open modal
-    authButton.addEventListener('click', () => {
-      const user = auth.currentUser;
-      if (user) {
-        signOut(auth).catch((error) => {
-          showError(error.message);
-        });
-      } else {
-        authModal.classList.add('active');
-        emailInput.focus();
-      }
-    });
-
-    // Close modal
-    closeModal.addEventListener('click', closeAuthModal);
-    cancelBtn.addEventListener('click', closeAuthModal);
-    authModal.addEventListener('click', (e) => {
-      if (e.target === authModal) {
-        closeAuthModal();
-      }
-    });
-
-    function closeAuthModal() {
-      authModal.classList.remove('active');
-      errorMessage.classList.remove('show');
-      authForm.reset();
-    }
-
-    // Switch between login and signup
-    loginTab.addEventListener('click', () => {
-      isLoginMode = true;
-      loginTab.classList.add('active');
-      signupTab.classList.remove('active');
-      submitBtn.textContent = 'Login';
-      passwordInput.setAttribute('autocomplete', 'current-password');
-      errorMessage.classList.remove('show');
-    });
-
-    signupTab.addEventListener('click', () => {
-      isLoginMode = false;
-      signupTab.classList.add('active');
-      loginTab.classList.remove('active');
-      submitBtn.textContent = 'Sign Up';
-      passwordInput.setAttribute('autocomplete', 'new-password');
-      errorMessage.classList.remove('show');
-    });
-
-    // Handle form submission
-    authForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      errorMessage.classList.remove('show');
-      
-      const email = emailInput.value.trim();
-      const password = passwordInput.value;
-
-      try {
-        if (isLoginMode) {
-          await signInWithEmailAndPassword(auth, email, password);
-        } else {
-          await createUserWithEmailAndPassword(auth, email, password);
-        }
-        closeAuthModal();
-      } catch (error) {
-        showError(error.message);
-      }
-    });
-
-    function showError(message) {
-      errorMessage.textContent = message;
-      errorMessage.classList.add('show');
-    }
-  </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>360 Panorama Viewer</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.css">
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <button id="auth-button">Login</button>
-  <div id="viewer"></div>
+    <!-- Login Button -->
+    <div class="auth-container">
+        <button id="authButton" class="auth-button">Login</button>
+    </div>
+
+    <!-- 360 Panorama Viewer -->
+    <div id="panorama"></div>
+
+    <!-- Auth Popup Modal -->
+    <div id="authModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 id="modalTitle">Login</h2>
+            
+            <div id="loginForm" class="auth-form">
+                <input type="email" id="loginEmail" placeholder="Email" required>
+                <input type="password" id="loginPassword" placeholder="Password" required>
+                <button id="loginSubmit" class="submit-button">Login</button>
+                <p class="switch-auth">Don't have an account? <a href="#" id="switchToSignup">Sign up</a></p>
+            </div>
+
+            <div id="signupForm" class="auth-form" style="display: none;">
+                <input type="email" id="signupEmail" placeholder="Email" required>
+                <input type="password" id="signupPassword" placeholder="Password" required>
+                <input type="password" id="signupPasswordConfirm" placeholder="Confirm Password" required>
+                <button id="signupSubmit" class="submit-button">Sign Up</button>
+                <p class="switch-auth">Already have an account? <a href="#" id="switchToLogin">Login</a></p>
+            </div>
+
+            <div id="authError" class="error-message"></div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <!-- Pannellum -->
+    <script src="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.js"></script>
+    <!-- App Script -->
+    <script src="app.js"></script>
 </body>
 </html>
