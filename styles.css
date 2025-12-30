@@ -48,6 +48,11 @@ body {
     height: 100vh;
 }
 
+/* Hide zoom buttons */
+.pnlm-zoom-controls {
+    display: none !important;
+}
+
 /* Modal Styles */
 .modal {
     display: none;
