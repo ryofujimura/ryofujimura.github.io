@@ -4,6 +4,13 @@ A Python implementation of the dual fisheye to equirectangular conversion algori
 
 This tool converts two fisheye images (typically from a dual fisheye 360° camera) into a single equirectangular (spherical) projection that can be viewed in standard 360° panorama viewers.
 
+## Supported Formats
+
+- **Input formats**: JPEG, PNG, TIFF, and **DNG (Digital Negative)** raw files
+- **Output format**: JPEG (equirectangular projection)
+
+DNG files are processed using the `rawpy` library with automatic white balance and full resolution processing.
+
 ## Installation
 
 Install the required dependencies:
@@ -11,6 +18,8 @@ Install the required dependencies:
 ```bash
 pip install -r requirements.txt
 ```
+
+**Note**: DNG support requires the `rawpy` library, which is included in the requirements. If you only need standard image formats, you can install without rawpy, but DNG files will not be supported.
 
 ## Usage
 
@@ -25,7 +34,7 @@ python dualfish2sphere.py params.txt -w 4096 -b 10 -o output.jpg
 Example parameter file (`params.txt`):
 
 ```
-# Left fisheye image
+# Left fisheye image (supports DNG, JPEG, PNG, etc.)
 IMAGE: images/left.jpg
 RADIUS: 1024
 CENTER: 1024 1024
@@ -42,6 +51,17 @@ APERTURE: 190
 ROTATEX: 0
 ROTATEY: 0
 ROTATEZ: 0
+```
+
+You can also use DNG files directly:
+
+```
+# Left fisheye image (DNG format)
+IMAGE: images/IMG_20241209_111244_00_001.dng
+RADIUS: 2048
+CENTER: 2048 2048
+APERTURE: 190
+...
 ```
 
 ### Method 2: Simplified Command-Line Interface
@@ -118,9 +138,15 @@ Convert your dual fisheye images:
 # Using parameter file
 python dualfish2sphere.py example_params.txt -w 4096 -b 10 -a 2 -o panorama.jpg
 
-# Using simplified interface
+# Using simplified interface with JPEG/PNG
 python convert_dualfish.py images/left.jpg images/right.jpg -o panorama.jpg \
   --left-center-x 1024 --left-center-y 1024 --left-radius 1024 --left-aperture 190 \
   --right-center-x 1024 --right-center-y 1024 --right-radius 1024 --right-aperture 190 \
   -b 10 -w 4096
+
+# Using DNG files directly
+python convert_dualfish.py images/left.dng images/right.dng -o panorama.jpg \
+  --left-center-x 2048 --left-center-y 2048 --left-radius 2048 --left-aperture 190 \
+  --right-center-x 2048 --right-center-y 2048 --right-radius 2048 --right-aperture 190 \
+  -b 10 -w 4096 --auto-detect
 ```

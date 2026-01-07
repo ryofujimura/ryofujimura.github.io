@@ -10,8 +10,16 @@ import numpy as np
 from PIL import Image
 import argparse
 import math
+import os
 from typing import Tuple, List, Optional
 from dataclasses import dataclass
+
+# Try to import rawpy for DNG support
+try:
+    import rawpy
+    HAS_RAWPY = True
+except ImportError:
+    HAS_RAWPY = False
 
 
 @dataclass
@@ -214,6 +222,42 @@ def sample_fisheye_image(img: np.ndarray, u: float, v: float, antialias: int = 1
         return np.mean(samples, axis=0).astype(np.uint8)
 
 
+def load_image(image_path: str) -> np.ndarray:
+    """
+    Load an image file, supporting both standard formats (JPEG, PNG, etc.) and DNG raw files.
+    
+    Args:
+        image_path: Path to the image file
+    
+    Returns:
+        RGB image as numpy array (uint8)
+    """
+    file_ext = os.path.splitext(image_path.lower())[1]
+    
+    # Handle DNG files
+    if file_ext == '.dng':
+        if not HAS_RAWPY:
+            raise ImportError(
+                "DNG support requires 'rawpy' library. Install it with: pip install rawpy"
+            )
+        
+        with rawpy.imread(image_path) as raw:
+            # Process raw image to RGB
+            rgb = raw.postprocess(
+                use_camera_wb=True,  # Use camera white balance
+                half_size=False,      # Full resolution
+                no_auto_bright=False, # Auto brightness
+                output_bps=8          # 8-bit output
+            )
+            return rgb
+    
+    # Handle standard image formats with PIL
+    img = Image.open(image_path)
+    if img.mode != 'RGB':
+        img = img.convert('RGB')
+    return np.array(img)
+
+
 def blend_weight(lon: float, blend_start: float, blend_end: float, blend_power: float = 1.0) -> float:
     """
     Calculate blend weight for a longitude in blend zone
@@ -259,10 +303,8 @@ def convert_dualfish_to_equirectangular(
     # Load fisheye images
     fisheye_images = []
     for params in params_list:
-        img = Image.open(params.image_path)
-        if img.mode != 'RGB':
-            img = img.convert('RGB')
-        fisheye_images.append(np.array(img))
+        img_array = load_image(params.image_path)
+        fisheye_images.append(img_array)
     
     # Create output image
     output = np.zeros((output_height, output_width, 3), dtype=np.uint8)

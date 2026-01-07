@@ -7,7 +7,8 @@ This script provides a simpler way to convert dual fisheye images without a para
 import argparse
 from dualfish2sphere import (
     FisheyeParams,
-    convert_dualfish_to_equirectangular
+    convert_dualfish_to_equirectangular,
+    load_image
 )
 from PIL import Image
 import numpy as np
@@ -50,11 +51,15 @@ def main():
     
     args = parser.parse_args()
     
-    # Load images to get dimensions
-    left_img = Image.open(args.left_image)
-    right_img = Image.open(args.right_image)
-    left_w, left_h = left_img.size
-    right_w, right_h = right_img.size
+    # Load images to get dimensions (supporting DNG)
+    try:
+        left_img_array = load_image(args.left_image)
+        right_img_array = load_image(args.right_image)
+        left_h, left_w = left_img_array.shape[:2]
+        right_h, right_w = right_img_array.shape[:2]
+    except Exception as e:
+        print(f"Error loading images: {e}")
+        return
     
     # Auto-detect or use provided parameters
     if args.auto_detect:
