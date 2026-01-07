@@ -1,0 +1,21 @@
+# Example parameter file for dual fisheye to equirectangular conversion
+# Format: keyword: value
+# Lines starting with # are comments
+
+# Left fisheye image
+IMAGE: images/left.jpg
+RADIUS: 1024
+CENTER: 1024 1024
+APERTURE: 190
+ROTATEX: 0
+ROTATEY: 0
+ROTATEZ: 0
+
+# Right fisheye image
+IMAGE: images/right.jpg
+RADIUS: 1024
+CENTER: 1024 1024
+APERTURE: 190
+ROTATEX: 0
+ROTATEY: 0
+ROTATEZ: 0
