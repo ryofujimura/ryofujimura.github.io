@@ -14,11 +14,15 @@ const skills = {
 }
 
 const stats = [
-  { label: "Publications", value: "2" },
-  { label: "Years Coding", value: "4+" },
+  { label: "Years Coding", value: "8+" },
   { label: "Projects Shipped", value: "10+" },
-  { label: "Internships", value: "3" },
+  { label: "Internships", value: "2" },
+  { label: "Publications", value: "2" },
 ]
+
+/** MMM. YYYY for LeonardoNotebook dates */
+const currentMonthYear =
+  new Date().toLocaleString("en-US", { month: "short" }) + ". " + new Date().getFullYear()
 
 export function AboutSection() {
   const gridRef = useRef<SVGSVGElement | null>(null)
@@ -220,26 +224,26 @@ export function AboutSection() {
           {/* Right column: Leonardo-style technical notebook */}
           <div className="space-y-6 sm:space-y-7">
             <AnimatedSection>
-              <LeonardoNotebook folioRef="RF.DV.ABOUT.001" date="2025">
+              <LeonardoNotebook folioRef="RF.DV.ABOUT.001" date={currentMonthYear}>
                 <TechnicalDrawing
-                  title="PIPELINE: LAB → DEVICE"
+                  title="PIPELINE: IDEA → PROTOTYPE → PRODUCTION"
                   asciiArt={[
-                    "+------------------+   +------------------+",
-                    "|      IDEA        |   | AI ENHANCEMENT   |",
-                    "| (problem, goal)   |-->| (spec, expand)   |",
-                    "+--------+---------+   +---------+--------+",
-                    "         |                       |",
-                    "         v                       v",
-                    "+------------------+   +------------------+",
-                    "|     CODING       |   |    PROTOTYPE     |",
-                    "|   (implement)    |-->|   (MVP, demo)     |",
-                    "+--------+---------+   +---------+--------+",
-                    "         |                       |",
-                    "         v                       v",
-                    "+------------------+   +------------------+",
-                    "|    ITERATE       |   |   PRODUCTION     |",
-                    "| (feedback, fix)  |-->| (deploy, scale)  |",
-                    "+------------------+   +------------------+",
+                    "+-----------------+   +-----------------+",
+                    "|      IDEA       |   | AI ENHANCEMENT  |",
+                    "| (problem, goal) |-->| (spec, expand)  |",
+                    "+--------+--------+   +-----------------+",
+                    "         |                     |",
+                    "         v                     v",
+                    "+-----------------+   +-----------------+",
+                    "|     CODING      |   |    PROTOTYPE    |",
+                    "|   (implement)   |-->|   (MVP, demo)   |",
+                    "+--------+--------+   +--------+--------+",
+                    "         |                     |",
+                    "         v                     v",
+                    "+-----------------+   +-----------------+",
+                    "|    ITERATE      |   |   PRODUCTION    |",
+                    "| (feedback, fix) |-->| (deploy, scale) |",
+                    "+--------+--------+   +--------+--------+",
                   ].join("\n")}
                   measurements={[
                     { label: "Latency", value: "−40%", unit: " vs. baseline" },
@@ -252,7 +256,7 @@ export function AboutSection() {
             </AnimatedSection>
 
             <AnimatedSection delay={120}>
-              <LeonardoNotebook folioRef="RF.DV.SKILLS.002" date="2025">
+              <LeonardoNotebook folioRef="RF.DV.SKILLS.002" date={currentMonthYear}>
                 <div className="space-y-3 sm:space-y-4">
                   <p className="font-mono text-[10px] sm:text-xs text-foreground/90 font-semibold uppercase tracking-[0.18em]">
                     TOOLING DISTRIBUTION
