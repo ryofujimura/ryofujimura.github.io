@@ -223,19 +223,24 @@ export function AboutSection() {
               <LeonardoNotebook folioRef="RF.DV.ABOUT.001" date="2025">
                 <TechnicalDrawing
                   title="PIPELINE: LAB → DEVICE"
-                  asciiArt={`    ╭─────────────╮
-   ╱  EXPERIMENT  ╲
-  │   (PyTorch)    │
-  │       │        │
-  │       ▼        │
-  │   OPTIMIZE     │
-  │  (Quantize)    │
-  │       │        │
-  │       ▼        │
-  │   DEPLOY       │
-  │   (CoreML)     │
-   ╲              ╱
-    ╰────────────╯`}
+                  asciiArt={[
+                    "╭──────────────────╮   ╭──────────────────╮",
+                    "│  SYSTEM PROMPT   │   │  MODEL RESPONSE  │",
+                    "│ (role, rules)    │──▶│ (completion)     │",
+                    "╰─────────┬────────╯   ╰─────────┬────────╯",
+                    "          │                      │",
+                    "          ▼                      ▼",
+                    "╭──────────────────╮   ╭──────────────────╮",
+                    "│   EVALUATE       │   │  REFINE PROMPT   │",
+                    "│ (errors, drift)  │──▶│ (add constraints)│",
+                    "╰─────────┬────────╯   ╰─────────┬────────╯",
+                    "          │                      │",
+                    "          ▼                      ▼",
+                    "╭──────────────────╮   ╭──────────────────╮",
+                    "│  FINAL OUTPUT    │   │   DECISION       │",
+                    "│ (stable result)  │──▶│ ship / iterate   │",
+                    "╰──────────────────╯   ╰──────────────────╯",
+                  ].join("\n")}
                   measurements={[
                     { label: "Latency", value: "−40%", unit: " vs. baseline" },
                     { label: "Memory", value: "−3GB", unit: " footprint" },
