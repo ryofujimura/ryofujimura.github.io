@@ -116,6 +116,11 @@ export function Navigation() {
             </div>
           </div>
         </div>
+
+        {/* Slime pill underlay — desktop only */}
+        <div className="pointer-events-none absolute inset-x-0 -bottom-6 flex justify-center hidden md:flex">
+          <div className="slime-pill h-6 w-40 sm:h-7 sm:w-52 bg-foreground/90 dark:bg-black/90" />
+        </div>
       </nav>
 
       {/* Mobile menu — safe area + 44px taps */}
@@ -155,6 +160,45 @@ export function Navigation() {
           </a>
         </div>
       </div>
+
+      <style jsx>{`
+        .slime-pill {
+          border-radius: 999px;
+          filter: blur(8px);
+          opacity: 0.7;
+          box-shadow:
+            0 10px 30px rgba(0, 0, 0, 0.35),
+            0 0 40px rgba(0, 0, 0, 0.4);
+          animation: slimeWobble 6s ease-in-out infinite;
+        }
+
+        @keyframes slimeWobble {
+          0% {
+            transform: scaleX(1) scaleY(1);
+            border-radius: 999px;
+          }
+          20% {
+            transform: scaleX(1.15) scaleY(0.9);
+            border-radius: 60% 40% 70% 30% / 60% 55% 45% 40%;
+          }
+          40% {
+            transform: scaleX(0.9) scaleY(1.1) translateY(1px);
+            border-radius: 45% 55% 40% 60% / 55% 65% 35% 45%;
+          }
+          60% {
+            transform: scaleX(1.1) scaleY(0.95) translateY(-1px);
+            border-radius: 65% 35% 55% 45% / 50% 60% 40% 50%;
+          }
+          80% {
+            transform: scaleX(0.95) scaleY(1.05);
+            border-radius: 55% 45% 60% 40% / 65% 45% 55% 35%;
+          }
+          100% {
+            transform: scaleX(1) scaleY(1);
+            border-radius: 999px;
+          }
+        }
+      `}</style>
     </>
   )
 }
