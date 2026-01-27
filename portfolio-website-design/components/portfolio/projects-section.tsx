@@ -398,47 +398,56 @@ export function ProjectsSection() {
   const [showAll, setShowAll] = useState(false)
   const [visibleCount, setVisibleCount] = useState(0)
   const sectionRef = useRef<HTMLDivElement>(null)
-  const scrollRowRef = useRef<HTMLDivElement>(null)
-  const projectRefs = useRef<(HTMLDivElement | null)[]>([])
+  const pinRef = useRef<HTMLDivElement>(null)
+  const trackRef = useRef<HTMLDivElement>(null)
   const titleRef = useRef<HTMLDivElement>(null)
 
   const displayedProjects = showAll ? allProjects : allProjects.slice(0, 3)
 
-  const handleShowAll = () => {
+  const handleShowMore = () => {
     setShowAll(true)
     setVisibleCount(allProjects.length)
   }
 
+  // Scroll-driven horizontal motion: pin section, scrub translateX by scroll
   useEffect(() => {
-    const row = scrollRowRef.current
-    if (!row) return
+    const section = sectionRef.current
+    const pin = pinRef.current
+    const track = trackRef.current
+    if (!section || !pin || !track) return
 
-    const st = ScrollTrigger.create({
-      trigger: row,
-      start: "top 85%",
-      onEnter: () => setVisibleCount(displayedProjects.length),
-    })
-    return () => st.kill()
-  }, [displayedProjects.length])
+    const getMaxTravel = () => {
+      const viewW = pin.offsetWidth
+      const trackW = track.scrollWidth
+      return Math.max(0, trackW - viewW)
+    }
 
-  useEffect(() => {
-    const refs = projectRefs.current
-    const visible = refs.filter(Boolean).length
-    if (visible === 0) return
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            const i = refs.indexOf(entry.target as HTMLDivElement)
-            if (i >= 0) setVisibleCount((prev) => Math.max(prev, i + 1))
-          }
-        })
-      },
-      { threshold: 0.15, rootMargin: "0px 0px -20px 0px" }
+    const scrollDistance = Math.max(600, displayedProjects.length * 280)
+
+    gsap.set(track, { x: 0 })
+    const anim = gsap.fromTo(
+      track,
+      { x: 0 },
+      {
+        x: () => -getMaxTravel(),
+        ease: "none",
+        scrollTrigger: {
+          trigger: section,
+          start: "top 80%",
+          end: `+=${scrollDistance}`,
+          scrub: 1,
+          pin: pin,
+          invalidateOnRefresh: true,
+          onEnter: () => setVisibleCount(displayedProjects.length),
+        },
+      }
     )
-    refs.forEach((el) => el && observer.observe(el))
-    return () => observer.disconnect()
-  }, [displayedProjects.length])
+
+    return () => {
+      anim.scrollTrigger?.kill()
+      anim.kill()
+    }
+  }, [displayedProjects.length, showAll])
 
   return (
     <section id="projects" ref={sectionRef} className="relative py-20 sm:py-24 md:py-32 lg:py-40 px-4 sm:px-6 overflow-hidden">
@@ -465,62 +474,61 @@ export function ProjectsSection() {
               className="text-base sm:text-lg text-muted-foreground max-w-xl font-mono"
               delay={0.5}
             >
-              &gt; A selection of projects — AI, mobile, full-stack
+              &gt; Scroll down to move through projects — AI, mobile, full-stack
             </GSAPText>
           </div>
         </div>
 
-        {/* Horizontal scroll row with scroll-triggered animation */}
+        {/* Pinned viewport: vertical scroll drives horizontal movement */}
         <div
-          ref={scrollRowRef}
-          className="overflow-x-auto overflow-y-hidden -mx-4 sm:-mx-6 px-4 sm:px-6 pb-4 scrollbar-hide touch-pan-x"
-          style={{ scrollBehavior: "smooth" }}
+          ref={pinRef}
+          className="relative w-full overflow-hidden"
+          style={{ minHeight: "72vh" }}
         >
-          <div className="flex gap-6 sm:gap-8 min-w-max">
-            {displayedProjects.map((project, index) => (
-              <div
-                key={`${project.title}-${project.number}`}
-                ref={(el) => {
-                  projectRefs.current[index] = el
-                }}
-                className="flex-shrink-0 w-[min(340px,85vw)] sm:w-[380px]"
+          <div className="h-[70vh] min-h-[380px] overflow-hidden">
+            <div
+              ref={trackRef}
+              className="flex gap-6 sm:gap-8 pt-2 pr-4 sm:pr-6"
+              style={{ width: "max-content" }}
+            >
+              {displayedProjects.map((project, index) => (
+                <div
+                  key={`${project.title}-${project.number}`}
+                  className="flex-shrink-0 w-[min(340px,85vw)] sm:w-[380px]"
+                >
+                  <ProjectCard
+                    project={project}
+                    index={index}
+                    isVisible={visibleCount > index}
+                    compact={true}
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="absolute bottom-0 left-0 right-0 flex flex-col items-center gap-4 pt-6 pb-4 sm:pb-8">
+            {!showAll && allProjects.length > 3 ? (
+              <MagneticButton
+                onClick={handleShowMore}
+                className="touch-target group relative inline-flex items-center justify-center gap-2 sm:gap-4 px-6 sm:px-12 py-4 sm:py-5 min-h-[48px] text-sm font-mono uppercase tracking-wider text-foreground border-2 border-foreground hover:bg-foreground hover:text-background transition-all duration-300"
               >
-                <ProjectCard
-                  project={project}
-                  index={index}
-                  isVisible={visibleCount > index}
-                  compact={true}
-                />
-              </div>
-            ))}
+                <Eye className="w-5 h-5 shrink-0" />
+                Show more projects ({allProjects.length - 3} more)
+                <ChevronRight className="w-5 h-5 group-hover:translate-x-2 transition-transform shrink-0" />
+              </MagneticButton>
+            ) : showAll ? (
+              <MagneticButton
+                as="a"
+                href="#contact"
+                className="touch-target group inline-flex items-center justify-center gap-3 min-h-[48px] text-base sm:text-lg font-mono text-muted-foreground hover:text-foreground transition-colors"
+              >
+                {"Let's collaborate"}
+                <ArrowRight className="w-5 h-5 group-hover:translate-x-2 transition-transform shrink-0" />
+              </MagneticButton>
+            ) : null}
           </div>
         </div>
-
-        {!showAll && allProjects.length > 3 && (
-          <div className="flex justify-center mt-10 sm:mt-14">
-            <MagneticButton
-              onClick={handleShowAll}
-              className="touch-target group relative inline-flex items-center justify-center gap-2 sm:gap-4 px-6 sm:px-12 py-4 sm:py-5 min-h-[48px] text-sm font-mono uppercase tracking-wider text-foreground border-2 border-foreground hover:bg-foreground hover:text-background transition-all duration-300"
-            >
-              <Eye className="w-5 h-5 shrink-0" />
-              View All Projects ({allProjects.length})
-              <ChevronRight className="w-5 h-5 group-hover:translate-x-2 transition-transform shrink-0" />
-            </MagneticButton>
-          </div>
-        )}
-
-        {showAll && (
-          <div className="flex justify-center mt-10 sm:mt-14">
-            <MagneticButton
-              as="a"
-              href="#contact"
-              className="touch-target group inline-flex items-center justify-center gap-3 min-h-[48px] text-base sm:text-lg font-mono text-muted-foreground hover:text-foreground transition-colors"
-            >
-              {"Let's collaborate"}
-              <ArrowRight className="w-5 h-5 group-hover:translate-x-2 transition-transform shrink-0" />
-            </MagneticButton>
-          </div>
-        )}
       </div>
     </section>
   )
