@@ -5,6 +5,7 @@ import { gsap } from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
 import { ExternalLink, Github, ChevronDown } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { AsciiObjRenderer } from "@/components/ascii-obj-renderer"
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -143,6 +144,18 @@ const allProjects = [
     skills: ["Swift", "WatchOS", "probability"],
     links: { github: "https://github.com/ryofujimura", appStore: "#" },
   },
+  {
+    id: "13",
+    title: "Custom 3D-Printed Mouse",
+    subtitle: "ICCPS 2025 Demo Abstract — Personalized Input Devices",
+    year: "2025",
+    description:
+      "Designed a personalized 3D-printed mouse reducing total weight by 45%, with a 15.1g custom shell and stress-tested 15% infill. Proof of concept for personalized input devices (ACM/IEEE ICCPS 2025).",
+    stats: ["45% lighter", "15.1g shell", "15% infill"],
+    skills: ["3D printing", "CAD", "stress testing", "research"],
+    links: { github: "https://github.com/ryofujimura", paper: "#" },
+    objModels: ["/models/mouse1.obj", "/models/mouse2.obj"] as const,
+  },
 ]
 
 type Project = (typeof allProjects)[0]
@@ -187,6 +200,8 @@ function ProjectBlock({
   const hasDemo = "demo" in project.links && (project.links as { demo?: string }).demo
   const hasAppStore = "appStore" in project.links && (project.links as { appStore?: string }).appStore
   const hasPlayStore = "playStore" in project.links && (project.links as { playStore?: string }).playStore
+  const objModels = "objModels" in project && project.objModels ? project.objModels : null
+  const [objModelIndex, setObjModelIndex] = useState(0)
 
   return (
     <article
@@ -293,6 +308,42 @@ function ProjectBlock({
             </a>
           )}
         </div>
+
+        {/* ASCII OBJ viewer — per Alex Harri / OBJ tutorial */}
+        {objModels && objModels.length > 0 && (
+          <div className="mt-6 sm:mt-8 border-t border-foreground/20 pt-4 sm:pt-6">
+            <p className="font-mono text-[10px] sm:text-xs text-muted-foreground uppercase tracking-wider mb-2 sm:mb-3">
+              ASCII 3D model
+            </p>
+            {objModels.length > 1 && (
+              <div className="flex gap-2 mb-3">
+                {objModels.map((_, i) => (
+                  <button
+                    key={i}
+                    type="button"
+                    onClick={() => setObjModelIndex(i)}
+                    className={cn(
+                      "touch-target min-h-[36px] px-2 sm:px-3 font-mono text-[9px] sm:text-[10px] uppercase border border-foreground/30 transition-colors",
+                      objModelIndex === i
+                        ? "bg-foreground text-background"
+                        : "text-foreground/80 hover:border-foreground/50"
+                    )}
+                  >
+                    Model {i + 1}
+                  </button>
+                ))}
+              </div>
+            )}
+            <AsciiObjRenderer
+              src={objModels[objModelIndex]}
+              cols={72}
+              rows={36}
+              scale={8}
+              subsample={15}
+              className="max-h-[200px] sm:max-h-[260px]"
+            />
+          </div>
+        )}
       </div>
     </article>
   )
