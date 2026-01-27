@@ -74,11 +74,11 @@ export function ExperienceSection() {
   return (
     <section
       id="experience"
-      className="relative py-20 sm:py-24 md:py-32 lg:py-40 px-4 sm:px-6 bg-background overflow-hidden border-y border-foreground"
+      className="relative py-16 sm:py-24 md:py-32 lg:py-40 px-3 sm:px-6 bg-background overflow-hidden border-y border-foreground"
     >
       {/* Brutalist technical chrome */}
       <TechnicalPattern />
-      <div className="pointer-events-none absolute inset-4 opacity-10">
+      <div className="pointer-events-none absolute inset-4 opacity-10 hidden sm:block">
         <TechnicalGrid className="w-full h-full text-foreground" />
       </div>
 
@@ -118,7 +118,7 @@ export function ExperienceSection() {
                 <span className="text-accent font-semibold">throughput, savings, or deltas</span> – not vibes.
               </p>
 
-              <GSAPSVG className="mt-4 w-full h-20 text-foreground/40">
+              <GSAPSVG className="mt-4 hidden w-full h-20 text-foreground/40 sm:block">
                 <svg viewBox="0 0 400 80" className="w-full h-full" fill="none" stroke="currentColor">
                   <line x1="10" y1="70" x2="390" y2="70" strokeWidth="0.75" />
                   {experiences.map((_, i) => {
@@ -197,7 +197,7 @@ export function ExperienceSection() {
           </div>
 
           {/* Detail grid */}
-          <div className="relative border border-foreground bg-card shadow-[6px_6px_0_0_theme(colors.foreground)]">
+          <div className="relative border border-foreground bg-card shadow-none sm:shadow-[6px_6px_0_0_theme(colors.foreground)]">
             <div className="absolute inset-x-0 top-0 h-8 bg-[repeating-linear-gradient(90deg,transparent,transparent_6px,theme(colors.foreground/10)_6px,theme(colors.foreground/10)_8px)] opacity-60 pointer-events-none" />
 
             <div className="relative p-4 sm:p-6 md:p-7 space-y-5 sm:space-y-6">
