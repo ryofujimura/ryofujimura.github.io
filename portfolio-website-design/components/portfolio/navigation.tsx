@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { cn } from "@/lib/utils"
 import { MagneticButton } from "@/components/magnetic-button"
 import { Menu, X } from "lucide-react"
@@ -17,6 +17,10 @@ export function Navigation() {
   const [activeSection, setActiveSection] = useState("")
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const itemRefs = useRef<(HTMLButtonElement | null)[]>([])
+  const [indicatorStyle, setIndicatorStyle] = useState<{ left: number; width: number } | null>(
+    null
+  )
 
   useEffect(() => {
     const handleScroll = () => {
@@ -32,12 +36,39 @@ export function Navigation() {
           break
         }
       }
+
+      // Default to first item when near the very top
+      if (scrollPosition < 120 && !activeSection) {
+        setActiveSection(navItems[0]?.href.replace("#", "") || "")
+      }
     }
 
     window.addEventListener("scroll", handleScroll)
     handleScroll()
     return () => window.removeEventListener("scroll", handleScroll)
-  }, [])
+  }, [activeSection])
+
+  // Update pill position when active section changes or items mount
+  useEffect(() => {
+    if (typeof window === "undefined") return
+    const index =
+      navItems.findIndex((item) => item.href.replace("#", "") === activeSection) ?? -1
+    const fallbackIndex = index === -1 ? 0 : index
+    const el = itemRefs.current[fallbackIndex]
+    if (el) {
+      const rect = el.getBoundingClientRect()
+      const containerRect = el.offsetParent instanceof HTMLElement ? el.offsetParent.getBoundingClientRect() : null
+      const left =
+        containerRect && typeof rect.left === "number" && typeof containerRect.left === "number"
+          ? rect.left - containerRect.left
+          : el.offsetLeft
+
+      setIndicatorStyle({
+        left,
+        width: rect.width || el.offsetWidth,
+      })
+    }
+  }, [activeSection])
 
   const scrollToSection = (href: string) => {
     const element = document.querySelector(href)
@@ -73,22 +104,84 @@ export function Navigation() {
             </MagneticButton>
 
             {/* Desktop navigation */}
-            <div className="hidden md:flex items-center gap-1 p-1.5 rounded-full bg-secondary/50 backdrop-blur-sm border border-border">
+            <div className="hidden md:flex items-center gap-1 p-1.5 rounded-full bg-secondary/50 backdrop-blur-sm border border-border relative overflow-hidden">
+              {/* Animated pill indicator under nav bar */}
+              {indicatorStyle && (
+                <span
+                  className="absolute top-1/2 -translate-y-1/2 h-8 bg-foreground rounded-full -z-10 transition-all duration-300 ease-out"
+                  style={{
+                    left: indicatorStyle.left,
+                    width: indicatorStyle.width,
+                  }}
+                  aria-hidden
+                />
+              )}
               {navItems.map((item) => (
                 <button
                   type="button"
                   key={item.href}
+                  ref={(el) => {
+                    const index = navItems.findIndex((nav) => nav.href === item.href)
+                    if (index !== -1) {
+                      itemRefs.current[index] = el
+                    }
+                  }}
                   onClick={() => scrollToSection(item.href)}
                   className={cn(
-                    "relative px-4 py-2 text-sm font-medium rounded-full transition-all duration-300",
+                    "relative px-4 py-2 text-sm font-medium rounded-full transition-all duration-300 z-10",
                     activeSection === item.href.replace("#", "")
                       ? "text-primary-foreground"
                       : "text-muted-foreground hover:text-foreground"
                   )}
+                  onMouseEnter={() => {
+                    const index = navItems.findIndex((nav) => nav.href === item.href)
+                    const el = itemRefs.current[index]
+                    if (el) {
+                      const rect = el.getBoundingClientRect()
+                      const containerRect =
+                        el.offsetParent instanceof HTMLElement
+                          ? el.offsetParent.getBoundingClientRect()
+                          : null
+                      const left =
+                        containerRect &&
+                        typeof rect.left === "number" &&
+                        typeof containerRect.left === "number"
+                          ? rect.left - containerRect.left
+                          : el.offsetLeft
+
+                      setIndicatorStyle({
+                        left,
+                        width: rect.width || el.offsetWidth,
+                      })
+                    }
+                  }}
+                  onMouseLeave={() => {
+                    // Re-align pill to the active section
+                    const index = navItems.findIndex(
+                      (nav) => nav.href.replace("#", "") === activeSection
+                    )
+                    const fallbackIndex = index === -1 ? 0 : index
+                    const el = itemRefs.current[fallbackIndex]
+                    if (el) {
+                      const rect = el.getBoundingClientRect()
+                      const containerRect =
+                        el.offsetParent instanceof HTMLElement
+                          ? el.offsetParent.getBoundingClientRect()
+                          : null
+                      const left =
+                        containerRect &&
+                        typeof rect.left === "number" &&
+                        typeof containerRect.left === "number"
+                          ? rect.left - containerRect.left
+                          : el.offsetLeft
+
+                      setIndicatorStyle({
+                        left,
+                        width: rect.width || el.offsetWidth,
+                      })
+                    }
+                  }}
                 >
-                  {activeSection === item.href.replace("#", "") && (
-                    <span className="absolute inset-0 bg-primary rounded-full -z-10" />
-                  )}
                   {item.label}
                 </button>
               ))}
@@ -115,11 +208,6 @@ export function Navigation() {
               </button>
             </div>
           </div>
-        </div>
-
-        {/* Slime pill underlay — desktop only */}
-        <div className="pointer-events-none absolute inset-x-0 -bottom-6 flex justify-center hidden md:flex">
-          <div className="slime-pill h-6 w-40 sm:h-7 sm:w-52 bg-foreground/90 dark:bg-black/90" />
         </div>
       </nav>
 
@@ -160,45 +248,6 @@ export function Navigation() {
           </a>
         </div>
       </div>
-
-      <style jsx>{`
-        .slime-pill {
-          border-radius: 999px;
-          filter: blur(8px);
-          opacity: 0.7;
-          box-shadow:
-            0 10px 30px rgba(0, 0, 0, 0.35),
-            0 0 40px rgba(0, 0, 0, 0.4);
-          animation: slimeWobble 6s ease-in-out infinite;
-        }
-
-        @keyframes slimeWobble {
-          0% {
-            transform: scaleX(1) scaleY(1);
-            border-radius: 999px;
-          }
-          20% {
-            transform: scaleX(1.15) scaleY(0.9);
-            border-radius: 60% 40% 70% 30% / 60% 55% 45% 40%;
-          }
-          40% {
-            transform: scaleX(0.9) scaleY(1.1) translateY(1px);
-            border-radius: 45% 55% 40% 60% / 55% 65% 35% 45%;
-          }
-          60% {
-            transform: scaleX(1.1) scaleY(0.95) translateY(-1px);
-            border-radius: 65% 35% 55% 45% / 50% 60% 40% 50%;
-          }
-          80% {
-            transform: scaleX(0.95) scaleY(1.05);
-            border-radius: 55% 45% 60% 40% / 65% 45% 55% 35%;
-          }
-          100% {
-            transform: scaleX(1) scaleY(1);
-            border-radius: 999px;
-          }
-        }
-      `}</style>
     </>
   )
 }
