@@ -16,8 +16,8 @@ interface GSAPTextProps {
   stagger?: number
   duration?: number
   scrub?: boolean
-  /** When true, animate on load with delay only (no ScrollTrigger). For hero sections. */
-  playOnLoad?: boolean
+  /** When true, animate once on mount (no ScrollTrigger). Use for hero/fold content. */
+  runOnceOnMount?: boolean
 }
 
 export function GSAPText({
@@ -28,7 +28,7 @@ export function GSAPText({
   stagger = 0.02,
   duration = 0.8,
   scrub = false,
-  playOnLoad = false,
+  runOnceOnMount = false,
 }: GSAPTextProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const hasAnimated = useRef(false)
@@ -39,7 +39,7 @@ export function GSAPText({
     const container = containerRef.current
     const text = children
 
-    const scrollTriggerConfig = playOnLoad
+    const scrollTriggerConfig = runOnceOnMount
       ? undefined
       : scrub
         ? { trigger: container, start: "top 85%", end: "top 30%", scrub: 1 }
@@ -98,44 +98,43 @@ export function GSAPText({
         ...(scrollTriggerConfig ? { scrollTrigger: scrollTriggerConfig } : {}),
       })
     } else if (variant === "scramble") {
-      const chars = "!<>-_\\/[]{}—=+*^?#_ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+      const randChars = "!<>-_\\/[]{}—=+*^?#_ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
       let iteration = 0
       const originalText = text
 
-      container.textContent = originalText.split("").map(() => chars[Math.floor(Math.random() * chars.length)]).join("")
+      container.textContent = originalText.split("").map(() => randChars[Math.floor(Math.random() * randChars.length)]).join("")
 
       const runScramble = () => {
-        const id = setInterval(() => {
+        const interval = setInterval(() => {
           container.textContent = originalText
             .split("")
             .map((char, index) => {
               if (index < iteration) return char
-              return chars[Math.floor(Math.random() * chars.length)]
+              return randChars[Math.floor(Math.random() * randChars.length)]
             })
             .join("")
-          if (iteration >= originalText.length) clearInterval(id)
+          if (iteration >= originalText.length) clearInterval(interval)
           iteration += 1 / 2
         }, 30)
       }
 
-      if (playOnLoad) {
-        hasAnimated.current = true
-        const t = setTimeout(runScramble, delay * 1000)
-        return () => clearTimeout(t)
+      if (runOnceOnMount) {
+        runScramble()
+      } else {
+        ScrollTrigger.create({
+          trigger: container,
+          start: "top 85%",
+          onEnter: runScramble,
+        })
       }
-      ScrollTrigger.create({
-        trigger: container,
-        start: "top 85%",
-        onEnter: runScramble,
-      })
     }
 
     hasAnimated.current = true
 
     return () => {
-      if (!playOnLoad) ScrollTrigger.getAll().forEach((t) => t.kill())
+      ScrollTrigger.getAll().forEach((trigger) => trigger.kill())
     }
-  }, [children, variant, delay, stagger, duration, scrub, playOnLoad])
+  }, [children, variant, delay, stagger, duration, scrub, runOnceOnMount])
 
   return <div ref={containerRef} className={className} />
 }
@@ -145,9 +144,17 @@ interface GSAPSVGProps {
   className?: string
   duration?: number
   delay?: number
+  /** When true, animate once on mount (no ScrollTrigger). Use for hero/fold. */
+  runOnceOnMount?: boolean
 }
 
-export function GSAPSVG({ children, className = "", duration = 2, delay = 0 }: GSAPSVGProps) {
+export function GSAPSVG({
+  children,
+  className = "",
+  duration = 2,
+  delay = 0,
+  runOnceOnMount = false,
+}: GSAPSVGProps) {
   const svgRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -176,17 +183,21 @@ export function GSAPSVG({ children, className = "", duration = 2, delay = 0 }: G
       delay,
       stagger: 0.1,
       ease: "power2.inOut",
-      scrollTrigger: {
-        trigger: svgRef.current,
-        start: "top 80%",
-        toggleActions: "play none none none",
-      },
+      ...(runOnceOnMount
+        ? {}
+        : {
+            scrollTrigger: {
+              trigger: svgRef.current,
+              start: "top 80%",
+              toggleActions: "play none none none",
+            },
+          }),
     })
 
     return () => {
       ScrollTrigger.getAll().forEach((trigger) => trigger.kill())
     }
-  }, [duration, delay])
+  }, [duration, delay, runOnceOnMount])
 
   return (
     <div ref={svgRef} className={className}>

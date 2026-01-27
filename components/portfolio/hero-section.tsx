@@ -2,173 +2,207 @@
 
 import { useEffect, useRef, useState } from "react"
 import { gsap } from "gsap"
-import { GSAPText } from "@/components/gsap-text"
-import { HeroBrutalistPattern } from "@/components/hero-brutalist-pattern"
-import { HeroAsciiBlock } from "@/components/hero-ascii-block"
+import { ScrollTrigger } from "gsap/ScrollTrigger"
+import { GSAPText, GSAPSVG } from "@/components/gsap-text"
+import { HeroTechnicalPattern } from "@/components/hero-technical-pattern"
 import { MagneticButton } from "@/components/magnetic-button"
-import { ArrowDown, Github, Linkedin, Mail, ArrowRight } from "lucide-react"
+import { ArrowDown, ArrowRight, Mail } from "lucide-react"
 import { LocationHoverText } from "@/components/portfolio/location-hover-text"
 
-const HERO_ASCII_LINES = [
-  "  ┌─────────────────────────────────────────────────────────────────────────────┐",
-  "  │  RF.DV.HERO.001  │  OBSERVATION_LOG  │  CIRCA_2025                            │",
-  "  │  > status: AVAILABLE_FOR_WORK  │  locale: Irvine, CA                          │",
-  "  └─────────────────────────────────────────────────────────────────────────────┘",
-]
+gsap.registerPlugin(ScrollTrigger)
+
+const ASCII_HEADER = `╔══════════════════════════════════════════════════════════════╗
+║  FOLIO.RF  │  2025  │  STATUS: AVAILABLE_FOR_WORK  │  Irvine, CA  ║
+╚══════════════════════════════════════════════════════════════╝`
 
 export function HeroSection() {
-  const containerRef = useRef<HTMLElement>(null)
-  const gridRef = useRef<HTMLDivElement>(null)
-  const contentRef = useRef<HTMLDivElement>(null)
-  const ctaRef = useRef<HTMLDivElement>(null)
-  const scrollCueRef = useRef<HTMLDivElement>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
+  const asciiFrameRef = useRef<HTMLPreElement>(null)
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
   const [isTouch, setIsTouch] = useState(false)
 
   useEffect(() => {
-    setIsTouch(typeof window !== "undefined" && ("ontouchstart" in window || navigator.maxTouchPoints > 0))
+    setIsTouch("ontouchstart" in window || navigator.maxTouchPoints > 0)
   }, [])
 
   useEffect(() => {
-    if (!containerRef.current) return
+    if (isTouch) return
+    const handleMouseMove = (e: MouseEvent) => {
+      setMousePosition({
+        x: (e.clientX / window.innerWidth - 0.5) * 2,
+        y: (e.clientY / window.innerHeight - 0.5) * 2,
+      })
+    }
+    window.addEventListener("mousemove", handleMouseMove)
+    return () => window.removeEventListener("mousemove", handleMouseMove)
+  }, [isTouch])
 
-    const ctx = gsap.context(() => {
-      if (gridRef.current) {
-        gsap.fromTo(gridRef.current, { opacity: 0 }, { opacity: 0.14, duration: 1.4, ease: "power2.out" })
+  // ASCII frame lines animate in on load
+  useEffect(() => {
+    if (!asciiFrameRef.current) return
+    const lines = asciiFrameRef.current.querySelectorAll(".ascii-line")
+    if (lines.length === 0) return
+    gsap.fromTo(
+      lines,
+      { opacity: 0, x: -12 },
+      {
+        opacity: 1,
+        x: 0,
+        duration: 0.5,
+        stagger: 0.06,
+        delay: 0.15,
+        ease: "power2.out",
       }
-      if (contentRef.current) {
-        gsap.fromTo(contentRef.current, { opacity: 0 }, { opacity: 1, duration: 0.6, delay: 0.4 })
-      }
-      if (ctaRef.current) {
-        gsap.fromTo(
-          ctaRef.current.children,
-          { opacity: 0, y: 8 },
-          { opacity: 1, y: 0, duration: 0.5, stagger: 0.06, delay: 2.2, ease: "power2.out" }
-        )
-      }
-      if (scrollCueRef.current) {
-        gsap.fromTo(scrollCueRef.current, { opacity: 0 }, { opacity: 1, duration: 0.8, delay: 2.8 })
-      }
-    }, containerRef)
-
-    return () => ctx.revert()
+    )
   }, [])
+
+  const schematicTilt = !isTouch
+    ? { rotateY: mousePosition.x * 4, rotateX: -mousePosition.y * 4 }
+    : { rotateY: 0, rotateX: 0 }
 
   return (
     <section
       ref={containerRef}
-      className="relative min-h-[100dvh] min-h-screen flex items-center justify-center px-4 sm:px-6 pt-[max(5rem,env(safe-area-inset-top))] pb-8 overflow-hidden"
+      className="relative min-h-[100dvh] min-h-screen flex items-center justify-center px-3 sm:px-6 pt-[max(5rem,env(safe-area-inset-top))] pb-8 overflow-hidden bg-background"
     >
-      {/* Dense brutalist grid — technical lines */}
+      {/* Layer 1: dense technical grid — brutalist base */}
       <div
-        ref={gridRef}
-        className="absolute inset-0 opacity-0 text-foreground"
-        style={{
-          backgroundImage: `
-            linear-gradient(to right, currentColor 1px, transparent 1px),
-            linear-gradient(to bottom, currentColor 1px, transparent 1px)
-          `,
-          backgroundSize: "min(32px, 8vw) min(32px, 8vw)",
-        }}
+        className="absolute inset-0 bg-brutalist-grid opacity-[0.06]"
+        style={{ backgroundSize: "20px 20px" }}
         aria-hidden
       />
 
-      {/* Complex technical pattern — draws on via GSAP inside HeroBrutalistPattern */}
-      <div className="absolute inset-0 pointer-events-none text-foreground/[0.07] dark:text-foreground/[0.12]">
-        <HeroBrutalistPattern className="w-full h-full" />
+      {/* Layer 2: complex technical pattern — isometric lines, crosshairs, dimensions */}
+      <HeroTechnicalPattern />
+
+      {/* Layer 3: corner brackets — technical frame */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        <GSAPSVG
+          className="absolute top-6 left-6 w-14 h-14 text-foreground/25"
+          duration={1}
+          delay={0.4}
+          runOnceOnMount
+        >
+          <svg viewBox="0 0 56 56" fill="none" stroke="currentColor" strokeWidth="1.5">
+            <path d="M0 20V0h20M0 36v20h20" />
+          </svg>
+        </GSAPSVG>
+        <GSAPSVG
+          className="absolute top-6 right-6 w-14 h-14 text-foreground/25"
+          duration={1}
+          delay={0.5}
+          runOnceOnMount
+        >
+          <svg viewBox="0 0 56 56" fill="none" stroke="currentColor" strokeWidth="1.5">
+            <path d="M56 20V0H36M56 36v20H36" />
+          </svg>
+        </GSAPSVG>
+        <GSAPSVG
+          className="absolute bottom-6 left-6 w-14 h-14 text-foreground/25"
+          duration={1}
+          delay={0.6}
+          runOnceOnMount
+        >
+          <svg viewBox="0 0 56 56" fill="none" stroke="currentColor" strokeWidth="1.5">
+            <path d="M0 36v20h20M0 20V0h20" />
+          </svg>
+        </GSAPSVG>
+        <GSAPSVG
+          className="absolute bottom-6 right-6 w-14 h-14 text-foreground/25"
+          duration={1}
+          delay={0.7}
+          runOnceOnMount
+        >
+          <svg viewBox="0 0 56 56" fill="none" stroke="currentColor" strokeWidth="1.5">
+            <path d="M56 36v20H36M56 20V0H36" />
+          </svg>
+        </GSAPSVG>
       </div>
 
-      {/* Main content — ASCII-first brutalist layout */}
-      <div ref={contentRef} className="max-w-4xl mx-auto w-full relative z-10">
-        <div className="grid lg:grid-cols-[1fr,auto] gap-12 lg:gap-16 items-start">
-          <div className="space-y-6 sm:space-y-8">
-            {/* ASCII header block — line-by-line GSAP reveal */}
-            <HeroAsciiBlock
-              lines={HERO_ASCII_LINES}
-              delay={0.6}
-              stagger={0.08}
-              duration={0.4}
-            />
+      {/* Main content — ASCII viewport frame + typography */}
+      <div className="max-w-5xl mx-auto w-full relative z-10">
+        <div className="grid lg:grid-cols-[1fr,minmax(280px,400px)] gap-8 lg:gap-12 items-center">
+          <div className="space-y-3 sm:space-y-5">
+            {/* ASCII header — line-by-line GSAP */}
+            <pre
+              ref={asciiFrameRef}
+              className="font-mono text-[8px] xs:text-[9px] sm:text-[10px] text-muted-foreground/70 overflow-x-auto py-0 touch-manipulation whitespace-pre border border-foreground/10 bg-background/80 px-2 py-1.5"
+              aria-hidden
+            >
+              {ASCII_HEADER.split("\n").map((line, i) => (
+                <span key={i} className="ascii-line block">
+                  {line}
+                </span>
+              ))}
+            </pre>
 
-            {/* Status scramble — terminal flicker */}
+            {/* Role — scramble on load */}
             <GSAPText
               variant="scramble"
-              className="text-[10px] xs:text-xs font-mono uppercase tracking-[0.2em] text-muted-foreground/80"
-              delay={1.0}
-              playOnLoad
+              className="text-[10px] xs:text-xs font-mono uppercase tracking-[0.25em] text-muted-foreground block"
+              delay={0.5}
+              runOnceOnMount
             >
-              status: AVAILABLE_FOR_WORK
+              SOFTWARE ENGINEER & AI RESEARCHER
             </GSAPText>
 
-            {/* Name — brutalist typography, char stagger */}
-            <div className="space-y-0 leading-[0.88] tracking-[-0.04em]">
+            {/* Main title — brutalist lockup, char stagger on load */}
+            <div className="space-y-0 leading-[0.88]">
               <GSAPText
                 variant="chars"
-                className="text-4xl xs:text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black text-foreground font-mono"
-                stagger={0.025}
+                className="text-4xl xs:text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black text-foreground tracking-[-0.04em] font-mono block"
+                stagger={0.028}
                 duration={0.5}
-                delay={1.1}
-                playOnLoad
+                delay={0.35}
+                runOnceOnMount
               >
                 RYO
               </GSAPText>
               <GSAPText
                 variant="chars"
-                className="text-4xl xs:text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black text-foreground font-mono"
-                stagger={0.025}
+                className="text-4xl xs:text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black text-foreground tracking-[-0.04em] font-mono block"
+                stagger={0.028}
                 duration={0.5}
-                delay={1.35}
-                playOnLoad
+                delay={0.55}
+                runOnceOnMount
               >
                 FUJIMURA
               </GSAPText>
             </div>
 
-            {/* Role — words reveal */}
-            <GSAPText
-              variant="words"
-              className="text-xs sm:text-sm font-mono uppercase tracking-[0.25em] sm:tracking-[0.35em] text-muted-foreground"
-              delay={1.7}
-              stagger={0.05}
-              duration={0.4}
-              playOnLoad
-            >
-              Software Engineer & AI Researcher
-            </GSAPText>
-
-            {/* Tagline — single line */}
+            {/* One-line tagline */}
             <GSAPText
               variant="lines"
-              className="text-sm sm:text-base text-muted-foreground/80 max-w-lg font-mono"
-              delay={1.95}
-              duration={0.5}
-              playOnLoad
+              className="text-sm sm:text-base text-muted-foreground max-w-md font-mono"
+              delay={1}
+              runOnceOnMount
             >
-              Building intelligent systems at the intersection of AI research and real-world applications.
+              Building intelligent systems at the intersection of AI and applied research.
             </GSAPText>
 
-            {/* CTAs — stagger in */}
-            <div ref={ctaRef} className="flex flex-col xs:flex-row flex-wrap gap-3 sm:gap-4 pt-2 sm:pt-4">
+            {/* CTAs — brutalist buttons */}
+            <div className="flex flex-wrap gap-3 pt-2 sm:pt-4">
               <MagneticButton
                 as="a"
                 href="#projects"
-                className="touch-target group relative inline-flex items-center justify-center gap-2 sm:gap-3 px-6 sm:px-8 py-3.5 sm:py-4 min-h-[48px] text-sm font-mono uppercase tracking-wider text-primary-foreground bg-primary border-2 border-primary hover:bg-transparent hover:text-primary transition-all duration-300"
+                className="touch-target group inline-flex items-center gap-2 px-5 sm:px-6 py-3 min-h-[48px] text-xs font-mono uppercase tracking-widest text-primary-foreground bg-primary border-2 border-primary hover:bg-transparent hover:text-primary transition-colors"
               >
-                View Work
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform shrink-0" />
+                &gt; view work
+                <ArrowRight className="w-3.5 h-3.5 shrink-0" />
               </MagneticButton>
               <MagneticButton
                 as="a"
                 href="#contact"
-                className="touch-target group inline-flex items-center justify-center gap-2 sm:gap-3 px-6 sm:px-8 py-3.5 sm:py-4 min-h-[48px] text-sm font-mono uppercase tracking-wider text-foreground bg-transparent border-2 border-foreground hover:bg-foreground hover:text-background transition-all duration-300"
+                className="touch-target group inline-flex items-center gap-2 px-5 sm:px-6 py-3 min-h-[48px] text-xs font-mono uppercase tracking-widest text-foreground bg-transparent border-2 border-foreground hover:bg-foreground hover:text-background transition-colors"
               >
-                Contact
-                <ArrowDown className="w-4 h-4 group-hover:translate-y-1 transition-transform shrink-0" />
+                &gt; contact
+                <ArrowDown className="w-3.5 h-3.5 shrink-0" />
               </MagneticButton>
             </div>
 
-            {/* Social + location */}
-            <div className="flex flex-wrap items-center gap-3 sm:gap-6 pt-2">
-              <div className="flex items-center gap-0.5 sm:gap-1">
+            {/* Social + location — compact */}
+            <div className="flex flex-wrap items-center gap-3 pt-1">
+              <div className="flex items-center gap-0.5">
                 {[
                   { href: "https://github.com/ryofujimura", img: "/images/github.png", label: "GitHub" },
                   { href: "https://linkedin.com/in/ryofujimura", img: "/images/linkedin.png", label: "LinkedIn" },
@@ -182,46 +216,85 @@ export function HeroSection() {
                       href={item.href}
                       target={item.href.startsWith("http") ? "_blank" : undefined}
                       rel={item.href.startsWith("http") ? "noopener noreferrer" : undefined}
-                      className="touch-target p-3 min-h-[44px] min-w-[44px] flex items-center justify-center text-muted-foreground hover:text-foreground border border-transparent hover:border-border transition-all"
+                      className="touch-target p-2.5 min-h-[44px] min-w-[44px] flex items-center justify-center text-muted-foreground hover:text-foreground border border-transparent hover:border-border transition-colors"
                     >
                       {"img" in item ? (
-                        <img src={item.img} alt="" className="w-5 h-5 object-contain" width={20} height={20} />
+                        <img src={item.img} alt="" className="w-4 h-4 object-contain" width={16} height={16} />
                       ) : (
-                        Icon && <Icon className="w-5 h-5" />
+                        Icon && <Icon className="w-4 h-4" />
                       )}
                       <span className="sr-only">{item.label}</span>
                     </MagneticButton>
                   )
                 })}
               </div>
-              <div className="w-px h-5 sm:h-6 bg-border shrink-0" />
+              <span className="text-muted-foreground/60 font-mono text-[10px]">|</span>
               <LocationHoverText
                 defaultWords={["Irvine", ", ", "CA"]}
                 hoverWords={["Open", " to", "relocate"]}
-                className="text-[10px] xs:text-xs font-mono text-muted-foreground"
+                className="text-[10px] font-mono text-muted-foreground"
               />
             </div>
           </div>
 
-          {/* Right: technical SVG + profile — desktop */}
-          <div className="hidden lg:block relative w-full max-w-[340px]">
-            <HeroTechnicalFigure />
+          {/* Right: technical schematic + profile — desktop */}
+          <div className="hidden lg:block relative">
+            <div
+              className="relative aspect-square max-w-[340px] mx-auto"
+              style={{
+                transform: `perspective(1000px) rotateY(${schematicTilt.rotateY}deg) rotateX(${schematicTilt.rotateX}deg)`,
+                transition: "transform 0.2s ease-out",
+              }}
+            >
+              {/* Schematic SVG — stroke draw on load */}
+              <GSAPSVG
+                className="absolute inset-0 text-foreground/20"
+                duration={2}
+                delay={0.6}
+                runOnceOnMount
+              >
+                <svg viewBox="0 0 400 400" className="w-full h-full" fill="none" stroke="currentColor" strokeWidth="0.6">
+                  <rect x="80" y="80" width="240" height="240" />
+                  <rect x="100" y="60" width="240" height="240" opacity="0.6" />
+                  <line x1="80" y1="80" x2="100" y2="60" opacity="0.5" />
+                  <line x1="320" y1="80" x2="340" y2="60" opacity="0.5" />
+                  <line x1="80" y1="320" x2="100" y2="300" opacity="0.5" />
+                  <line x1="320" y1="320" x2="340" y2="300" opacity="0.5" />
+                  <circle cx="200" cy="200" r="70" opacity="0.4" />
+                  <line x1="200" y1="130" x2="200" y2="270" opacity="0.35" />
+                  <line x1="130" y1="200" x2="270" y2="200" opacity="0.35" />
+                  <line x1="155" y1="175" x2="245" y2="225" opacity="0.3" />
+                  <line x1="245" y1="175" x2="155" y2="225" opacity="0.3" />
+                </svg>
+              </GSAPSVG>
+
+              {/* Profile — brutalist frame */}
+              <div className="absolute inset-0 flex items-center justify-center p-8">
+                <div className="relative w-36 h-36 sm:w-44 sm:h-44 border-[3px] border-foreground bg-background shadow-[5px_5px_0_0_var(--foreground)] overflow-hidden">
+                  <img
+                    src="/images/profile.jpg"
+                    alt="Ryo Fujimura"
+                    className="w-full h-full object-cover object-top"
+                    width={176}
+                    height={176}
+                  />
+                  <span className="absolute bottom-0.5 right-0.5 font-mono text-[7px] text-foreground/50 bg-background px-0.5">RF</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
       {/* Scroll cue — ASCII */}
-      <div
-        ref={scrollCueRef}
-        className="absolute bottom-4 sm:bottom-8 left-1/2 -translate-x-1/2 pb-[env(safe-area-inset-bottom)] opacity-0"
-      >
-        <div className="flex flex-col items-center gap-2 sm:gap-4">
-          <span className="text-[10px] font-mono uppercase tracking-[0.3em] sm:tracking-[0.4em] text-muted-foreground">
+      <div className="absolute bottom-4 sm:bottom-8 left-1/2 -translate-x-1/2 pb-[env(safe-area-inset-bottom)]">
+        <div className="flex flex-col items-center gap-2">
+          <span className="text-[9px] font-mono uppercase tracking-[0.35em] text-muted-foreground/80">
             &gt; scroll
           </span>
-          <div className="w-px h-10 sm:h-16 bg-foreground/20 relative overflow-hidden">
+          <div className="w-px h-8 sm:h-12 bg-foreground/25 relative overflow-hidden">
             <div
-              className="absolute top-0 left-0 w-full h-6 sm:h-8 bg-foreground"
+              className="absolute top-0 left-0 w-full h-4 bg-foreground/60"
               style={{ animation: "slideDown 2s ease-in-out infinite" }}
             />
           </div>
@@ -231,80 +304,10 @@ export function HeroSection() {
       <style jsx>{`
         @keyframes slideDown {
           0% { transform: translateY(-100%); }
-          50% { transform: translateY(200%); }
-          100% { transform: translateY(200%); }
+          50% { transform: translateY(180%); }
+          100% { transform: translateY(180%); }
         }
       `}</style>
     </section>
-  )
-}
-
-/** Desktop-only technical figure: draw-on SVG + brutalist profile frame */
-function HeroTechnicalFigure() {
-  const svgRef = useRef<SVGSVGElement>(null)
-
-  useEffect(() => {
-    const el = svgRef.current
-    if (!el) return
-
-    const paths = el.querySelectorAll("path, line, circle, polyline")
-    paths.forEach((p) => {
-      const el = p as SVGGeometryElement
-      if (typeof el.getTotalLength === "function") {
-        try {
-          const len = el.getTotalLength()
-          gsap.set(el, { strokeDasharray: len, strokeDashoffset: len })
-        } catch {
-          /* skip */
-        }
-      }
-    })
-
-    gsap.to(paths, {
-      strokeDashoffset: 0,
-      duration: 2.2,
-      stagger: 0.05,
-      delay: 0.8,
-      ease: "power2.inOut",
-    })
-  }, [])
-
-  return (
-    <div className="relative aspect-square">
-      <svg
-        ref={svgRef}
-        viewBox="0 0 400 400"
-        className="absolute inset-0 w-full h-full text-foreground/[0.08] dark:text-foreground/[0.12]"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="0.5"
-      >
-        <circle cx="200" cy="200" r="180" />
-        <circle cx="200" cy="200" r="120" />
-        <circle cx="200" cy="200" r="60" />
-        <line x1="200" y1="20" x2="200" y2="380" />
-        <line x1="20" y1="200" x2="380" y2="200" />
-        <line x1="50" y1="50" x2="350" y2="350" />
-        <line x1="350" y1="50" x2="50" y2="350" />
-        <path d="M 80 80 L 80 40 L 120 40" />
-        <path d="M 320 80 L 320 40 L 280 40" />
-        <path d="M 80 320 L 80 360 L 120 360" />
-        <path d="M 320 320 L 320 360 L 280 360" />
-      </svg>
-      <div className="absolute inset-0 flex items-center justify-center p-8">
-        <div className="relative w-36 h-36 sm:w-44 sm:h-44 border-[3px] border-foreground bg-background shadow-[6px_6px_0_0_var(--foreground)] overflow-hidden">
-          <img
-            src="/images/profile.jpg"
-            alt="Ryo Fujimura"
-            className="w-full h-full object-cover object-top"
-            width={176}
-            height={176}
-          />
-          <span className="absolute bottom-1 right-1 font-mono text-[8px] text-foreground/60 bg-background/90 px-1">
-            RF
-          </span>
-        </div>
-      </div>
-    </div>
   )
 }
