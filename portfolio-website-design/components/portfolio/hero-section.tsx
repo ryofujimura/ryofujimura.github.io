@@ -8,6 +8,7 @@ import { BlueprintLines, TechnicalPattern } from "@/components/technical-grid"
 import { MagneticButton } from "@/components/magnetic-button"
 import { AsciiHeroLine } from "@/components/ascii-banner"
 import { ArrowDown, Github, Linkedin, Mail, ArrowRight } from "lucide-react"
+import { LocationHoverText } from "@/components/portfolio/location-hover-text"
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -17,9 +18,6 @@ export function HeroSection() {
   const [isTouch, setIsTouch] = useState(false)
   const gridRef = useRef<HTMLDivElement>(null)
   const linesRef = useRef<SVGSVGElement>(null)
-  const [cubeRotation, setCubeRotation] = useState({ x: 0, y: 0 })
-  const [isDraggingCube, setIsDraggingCube] = useState(false)
-  const cubeDragStartRef = useRef<{ x: number; y: number } | null>(null)
 
   useEffect(() => {
     setIsTouch("ontouchstart" in window || navigator.maxTouchPoints > 0)
@@ -69,33 +67,6 @@ export function HeroSection() {
 
   const parallax = !isTouch ? { x: mousePosition.x * 5, y: mousePosition.y * 5 } : { x: 0, y: 0 }
   const blueprintMove = !isTouch ? { x: mousePosition.x * -20, y: -50 + mousePosition.y * -20 } : { x: 0, y: -50 }
-
-  const handleCubePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
-    setIsDraggingCube(true)
-    cubeDragStartRef.current = { x: e.clientX, y: e.clientY }
-    e.currentTarget.setPointerCapture(e.pointerId)
-  }
-
-  const handleCubePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
-    if (!isDraggingCube || !cubeDragStartRef.current) return
-    const { x, y } = cubeDragStartRef.current
-    const dx = e.clientX - x
-    const dy = e.clientY - y
-    cubeDragStartRef.current = { x: e.clientX, y: e.clientY }
-
-    setCubeRotation((prev) => ({
-      x: prev.x + dy * 0.4,
-      y: prev.y + dx * 0.4,
-    }))
-  }
-
-  const handleCubePointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
-    if (e.currentTarget.hasPointerCapture(e.pointerId)) {
-      e.currentTarget.releasePointerCapture(e.pointerId)
-    }
-    setIsDraggingCube(false)
-    cubeDragStartRef.current = null
-  }
 
   return (
     <section
@@ -257,66 +228,69 @@ export function HeroSection() {
                 ))}
               </div>
               <div className="w-px h-5 sm:h-6 bg-border shrink-0" />
-              <span className="text-[10px] xs:text-xs font-mono text-muted-foreground">Irvine, CA</span>
+              <LocationHoverText
+                defaultWords={["Irvine", ", ", "CA"]}
+                hoverWords={["Open", " to ", "relocate"]}
+                className="text-[10px] xs:text-xs font-mono text-muted-foreground"
+              />
             </div>
           </div>
 
-          {/* Right column — desktop only, interactive 3D cube */}
+          {/* Right column — desktop only, no 3D on touch */}
           <div className="hidden lg:block relative">
             <div
-              className="relative aspect-square max-w-lg mx-auto cursor-grab active:cursor-grabbing"
+              className="relative aspect-square max-w-lg mx-auto"
               style={{
                 transform: isTouch
-                  ? `perspective(1000px) rotateY(${cubeRotation.y}deg) rotateX(${cubeRotation.x}deg)`
-                  : `perspective(1000px) rotateY(${mousePosition.x * 5 + cubeRotation.y}deg) rotateX(${
-                      -mousePosition.y * 5 + cubeRotation.x
-                    }deg)`,
-                transition: isDraggingCube ? "transform 0s" : "transform 0.3s ease-out",
+                  ? "none"
+                  : `perspective(1000px) rotateY(${mousePosition.x * 5}deg) rotateX(${-mousePosition.y * 5}deg)`,
+                transition: "transform 0.3s ease-out",
               }}
-              onPointerDown={handleCubePointerDown}
-              onPointerMove={handleCubePointerMove}
-              onPointerUp={handleCubePointerUp}
-              onPointerLeave={handleCubePointerUp}
             >
+              {/* Wireframe cube - animated */}
+              <GSAPSVG className="absolute inset-0 text-foreground" duration={2}>
+                <svg viewBox="0 0 400 400" className="w-full h-full" fill="none" stroke="currentColor" strokeWidth="1">
+                  {/* Front face */}
+                  <rect x="100" y="100" width="200" height="200" opacity="0.4" />
+                  {/* Back face */}
+                  <rect x="140" y="60" width="200" height="200" opacity="0.2" />
+                  {/* Connecting lines */}
+                  <line x1="100" y1="100" x2="140" y2="60" opacity="0.3" />
+                  <line x1="300" y1="100" x2="340" y2="60" opacity="0.3" />
+                  <line x1="100" y1="300" x2="140" y2="260" opacity="0.3" />
+                  <line x1="300" y1="300" x2="340" y2="260" opacity="0.3" />
+                </svg>
+              </GSAPSVG>
+
+              {/* Inner technical details */}
+              <GSAPSVG className="absolute inset-0 text-foreground" duration={3} delay={1}>
+                <svg viewBox="0 0 400 400" className="w-full h-full" fill="none" stroke="currentColor" strokeWidth="0.5">
+                  {/* Diagonal cross */}
+                  <line x1="100" y1="100" x2="300" y2="300" opacity="0.2" />
+                  <line x1="300" y1="100" x2="100" y2="300" opacity="0.2" />
+                  {/* Center circle */}
+                  <circle cx="200" cy="200" r="50" opacity="0.3" />
+                  <circle cx="200" cy="200" r="80" opacity="0.2" />
+                  {/* Technical marks */}
+                  <line x1="200" y1="100" x2="200" y2="120" opacity="0.4" />
+                  <line x1="200" y1="280" x2="200" y2="300" opacity="0.4" />
+                  <line x1="100" y1="200" x2="120" y2="200" opacity="0.4" />
+                  <line x1="280" y1="200" x2="300" y2="200" opacity="0.4" />
+                </svg>
+              </GSAPSVG>
+
+              {/* Floating labels */}
+              <div className="absolute top-4 left-4 text-xs font-mono text-muted-foreground/50">
+                <span>x: 200</span>
+              </div>
+              <div className="absolute bottom-4 right-4 text-xs font-mono text-muted-foreground/50">
+                <span>y: 200</span>
+              </div>
+
+              {/* Profile placeholder */}
               <div className="absolute inset-0 flex items-center justify-center">
-                <div
-                  className="relative"
-                  style={{
-                    width: 180,
-                    height: 180,
-                    transformStyle: "preserve-3d",
-                  }}
-                >
-                  {/* Front */}
-                  <div
-                    className="absolute inset-0 border-2 border-foreground bg-background/80"
-                    style={{ transform: "translateZ(90px)" }}
-                  />
-                  {/* Back */}
-                  <div
-                    className="absolute inset-0 border-2 border-foreground/40 bg-background/40"
-                    style={{ transform: "rotateY(180deg) translateZ(90px)" }}
-                  />
-                  {/* Right */}
-                  <div
-                    className="absolute inset-0 border-2 border-foreground/60 bg-background/60"
-                    style={{ transform: "rotateY(90deg) translateZ(90px)" }}
-                  />
-                  {/* Left */}
-                  <div
-                    className="absolute inset-0 border-2 border-foreground/60 bg-background/60"
-                    style={{ transform: "rotateY(-90deg) translateZ(90px)" }}
-                  />
-                  {/* Top */}
-                  <div
-                    className="absolute inset-0 border-2 border-foreground/70 bg-background/70"
-                    style={{ transform: "rotateX(90deg) translateZ(90px)" }}
-                  />
-                  {/* Bottom */}
-                  <div
-                    className="absolute inset-0 border-2 border-foreground/40 bg-background/40"
-                    style={{ transform: "rotateX(-90deg) translateZ(90px)" }}
-                  />
+                <div className="w-32 h-32 border-2 border-foreground/20 flex items-center justify-center bg-background/80">
+                  <span className="text-4xl font-black text-foreground/30">RF</span>
                 </div>
               </div>
             </div>

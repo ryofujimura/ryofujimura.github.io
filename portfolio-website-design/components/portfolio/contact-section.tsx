@@ -6,6 +6,7 @@ import { MagneticButton } from "@/components/magnetic-button"
 import { RevealText } from "@/components/reveal-text"
 import { AsciiSectionHeader } from "@/components/ascii-banner"
 import { Mail, Github, Linkedin, MapPin, ArrowUpRight } from "lucide-react"
+import { LocationHoverText } from "@/components/portfolio/location-hover-text"
 
 const socialLinks = [
   {
@@ -119,7 +120,13 @@ export function ContactSection() {
         <AnimatedSection delay={500}>
           <div className="flex items-center justify-center gap-2 mt-8 sm:mt-12 text-muted-foreground font-mono text-sm">
             <MapPin className="w-4 h-4 shrink-0" />
-            <span>&gt; Irvine, California</span>
+            <span>
+              &gt;{" "}
+              <LocationHoverText
+                defaultWords={["Irvine", ", ", "California"]}
+                hoverWords={["Open", " to ", "relocate"]}
+              />
+            </span>
           </div>
         </AnimatedSection>
       </div>
