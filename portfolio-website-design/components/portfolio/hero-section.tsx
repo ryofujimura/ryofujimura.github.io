@@ -230,7 +230,7 @@ export function HeroSection() {
               <div className="w-px h-5 sm:h-6 bg-border shrink-0" />
               <LocationHoverText
                 defaultWords={["Irvine", ", ", "CA"]}
-                hoverWords={["Open", " to ", "relocate"]}
+                hoverWords={["Open", " to", " relocate"]}
                 className="text-[10px] xs:text-xs font-mono text-muted-foreground"
               />
             </div>

@@ -124,7 +124,7 @@ export function ContactSection() {
               &gt;{" "}
               <LocationHoverText
                 defaultWords={["Irvine", ", ", "California"]}
-                hoverWords={["Open", " to ", "relocate"]}
+                hoverWords={["Open", " to", " relocate"]}
               />
             </span>
           </div>
