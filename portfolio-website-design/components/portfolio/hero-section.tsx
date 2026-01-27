@@ -6,6 +6,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger"
 import { GSAPText, GSAPSVG } from "@/components/gsap-text"
 import { BlueprintLines, TechnicalPattern } from "@/components/technical-grid"
 import { MagneticButton } from "@/components/magnetic-button"
+import { AsciiHeroLine } from "@/components/ascii-banner"
 import { ArrowDown, Github, Linkedin, Mail, ArrowRight } from "lucide-react"
 
 gsap.registerPlugin(ScrollTrigger)
@@ -13,20 +14,25 @@ gsap.registerPlugin(ScrollTrigger)
 export function HeroSection() {
   const containerRef = useRef<HTMLDivElement>(null)
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
+  const [isTouch, setIsTouch] = useState(false)
   const gridRef = useRef<HTMLDivElement>(null)
   const linesRef = useRef<SVGSVGElement>(null)
 
   useEffect(() => {
+    setIsTouch("ontouchstart" in window || navigator.maxTouchPoints > 0)
+  }, [])
+
+  useEffect(() => {
+    if (isTouch) return
     const handleMouseMove = (e: MouseEvent) => {
       setMousePosition({
         x: (e.clientX / window.innerWidth - 0.5) * 2,
         y: (e.clientY / window.innerHeight - 0.5) * 2,
       })
     }
-
     window.addEventListener("mousemove", handleMouseMove)
     return () => window.removeEventListener("mousemove", handleMouseMove)
-  }, [])
+  }, [isTouch])
 
   useEffect(() => {
     if (!containerRef.current) return
@@ -58,12 +64,15 @@ export function HeroSection() {
     }
   }, [])
 
+  const parallax = !isTouch ? { x: mousePosition.x * 5, y: mousePosition.y * 5 } : { x: 0, y: 0 }
+  const blueprintMove = !isTouch ? { x: mousePosition.x * -20, y: -50 + mousePosition.y * -20 } : { x: 0, y: -50 }
+
   return (
     <section
       ref={containerRef}
-      className="relative min-h-screen flex items-center justify-center px-6 pt-20 overflow-hidden"
+      className="relative min-h-[100dvh] min-h-screen flex items-center justify-center px-4 sm:px-6 pt-[max(5rem,env(safe-area-inset-top))] pb-8 overflow-hidden"
     >
-      {/* Technical grid background */}
+      {/* Technical grid — subtle on mobile */}
       <div
         ref={gridRef}
         className="absolute inset-0 opacity-0"
@@ -72,26 +81,26 @@ export function HeroSection() {
             linear-gradient(to right, rgba(0,0,0,0.03) 1px, transparent 1px),
             linear-gradient(to bottom, rgba(0,0,0,0.03) 1px, transparent 1px)
           `,
-          backgroundSize: "60px 60px",
-          transform: `translate(${mousePosition.x * 5}px, ${mousePosition.y * 5}px)`,
+          backgroundSize: "min(60px, 12vw) min(60px, 12vw)",
+          transform: `translate(${parallax.x}px, ${parallax.y}px)`,
           transition: "transform 0.3s ease-out",
         }}
       />
 
-      {/* Blueprint technical drawing - left side */}
+      {/* Blueprint — desktop only to save mobile paint */}
       <div
-        className="absolute left-0 top-1/2 -translate-y-1/2 w-[500px] h-[500px] text-foreground/10 pointer-events-none"
+        className="absolute left-0 top-1/2 -translate-y-1/2 w-[500px] h-[500px] text-foreground/10 pointer-events-none hidden md:block"
         style={{
-          transform: `translate(${mousePosition.x * -20}px, ${-50 + mousePosition.y * -20}%)`,
+          transform: `translate(${blueprintMove.x}px, ${blueprintMove.y}%)`,
           transition: "transform 0.5s ease-out",
         }}
       >
         <BlueprintLines className="w-full h-full" />
       </div>
 
-      {/* Da Vinci Vitruvian inspired SVG - right side */}
+      {/* Vitruvian SVG — desktop only */}
       <GSAPSVG
-        className="absolute right-0 top-1/2 -translate-y-1/2 w-[400px] h-[400px] text-foreground/10 pointer-events-none"
+        className="absolute right-0 top-1/2 -translate-y-1/2 w-[400px] h-[400px] text-foreground/10 pointer-events-none hidden lg:block"
         duration={3}
         delay={1}
       >
@@ -101,7 +110,6 @@ export function HeroSection() {
           <rect x="60" y="60" width="280" height="280" strokeWidth="0.5" />
           <line x1="200" y1="20" x2="200" y2="380" strokeWidth="0.3" />
           <line x1="20" y1="200" x2="380" y2="200" strokeWidth="0.3" />
-          {/* Golden ratio points */}
           <circle cx="200" cy="200" r="3" fill="currentColor" />
           <circle cx="200" cy="76" r="2" fill="currentColor" />
           <circle cx="200" cy="324" r="2" fill="currentColor" />
@@ -112,33 +120,33 @@ export function HeroSection() {
 
       <TechnicalPattern />
 
-      {/* Main content */}
+      {/* Main content — mobile-first, ASCII accent */}
       <div className="max-w-6xl mx-auto w-full relative z-10">
-        <div className="grid lg:grid-cols-2 gap-16 items-center">
-          {/* Left column - Typography */}
-          <div className="space-y-8">
-            {/* Status indicator */}
-            <div className="flex items-center gap-3">
-              <div className="w-2 h-2 bg-accent animate-pulse" />
-              <span className="text-xs font-mono uppercase tracking-[0.3em] text-muted-foreground">
+        <div className="grid lg:grid-cols-2 gap-10 sm:gap-16 items-center">
+          <div className="space-y-4 sm:space-y-6 md:space-y-8">
+            {/* ASCII status line */}
+            <AsciiHeroLine> status: AVAILABLE_FOR_WORK</AsciiHeroLine>
+
+            <div className="flex items-center gap-2 sm:gap-3">
+              <div className="w-2 h-2 bg-accent animate-pulse shrink-0" />
+              <span className="text-[10px] xs:text-xs font-mono uppercase tracking-[0.2em] sm:tracking-[0.3em] text-muted-foreground">
                 Available for Work
               </span>
             </div>
 
-            {/* Role - scramble effect */}
             <GSAPText
               variant="scramble"
-              className="text-sm font-mono uppercase tracking-[0.5em] text-muted-foreground"
+              className="text-xs sm:text-sm font-mono uppercase tracking-[0.3em] sm:tracking-[0.5em] text-muted-foreground"
               delay={0.2}
             >
               Software Engineer & AI Researcher
             </GSAPText>
 
-            {/* Main title - character reveal */}
-            <div className="space-y-2">
+            {/* Main title — responsive scale */}
+            <div className="space-y-0 sm:space-y-2">
               <GSAPText
                 variant="chars"
-                className="text-6xl md:text-7xl lg:text-8xl font-black text-foreground leading-[0.9] tracking-tighter"
+                className="text-4xl xs:text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black text-foreground leading-[0.9] tracking-tighter font-mono"
                 stagger={0.03}
                 duration={0.6}
               >
@@ -146,7 +154,7 @@ export function HeroSection() {
               </GSAPText>
               <GSAPText
                 variant="chars"
-                className="text-6xl md:text-7xl lg:text-8xl font-black text-foreground leading-[0.9] tracking-tighter"
+                className="text-4xl xs:text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black text-foreground leading-[0.9] tracking-tighter font-mono"
                 delay={0.3}
                 stagger={0.03}
                 duration={0.6}
@@ -155,50 +163,48 @@ export function HeroSection() {
               </GSAPText>
             </div>
 
-            {/* Tagline - word reveal */}
             <GSAPText
               variant="words"
-              className="text-xl md:text-2xl text-muted-foreground font-light max-w-md leading-relaxed"
+              className="text-base sm:text-xl md:text-2xl text-muted-foreground font-light max-w-md leading-relaxed"
               delay={0.8}
               stagger={0.08}
             >
               Building intelligent systems at the intersection of AI research and real-world applications
             </GSAPText>
 
-            {/* Da Vinci quote */}
-            <div className="pt-4 border-t border-border">
+            <div className="pt-2 sm:pt-4 border-t border-border">
               <GSAPText
                 variant="lines"
-                className="text-sm text-muted-foreground/60 font-mono italic"
+                className="text-xs sm:text-sm text-muted-foreground/60 font-mono italic"
                 delay={1.2}
               >
-                "Simplicity is the ultimate sophistication." - Leonardo da Vinci
+                &quot;// Simplicity is the ultimate sophistication.&quot; — Leonardo da Vinci
               </GSAPText>
             </div>
 
-            {/* CTAs */}
-            <div className="flex flex-wrap gap-4 pt-6">
+            {/* CTAs — 44px+ touch targets */}
+            <div className="flex flex-col xs:flex-row flex-wrap gap-3 sm:gap-4 pt-4 sm:pt-6">
               <MagneticButton
                 as="a"
                 href="#projects"
-                className="group relative inline-flex items-center gap-3 px-8 py-4 text-sm font-mono uppercase tracking-wider text-primary-foreground bg-primary border-2 border-primary hover:bg-transparent hover:text-primary transition-all duration-300"
+                className="touch-target group relative inline-flex items-center justify-center gap-2 sm:gap-3 px-6 sm:px-8 py-3.5 sm:py-4 min-h-[48px] text-sm font-mono uppercase tracking-wider text-primary-foreground bg-primary border-2 border-primary hover:bg-transparent hover:text-primary transition-all duration-300"
               >
                 View Work
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform shrink-0" />
               </MagneticButton>
               <MagneticButton
                 as="a"
                 href="#contact"
-                className="group inline-flex items-center gap-3 px-8 py-4 text-sm font-mono uppercase tracking-wider text-foreground bg-transparent border-2 border-foreground hover:bg-foreground hover:text-background transition-all duration-300"
+                className="touch-target group inline-flex items-center justify-center gap-2 sm:gap-3 px-6 sm:px-8 py-3.5 sm:py-4 min-h-[48px] text-sm font-mono uppercase tracking-wider text-foreground bg-transparent border-2 border-foreground hover:bg-foreground hover:text-background transition-all duration-300"
               >
                 Contact
-                <ArrowDown className="w-4 h-4 group-hover:translate-y-1 transition-transform" />
+                <ArrowDown className="w-4 h-4 group-hover:translate-y-1 transition-transform shrink-0" />
               </MagneticButton>
             </div>
 
-            {/* Social links */}
-            <div className="flex items-center gap-6 pt-4">
-              <div className="flex items-center gap-1">
+            {/* Social — 44px tap targets */}
+            <div className="flex flex-wrap items-center gap-3 sm:gap-6 pt-2 sm:pt-4">
+              <div className="flex items-center gap-0.5 sm:gap-1">
                 {[
                   { href: "https://github.com/ryofujimura", icon: Github, label: "GitHub" },
                   { href: "https://linkedin.com/in/ryofujimura", icon: Linkedin, label: "LinkedIn" },
@@ -210,24 +216,26 @@ export function HeroSection() {
                     href={href}
                     target={href.startsWith("http") ? "_blank" : undefined}
                     rel={href.startsWith("http") ? "noopener noreferrer" : undefined}
-                    className="p-3 text-muted-foreground hover:text-foreground border border-transparent hover:border-border transition-all"
+                    className="touch-target p-3 min-h-[44px] min-w-[44px] flex items-center justify-center text-muted-foreground hover:text-foreground border border-transparent hover:border-border transition-all"
                   >
                     <Icon className="w-5 h-5" />
                     <span className="sr-only">{label}</span>
                   </MagneticButton>
                 ))}
               </div>
-              <div className="w-px h-6 bg-border" />
-              <span className="text-xs font-mono text-muted-foreground">Irvine, CA</span>
+              <div className="w-px h-5 sm:h-6 bg-border shrink-0" />
+              <span className="text-[10px] xs:text-xs font-mono text-muted-foreground">Irvine, CA</span>
             </div>
           </div>
 
-          {/* Right column - 3D Technical Element */}
+          {/* Right column — desktop only, no 3D on touch */}
           <div className="hidden lg:block relative">
             <div
               className="relative aspect-square max-w-lg mx-auto"
               style={{
-                transform: `perspective(1000px) rotateY(${mousePosition.x * 5}deg) rotateX(${-mousePosition.y * 5}deg)`,
+                transform: isTouch
+                  ? "none"
+                  : `perspective(1000px) rotateY(${mousePosition.x * 5}deg) rotateX(${-mousePosition.y * 5}deg)`,
                 transition: "transform 0.3s ease-out",
               }}
             >
@@ -282,12 +290,14 @@ export function HeroSection() {
         </div>
       </div>
 
-      {/* Scroll indicator */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2">
-        <div className="flex flex-col items-center gap-4">
-          <span className="text-[10px] font-mono uppercase tracking-[0.4em] text-muted-foreground">Scroll</span>
-          <div className="w-px h-16 bg-foreground/20 relative overflow-hidden">
-            <div className="absolute top-0 left-0 w-full h-8 bg-foreground animate-[slideDown_2s_ease-in-out_infinite]" />
+      {/* Scroll — ASCII cue, below fold on small screens */}
+      <div className="absolute bottom-4 sm:bottom-8 left-1/2 -translate-x-1/2 pb-[env(safe-area-inset-bottom)]">
+        <div className="flex flex-col items-center gap-2 sm:gap-4">
+          <span className="text-[10px] font-mono uppercase tracking-[0.3em] sm:tracking-[0.4em] text-muted-foreground">
+            &gt; scroll
+          </span>
+          <div className="w-px h-10 sm:h-16 bg-foreground/20 relative overflow-hidden">
+            <div className="absolute top-0 left-0 w-full h-6 sm:h-8 bg-foreground animate-[slideDown_2s_ease-in-out_infinite]" />
           </div>
         </div>
       </div>

@@ -5,6 +5,7 @@ import { MouseFollowerCard } from "@/components/mouse-follower-card"
 import { ParallaxText } from "@/components/parallax-text"
 import { FloatingElement } from "@/components/floating-element"
 import { Shape3D } from "@/components/geometric-shapes"
+import { AsciiSectionHeader } from "@/components/ascii-banner"
 
 const skills = {
   "Languages": ["Python", "Swift", "Kotlin", "Java", "C++", "TypeScript", "JavaScript"],
@@ -23,9 +24,9 @@ const stats = [
 
 export function AboutSection() {
   return (
-    <section id="about" className="relative py-32 md:py-40 px-6 overflow-hidden">
-      {/* Floating background shapes */}
-      <div className="absolute inset-0 pointer-events-none">
+    <section id="about" className="relative py-20 sm:py-24 md:py-32 lg:py-40 px-4 sm:px-6 overflow-hidden">
+      {/* Floating shapes — hide on small screens to improve mobile perf */}
+      <div className="absolute inset-0 pointer-events-none hidden sm:block">
         <div className="absolute top-20 right-20 opacity-15">
           <FloatingElement amplitude={18} frequency={5500}>
             <Shape3D variant="vitruvian" size={180} />
@@ -36,27 +37,23 @@ export function AboutSection() {
             <Shape3D variant="spiral" size={140} />
           </FloatingElement>
         </div>
-        <div className="absolute top-1/2 right-1/4 opacity-8">
+        <div className="absolute top-1/2 right-1/4 opacity-8 hidden md:block">
           <FloatingElement amplitude={8} frequency={6000} delay={400}>
             <Shape3D variant="cube" size={50} />
           </FloatingElement>
         </div>
       </div>
 
-      {/* Marquee text */}
-      <ParallaxText className="mb-20 -mx-6" speed={0.3} direction="left">
-        <span className="text-8xl md:text-9xl font-bold text-foreground/[0.03] whitespace-nowrap uppercase tracking-tight">
-          Software Engineer & AI Researcher — Software Engineer & AI Researcher —
+      {/* Marquee — lighter on mobile */}
+      <ParallaxText className="mb-12 sm:mb-20 -mx-4 sm:-mx-6" speed={0.3} direction="left">
+        <span className="text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-bold text-foreground/[0.03] whitespace-nowrap uppercase tracking-tight font-mono">
+          &gt;&gt; Engineer — Researcher — &gt;&gt; Engineer — Researcher —
         </span>
       </ParallaxText>
 
       <div className="max-w-6xl mx-auto relative z-10">
         <AnimatedSection>
-          <div className="flex items-center gap-4 mb-16">
-            <span className="text-accent font-mono text-sm">01.</span>
-            <h2 className="text-3xl md:text-4xl font-bold text-foreground">About Me</h2>
-            <div className="flex-1 h-px bg-border ml-4" />
-          </div>
+          <AsciiSectionHeader number="01" title="About Me" />
         </AnimatedSection>
 
         <div className="grid lg:grid-cols-2 gap-16">
@@ -96,18 +93,16 @@ export function AboutSection() {
               </p>
             </AnimatedSection>
 
-            {/* Stats with floating effect */}
+            {/* Stats — 2x2 on mobile, 4 col on desktop */}
             <AnimatedSection delay={400}>
-              <div className="grid grid-cols-4 gap-4 pt-8 border-t border-border">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 pt-6 sm:pt-8 border-t border-border">
                 {stats.map((stat, index) => (
                   <FloatingElement key={stat.label} amplitude={4} frequency={3000 + index * 400} delay={index * 150}>
-                    <div className="text-center group cursor-default">
-                      <div 
-                        className="text-3xl md:text-4xl font-bold text-foreground group-hover:text-accent transition-colors duration-300"
-                      >
+                    <div className="text-center group cursor-default touch-manipulation min-h-[52px] flex flex-col justify-center">
+                      <div className="text-2xl sm:text-3xl md:text-4xl font-bold font-mono text-foreground group-hover:text-accent transition-colors duration-300">
                         {stat.value}
                       </div>
-                      <div className="text-xs text-muted-foreground uppercase tracking-wide mt-1">
+                      <div className="text-[10px] sm:text-xs text-muted-foreground uppercase tracking-wide mt-1 font-mono">
                         {stat.label}
                       </div>
                     </div>
@@ -121,13 +116,14 @@ export function AboutSection() {
           <div className="space-y-6">
             <AnimatedSection delay={400}>
               <MouseFollowerCard glareEffect={true}>
-                <div className="relative p-8 bg-card rounded-2xl border border-border overflow-hidden">
-                  {/* Corner decoration */}
-                  <div className="absolute top-4 right-4 opacity-20">
+                <div className="relative p-5 sm:p-6 md:p-8 bg-card rounded-xl sm:rounded-2xl border border-border overflow-hidden">
+                  <div className="absolute top-4 right-4 opacity-20 hidden sm:block">
                     <Shape3D variant="vitruvian" size={60} />
                   </div>
 
-                  <h3 className="text-xl font-semibold text-foreground mb-8">Technical Expertise</h3>
+                  <h3 className="text-lg sm:text-xl font-semibold font-mono text-foreground mb-6 sm:mb-8">
+                    // Technical Expertise
+                  </h3>
                   <div className="space-y-6">
                     {Object.entries(skills).map(([category, items], categoryIndex) => (
                       <AnimatedSection key={category} delay={500 + categoryIndex * 100}>

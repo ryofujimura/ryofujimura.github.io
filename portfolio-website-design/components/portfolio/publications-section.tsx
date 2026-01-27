@@ -3,6 +3,7 @@
 import { AnimatedSection } from "@/components/animated-section"
 import { MouseFollowerCard } from "@/components/mouse-follower-card"
 import { MagneticButton } from "@/components/magnetic-button"
+import { AsciiSectionHeader } from "@/components/ascii-banner"
 import { FileText, ExternalLink, Award, ArrowUpRight } from "lucide-react"
 
 const publications = [
@@ -28,14 +29,10 @@ const publications = [
 
 export function PublicationsSection() {
   return (
-    <section id="publications" className="py-32 md:py-40 px-6 bg-secondary/30">
+    <section id="publications" className="py-20 sm:py-24 md:py-32 lg:py-40 px-4 sm:px-6 bg-secondary/30">
       <div className="max-w-6xl mx-auto">
         <AnimatedSection>
-          <div className="flex items-center gap-4 mb-16">
-            <span className="text-accent font-mono text-sm">04.</span>
-            <h2 className="text-3xl md:text-4xl font-bold text-foreground">Research & Publications</h2>
-            <div className="flex-1 h-px bg-border ml-4" />
-          </div>
+          <AsciiSectionHeader number="04" title="Research & Publications" />
         </AnimatedSection>
 
         <div className="grid gap-8">
@@ -48,7 +45,7 @@ export function PublicationsSection() {
                   rel="noopener noreferrer"
                   data-cursor="pointer"
                   data-cursor-text="Read"
-                  className="group block p-8 md:p-10 bg-card rounded-2xl border border-border hover:border-accent/30 transition-all duration-500"
+                  className="touch-target group block p-5 sm:p-6 md:p-8 lg:p-10 bg-card rounded-xl sm:rounded-2xl border border-border hover:border-accent/30 transition-all duration-500 min-h-[44px]"
                 >
                   <div className="flex flex-col md:flex-row gap-8">
                     {/* Icon */}

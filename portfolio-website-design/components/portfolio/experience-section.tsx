@@ -5,6 +5,7 @@ import { AnimatedSection } from "@/components/animated-section"
 import { MagneticButton } from "@/components/magnetic-button"
 import { FloatingElement } from "@/components/floating-element"
 import { Shape3D } from "@/components/geometric-shapes"
+import { AsciiSectionHeader } from "@/components/ascii-banner"
 import { ExternalLink } from "lucide-react"
 import { cn } from "@/lib/utils"
 
@@ -74,9 +75,8 @@ export function ExperienceSection() {
   const [activeIndex, setActiveIndex] = useState(0)
 
   return (
-    <section id="experience" className="relative py-32 md:py-40 px-6 bg-secondary/30 overflow-hidden">
-      {/* Floating background shapes */}
-      <div className="absolute inset-0 pointer-events-none">
+    <section id="experience" className="relative py-20 sm:py-24 md:py-32 lg:py-40 px-4 sm:px-6 bg-secondary/30 overflow-hidden">
+      <div className="absolute inset-0 pointer-events-none hidden sm:block">
         <div className="absolute top-16 left-20 opacity-10">
           <FloatingElement amplitude={15} frequency={5000}>
             <Shape3D variant="cube" size={100} />
@@ -87,12 +87,12 @@ export function ExperienceSection() {
             <Shape3D variant="vitruvian" size={160} />
           </FloatingElement>
         </div>
-        <div className="absolute top-1/3 right-1/4 opacity-8">
+        <div className="absolute top-1/3 right-1/4 opacity-8 hidden md:block">
           <FloatingElement amplitude={10} frequency={5500} delay={300}>
             <Shape3D variant="pyramid" size={60} />
           </FloatingElement>
         </div>
-        <div className="absolute bottom-1/3 left-1/3 opacity-10">
+        <div className="absolute bottom-1/3 left-1/3 opacity-10 hidden md:block">
           <FloatingElement amplitude={12} frequency={6000} delay={900}>
             <Shape3D variant="spiral" size={100} />
           </FloatingElement>
@@ -101,11 +101,7 @@ export function ExperienceSection() {
 
       <div className="max-w-6xl mx-auto relative z-10">
         <AnimatedSection>
-          <div className="flex items-center gap-4 mb-8">
-            <span className="text-accent font-mono text-sm">02.</span>
-            <h2 className="text-3xl md:text-4xl font-bold text-foreground">Experience</h2>
-            <div className="flex-1 h-px bg-border ml-4" />
-          </div>
+          <AsciiSectionHeader number="02" title="Experience" />
         </AnimatedSection>
 
         <AnimatedSection delay={50}>
@@ -115,20 +111,20 @@ export function ExperienceSection() {
           </p>
         </AnimatedSection>
 
-        <div className="grid lg:grid-cols-[280px_1fr] gap-8">
-          {/* Tab navigation */}
+        <div className="grid lg:grid-cols-[280px_1fr] gap-6 sm:gap-8">
+          {/* Tabs — horizontal scroll on mobile, 44px tap targets */}
           <AnimatedSection delay={100}>
-            <div className="flex lg:flex-col gap-2 overflow-x-auto lg:overflow-visible pb-4 lg:pb-0 border-b lg:border-b-0 lg:border-r border-border">
+            <div className="flex lg:flex-col gap-2 overflow-x-auto overflow-y-hidden lg:overflow-visible pb-4 lg:pb-0 border-b lg:border-b-0 lg:border-r border-border scrollbar-hide -mx-1 px-1 lg:mx-0 lg:px-0">
               {experiences.map((exp, index) => (
                 <FloatingElement key={exp.company} amplitude={2} frequency={4000 + index * 300} rotateX={0} rotateY={0}>
                   <button
                     type="button"
                     onClick={() => setActiveIndex(index)}
                     className={cn(
-                      "relative px-5 py-4 text-left text-sm font-medium whitespace-nowrap lg:whitespace-normal transition-all duration-300 rounded-lg lg:rounded-l-lg lg:rounded-r-none",
+                      "touch-target min-h-[48px] relative px-4 sm:px-5 py-3.5 sm:py-4 text-left text-sm font-medium font-mono whitespace-nowrap lg:whitespace-normal transition-all duration-300 rounded-lg lg:rounded-l-lg lg:rounded-r-none flex flex-col justify-center",
                       activeIndex === index
                         ? "text-accent bg-accent/10"
-                        : "text-muted-foreground hover:text-foreground hover:bg-secondary"
+                        : "text-muted-foreground hover:text-foreground hover:bg-secondary active:bg-secondary"
                     )}
                   >
                     {activeIndex === index && (

@@ -7,6 +7,7 @@ import { gsap } from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
 import { GSAPText, GSAPSVG } from "@/components/gsap-text"
 import { MagneticButton } from "@/components/magnetic-button"
+import { AsciiSectionHeader } from "@/components/ascii-banner"
 import { ExternalLink, Github, ArrowRight, Eye, ChevronRight } from "lucide-react"
 import { cn } from "@/lib/utils"
 
@@ -71,6 +72,10 @@ function ProjectCard({
   const cardRef = useRef<HTMLDivElement>(null)
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 })
   const [isHovered, setIsHovered] = useState(false)
+  const [isTouch, setIsTouch] = useState(false)
+  useEffect(() => {
+    setIsTouch(typeof window !== "undefined" && ("ontouchstart" in window || navigator.maxTouchPoints > 0))
+  }, [])
 
   useEffect(() => {
     if (!cardRef.current || !isVisible) return
@@ -119,7 +124,7 @@ function ProjectCard({
       <div
         className="relative border-2 border-foreground bg-card overflow-hidden group"
         style={{
-          transform: isHovered
+          transform: !isTouch && isHovered
             ? `rotateY(${mousePos.x * 0.1}deg) rotateX(${-mousePos.y * 0.1}deg) scale(1.01)`
             : "rotateY(0) rotateX(0) scale(1)",
           transition: "transform 0.3s ease-out",
@@ -131,9 +136,8 @@ function ProjectCard({
         <div className="absolute bottom-0 left-0 w-6 h-6 border-t-2 border-r-2 border-foreground/30" />
         <div className="absolute bottom-0 right-0 w-6 h-6 border-t-2 border-l-2 border-foreground/30" />
 
-        <div className="grid lg:grid-cols-2">
-          {/* Left - Technical visualization */}
-          <div className="relative aspect-video lg:aspect-auto lg:h-[450px] bg-secondary/30 overflow-hidden border-r-2 border-foreground">
+        <div className="grid grid-cols-1 lg:grid-cols-2">
+          <div className="relative aspect-video lg:aspect-auto lg:h-[450px] bg-secondary/30 overflow-hidden border-b-2 lg:border-b-0 lg:border-r-2 border-foreground">
             {/* Grid pattern */}
             <div
               className="absolute inset-0"
@@ -181,8 +185,7 @@ function ProjectCard({
             </div>
           </div>
 
-          {/* Right - Content */}
-          <div className="p-8 lg:p-12 flex flex-col justify-center">
+          <div className="p-5 sm:p-6 md:p-8 lg:p-12 flex flex-col justify-center">
             <div className="space-y-6">
               {/* Subtitle */}
               <div className="flex items-center gap-3">
@@ -232,23 +235,22 @@ function ProjectCard({
                 ))}
               </div>
 
-              {/* Links */}
-              <div className="flex items-center gap-4 pt-4">
+              <div className="flex flex-wrap items-center gap-3 sm:gap-4 pt-4">
                 <MagneticButton
                   as="a"
                   href={project.links.github}
-                  className="inline-flex items-center gap-2 px-6 py-3 text-xs font-mono uppercase tracking-wider text-foreground border-2 border-foreground hover:bg-foreground hover:text-background transition-all"
+                  className="touch-target inline-flex items-center justify-center gap-2 min-h-[44px] px-4 sm:px-6 py-2.5 sm:py-3 text-xs font-mono uppercase tracking-wider text-foreground border-2 border-foreground hover:bg-foreground hover:text-background transition-all"
                 >
-                  <Github className="w-4 h-4" />
+                  <Github className="w-4 h-4 shrink-0" />
                   Source
                 </MagneticButton>
                 {project.links.demo && (
                   <MagneticButton
                     as="a"
                     href={project.links.demo}
-                    className="inline-flex items-center gap-2 px-6 py-3 text-xs font-mono uppercase tracking-wider text-background bg-foreground border-2 border-foreground hover:bg-transparent hover:text-foreground transition-all"
+                    className="touch-target inline-flex items-center justify-center gap-2 min-h-[44px] px-4 sm:px-6 py-2.5 sm:py-3 text-xs font-mono uppercase tracking-wider text-background bg-foreground border-2 border-foreground hover:bg-transparent hover:text-foreground transition-all"
                   >
-                    <ExternalLink className="w-4 h-4" />
+                    <ExternalLink className="w-4 h-4 shrink-0" />
                     Demo
                   </MagneticButton>
                 )}
@@ -318,8 +320,7 @@ export function ProjectsSection() {
   }, [displayedProjects.length])
 
   return (
-    <section id="projects" ref={sectionRef} className="relative py-32 md:py-40 px-6 overflow-hidden">
-      {/* Background pattern */}
+    <section id="projects" ref={sectionRef} className="relative py-20 sm:py-24 md:py-32 lg:py-40 px-4 sm:px-6 overflow-hidden">
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
@@ -327,46 +328,29 @@ export function ProjectsSection() {
             linear-gradient(to right, rgba(0,0,0,0.02) 1px, transparent 1px),
             linear-gradient(to bottom, rgba(0,0,0,0.02) 1px, transparent 1px)
           `,
-          backgroundSize: "80px 80px",
+          backgroundSize: "min(80px, 15vw) min(80px, 15vw)",
         }}
       />
-
-      {/* Side technical decoration */}
-      <div className="absolute left-0 top-1/3 w-px h-64 bg-foreground/10" />
-      <div className="absolute right-0 top-1/2 w-px h-48 bg-foreground/10" />
+      <div className="absolute left-0 top-1/3 w-px h-32 sm:h-64 bg-foreground/10 hidden sm:block" />
+      <div className="absolute right-0 top-1/2 w-px h-24 sm:h-48 bg-foreground/10 hidden sm:block" />
 
       <div className="max-w-6xl mx-auto relative z-10">
-        {/* Section header */}
-        <div ref={titleRef} className="mb-20">
-          <div className="flex items-center gap-6 mb-8">
-            <span className="animate-title text-xs font-mono px-3 py-1 border border-foreground text-foreground">
-              003
-            </span>
-            <div className="animate-title flex-1 h-px bg-foreground/20" />
-          </div>
+        <div ref={titleRef} className="mb-12 sm:mb-16 md:mb-20">
+          <AsciiSectionHeader number="03" title="FEATURED WORK" />
 
-          <GSAPText
-            variant="chars"
-            className="text-5xl md:text-6xl lg:text-7xl font-black text-foreground tracking-tighter"
-            stagger={0.02}
-          >
-            FEATURED WORK
-          </GSAPText>
-
-          <div className="mt-8 flex items-start gap-8">
-            <div className="w-16 h-px bg-accent mt-3" />
+          <div className="mt-4 sm:mt-6 md:mt-8 flex flex-col sm:flex-row items-start gap-4 sm:gap-8">
+            <div className="w-12 sm:w-16 h-px bg-accent mt-2 sm:mt-3 shrink-0" />
             <GSAPText
               variant="words"
-              className="text-lg text-muted-foreground max-w-xl"
+              className="text-base sm:text-lg text-muted-foreground max-w-xl font-mono"
               delay={0.5}
             >
-              A selection of projects showcasing expertise in AI, mobile development, and full-stack engineering
+              &gt; A selection of projects — AI, mobile, full-stack
             </GSAPText>
           </div>
         </div>
 
-        {/* Projects list */}
-        <div className="space-y-16">
+        <div className="space-y-10 sm:space-y-16">
           {displayedProjects.map((project, index) => (
             <div
               key={project.title}
@@ -383,16 +367,15 @@ export function ProjectsSection() {
           ))}
         </div>
 
-        {/* View more button */}
         {!showAll && allProjects.length > 3 && (
-          <div className="flex justify-center mt-20">
+          <div className="flex justify-center mt-12 sm:mt-20">
             <MagneticButton
               onClick={() => setShowAll(true)}
-              className="group relative inline-flex items-center gap-4 px-12 py-5 text-sm font-mono uppercase tracking-wider text-foreground border-2 border-foreground hover:bg-foreground hover:text-background transition-all duration-300"
+              className="touch-target group relative inline-flex items-center justify-center gap-2 sm:gap-4 px-6 sm:px-12 py-4 sm:py-5 min-h-[48px] text-sm font-mono uppercase tracking-wider text-foreground border-2 border-foreground hover:bg-foreground hover:text-background transition-all duration-300"
             >
-              <Eye className="w-5 h-5" />
+              <Eye className="w-5 h-5 shrink-0" />
               View All Projects
-              <ChevronRight className="w-5 h-5 group-hover:translate-x-2 transition-transform" />
+              <ChevronRight className="w-5 h-5 group-hover:translate-x-2 transition-transform shrink-0" />
             </MagneticButton>
           </div>
         )}
