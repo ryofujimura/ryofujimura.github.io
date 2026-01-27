@@ -8,6 +8,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger"
 import { GSAPText, GSAPSVG } from "@/components/gsap-text"
 import { MagneticButton } from "@/components/magnetic-button"
 import { AsciiSectionHeader } from "@/components/ascii-banner"
+import { LeonardoNotebook, TechnicalDrawing, SpecAnnotation } from "@/components/leonardo-notebook"
 import { ExternalLink, Github, ArrowRight, Eye, ChevronRight } from "lucide-react"
 import { cn } from "@/lib/utils"
 
@@ -211,24 +212,85 @@ function ProjectCard({
                   <div
                     key={key}
                     className={cn(
-                      "p-4 text-center",
+                      "p-3 sm:p-4 text-center",
                       i < 2 && "border-r-2 border-foreground"
                     )}
                   >
-                    <div className="text-2xl font-black text-foreground">{value}</div>
-                    <div className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground mt-1">
+                    <div className="text-xl sm:text-2xl font-black text-foreground font-mono">{value}</div>
+                    <div className="text-[9px] sm:text-[10px] font-mono uppercase tracking-wider text-muted-foreground mt-1">
                       {key}
                     </div>
                   </div>
                 ))}
               </div>
 
+              {/* Leonardo notebook: Project spec sheet */}
+              <div className="mt-4 sm:mt-6">
+                <LeonardoNotebook folioRef={`RF.DV.PROJ.${project.number}`} date={project.year} className="p-3 sm:p-4">
+                  <TechnicalDrawing
+                    title={`SYSTEM: ${project.title}`}
+                    asciiArt={project.number === "001" 
+                      ? `  ╭───────────╮
+ ╱  EMAIL     ╲
+│   INPUT      │
+│      │       │
+│      ▼       │
+│   AI ENGINE  │
+│   (95% ACC)  │
+│      │       │
+│      ▼       │
+│   PRIORITY   │
+│   OUTPUT     │
+ ╲           ╱
+  ╰─────────╯`
+                      : project.number === "002"
+                      ? `  ╭───────╮
+ ╱  USER  ╲
+│   CART   │
+│    │     │
+│    ▼     │
+│  FIREBASE│
+│    │     │
+│    ▼     │
+│  ORDER   │
+ ╲       ╱
+  ╰─────╯`
+                      : project.number === "003"
+                      ? `  ╭─────────╮
+ ╱  DEVICE ╲
+│   LOC     │
+│    │      │
+│    ▼      │
+│  RTDB     │
+│  SYNC     │
+│  <100ms   │
+ ╲        ╱
+  ╰──────╯`
+                      : `  ╭───────╮
+ ╱  ROBOT ╲
+│   SENSOR │
+│    │     │
+│    ▼     │
+│   SLAM   │
+│   LOCAL  │
+│   SUB-M  │
+ ╲       ╱
+  ╰─────╯`}
+                    measurements={Object.entries(project.stats).map(([key, value]) => ({
+                      label: key.charAt(0).toUpperCase() + key.slice(1),
+                      value: value.toString(),
+                    }))}
+                    notes={project.subtitle}
+                  />
+                </LeonardoNotebook>
+              </div>
+
               {/* Skills */}
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-2 mt-4 sm:mt-6">
                 {project.skills.map((skill) => (
                   <span
                     key={skill}
-                    className="px-3 py-1 text-xs font-mono text-foreground border border-foreground/30 hover:bg-foreground hover:text-background transition-colors cursor-default"
+                    className="px-2 sm:px-3 py-1 text-[10px] sm:text-xs font-mono text-foreground border border-foreground/30 hover:bg-foreground hover:text-background transition-colors cursor-default touch-manipulation"
                   >
                     {skill}
                   </span>

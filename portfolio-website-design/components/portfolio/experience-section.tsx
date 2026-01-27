@@ -6,6 +6,7 @@ import { MagneticButton } from "@/components/magnetic-button"
 import { FloatingElement } from "@/components/floating-element"
 import { Shape3D } from "@/components/geometric-shapes"
 import { AsciiSectionHeader } from "@/components/ascii-banner"
+import { LeonardoNotebook, TechnicalDrawing } from "@/components/leonardo-notebook"
 import { ExternalLink } from "lucide-react"
 import { cn } from "@/lib/utils"
 
@@ -201,12 +202,27 @@ export function ExperienceSection() {
                             rotateY={0}
                           >
                             <span
-                              className="px-3 py-1.5 text-sm font-medium text-accent bg-accent/10 rounded-full border border-accent/20 hover:bg-accent/20 transition-colors"
+                              className="px-2 sm:px-3 py-1 sm:py-1.5 text-[10px] sm:text-sm font-medium text-accent bg-accent/10 rounded-full border border-accent/20 hover:bg-accent/20 transition-colors touch-manipulation"
                             >
                               {skill}
                             </span>
                           </FloatingElement>
                         ))}
+                      </div>
+
+                      <div className="mt-6 sm:mt-8">
+                        <LeonardoNotebook folioRef={`RF.DV.EXP.${exp.company.slice(0, 6).toUpperCase()}`} date={exp.period.slice(-4)} className="p-3 sm:p-4">
+                          <TechnicalDrawing
+                            title={`ROLE: ${exp.title.toUpperCase()}`}
+                            asciiArt={`  ╭─────────────╮\n ╱  ${exp.company.slice(0, 12).padEnd(12)} ╲\n│   ROLE        │\n│   ${exp.title.slice(0, 14).padEnd(14)} │\n│               │\n│   SKILLS:     │\n│   ${exp.skills.slice(0, 3).join(", ").slice(0, 20).padEnd(20)} │\n ╲               ╱\n  ╰─────────────╯`}
+                            measurements={[
+                              { label: "Period", value: exp.period, unit: "" },
+                              { label: "Highlights", value: String(exp.highlights.length), unit: " items" },
+                              { label: "Skills", value: String(exp.skills.length), unit: "" },
+                            ]}
+                            notes={exp.description.slice(0, 80) + (exp.description.length > 80 ? "…" : "")}
+                          />
+                        </LeonardoNotebook>
                       </div>
                     </div>
                   )}

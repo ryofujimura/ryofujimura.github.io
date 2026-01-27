@@ -120,11 +120,14 @@ export function HeroSection() {
 
       <TechnicalPattern />
 
-      {/* Main content — mobile-first, ASCII accent */}
+      {/* Main content — mobile-first, Leonardo + ASCII accent */}
       <div className="max-w-6xl mx-auto w-full relative z-10">
         <div className="grid lg:grid-cols-2 gap-10 sm:gap-16 items-center">
           <div className="space-y-4 sm:space-y-6 md:space-y-8">
-            {/* ASCII status line */}
+            {/* Leonardo folio header */}
+            <pre className="font-mono text-[8px] xs:text-[9px] sm:text-[10px] text-muted-foreground/60 overflow-x-auto py-0.5 touch-manipulation" aria-hidden>
+              FOLIO: RF.DV.HERO.001 — OBSERVATION LOG & CONCEPTUAL SKETCHES — CIRCA 2025
+            </pre>
             <AsciiHeroLine> status: AVAILABLE_FOR_WORK</AsciiHeroLine>
 
             <div className="flex items-center gap-2 sm:gap-3">

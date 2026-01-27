@@ -6,6 +6,7 @@ import { ParallaxText } from "@/components/parallax-text"
 import { FloatingElement } from "@/components/floating-element"
 import { Shape3D } from "@/components/geometric-shapes"
 import { AsciiSectionHeader } from "@/components/ascii-banner"
+import { LeonardoNotebook, TechnicalDrawing, SpecAnnotation } from "@/components/leonardo-notebook"
 
 const skills = {
   "Languages": ["Python", "Swift", "Kotlin", "Java", "C++", "TypeScript", "JavaScript"],
@@ -56,9 +57,9 @@ export function AboutSection() {
           <AsciiSectionHeader number="01" title="About Me" />
         </AnimatedSection>
 
-        <div className="grid lg:grid-cols-2 gap-16">
+        <div className="grid lg:grid-cols-2 gap-8 sm:gap-12 lg:gap-16">
           {/* Left column - Bio */}
-          <div className="space-y-8">
+          <div className="space-y-6 sm:space-y-8">
             <AnimatedSection delay={100}>
               <p className="text-xl md:text-2xl text-foreground leading-relaxed font-light">
                 I build intelligent systems that bridge{" "}
@@ -110,10 +111,45 @@ export function AboutSection() {
                 ))}
               </div>
             </AnimatedSection>
+
+            {/* Leonardo notebook: Technical spec sheet */}
+            <AnimatedSection delay={500}>
+              <LeonardoNotebook folioRef="RF.DV.ABOUT.001" date="2025">
+                <TechnicalDrawing
+                  title="SYSTEM ARCHITECTURE: AI RESEARCH → PRODUCTION"
+                  asciiArt={`    ╭─────────────╮
+   ╱               ╲
+  │   RESEARCH      │
+  │   (PyTorch)     │
+  │                 │
+  │      │          │
+  │      ▼          │
+  │   OPTIMIZE      │
+  │   (Quantize)    │
+  │      │          │
+  │      ▼          │
+  │   DEPLOY        │
+  │   (CoreML)      │
+   ╲               ╱
+    ╰─────────────╯
+         │
+         ▼
+    ┌─────────┐
+    │  USERS  │
+    └─────────┘`}
+                  measurements={[
+                    { label: "Latency Reduction", value: "40%", unit: "" },
+                    { label: "Model Size", value: "3GB", unit: "saved" },
+                    { label: "Accuracy", value: "95%", unit: "" },
+                  ]}
+                  notes="Hybrid inference pipeline: research models optimized for edge deployment"
+                />
+              </LeonardoNotebook>
+            </AnimatedSection>
           </div>
 
-          {/* Right column - Skills */}
-          <div className="space-y-6">
+          {/* Right column - Skills + Leonardo notebook */}
+          <div className="space-y-6 sm:space-y-8">
             <AnimatedSection delay={400}>
               <MouseFollowerCard glareEffect={true}>
                 <div className="relative p-5 sm:p-6 md:p-8 bg-card rounded-xl sm:rounded-2xl border border-border overflow-hidden">
@@ -154,6 +190,38 @@ export function AboutSection() {
                   </div>
                 </div>
               </MouseFollowerCard>
+            </AnimatedSection>
+
+            {/* Leonardo notebook: Geometric study */}
+            <AnimatedSection delay={600}>
+              <LeonardoNotebook folioRef="RF.DV.SKILLS.002" date="2025">
+                <div className="space-y-4">
+                  <div className="font-mono text-[10px] xs:text-xs sm:text-sm text-foreground/90 font-semibold border-b border-foreground/20 pb-1">
+                    GEOMETRIC STUDY: TECH STACK PROPORTIONS
+                  </div>
+                  <div className="bg-secondary/20 p-3 sm:p-4 border border-foreground/10">
+                    <pre className="font-mono text-[8px] xs:text-[9px] sm:text-[10px] text-foreground/80 whitespace-pre overflow-x-auto touch-manipulation">
+{`     ╭─────╮
+    ╱   AI   ╲
+   │   /ML   │
+   │  ╱  ╲   │
+   │ ╱    ╲  │
+   ││ MOBILE ││
+   │ ╲    ╱  │
+   │  ╲  ╱   │
+   │   BACKEND│
+    ╲       ╱
+     ╰─────╯`}
+                    </pre>
+                  </div>
+                  <div className="space-y-1.5 sm:space-y-2">
+                    <SpecAnnotation label="AI/ML Ratio" value="35%" notes="PyTorch, Transformers, CoreML" />
+                    <SpecAnnotation label="Mobile Ratio" value="30%" notes="iOS, Android, SwiftUI" />
+                    <SpecAnnotation label="Backend Ratio" value="25%" notes="Firebase, Node.js, APIs" />
+                    <SpecAnnotation label="Tools Ratio" value="10%" notes="Git, Docker, CUDA" />
+                  </div>
+                </div>
+              </LeonardoNotebook>
             </AnimatedSection>
           </div>
         </div>
