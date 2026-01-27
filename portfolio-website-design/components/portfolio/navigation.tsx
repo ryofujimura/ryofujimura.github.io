@@ -133,54 +133,6 @@ export function Navigation() {
                       ? "text-primary-foreground"
                       : "text-muted-foreground hover:text-foreground"
                   )}
-                  onMouseEnter={() => {
-                    const index = navItems.findIndex((nav) => nav.href === item.href)
-                    const el = itemRefs.current[index]
-                    if (el) {
-                      const rect = el.getBoundingClientRect()
-                      const containerRect =
-                        el.offsetParent instanceof HTMLElement
-                          ? el.offsetParent.getBoundingClientRect()
-                          : null
-                      const left =
-                        containerRect &&
-                        typeof rect.left === "number" &&
-                        typeof containerRect.left === "number"
-                          ? rect.left - containerRect.left
-                          : el.offsetLeft
-
-                      setIndicatorStyle({
-                        left,
-                        width: rect.width || el.offsetWidth,
-                      })
-                    }
-                  }}
-                  onMouseLeave={() => {
-                    // Re-align pill to the active section
-                    const index = navItems.findIndex(
-                      (nav) => nav.href.replace("#", "") === activeSection
-                    )
-                    const fallbackIndex = index === -1 ? 0 : index
-                    const el = itemRefs.current[fallbackIndex]
-                    if (el) {
-                      const rect = el.getBoundingClientRect()
-                      const containerRect =
-                        el.offsetParent instanceof HTMLElement
-                          ? el.offsetParent.getBoundingClientRect()
-                          : null
-                      const left =
-                        containerRect &&
-                        typeof rect.left === "number" &&
-                        typeof containerRect.left === "number"
-                          ? rect.left - containerRect.left
-                          : el.offsetLeft
-
-                      setIndicatorStyle({
-                        left,
-                        width: rect.width || el.offsetWidth,
-                      })
-                    }
-                  }}
                 >
                   {item.label}
                 </button>
