@@ -5,13 +5,25 @@ import { gsap } from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
 import { ExternalLink, Github, ChevronDown } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { AsciiObjRenderer } from "@/components/ascii-obj-renderer"
+import { AsciiObjSplitView } from "@/components/ascii-obj-split-view"
 
 gsap.registerPlugin(ScrollTrigger)
 
 const INITIAL_VISIBLE = 4
 
-const allProjects = [
+type Project = {
+  id: string
+  title: string
+  subtitle: string
+  year: string
+  description: string
+  stats: string[]
+  skills: string[]
+  links: Record<string, string>
+  objViewer?: { urls: string[] }
+}
+
+const allProjects: Project[] = [
   {
     id: "01",
     title: "Saboriendo Bakery Platform",
@@ -147,18 +159,21 @@ const allProjects = [
   {
     id: "13",
     title: "Custom 3D-Printed Mouse",
-    subtitle: "ICCPS 2025 Demo Abstract — Personalized Input Devices",
+    subtitle: "ICCPS 2025",
     year: "2025",
     description:
-      "Designed a personalized 3D-printed mouse reducing total weight by 45%, with a 15.1g custom shell and stress-tested 15% infill. Proof of concept for personalized input devices (ACM/IEEE ICCPS 2025).",
-    stats: ["45% lighter", "15.1g shell", "15% infill"],
-    skills: ["3D printing", "CAD", "stress testing", "research"],
-    links: { github: "https://github.com/ryofujimura", paper: "#" },
-    objModels: ["/models/mouse1.obj", "/models/mouse2.obj"] as const,
+      "Ergonomic 3D-printed mouse designs. OBJ models for mouse1 and mouse2 — interactive ASCII split view (original vs. character-based rendering) per Alex Harri’s shape-aware technique.",
+    stats: ["OBJ viewer", "ASCII split view", "ICCPS 2025"],
+    skills: ["Three.js", "OBJ", "ASCII rendering"],
+    links: { github: "https://github.com/ryofujimura", demo: "#" },
+    objViewer: { urls: ["/models/mouse1.obj", "/models/mouse2.obj"] },
   },
 ]
 
-type Project = (typeof allProjects)[0]
+function projectLabelFromUrl(url: string): string {
+  const name = url.split("/").pop()?.replace(/\.obj$/i, "") ?? "model"
+  return name
+}
 
 function ProjectBlock({
   project,
@@ -170,6 +185,9 @@ function ProjectBlock({
   totalVisible: number
 }) {
   const blockRef = useRef<HTMLDivElement>(null)
+  const urls = project.objViewer?.urls ?? []
+  const [objIndex, setObjIndex] = useState(0)
+  const selectedUrl = urls[objIndex] ?? urls[0]
 
   useEffect(() => {
     const el = blockRef.current
@@ -200,8 +218,6 @@ function ProjectBlock({
   const hasDemo = "demo" in project.links && (project.links as { demo?: string }).demo
   const hasAppStore = "appStore" in project.links && (project.links as { appStore?: string }).appStore
   const hasPlayStore = "playStore" in project.links && (project.links as { playStore?: string }).playStore
-  const objModels = "objModels" in project && project.objModels ? project.objModels : null
-  const [objModelIndex, setObjModelIndex] = useState(0)
 
   return (
     <article
@@ -263,6 +279,40 @@ function ProjectBlock({
           ))}
         </div>
 
+        {/* OBJ + ASCII split view (Alex Harri–style) */}
+        {urls.length > 0 && (
+          <div className="mt-4 sm:mt-5">
+            {urls.length > 1 && (
+              <div className="flex flex-wrap gap-1 sm:gap-2 mb-2">
+                {urls.map((url, i) => (
+                  <button
+                    key={url}
+                    type="button"
+                    onClick={() => setObjIndex(i)}
+                    className={cn(
+                      "touch-target min-h-[44px] font-mono text-[10px] sm:text-xs uppercase tracking-wider px-2.5 py-1.5 sm:px-3 sm:py-2 border-2 transition-colors",
+                      i === objIndex
+                        ? "border-foreground bg-foreground text-background"
+                        : "border-foreground/50 text-foreground hover:border-foreground"
+                    )}
+                  >
+                    {projectLabelFromUrl(url)}
+                  </button>
+                ))}
+              </div>
+            )}
+            <AsciiObjSplitView
+              objUrl={selectedUrl}
+              className="rounded-none"
+              asciiCols={72}
+              asciiRows={36}
+              sampleQuality={2}
+              renderWidth={320}
+              renderHeight={240}
+            />
+          </div>
+        )}
+
         {/* Links — 44px touch targets */}
         <div className="flex flex-wrap gap-2 sm:gap-3 mt-4 sm:mt-5">
           {hasGithub && (
@@ -308,42 +358,6 @@ function ProjectBlock({
             </a>
           )}
         </div>
-
-        {/* ASCII OBJ viewer — per Alex Harri / OBJ tutorial */}
-        {objModels && objModels.length > 0 && (
-          <div className="mt-6 sm:mt-8 border-t border-foreground/20 pt-4 sm:pt-6">
-            <p className="font-mono text-[10px] sm:text-xs text-muted-foreground uppercase tracking-wider mb-2 sm:mb-3">
-              ASCII 3D model
-            </p>
-            {objModels.length > 1 && (
-              <div className="flex gap-2 mb-3">
-                {objModels.map((_, i) => (
-                  <button
-                    key={i}
-                    type="button"
-                    onClick={() => setObjModelIndex(i)}
-                    className={cn(
-                      "touch-target min-h-[36px] px-2 sm:px-3 font-mono text-[9px] sm:text-[10px] uppercase border border-foreground/30 transition-colors",
-                      objModelIndex === i
-                        ? "bg-foreground text-background"
-                        : "text-foreground/80 hover:border-foreground/50"
-                    )}
-                  >
-                    Model {i + 1}
-                  </button>
-                ))}
-              </div>
-            )}
-            <AsciiObjRenderer
-              src={objModels[objModelIndex]}
-              cols={72}
-              rows={36}
-              scale={8}
-              subsample={15}
-              className="max-h-[200px] sm:max-h-[260px]"
-            />
-          </div>
-        )}
       </div>
     </article>
   )
