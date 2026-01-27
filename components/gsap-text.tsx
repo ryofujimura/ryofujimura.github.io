@@ -16,8 +16,8 @@ interface GSAPTextProps {
   stagger?: number
   duration?: number
   scrub?: boolean
-  /** When true, animate once on mount (no ScrollTrigger). Use for hero/fold content. */
-  runOnceOnMount?: boolean
+  /** Run on mount (no ScrollTrigger). Use for hero / above-fold content. */
+  immediate?: boolean
 }
 
 export function GSAPText({
@@ -28,7 +28,7 @@ export function GSAPText({
   stagger = 0.02,
   duration = 0.8,
   scrub = false,
-  runOnceOnMount = false,
+  immediate = false,
 }: GSAPTextProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const hasAnimated = useRef(false)
@@ -38,12 +38,6 @@ export function GSAPText({
 
     const container = containerRef.current
     const text = children
-
-    const scrollTriggerConfig = runOnceOnMount
-      ? undefined
-      : scrub
-        ? { trigger: container, start: "top 85%", end: "top 30%", scrub: 1 }
-        : { trigger: container, start: "top 85%", toggleActions: "play none none none" }
 
     if (variant === "chars") {
       container.innerHTML = text
@@ -64,7 +58,22 @@ export function GSAPText({
         stagger,
         delay,
         ease: "power4.out",
-        ...(scrollTriggerConfig ? { scrollTrigger: scrollTriggerConfig } : {}),
+        ...(immediate
+          ? {}
+          : {
+              scrollTrigger: scrub
+                ? {
+                    trigger: container,
+                    start: "top 85%",
+                    end: "top 30%",
+                    scrub: 1,
+                  }
+                : {
+                    trigger: container,
+                    start: "top 85%",
+                    toggleActions: "play none none none",
+                  },
+            }),
       })
     } else if (variant === "words") {
       container.innerHTML = text
@@ -83,7 +92,22 @@ export function GSAPText({
         stagger: stagger * 3,
         delay,
         ease: "power4.out",
-        ...(scrollTriggerConfig ? { scrollTrigger: scrollTriggerConfig } : {}),
+        ...(immediate
+          ? {}
+          : {
+              scrollTrigger: scrub
+                ? {
+                    trigger: container,
+                    start: "top 85%",
+                    end: "top 30%",
+                    scrub: 1,
+                  }
+                : {
+                    trigger: container,
+                    start: "top 85%",
+                    toggleActions: "play none none none",
+                  },
+            }),
       })
     } else if (variant === "lines") {
       container.innerHTML = `<span class="block overflow-hidden"><span class="block translate-y-full">${text}</span></span>`
@@ -95,38 +119,51 @@ export function GSAPText({
         duration,
         delay,
         ease: "power4.out",
-        ...(scrollTriggerConfig ? { scrollTrigger: scrollTriggerConfig } : {}),
+        ...(immediate ? {} : { scrollTrigger: { trigger: container, start: "top 85%", toggleActions: "play none none none" } }),
       })
     } else if (variant === "scramble") {
-      const randChars = "!<>-_\\/[]{}—=+*^?#_ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+      const chars = "!<>-_\\/[]{}—=+*^?#_ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
       let iteration = 0
       const originalText = text
 
-      container.textContent = originalText.split("").map(() => randChars[Math.floor(Math.random() * randChars.length)]).join("")
+      container.textContent = originalText.split("").map(() => chars[Math.floor(Math.random() * chars.length)]).join("")
 
-      const runScramble = () => {
-        const interval = setInterval(() => {
+      if (immediate) {
+        let it = 0
+        const iv = setInterval(() => {
           container.textContent = originalText
             .split("")
-            .map((char, index) => {
-              if (index < iteration) return char
-              return randChars[Math.floor(Math.random() * randChars.length)]
-            })
+            .map((ch, i) => (i < it ? ch : chars[Math.floor(Math.random() * chars.length)]))
             .join("")
-          if (iteration >= originalText.length) clearInterval(interval)
-          iteration += 1 / 2
+          if (it >= originalText.length) clearInterval(iv)
+          it += 1 / 2
         }, 30)
+        hasAnimated.current = true
+        return () => clearInterval(iv)
       }
+      ScrollTrigger.create({
+        trigger: container,
+        start: "top 85%",
+        onEnter: () => {
+          const interval = setInterval(() => {
+            container.textContent = originalText
+              .split("")
+              .map((char, index) => {
+                if (index < iteration) {
+                  return char
+                }
+                return chars[Math.floor(Math.random() * chars.length)]
+              })
+              .join("")
 
-      if (runOnceOnMount) {
-        runScramble()
-      } else {
-        ScrollTrigger.create({
-          trigger: container,
-          start: "top 85%",
-          onEnter: runScramble,
-        })
-      }
+            if (iteration >= originalText.length) {
+              clearInterval(interval)
+            }
+
+            iteration += 1 / 2
+          }, 30)
+        },
+      })
     }
 
     hasAnimated.current = true
@@ -134,7 +171,7 @@ export function GSAPText({
     return () => {
       ScrollTrigger.getAll().forEach((trigger) => trigger.kill())
     }
-  }, [children, variant, delay, stagger, duration, scrub, runOnceOnMount])
+  }, [children, variant, delay, stagger, duration, scrub, immediate])
 
   return <div ref={containerRef} className={className} />
 }
@@ -144,17 +181,9 @@ interface GSAPSVGProps {
   className?: string
   duration?: number
   delay?: number
-  /** When true, animate once on mount (no ScrollTrigger). Use for hero/fold. */
-  runOnceOnMount?: boolean
 }
 
-export function GSAPSVG({
-  children,
-  className = "",
-  duration = 2,
-  delay = 0,
-  runOnceOnMount = false,
-}: GSAPSVGProps) {
+export function GSAPSVG({ children, className = "", duration = 2, delay = 0 }: GSAPSVGProps) {
   const svgRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -183,21 +212,17 @@ export function GSAPSVG({
       delay,
       stagger: 0.1,
       ease: "power2.inOut",
-      ...(runOnceOnMount
-        ? {}
-        : {
-            scrollTrigger: {
-              trigger: svgRef.current,
-              start: "top 80%",
-              toggleActions: "play none none none",
-            },
-          }),
+      scrollTrigger: {
+        trigger: svgRef.current,
+        start: "top 80%",
+        toggleActions: "play none none none",
+      },
     })
 
     return () => {
       ScrollTrigger.getAll().forEach((trigger) => trigger.kill())
     }
-  }, [duration, delay, runOnceOnMount])
+  }, [duration, delay])
 
   return (
     <div ref={svgRef} className={className}>
