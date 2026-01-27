@@ -3,7 +3,6 @@
 import { useState } from "react"
 import { AnimatedSection } from "@/components/animated-section"
 import { MagneticButton } from "@/components/magnetic-button"
-import { FloatingElement } from "@/components/floating-element"
 import { Shape3D } from "@/components/geometric-shapes"
 import { AsciiSectionHeader } from "@/components/ascii-banner"
 import { LeonardoNotebook, TechnicalDrawing } from "@/components/leonardo-notebook"
@@ -79,24 +78,16 @@ export function ExperienceSection() {
     <section id="experience" className="relative py-20 sm:py-24 md:py-32 lg:py-40 px-4 sm:px-6 bg-secondary/30 overflow-hidden">
       <div className="absolute inset-0 pointer-events-none hidden sm:block">
         <div className="absolute top-16 left-20 opacity-10">
-          <FloatingElement amplitude={15} frequency={5000}>
-            <Shape3D variant="cube" size={100} />
-          </FloatingElement>
+          <Shape3D variant="cube" size={100} />
         </div>
         <div className="absolute bottom-24 right-16 opacity-15">
-          <FloatingElement amplitude={20} frequency={4500} delay={600}>
-            <Shape3D variant="vitruvian" size={160} />
-          </FloatingElement>
+          <Shape3D variant="vitruvian" size={160} />
         </div>
         <div className="absolute top-1/3 right-1/4 opacity-8 hidden md:block">
-          <FloatingElement amplitude={10} frequency={5500} delay={300}>
-            <Shape3D variant="pyramid" size={60} />
-          </FloatingElement>
+          <Shape3D variant="pyramid" size={60} />
         </div>
         <div className="absolute bottom-1/3 left-1/3 opacity-10 hidden md:block">
-          <FloatingElement amplitude={12} frequency={6000} delay={900}>
-            <Shape3D variant="spiral" size={100} />
-          </FloatingElement>
+          <Shape3D variant="spiral" size={100} />
         </div>
       </div>
 
@@ -117,24 +108,23 @@ export function ExperienceSection() {
           <AnimatedSection delay={100}>
             <div className="flex lg:flex-col gap-2 overflow-x-auto overflow-y-hidden lg:overflow-visible pb-4 lg:pb-0 border-b lg:border-b-0 lg:border-r border-border scrollbar-hide -mx-1 px-1 lg:mx-0 lg:px-0">
               {experiences.map((exp, index) => (
-                <FloatingElement key={exp.company} amplitude={2} frequency={4000 + index * 300} rotateX={0} rotateY={0}>
-                  <button
-                    type="button"
-                    onClick={() => setActiveIndex(index)}
-                    className={cn(
-                      "touch-target min-h-[48px] relative px-4 sm:px-5 py-3.5 sm:py-4 text-left text-sm font-medium font-mono whitespace-nowrap lg:whitespace-normal transition-all duration-300 rounded-lg lg:rounded-l-lg lg:rounded-r-none flex flex-col justify-center",
-                      activeIndex === index
-                        ? "text-accent bg-accent/10"
-                        : "text-muted-foreground hover:text-foreground hover:bg-secondary active:bg-secondary"
-                    )}
-                  >
-                    {activeIndex === index && (
-                      <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-8 bg-accent rounded-full hidden lg:block" />
-                    )}
-                    <span className="block font-semibold">{exp.company}</span>
-                    <span className="block text-xs text-muted-foreground mt-0.5">{exp.period}</span>
-                  </button>
-                </FloatingElement>
+                <button
+                  key={exp.company}
+                  type="button"
+                  onClick={() => setActiveIndex(index)}
+                  className={cn(
+                    "touch-target min-h-[48px] relative px-4 sm:px-5 py-3.5 sm:py-4 text-left text-sm font-medium font-mono whitespace-nowrap lg:whitespace-normal transition-all duration-300 rounded-lg lg:rounded-l-lg lg:rounded-r-none flex flex-col justify-center",
+                    activeIndex === index
+                      ? "text-accent bg-accent/10"
+                      : "text-muted-foreground hover:text-foreground hover:bg-secondary active:bg-secondary"
+                  )}
+                >
+                  {activeIndex === index && (
+                    <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-8 bg-accent rounded-full hidden lg:block" />
+                  )}
+                  <span className="block font-semibold">{exp.company}</span>
+                  <span className="block text-xs text-muted-foreground mt-0.5">{exp.period}</span>
+                </button>
               ))}
             </div>
           </AnimatedSection>
@@ -193,20 +183,13 @@ export function ExperienceSection() {
                       </ul>
 
                       <div className="flex flex-wrap gap-2 pt-4">
-                        {exp.skills.map((skill, skillIndex) => (
-                          <FloatingElement 
-                            key={skill} 
-                            amplitude={2} 
-                            frequency={3500 + skillIndex * 200} 
-                            rotateX={0} 
-                            rotateY={0}
+                        {exp.skills.map((skill) => (
+                          <span
+                            key={skill}
+                            className="px-2 sm:px-3 py-1 sm:py-1.5 text-[10px] sm:text-sm font-medium text-accent bg-accent/10 rounded-full border border-accent/20 hover:bg-accent/20 transition-colors touch-manipulation"
                           >
-                            <span
-                              className="px-2 sm:px-3 py-1 sm:py-1.5 text-[10px] sm:text-sm font-medium text-accent bg-accent/10 rounded-full border border-accent/20 hover:bg-accent/20 transition-colors touch-manipulation"
-                            >
-                              {skill}
-                            </span>
-                          </FloatingElement>
+                            {skill}
+                          </span>
                         ))}
                       </div>
 

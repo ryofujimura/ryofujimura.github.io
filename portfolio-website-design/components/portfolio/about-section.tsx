@@ -3,7 +3,6 @@
 import { AnimatedSection } from "@/components/animated-section"
 import { MouseFollowerCard } from "@/components/mouse-follower-card"
 import { ParallaxText } from "@/components/parallax-text"
-import { FloatingElement } from "@/components/floating-element"
 import { Shape3D } from "@/components/geometric-shapes"
 import { AsciiSectionHeader } from "@/components/ascii-banner"
 import { LeonardoNotebook, TechnicalDrawing, SpecAnnotation } from "@/components/leonardo-notebook"
@@ -26,22 +25,16 @@ const stats = [
 export function AboutSection() {
   return (
     <section id="about" className="relative py-20 sm:py-24 md:py-32 lg:py-40 px-4 sm:px-6 overflow-hidden">
-      {/* Floating shapes — hide on small screens to improve mobile perf */}
+      {/* Background shapes — hide on small screens */}
       <div className="absolute inset-0 pointer-events-none hidden sm:block">
         <div className="absolute top-20 right-20 opacity-15">
-          <FloatingElement amplitude={18} frequency={5500}>
-            <Shape3D variant="vitruvian" size={180} />
-          </FloatingElement>
+          <Shape3D variant="vitruvian" size={180} />
         </div>
         <div className="absolute bottom-32 left-16 opacity-10">
-          <FloatingElement amplitude={12} frequency={4500} delay={800}>
-            <Shape3D variant="spiral" size={140} />
-          </FloatingElement>
+          <Shape3D variant="spiral" size={140} />
         </div>
         <div className="absolute top-1/2 right-1/4 opacity-8 hidden md:block">
-          <FloatingElement amplitude={8} frequency={6000} delay={400}>
-            <Shape3D variant="cube" size={50} />
-          </FloatingElement>
+          <Shape3D variant="cube" size={50} />
         </div>
       </div>
 
@@ -97,17 +90,15 @@ export function AboutSection() {
             {/* Stats — 2x2 on mobile, 4 col on desktop */}
             <AnimatedSection delay={400}>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 pt-6 sm:pt-8 border-t border-border">
-                {stats.map((stat, index) => (
-                  <FloatingElement key={stat.label} amplitude={4} frequency={3000 + index * 400} delay={index * 150}>
-                    <div className="text-center group cursor-default touch-manipulation min-h-[52px] flex flex-col justify-center">
-                      <div className="text-2xl sm:text-3xl md:text-4xl font-bold font-mono text-foreground group-hover:text-accent transition-colors duration-300">
-                        {stat.value}
-                      </div>
-                      <div className="text-[10px] sm:text-xs text-muted-foreground uppercase tracking-wide mt-1 font-mono">
-                        {stat.label}
-                      </div>
+                {stats.map((stat) => (
+                  <div key={stat.label} className="text-center group cursor-default touch-manipulation min-h-[52px] flex flex-col justify-center">
+                    <div className="text-2xl sm:text-3xl md:text-4xl font-bold font-mono text-foreground group-hover:text-accent transition-colors duration-300">
+                      {stat.value}
                     </div>
-                  </FloatingElement>
+                    <div className="text-[10px] sm:text-xs text-muted-foreground uppercase tracking-wide mt-1 font-mono">
+                      {stat.label}
+                    </div>
+                  </div>
                 ))}
               </div>
             </AnimatedSection>
@@ -168,20 +159,13 @@ export function AboutSection() {
                             {category}
                           </p>
                           <div className="flex flex-wrap gap-2">
-                            {items.map((skill, skillIndex) => (
-                              <FloatingElement 
-                                key={skill} 
-                                amplitude={2} 
-                                frequency={4000 + skillIndex * 200} 
-                                rotateX={0} 
-                                rotateY={0}
+                            {items.map((skill) => (
+                              <span
+                                key={skill}
+                                className="px-3 py-1.5 text-sm text-muted-foreground bg-secondary rounded-lg border border-border hover:border-accent/50 hover:text-foreground hover:shadow-md transition-all cursor-default"
                               >
-                                <span
-                                  className="px-3 py-1.5 text-sm text-muted-foreground bg-secondary rounded-lg border border-border hover:border-accent/50 hover:text-foreground hover:shadow-md transition-all cursor-default"
-                                >
-                                  {skill}
-                                </span>
-                              </FloatingElement>
+                                {skill}
+                              </span>
                             ))}
                           </div>
                         </div>
