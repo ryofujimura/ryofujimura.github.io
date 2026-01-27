@@ -17,6 +17,9 @@ export function HeroSection() {
   const [isTouch, setIsTouch] = useState(false)
   const gridRef = useRef<HTMLDivElement>(null)
   const linesRef = useRef<SVGSVGElement>(null)
+  const [cubeRotation, setCubeRotation] = useState({ x: 0, y: 0 })
+  const [isDraggingCube, setIsDraggingCube] = useState(false)
+  const cubeDragStartRef = useRef<{ x: number; y: number } | null>(null)
 
   useEffect(() => {
     setIsTouch("ontouchstart" in window || navigator.maxTouchPoints > 0)
@@ -66,6 +69,33 @@ export function HeroSection() {
 
   const parallax = !isTouch ? { x: mousePosition.x * 5, y: mousePosition.y * 5 } : { x: 0, y: 0 }
   const blueprintMove = !isTouch ? { x: mousePosition.x * -20, y: -50 + mousePosition.y * -20 } : { x: 0, y: -50 }
+
+  const handleCubePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    setIsDraggingCube(true)
+    cubeDragStartRef.current = { x: e.clientX, y: e.clientY }
+    e.currentTarget.setPointerCapture(e.pointerId)
+  }
+
+  const handleCubePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!isDraggingCube || !cubeDragStartRef.current) return
+    const { x, y } = cubeDragStartRef.current
+    const dx = e.clientX - x
+    const dy = e.clientY - y
+    cubeDragStartRef.current = { x: e.clientX, y: e.clientY }
+
+    setCubeRotation((prev) => ({
+      x: prev.x + dy * 0.4,
+      y: prev.y + dx * 0.4,
+    }))
+  }
+
+  const handleCubePointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (e.currentTarget.hasPointerCapture(e.pointerId)) {
+      e.currentTarget.releasePointerCapture(e.pointerId)
+    }
+    setIsDraggingCube(false)
+    cubeDragStartRef.current = null
+  }
 
   return (
     <section
@@ -231,16 +261,22 @@ export function HeroSection() {
             </div>
           </div>
 
-          {/* Right column — desktop only, no 3D on touch */}
+          {/* Right column — desktop only, interactive cube */}
           <div className="hidden lg:block relative">
             <div
-              className="relative aspect-square max-w-lg mx-auto"
+              className="relative aspect-square max-w-lg mx-auto cursor-grab active:cursor-grabbing"
               style={{
                 transform: isTouch
-                  ? "none"
-                  : `perspective(1000px) rotateY(${mousePosition.x * 5}deg) rotateX(${-mousePosition.y * 5}deg)`,
-                transition: "transform 0.3s ease-out",
+                  ? `perspective(1000px) rotateY(${cubeRotation.y}deg) rotateX(${cubeRotation.x}deg)`
+                  : `perspective(1000px) rotateY(${mousePosition.x * 5 + cubeRotation.y}deg) rotateX(${
+                      -mousePosition.y * 5 + cubeRotation.x
+                    }deg)`,
+                transition: isDraggingCube ? "transform 0s" : "transform 0.3s ease-out",
               }}
+              onPointerDown={handleCubePointerDown}
+              onPointerMove={handleCubePointerMove}
+              onPointerUp={handleCubePointerUp}
+              onPointerLeave={handleCubePointerUp}
             >
               {/* Wireframe cube - animated */}
               <GSAPSVG className="absolute inset-0 text-foreground" duration={2}>
