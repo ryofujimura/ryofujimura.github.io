@@ -1,11 +1,8 @@
 "use client"
 
 import { useState } from "react"
-import { AnimatedSection } from "@/components/animated-section"
-import { MagneticButton } from "@/components/magnetic-button"
-import { Shape3D } from "@/components/geometric-shapes"
-import { AsciiSectionHeader } from "@/components/ascii-banner"
-import { LeonardoNotebook, TechnicalDrawing } from "@/components/leonardo-notebook"
+import { GSAPText, GSAPSVG } from "@/components/gsap-text"
+import { TechnicalGrid, TechnicalPattern } from "@/components/technical-grid"
 import { ExternalLink } from "lucide-react"
 import { cn } from "@/lib/utils"
 
@@ -75,159 +72,230 @@ export function ExperienceSection() {
   const [activeIndex, setActiveIndex] = useState(0)
 
   return (
-    <section id="experience" className="relative py-20 sm:py-24 md:py-32 lg:py-40 px-4 sm:px-6 bg-secondary/30 overflow-hidden">
-      <div className="absolute inset-0 pointer-events-none hidden sm:block">
-        <div className="absolute top-16 left-20 opacity-10">
-          <Shape3D variant="cube" size={100} />
-        </div>
-        <div className="absolute bottom-24 right-16 opacity-15">
-          <Shape3D variant="vitruvian" size={160} />
-        </div>
-        <div className="absolute top-1/3 right-1/4 opacity-8 hidden md:block">
-          <Shape3D variant="pyramid" size={60} />
-        </div>
-        <div className="absolute bottom-1/3 left-1/3 opacity-10 hidden md:block">
-          <Shape3D variant="spiral" size={100} />
-        </div>
+    <section
+      id="experience"
+      className="relative py-20 sm:py-24 md:py-32 lg:py-40 px-4 sm:px-6 bg-background overflow-hidden border-y border-foreground"
+    >
+      {/* Brutalist technical chrome */}
+      <TechnicalPattern />
+      <div className="pointer-events-none absolute inset-4 opacity-10">
+        <TechnicalGrid className="w-full h-full text-foreground" />
       </div>
 
       <div className="max-w-6xl mx-auto relative z-10">
-        <AnimatedSection>
-          <AsciiSectionHeader number="02" title="Experience" />
-        </AnimatedSection>
+        <header className="grid gap-6 sm:gap-8 md:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] items-start mb-10 sm:mb-14 md:mb-16">
+          <div className="space-y-3 sm:space-y-4">
+            <GSAPText
+              variant="lines"
+              className="font-mono text-[11px] sm:text-xs uppercase tracking-[0.4em] text-muted-foreground"
+            >
+              Experience // Operational Log
+            </GSAPText>
+            <GSAPText
+              variant="words"
+              className="text-3xl xs:text-4xl sm:text-5xl md:text-6xl font-black tracking-tight leading-[0.9]"
+            >
+              Brutalist deployment history, tuned for real constraints.
+            </GSAPText>
+            <GSAPText
+              variant="scramble"
+              className="font-mono text-[11px] sm:text-xs text-muted-foreground/70"
+            >
+              STATUS: SYSTEMS-LEVEL ENGINEER // AI RESEARCH // EDGE DEPLOYMENTS
+            </GSAPText>
+          </div>
 
-        <AnimatedSection delay={50}>
-          <p className="text-muted-foreground/70 italic mb-16 max-w-xl">
-            {"\"I have been impressed with the urgency of doing. Knowing is not enough; we must apply.\""} 
-            <span className="ml-2">- Leonardo da Vinci</span>
-          </p>
-        </AnimatedSection>
+          <div className="relative">
+            <div className="absolute inset-0 border border-dashed border-foreground/30 pointer-events-none" />
+            <div className="bg-secondary p-4 sm:p-5 md:p-6 border border-foreground shadow-[4px_4px_0_0_theme(colors.foreground)]">
+              <p className="font-mono text-[11px] sm:text-xs text-muted-foreground leading-relaxed">
+                Each row below is a{" "}
+                <span className="text-foreground font-semibold">production experiment</span>: different
+                domains, same obsession with reliability, observability, and measurable impact.
+              </p>
+              <p className="font-mono text-[11px] sm:text-xs text-muted-foreground mt-3">
+                Hover or tap to lock a role. Numbers on the right are{" "}
+                <span className="text-accent font-semibold">throughput, savings, or deltas</span> – not vibes.
+              </p>
 
-        <div className="grid lg:grid-cols-[280px_1fr] gap-6 sm:gap-8">
-          {/* Tabs — horizontal scroll on mobile, 44px tap targets */}
-          <AnimatedSection delay={100}>
-            <div className="flex lg:flex-col gap-2 overflow-x-auto overflow-y-hidden lg:overflow-visible pb-4 lg:pb-0 border-b lg:border-b-0 lg:border-r border-border scrollbar-hide -mx-1 px-1 lg:mx-0 lg:px-0">
+              <GSAPSVG className="mt-4 w-full h-20 text-foreground/40">
+                <svg viewBox="0 0 400 80" className="w-full h-full" fill="none" stroke="currentColor">
+                  <line x1="10" y1="70" x2="390" y2="70" strokeWidth="0.75" />
+                  {experiences.map((_, i) => {
+                    const x = 40 + i * 80
+                    return (
+                      <>
+                        <circle key={`node-${i}`} cx={x} cy="40" r="6" strokeWidth="1" />
+                        <line
+                          key={`stem-${i}`}
+                          x1={x}
+                          y1="40"
+                          x2={x}
+                          y2="70"
+                          strokeWidth="0.75"
+                        />
+                      </>
+                    )
+                  })}
+                  <polyline
+                    points="40,38 120,30 200,24 280,28 360,20"
+                    strokeWidth="0.75"
+                    opacity="0.5"
+                  />
+                </svg>
+              </GSAPSVG>
+            </div>
+          </div>
+        </header>
+
+        {/* Matrix layout */}
+        <div className="grid gap-6 lg:grid-cols-[minmax(220px,260px)_minmax(0,1fr)]">
+          {/* Index rail */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between border-b border-foreground pb-2">
+              <span className="font-mono text-[11px] uppercase tracking-[0.3em]">
+                Index
+              </span>
+              <span className="font-mono text-[11px] text-muted-foreground">
+                0{experiences.length}
+              </span>
+            </div>
+
+            <div className="border border-foreground divide-y divide-foreground bg-secondary">
               {experiences.map((exp, index) => (
                 <button
                   key={exp.company}
                   type="button"
                   onClick={() => setActiveIndex(index)}
                   className={cn(
-                    "touch-target min-h-[48px] relative px-4 sm:px-5 py-3.5 sm:py-4 text-left text-sm font-medium font-mono whitespace-nowrap lg:whitespace-normal transition-all duration-300 rounded-lg lg:rounded-l-lg lg:rounded-r-none flex flex-col justify-center",
+                    "group w-full text-left px-3 sm:px-4 py-3 sm:py-3.5 flex items-center justify-between gap-3 touch-target",
+                    "font-mono text-[11px] sm:text-xs uppercase tracking-[0.12em]",
                     activeIndex === index
-                      ? "text-accent bg-accent/10"
-                      : "text-muted-foreground hover:text-foreground hover:bg-secondary active:bg-secondary"
+                      ? "bg-accent text-accent-foreground"
+                      : "bg-secondary hover:bg-foreground hover:text-background"
                   )}
                 >
-                  {activeIndex === index && (
-                    <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-8 bg-accent rounded-full hidden lg:block" />
-                  )}
-                  <span className="block font-semibold">{exp.company}</span>
-                  <span className="block text-xs text-muted-foreground mt-0.5">{exp.period}</span>
+                  <div className="flex items-center gap-2 sm:gap-3">
+                    <span className="inline-flex h-5 w-5 items-center justify-center border border-current">
+                      {index.toString().padStart(2, "0")}
+                    </span>
+                    <div className="flex flex-col">
+                      <span className="font-semibold leading-tight">
+                        {exp.company}
+                      </span>
+                      <span className="text-[10px] sm:text-[11px] opacity-70 leading-tight">
+                        {exp.title}
+                      </span>
+                    </div>
+                  </div>
+                  <span className="hidden sm:inline-flex text-[10px] opacity-80">
+                    {exp.period}
+                  </span>
                 </button>
               ))}
             </div>
-          </AnimatedSection>
+          </div>
 
-          {/* Content panel */}
-          <AnimatedSection delay={200}>
-            <div className="min-h-[400px] relative">
-              {experiences.map((exp, index) => (
-                <div
-                  key={exp.company}
-                  className={cn(
-                    "transition-all duration-500",
-                    activeIndex === index
-                      ? "opacity-100 translate-y-0"
-                      : "opacity-0 translate-y-4 absolute pointer-events-none"
-                  )}
-                >
-                  {activeIndex === index && (
-                    <div className="space-y-6">
-                      <div>
-                        <h3 className="text-2xl font-bold text-foreground mb-2">
+          {/* Detail grid */}
+          <div className="relative border border-foreground bg-card shadow-[6px_6px_0_0_theme(colors.foreground)]">
+            <div className="absolute inset-x-0 top-0 h-8 bg-[repeating-linear-gradient(90deg,transparent,transparent_6px,theme(colors.foreground/10)_6px,theme(colors.foreground/10)_8px)] opacity-60 pointer-events-none" />
+
+            <div className="relative p-4 sm:p-6 md:p-7 space-y-5 sm:space-y-6">
+              {experiences.map((exp, index) => {
+                const isActive = index === activeIndex
+                return (
+                  <article
+                    key={exp.company}
+                    className={cn(
+                      "transition-all duration-300 border border-dashed border-transparent",
+                      isActive
+                        ? "opacity-100 translate-y-0 border-foreground"
+                        : "opacity-0 pointer-events-none absolute inset-4"
+                    )}
+                    aria-hidden={!isActive}
+                  >
+                    <div className="flex flex-col gap-3 sm:gap-4">
+                      <div className="flex flex-wrap items-baseline justify-between gap-2">
+                        <h3 className="text-xl sm:text-2xl md:text-3xl font-black tracking-tight uppercase">
                           {exp.title}
                         </h3>
-                        <MagneticButton
-                          as="a"
+                        <p className="font-mono text-[11px] sm:text-xs text-muted-foreground uppercase tracking-[0.18em]">
+                          {exp.period}
+                        </p>
+                      </div>
+
+                      <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+                        <a
                           href={exp.companyUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-2 text-accent hover:underline"
+                          className="inline-flex items-center gap-1.5 border border-foreground px-2.5 py-1.5 text-[11px] sm:text-xs font-mono uppercase tracking-[0.16em] hover:bg-foreground hover:text-background transition-colors"
                         >
-                          {exp.companyFull}
-                          <ExternalLink className="w-4 h-4" />
-                        </MagneticButton>
-                        <p className="text-sm text-muted-foreground mt-2 font-mono">{exp.period}</p>
+                          <span>{exp.companyFull}</span>
+                          <ExternalLink className="w-3.5 h-3.5" />
+                        </a>
+                        <span className="h-px flex-1 bg-foreground/30" />
+                        <span className="font-mono text-[11px] sm:text-xs text-muted-foreground">
+                          Highlights: {exp.highlights.length.toString().padStart(2, "0")} // Skills:{" "}
+                          {exp.skills.length.toString().padStart(2, "0")}
+                        </span>
                       </div>
 
-                      <p className="text-muted-foreground leading-relaxed text-lg">
+                      <p className="text-sm sm:text-base text-muted-foreground leading-relaxed max-w-2xl">
                         {exp.description}
                       </p>
 
-                      <ul className="space-y-3">
-                        {exp.highlights.map((highlight, i) => (
-                          <li 
-                            key={i} 
-                            className="flex gap-4 text-muted-foreground"
-                            style={{ 
-                              animation: "fadeInUp 0.5s ease-out forwards",
-                              animationDelay: `${i * 100}ms`,
-                              opacity: 0,
-                            }}
-                          >
-                            <span className="text-accent mt-1 shrink-0">&#9656;</span>
-                            <span>{highlight}</span>
-                          </li>
-                        ))}
-                      </ul>
+                      <div className="grid gap-3 sm:gap-4 md:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] items-start">
+                        <ul className="space-y-2.5 sm:space-y-3">
+                          {exp.highlights.map((highlight, i) => (
+                            <li
+                              key={i}
+                              className="flex gap-3 text-xs sm:text-sm text-foreground/90"
+                            >
+                              <span className="mt-1 h-3 w-3 shrink-0 border border-foreground bg-accent/20" />
+                              <span className="leading-relaxed">{highlight}</span>
+                            </li>
+                          ))}
+                        </ul>
 
-                      <div className="flex flex-wrap gap-2 pt-4">
-                        {exp.skills.map((skill) => (
-                          <span
-                            key={skill}
-                            className="px-2 sm:px-3 py-1 sm:py-1.5 text-[10px] sm:text-sm font-medium text-accent bg-accent/10 rounded-full border border-accent/20 hover:bg-accent/20 transition-colors touch-manipulation"
-                          >
-                            {skill}
-                          </span>
-                        ))}
-                      </div>
+                        <div className="space-y-3 sm:space-y-4">
+                          <div className="border border-foreground bg-secondary/60 p-3 sm:p-4">
+                            <p className="font-mono text-[10px] sm:text-[11px] text-muted-foreground uppercase tracking-[0.14em] mb-2">
+                              Skill surface
+                            </p>
+                            <div className="flex flex-wrap gap-1.5 sm:gap-2">
+                              {exp.skills.map((skill) => (
+                                <span
+                                  key={skill}
+                                  className="px-2 py-1 text-[10px] sm:text-[11px] font-mono uppercase tracking-[0.16em] bg-background text-foreground border border-foreground"
+                                >
+                                  {skill}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
 
-                      <div className="mt-6 sm:mt-8">
-                        <LeonardoNotebook folioRef={`RF.DV.EXP.${exp.company.slice(0, 6).toUpperCase()}`} date={exp.period.slice(-4)} className="p-3 sm:p-4">
-                          <TechnicalDrawing
-                            title={`ROLE: ${exp.title.toUpperCase()}`}
-                            asciiArt={`  ╭─────────────╮\n ╱  ${exp.company.slice(0, 12).padEnd(12)} ╲\n│   ROLE        │\n│   ${exp.title.slice(0, 14).padEnd(14)} │\n│               │\n│   SKILLS:     │\n│   ${exp.skills.slice(0, 3).join(", ").slice(0, 20).padEnd(20)} │\n ╲               ╱\n  ╰─────────────╯`}
-                            measurements={[
-                              { label: "Period", value: exp.period, unit: "" },
-                              { label: "Highlights", value: String(exp.highlights.length), unit: " items" },
-                              { label: "Skills", value: String(exp.skills.length), unit: "" },
-                            ]}
-                            notes={exp.description.slice(0, 80) + (exp.description.length > 80 ? "…" : "")}
-                          />
-                        </LeonardoNotebook>
+                          <div className="border border-dashed border-foreground/60 p-3 sm:p-4">
+                            <p className="font-mono text-[10px] sm:text-[11px] text-muted-foreground uppercase tracking-[0.16em] mb-1">
+                              Signal summary
+                            </p>
+                            <p className="font-mono text-[10px] sm:text-[11px] text-muted-foreground/80 leading-relaxed">
+                              ΔLatency, ΔThroughput, ΔReliability vary per role, but constant is{" "}
+                              <span className="text-foreground font-semibold">shipping rigorously
+                              measured systems</span>{" "}
+                              under bandwidth, hardware, or organizational constraints.
+                            </p>
+                          </div>
+                        </div>
                       </div>
                     </div>
-                  )}
-                </div>
-              ))}
+                  </article>
+                )
+              })}
             </div>
-          </AnimatedSection>
+          </div>
         </div>
       </div>
-
-      <style jsx>{`
-        @keyframes fadeInUp {
-          from {
-            opacity: 0;
-            transform: translateY(10px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-      `}</style>
     </section>
   )
 }
