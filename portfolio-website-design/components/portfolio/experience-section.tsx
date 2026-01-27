@@ -124,17 +124,16 @@ export function ExperienceSection() {
                   {experiences.map((_, i) => {
                     const x = 40 + i * 80
                     return (
-                      <>
-                        <circle key={`node-${i}`} cx={x} cy="40" r="6" strokeWidth="1" />
+                      <g key={i}>
+                        <circle cx={x} cy="40" r="6" strokeWidth="1" />
                         <line
-                          key={`stem-${i}`}
                           x1={x}
                           y1="40"
                           x2={x}
                           y2="70"
                           strokeWidth="0.75"
                         />
-                      </>
+                      </g>
                     )
                   })}
                   <polyline

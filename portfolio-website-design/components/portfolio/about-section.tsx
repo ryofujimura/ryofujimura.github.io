@@ -121,8 +121,8 @@ export function AboutSection() {
                     {/* Radial lines */}
                     {Array.from({ length: 12 }).map((_, i) => {
                       const angle = (i * 30 * Math.PI) / 180
-                      const x2 = 100 + Math.cos(angle) * 80
-                      const y2 = 100 + Math.sin(angle) * 80
+                      const x2 = Number((100 + Math.cos(angle) * 80).toFixed(2))
+                      const y2 = Number((100 + Math.sin(angle) * 80).toFixed(2))
                       return <line key={i} x1="100" y1="100" x2={x2} y2={y2} strokeWidth="0.25" />
                     })}
                     {/* Offset hexagon */}
@@ -133,8 +133,8 @@ export function AboutSection() {
                           .map((_, j) => {
                             const angle = ((start + j * 60) * Math.PI) / 180
                             const r = 35 + idx * 6
-                            const x = 100 + Math.cos(angle) * r
-                            const y = 100 + Math.sin(angle) * r
+                            const x = Number((100 + Math.cos(angle) * r).toFixed(2))
+                            const y = Number((100 + Math.sin(angle) * r).toFixed(2))
                             return `${x},${y}`
                           })
                           .join(" ")}
