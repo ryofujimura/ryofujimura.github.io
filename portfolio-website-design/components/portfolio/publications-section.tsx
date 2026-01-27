@@ -1,4 +1,4 @@
-\"use client\"
+"use client"
 
 import { AnimatedSection } from "@/components/animated-section"
 import { GSAPText, GSAPSVG } from "@/components/gsap-text"
