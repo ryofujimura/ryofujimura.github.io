@@ -1,17 +1,120 @@
 "use client"
 
+import { useRef, useEffect, useState } from "react"
+import { gsap } from "gsap"
+import { ScrollTrigger } from "gsap/ScrollTrigger"
 import { AnimatedSection } from "@/components/animated-section"
 import { GSAPText, GSAPSVG } from "@/components/gsap-text"
 
-const hobbies = [
-  { id: "HB-01", label: "3D PRINTING", tag: "ADDITIVE", ascii: "  ╭───╮\n  │▣▣▣│\n  │▣ ▣│\n  ╰───╯" },
-  { id: "HB-02", label: "PHOTOGRAPHY", tag: "CAPTURE", ascii: "  ◉───◉\n   \\ │ /\n    \\│/\n     ▾" },
-  { id: "HB-03", label: "CAR", tag: "MECHANICAL", ascii: "  ┌─○─○─┐\n  │     │\n  └──▬──┘" },
-  { id: "HB-04", label: "MOTORCYCLE", tag: "MECHANICAL", ascii: "   ○  ○\n    \\/\n   ─▬─" },
-  { id: "HB-05", label: "TENNIS", tag: "RACQUET", ascii: "   ╲│╱\n    ●\n   ╱│╲" },
-  { id: "HB-06", label: "GOLF", tag: "PRECISION", ascii: "    │\n    ●\n   ╱ ╲" },
-  { id: "HB-07", label: "PICKLEBALL", tag: "COURT", ascii: "  ┌─┬─┐\n  ├─┼─┤\n  └─┴─┘" },
-  { id: "HB-08", label: "ARCHITECTURE", tag: "BRUTALIST", ascii: "  ┏━┓ ┏━┓\n  ┃ ┃ ┃ ┃\n  ┗━┛ ┗━┛" },
+gsap.registerPlugin(ScrollTrigger)
+
+type HobbyDetail = {
+  id: string
+  label: string
+  tag: string
+  ascii: string
+  detail: string
+  spec: Array<{ label: string; value: string }>
+  expandAscii: string
+}
+
+const hobbies: HobbyDetail[] = [
+  {
+    id: "HB-01",
+    label: "3D PRINTING",
+    tag: "ADDITIVE",
+    ascii: "  ╭───╮\n  │▣▣▣│\n  │▣ ▣│\n  ╰───╯",
+    detail: "Custom shells, tooling, and prototypes. FDM + resin; stress-tested infill and geometry for input devices and mechanical parts.",
+    spec: [
+      { label: "Process", value: "FDM / resin" },
+      { label: "Focus", value: "Shells, tooling" },
+    ],
+    expandAscii: "  LAYER  N→INFILL  Z+  [READY]\n  ═══════════════════════════════\n  ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓",
+  },
+  {
+    id: "HB-02",
+    label: "PHOTOGRAPHY",
+    tag: "CAPTURE",
+    ascii: "  ◉───◉\n   \\ │ /\n    \\│/\n     ▾",
+    detail: "Street, travel, and candid. Manual exposure and composition; light and geometry over gear.",
+    spec: [
+      { label: "Format", value: "Digital / 35mm" },
+      { label: "Style", value: "Street, candid" },
+    ],
+    expandAscii: "  ┌─ APERTURE ─┬─ SHUTTER ─┐\n  │    f/2.8   │   1/250   │\n  └───────────┴────────────┘",
+  },
+  {
+    id: "HB-03",
+    label: "CAR",
+    tag: "MECHANICAL",
+    ascii: "  ┌─○─○─┐\n  │     │\n  └──▬──┘",
+    detail: "Driving, mechanics, and design. From classic lines to modern chassis; maintenance and road trips.",
+    spec: [
+      { label: "Interest", value: "Driving, mechanics" },
+      { label: "Scope", value: "Classic → modern" },
+    ],
+    expandAscii: "  [FRONT]──○──────○──[REAR]\n  ─────────────────────────\n  CHASSIS │ SUSPENSION │ BRAKES",
+  },
+  {
+    id: "HB-04",
+    label: "MOTORCYCLE",
+    tag: "MECHANICAL",
+    ascii: "   ○  ○\n    \\/\n   ─▬─",
+    detail: "Riding and wrenching. Two wheels, minimal envelope; handling and ergonomics.",
+    spec: [
+      { label: "Focus", value: "Riding, wrenching" },
+      { label: "Aspect", value: "Handling, ergo" },
+    ],
+    expandAscii: "     ○══════○\n      \\    /\n       \\  /\n    ────▬────",
+  },
+  {
+    id: "HB-05",
+    label: "TENNIS",
+    tag: "RACQUET",
+    ascii: "   ╲│╱\n    ●\n   ╱│╲",
+    detail: "Singles and doubles. Aggressive baseliner; footwork and consistency over power.",
+    spec: [
+      { label: "Play", value: "Singles / doubles" },
+      { label: "Style", value: "Baseliner" },
+    ],
+    expandAscii: "  ═══╗     ╔═══\n     ║  ●  ║\n  ═══╝     ╚═══\n  [SERVICE] [RETURN]",
+  },
+  {
+    id: "HB-06",
+    label: "GOLF",
+    tag: "PRECISION",
+    ascii: "    │\n    ●\n   ╱ ╲",
+    detail: "Range and course. Rhythm and alignment; short game and putting practice.",
+    spec: [
+      { label: "Focus", value: "Rhythm, alignment" },
+      { label: "Area", value: "Short game" },
+    ],
+    expandAscii: "   │\n   ●─── TARGET\n  ╱ \\\n ─┘ └─",
+  },
+  {
+    id: "HB-07",
+    label: "PICKLEBALL",
+    tag: "COURT",
+    ascii: "  ┌─┬─┐\n  ├─┼─┤\n  └─┴─┘",
+    detail: "Recreational play and dinks. Fast pickup, strategy at the net.",
+    spec: [
+      { label: "Level", value: "Recreational" },
+      { label: "Tactics", value: "Net, dinks" },
+    ],
+    expandAscii: "  ┌───┬───┐\n  │ N │ N │  ← NET\n  ├───┼───┤\n  │ S │ S │\n  └───┴───┘",
+  },
+  {
+    id: "HB-08",
+    label: "ARCHITECTURE",
+    tag: "BRUTALIST",
+    ascii: "  ┏━┓ ┏━┓\n  ┃ ┃ ┃ ┃\n  ┗━┛ ┗━┛",
+    detail: "Raw concrete, mass, and light. Corb, Kahn, Ando; form follows structure and shadow.",
+    spec: [
+      { label: "Style", value: "Brutalist" },
+      { label: "References", value: "Corb, Kahn, Ando" },
+    ],
+    expandAscii: "  ┏━━━━━┓  ┏━━━━━┓\n  ┃  ▲  ┃  ┃  ▲  ┃  LIGHT\n  ┃ ▓▓▓ ┃  ┃ ▓▓▓ ┃  MASS\n  ┗━━━━━┛  ┗━━━━━┛",
+  },
 ]
 
 /** Technical grid SVG — blueprint / brutalist line field */
@@ -43,6 +146,28 @@ function TechnicalGridSVG() {
       <circle cx={160} cy={360} r={8} />
     </svg>
   )
+}
+
+/** Load line — draws across when section enters view */
+function useSectionLoadAnimation(sectionRef: React.RefObject<HTMLElement | null>, lineRef: React.RefObject<HTMLDivElement | null>) {
+  useEffect(() => {
+    if (!sectionRef.current || !lineRef.current) return
+    const ctx = gsap.context(() => {
+      gsap.set(lineRef.current, { scaleX: 0, transformOrigin: "left center" })
+      ScrollTrigger.create({
+        trigger: sectionRef.current,
+        start: "top 88%",
+        onEnter: () => {
+          gsap.to(lineRef.current, {
+            scaleX: 1,
+            duration: 0.9,
+            ease: "power3.inOut",
+          })
+        },
+      })
+    }, sectionRef)
+    return () => ctx.revert()
+  }, [sectionRef, lineRef])
 }
 
 /** Per-hobby micro SVG — technical icon */
@@ -117,12 +242,144 @@ function HobbyIconSVG({ variant }: { variant: number }) {
   )
 }
 
+/** Single hobby card: click animation + expandable more-info (GSAP) */
+function HobbyCard({
+  hobby,
+  index,
+}: {
+  hobby: HobbyDetail
+  index: number
+}) {
+  const cardRef = useRef<HTMLDivElement>(null)
+  const expandRef = useRef<HTMLDivElement>(null)
+  const [expanded, setExpanded] = useState(false)
+
+  const handleClick = () => {
+    if (!cardRef.current) return
+    // Click animation: quick squash then elastic release
+    gsap.to(cardRef.current, {
+      scale: 0.97,
+      duration: 0.06,
+      ease: "power2.in",
+      onComplete: () => {
+        setExpanded((e) => !e)
+        gsap.to(cardRef.current, {
+          scale: 1,
+          duration: 0.35,
+          ease: "back.out(1.4)",
+        })
+      },
+    })
+  }
+
+  useEffect(() => {
+    const el = expandRef.current
+    if (!el) return
+    if (expanded) {
+      gsap.set(el, { overflow: "hidden" })
+      gsap.fromTo(
+        el,
+        { height: 0, opacity: 0 },
+        { height: "auto", opacity: 1, duration: 0.4, ease: "power2.out" }
+      )
+    } else {
+      const startHeight = el.offsetHeight
+      gsap.set(el, { height: startHeight, overflow: "hidden" })
+      gsap.to(el, {
+        height: 0,
+        opacity: 0,
+        duration: 0.3,
+        ease: "power2.in",
+      })
+    }
+  }, [expanded])
+
+  return (
+    <AnimatedSection delay={80 + index * 60}>
+      <article
+        ref={cardRef}
+        role="button"
+        tabIndex={0}
+        onClick={handleClick}
+        onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && (e.preventDefault(), handleClick())}
+        className="group relative border-2 border-foreground/20 bg-background hover:border-foreground/40 hover:bg-secondary/30 transition-colors duration-300 p-4 sm:p-5 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-foreground/40"
+        data-cursor="pointer"
+        data-cursor-text={expanded ? "LESS" : "MORE"}
+        aria-expanded={expanded}
+      >
+        <div className="absolute -top-[1px] -left-[1px] w-6 h-6 border-t-2 border-l-2 border-foreground/50" aria-hidden />
+        <div className="flex flex-col sm:flex-row lg:flex-col gap-4">
+          <div className="w-11 h-11 sm:w-12 sm:h-12 shrink-0 text-foreground/60 group-hover:text-accent transition-colors">
+            <GSAPSVG duration={1.2} delay={0.15 + index * 0.05}>
+              <HobbyIconSVG variant={index} />
+            </GSAPSVG>
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="font-mono text-[10px] xs:text-xs text-muted-foreground/90 mb-1">
+              {hobby.id} · {hobby.tag}
+              <span className="ml-2 text-foreground/50">{expanded ? "[−]" : "[+]"}</span>
+            </p>
+            <GSAPText
+              variant="lines"
+              delay={0.2 + index * 0.03}
+              className="text-sm sm:text-base font-bold font-mono text-foreground tracking-tight"
+            >
+              {hobby.label}
+            </GSAPText>
+            <pre
+              className="mt-2 font-mono text-[8px] xs:text-[9px] text-foreground/50 whitespace-pre overflow-hidden"
+              aria-hidden
+            >
+              {hobby.ascii}
+            </pre>
+          </div>
+        </div>
+
+        {/* Expandable more-info — brutalist panel with ASCII + spec */}
+        <div ref={expandRef} className="h-0 opacity-0 overflow-hidden">
+          <div className="mt-4 pt-4 border-t border-foreground/20 space-y-3">
+            <p className="text-xs sm:text-sm text-foreground/90 leading-relaxed font-mono">
+              {hobby.detail}
+            </p>
+            <div className="flex flex-wrap gap-x-4 gap-y-1 font-mono text-[10px] xs:text-xs text-muted-foreground">
+              {hobby.spec.map((s, i) => (
+                <span key={i}>
+                  <span className="text-foreground/70">{s.label}:</span> {s.value}
+                </span>
+              ))}
+            </div>
+            <pre
+              className="font-mono text-[8px] xs:text-[9px] text-foreground/60 bg-secondary/50 border border-foreground/10 p-2 sm:p-3 whitespace-pre overflow-x-auto"
+              aria-hidden
+            >
+              {hobby.expandAscii}
+            </pre>
+          </div>
+        </div>
+      </article>
+    </AnimatedSection>
+  )
+}
+
 export function HobbiesSection() {
+  const sectionRef = useRef<HTMLElement>(null)
+  const loadLineRef = useRef<HTMLDivElement>(null)
+
+  useSectionLoadAnimation(sectionRef, loadLineRef)
+
   return (
     <section
+      ref={sectionRef}
       id="hobbies"
       className="relative py-16 sm:py-20 md:py-28 lg:py-36 px-4 sm:px-5 overflow-hidden bg-background border-t border-b border-foreground/10"
     >
+      {/* Load animation line — draws when section enters view */}
+      <div
+        ref={loadLineRef}
+        className="absolute top-0 left-0 right-0 h-0.5 bg-foreground/30 origin-left"
+        aria-hidden
+      />
+
       {/* Brutalist grid + registration marks */}
       <div
         className="pointer-events-none absolute inset-0 opacity-[0.06] mix-blend-soft-light"
@@ -195,39 +452,10 @@ export function HobbiesSection() {
           </div>
         </div>
 
-        {/* Hobby grid — 4×2 on large, 2×4 on mid, 1 col on small */}
+        {/* Hobby grid — click to expand more-info */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
           {hobbies.map((hobby, index) => (
-            <AnimatedSection key={hobby.id} delay={80 + index * 60}>
-              <article className="group relative border-2 border-foreground/20 bg-background hover:border-foreground/40 hover:bg-secondary/30 transition-all duration-300 p-4 sm:p-5">
-                <div className="absolute -top-[1px] -left-[1px] w-6 h-6 border-t-2 border-l-2 border-foreground/50" aria-hidden />
-                <div className="flex flex-col sm:flex-row lg:flex-col gap-4">
-                  <div className="w-11 h-11 sm:w-12 sm:h-12 shrink-0 text-foreground/60 group-hover:text-accent transition-colors">
-                    <GSAPSVG duration={1.2} delay={0.15 + index * 0.05}>
-                      <HobbyIconSVG variant={index} />
-                    </GSAPSVG>
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="font-mono text-[10px] xs:text-xs text-muted-foreground/90 mb-1">
-                      {hobby.id} · {hobby.tag}
-                    </p>
-                    <GSAPText
-                      variant="lines"
-                      delay={0.2 + index * 0.03}
-                      className="text-sm sm:text-base font-bold font-mono text-foreground tracking-tight"
-                    >
-                      {hobby.label}
-                    </GSAPText>
-                    <pre
-                      className="mt-2 font-mono text-[8px] xs:text-[9px] text-foreground/50 whitespace-pre overflow-hidden"
-                      aria-hidden
-                    >
-                      {hobby.ascii}
-                    </pre>
-                  </div>
-                </div>
-              </article>
-            </AnimatedSection>
+            <HobbyCard key={hobby.id} hobby={hobby} index={index} />
           ))}
         </div>
 
