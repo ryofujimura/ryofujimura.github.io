@@ -66,113 +66,63 @@ export function AboutSection() {
       <div className="pointer-events-none absolute inset-0 bg-brutalist-grid opacity-[0.04]" aria-hidden />
 
       <div className="relative z-10 max-w-5xl lg:max-w-6xl mx-auto">
-        {/* Header row */}
-        <div className="mb-10 sm:mb-14 md:mb-16 grid md:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] gap-8 lg:gap-10 items-start">
-          <div className="space-y-4 sm:space-y-6 flex flex-col md:flex-row md:gap-6 lg:gap-8 md:items-start">
-            <div className="shrink-0">
-              <div className="w-24 h-24 sm:w-28 sm:h-28 border-[3px] border-foreground bg-background shadow-[4px_4px_0_0_var(--foreground)] overflow-hidden">
-                <img
-                  src="/images/profile.jpg"
-                  alt="Ryo Fujimura"
-                  className="w-full h-full object-cover object-top"
-                  width={112}
-                  height={112}
-                />
+        {/* Left / Right columns — within each: top then bottom */}
+        <div className="grid md:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] gap-8 lg:gap-10 items-start">
+          {/* Left column: top = header+intro, bottom = narrative */}
+          <div className="space-y-10 sm:space-y-12">
+            {/* Top-left: profile + name + tagline + stats */}
+            <div className="space-y-4 sm:space-y-6 flex flex-col md:flex-row md:gap-6 lg:gap-8 md:items-start">
+              <div className="shrink-0">
+                <div className="w-24 h-24 sm:w-28 sm:h-28 border-[3px] border-foreground bg-background shadow-[4px_4px_0_0_var(--foreground)] overflow-hidden">
+                  <img
+                    src="/images/profile.jpg"
+                    alt="Ryo Fujimura"
+                    className="w-full h-full object-cover object-top"
+                    width={112}
+                    height={112}
+                  />
+                </div>
+                <p className="font-mono text-[8px] sm:text-[9px] text-muted-foreground uppercase tracking-widest mt-1.5">
+                  RF-01
+                </p>
               </div>
-              <p className="font-mono text-[8px] sm:text-[9px] text-muted-foreground uppercase tracking-widest mt-1.5">
-                RF-01
-              </p>
-            </div>
-            <div className="space-y-4 sm:space-y-6 min-w-0">
-            <p className="font-mono text-[10px] sm:text-xs text-muted-foreground uppercase tracking-[0.35em]">
-              ABOUT / SPECIMEN RF-01
-            </p>
-            <GSAPText
-              variant="chars"
-              className="text-3xl sm:text-4xl md:text-5xl lg:text-[3.4rem] font-black tracking-tight leading-[0.95] font-mono"
-              stagger={0.03}
-            >
-              RYO FUJIMURA
-            </GSAPText>
-            <GSAPText
-              variant="words"
-              className="text-sm sm:text-base md:text-lg text-muted-foreground max-w-xl"
-              delay={0.4}
-            >
-              Software engineer + AI researcher building systems that move smoothly from lab prototype to
-              production reality.
-            </GSAPText>
+              <div className="space-y-4 sm:space-y-6 min-w-0">
+                <p className="font-mono text-[10px] sm:text-xs text-muted-foreground uppercase tracking-[0.35em]">
+                  ABOUT / SPECIMEN RF-01
+                </p>
+                <GSAPText
+                  variant="chars"
+                  className="text-3xl sm:text-4xl md:text-5xl lg:text-[3.4rem] font-black tracking-tight leading-[0.95] font-mono"
+                  stagger={0.03}
+                >
+                  RYO FUJIMURA
+                </GSAPText>
+                <GSAPText
+                  variant="words"
+                  className="text-sm sm:text-base md:text-lg text-muted-foreground max-w-xl"
+                  delay={0.4}
+                >
+                  Software engineer + AI researcher building systems that move smoothly from lab prototype to
+                  production reality.
+                </GSAPText>
 
-            <div className="border-y border-foreground mt-4 sm:mt-6">
-              <dl className="grid grid-cols-2 sm:grid-cols-4 divide-x divide-foreground/30">
-                {stats.map((s) => (
-                  <div key={s.label} className="px-3 py-3 sm:px-4 sm:py-4">
-                    <dt className="font-mono text-[9px] sm:text-[10px] uppercase tracking-[0.18em] text-muted-foreground mb-1">
-                      {s.label}
-                    </dt>
-                    <dd className="font-mono text-xl sm:text-2xl md:text-3xl font-black">{s.value}</dd>
-                  </div>
-                ))}
-              </dl>
-            </div>
-            </div>
-          </div>
-
-          {/* Technical SVG panel – Da Vinci notebook inspired */}
-          <div className="hidden sm:block">
-            <div className="border-2 border-foreground bg-background p-3 sm:p-4 md:p-5 relative overflow-hidden">
-              <div className="absolute inset-0 pointer-events-none opacity-20">
-                <GSAPSVG className="w-full h-full" duration={1.8} delay={0.4}>
-                  <svg ref={gridRef} viewBox="0 0 200 200" className="w-full h-full" stroke="currentColor">
-                    {/* Concentric circles */}
-                    <circle cx="100" cy="100" r="80" strokeWidth="0.6" />
-                    <circle cx="100" cy="100" r="52" strokeWidth="0.5" />
-                    {/* Crosshair */}
-                    <line x1="100" y1="10" x2="100" y2="190" strokeWidth="0.4" />
-                    <line x1="10" y1="100" x2="190" y2="100" strokeWidth="0.4" />
-                    {/* Radial lines */}
-                    {Array.from({ length: 12 }).map((_, i) => {
-                      const angle = (i * 30 * Math.PI) / 180
-                      const x2 = Number((100 + Math.cos(angle) * 80).toFixed(2))
-                      const y2 = Number((100 + Math.sin(angle) * 80).toFixed(2))
-                      return <line key={i} x1="100" y1="100" x2={x2} y2={y2} strokeWidth="0.25" />
-                    })}
-                    {/* Offset hexagon */}
-                    {[0, 60, 120].map((start, idx) => (
-                      <polygon
-                        key={idx}
-                        points={Array.from({ length: 6 })
-                          .map((_, j) => {
-                            const angle = ((start + j * 60) * Math.PI) / 180
-                            const r = 35 + idx * 6
-                            const x = Number((100 + Math.cos(angle) * r).toFixed(2))
-                            const y = Number((100 + Math.sin(angle) * r).toFixed(2))
-                            return `${x},${y}`
-                          })
-                          .join(" ")}
-                        fill="none"
-                        strokeWidth={idx === 2 ? 0.8 : 0.4}
-                      />
+                <div className="border-y border-foreground mt-4 sm:mt-6">
+                  <dl className="grid grid-cols-2 sm:grid-cols-4 divide-x divide-foreground/30">
+                    {stats.map((s) => (
+                      <div key={s.label} className="px-3 py-3 sm:px-4 sm:py-4">
+                        <dt className="font-mono text-[9px] sm:text-[10px] uppercase tracking-[0.18em] text-muted-foreground mb-1">
+                          {s.label}
+                        </dt>
+                        <dd className="font-mono text-xl sm:text-2xl md:text-3xl font-black">{s.value}</dd>
+                      </div>
                     ))}
-                  </svg>
-                </GSAPSVG>
-              </div>
-
-              <div className="relative space-y-2">
-                <p className="font-mono text-[9px] sm:text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
-                  SYSTEM PROFILE
-                </p>
-                <p className="font-mono text-xs sm:text-sm text-foreground">
-                  Edge-friendly AI, mobile-first UX, and research-grade experimentation coexisting in one stack.
-                </p>
+                  </dl>
+                </div>
               </div>
             </div>
-          </div>
-        </div>
 
-        {/* Content grid: narrative + notebooks */}
-        <div className="mt-10 sm:mt-12 grid lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] gap-8 lg:gap-10">
-          <div className="space-y-5 sm:space-y-6">
+            {/* Bottom-left: narrative */}
+            <div className="space-y-5 sm:space-y-6">
             <AnimatedSection>
               <p className="text-sm sm:text-base text-foreground/90 leading-relaxed">
                 I work where{" "}
@@ -219,10 +169,64 @@ export function AboutSection() {
                 </div>
               </div>
             </AnimatedSection>
+            </div>
           </div>
 
-          {/* Right column: Leonardo-style technical notebook */}
-          <div className="space-y-6 sm:space-y-7">
+          {/* Right column: top = technical SVG, bottom = notebooks */}
+          <div className="space-y-10 sm:space-y-12">
+            {/* Top-right: Technical SVG panel */}
+            <div className="hidden sm:block">
+              <div className="border-2 border-foreground bg-background p-3 sm:p-4 md:p-5 relative overflow-hidden">
+                <div className="absolute inset-0 pointer-events-none opacity-20">
+                  <GSAPSVG className="w-full h-full" duration={1.8} delay={0.4}>
+                    <svg ref={gridRef} viewBox="0 0 200 200" className="w-full h-full" stroke="currentColor">
+                      {/* Concentric circles */}
+                      <circle cx="100" cy="100" r="80" strokeWidth="0.6" />
+                      <circle cx="100" cy="100" r="52" strokeWidth="0.5" />
+                      {/* Crosshair */}
+                      <line x1="100" y1="10" x2="100" y2="190" strokeWidth="0.4" />
+                      <line x1="10" y1="100" x2="190" y2="100" strokeWidth="0.4" />
+                      {/* Radial lines */}
+                      {Array.from({ length: 12 }).map((_, i) => {
+                        const angle = (i * 30 * Math.PI) / 180
+                        const x2 = Number((100 + Math.cos(angle) * 80).toFixed(2))
+                        const y2 = Number((100 + Math.sin(angle) * 80).toFixed(2))
+                        return <line key={i} x1="100" y1="100" x2={x2} y2={y2} strokeWidth="0.25" />
+                      })}
+                      {/* Offset hexagon */}
+                      {[0, 60, 120].map((start, idx) => (
+                        <polygon
+                          key={idx}
+                          points={Array.from({ length: 6 })
+                            .map((_, j) => {
+                              const angle = ((start + j * 60) * Math.PI) / 180
+                              const r = 35 + idx * 6
+                              const x = Number((100 + Math.cos(angle) * r).toFixed(2))
+                              const y = Number((100 + Math.sin(angle) * r).toFixed(2))
+                              return `${x},${y}`
+                            })
+                            .join(" ")}
+                          fill="none"
+                          strokeWidth={idx === 2 ? 0.8 : 0.4}
+                        />
+                      ))}
+                    </svg>
+                  </GSAPSVG>
+                </div>
+
+                <div className="relative space-y-2">
+                  <p className="font-mono text-[9px] sm:text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
+                    SYSTEM PROFILE
+                  </p>
+                  <p className="font-mono text-xs sm:text-sm text-foreground">
+                    Edge-friendly AI, mobile-first UX, and research-grade experimentation coexisting in one stack.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Bottom-right: Leonardo notebooks + stack summary */}
+            <div className="space-y-6 sm:space-y-7">
             <AnimatedSection>
               <LeonardoNotebook folioRef="RF.DV.ABOUT.001" date={currentMonthYear}>
                 <TechnicalDrawing
@@ -291,6 +295,7 @@ export function AboutSection() {
             </AnimatedSection>
           </div>
         </div>
+      </div>
       </div>
     </section>
   )
