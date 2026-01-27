@@ -1,6 +1,6 @@
 "use client"
 
-import { useRef, useState, useEffect } from "react"
+import { useRef, useState, useEffect, useMemo } from "react"
 import { GSAPText } from "@/components/gsap-text"
 import { HeroTechnicalCanvas } from "@/components/hero-technical-canvas"
 import { MagneticButton } from "@/components/magnetic-button"
@@ -9,23 +9,35 @@ import { ArrowDown, ArrowRight, Github, Linkedin, Mail } from "lucide-react"
 
 // Exact-length lines so the terminal block is always a complete rectangle
 const ASCII_W = 65
-const ASCII_HEADER_LINES = [
-  "╔" + "═".repeat(ASCII_W) + "╗",
-  "║" + "  SYS_ID: RF.001  │  CLASS: ENGINEER  │  LOC: IRVINE_CA".padEnd(ASCII_W) + "║",
-  "║" + "  > status: AVAILABLE  │  mode: BUILD  │  rev: 2025".padEnd(ASCII_W) + "║",
-  "╚" + "═".repeat(ASCII_W) + "╝",
-]
 const ASCII_MOBILE_W = 32
-const ASCII_HEADER_LINES_MOBILE = [
-  "╔" + "═".repeat(ASCII_MOBILE_W) + "╗",
-  "║" + " RF.001 │ ENG │ IRVINE_CA".padEnd(ASCII_MOBILE_W) + "║",
-  "║" + " AVAILABLE │ BUILD │ 2025".padEnd(ASCII_MOBILE_W) + "║",
-  "╚" + "═".repeat(ASCII_MOBILE_W) + "╝",
-]
+
+function revLabel() {
+  const d = new Date()
+  return `${d.toLocaleDateString("en-US", { month: "short" })}. ${d.getFullYear()}`
+}
 
 export function HeroSection() {
   const [isTouch, setIsTouch] = useState(false)
   const asciiBlockRef = useRef<HTMLDivElement>(null)
+
+  const asciiHeaderLines = useMemo(() => {
+    const rev = revLabel()
+    return [
+      "╔" + "═".repeat(ASCII_W) + "╗",
+      "║" + "  SYS_ID: RF.001  │  CLASS: ENGINEER  │  LOC: IRVINE_CA".padEnd(ASCII_W) + "║",
+      "║" + (`  > status: AVAILABLE  │  mode: BUILD  │  rev: ${rev}`).padEnd(ASCII_W) + "║",
+      "╚" + "═".repeat(ASCII_W) + "╝",
+    ]
+  }, [])
+  const asciiHeaderLinesMobile = useMemo(() => {
+    const rev = revLabel()
+    return [
+      "╔" + "═".repeat(ASCII_MOBILE_W) + "╗",
+      "║" + " RF.001 │ ENG │ IRVINE_CA".padEnd(ASCII_MOBILE_W) + "║",
+      "║" + (` AVAILABLE │ BUILD │ ${rev}`).padEnd(ASCII_MOBILE_W) + "║",
+      "╚" + "═".repeat(ASCII_MOBILE_W) + "╝",
+    ]
+  }, [])
 
   useEffect(() => {
     setIsTouch(typeof window !== "undefined" && ("ontouchstart" in window || navigator.maxTouchPoints > 0))
@@ -50,7 +62,7 @@ export function HeroSection() {
           >
             {/* Mobile: 34-char block, complete rectangle; horizontal scroll on narrow viewports */}
             <div className="block sm:hidden text-[9px] leading-tight overflow-x-auto scrollbar-hide" style={{ minWidth: "34ch" }}>
-              {ASCII_HEADER_LINES_MOBILE.map((line, i) => (
+              {asciiHeaderLinesMobile.map((line, i) => (
                 <GSAPText
                   key={`m-${i}`}
                   variant="lines"
@@ -65,7 +77,7 @@ export function HeroSection() {
             </div>
             {/* Desktop: 67-char block, horizontal scroll if ever needed */}
             <div className="hidden sm:block text-[10px] sm:text-[11px] leading-tight overflow-x-auto scrollbar-hide" style={{ minWidth: "min(100%, 67ch)" }}>
-              {ASCII_HEADER_LINES.map((line, i) => (
+              {asciiHeaderLines.map((line, i) => (
                 <GSAPText
                   key={`d-${i}`}
                   variant="lines"
