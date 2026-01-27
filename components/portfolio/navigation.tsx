@@ -97,10 +97,11 @@ export function Navigation() {
           <div className="flex items-center justify-between">
             <MagneticButton
               onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-              className="touch-target min-h-[44px] min-w-[44px] flex items-center justify-center text-lg sm:text-xl font-bold font-mono text-foreground hover:text-accent transition-colors"
+              className="touch-target min-h-[44px] min-w-[88px] flex items-center justify-center gap-1.5 text-lg sm:text-xl font-bold font-mono text-foreground hover:text-accent transition-colors"
               aria-label="Home"
             >
-              &gt; RF
+              <img src="/images/ryologo.svg" alt="" className="h-6 w-6 sm:h-7 sm:w-7 object-contain" width={28} height={28} />
+              <span>&gt; RF</span>
             </MagneticButton>
 
             {/* Desktop navigation */}

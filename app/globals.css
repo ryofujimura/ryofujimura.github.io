@@ -146,6 +146,48 @@
   }
 }
 
+/* Brutalist technical patterns — award-level aesthetic */
+.bg-brutalist-grid {
+  background-image:
+    linear-gradient(to right, var(--foreground) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--foreground) 1px, transparent 1px);
+  background-size: 24px 24px;
+  background-position: 0 0, 0 0;
+}
+
+.bg-brutalist-crosshatch {
+  background-image:
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 23px,
+      var(--foreground) 23px,
+      var(--foreground) 24px
+    ),
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 23px,
+      var(--foreground) 23px,
+      var(--foreground) 24px
+    );
+  background-size: 24px 24px;
+}
+
+.bg-brutalist-diagonal {
+  background-image: repeating-linear-gradient(
+    -45deg,
+    transparent,
+    transparent 8px,
+    rgba(0, 0, 0, 0.03) 8px,
+    rgba(0, 0, 0, 0.03) 9px
+  );
+}
+
+.border-brutalist {
+  box-shadow: 4px 4px 0 0 var(--foreground);
+}
+
 @layer utilities {
   .preserve-3d {
     transform-style: preserve-3d;

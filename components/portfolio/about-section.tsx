@@ -58,21 +58,28 @@ export function AboutSection() {
       id="about"
       className="relative py-16 sm:py-20 md:py-24 lg:py-28 px-4 sm:px-6 overflow-hidden bg-background"
     >
-      {/* Brutalist grid background */}
-      <div
-        className="pointer-events-none absolute inset-0 opacity-[0.04]"
-        aria-hidden
-        style={{
-          backgroundImage:
-            "linear-gradient(to right, currentColor 1px, transparent 1px), linear-gradient(to bottom, currentColor 1px, transparent 1px)",
-          backgroundSize: "32px 32px",
-        }}
-      />
+      {/* Brutalist technical grid */}
+      <div className="pointer-events-none absolute inset-0 bg-brutalist-grid opacity-[0.04]" aria-hidden />
 
       <div className="relative z-10 max-w-5xl lg:max-w-6xl mx-auto">
         {/* Header row */}
         <div className="mb-10 sm:mb-14 md:mb-16 grid md:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] gap-8 lg:gap-10 items-start">
-          <div className="space-y-4 sm:space-y-6">
+          <div className="space-y-4 sm:space-y-6 flex flex-col md:flex-row md:gap-6 lg:gap-8 md:items-start">
+            <div className="shrink-0">
+              <div className="w-24 h-24 sm:w-28 sm:h-28 border-[3px] border-foreground bg-background shadow-[4px_4px_0_0_var(--foreground)] overflow-hidden">
+                <img
+                  src="/images/profile.jpg"
+                  alt="Ryo Fujimura"
+                  className="w-full h-full object-cover object-top"
+                  width={112}
+                  height={112}
+                />
+              </div>
+              <p className="font-mono text-[8px] sm:text-[9px] text-muted-foreground uppercase tracking-widest mt-1.5">
+                RF-01
+              </p>
+            </div>
+            <div className="space-y-4 sm:space-y-6 min-w-0">
             <p className="font-mono text-[10px] sm:text-xs text-muted-foreground uppercase tracking-[0.35em]">
               ABOUT / SPECIMEN RF-01
             </p>
@@ -103,6 +110,7 @@ export function AboutSection() {
                   </div>
                 ))}
               </dl>
+            </div>
             </div>
           </div>
 

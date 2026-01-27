@@ -12,6 +12,7 @@ const experiences = [
     company: "CPX Lab, CSULB",
     companyFull: "California State University, Long Beach",
     companyUrl: "https://csulb.edu",
+    icon: "/images/cs_research.svg",
     period: "Aug 2024 – Present",
     description: "Contributing to a 30+ person robotics/AI research group, supporting two peer-reviewed publications (ICCPS 2025, ICRA 2026).",
     highlights: [
@@ -27,6 +28,7 @@ const experiences = [
     company: "Bose Corporation",
     companyFull: "Bose Corporation",
     companyUrl: "https://bose.com",
+    icon: "/images/bose_1.svg",
     period: "Jun 2025 – Aug 2025",
     description: "Engineered internal Bluetooth debugging tools adopted by 1,000+ engineers, accelerating cross-platform testing.",
     highlights: [
@@ -42,6 +44,7 @@ const experiences = [
     company: "American Honda",
     companyFull: "American Honda Motor Co., Inc.",
     companyUrl: "https://honda.com",
+    icon: "/images/honda.svg",
     period: "Jun 2024 – Aug 2024",
     description: "Prototyped next-generation on-device AI using Jetson Orin Nano, evaluating automotive-grade compute constraints.",
     highlights: [
@@ -57,6 +60,7 @@ const experiences = [
     company: "CUSCO USA",
     companyFull: "CUSCO USA Inc.",
     companyUrl: "#",
+    icon: "/images/cusco.svg",
     period: "Oct 2021 – May 2024",
     description: "Built Python-based extraction pipelines processing 11,500+ legacy files spanning PDFs, images, and mixed formats.",
     highlights: [
@@ -175,9 +179,15 @@ export function ExperienceSection() {
                   )}
                 >
                   <div className="flex items-center gap-2 sm:gap-3">
-                    <span className="inline-flex h-5 w-5 items-center justify-center border border-current">
-                      {index.toString().padStart(2, "0")}
-                    </span>
+                    {"icon" in exp && exp.icon ? (
+                      <span className="flex h-8 w-8 shrink-0 items-center justify-center border border-current overflow-hidden bg-background/80">
+                        <img src={exp.icon} alt="" className="h-5 w-5 object-contain" width={20} height={20} />
+                      </span>
+                    ) : (
+                      <span className="inline-flex h-5 w-5 items-center justify-center border border-current">
+                        {index.toString().padStart(2, "0")}
+                      </span>
+                    )}
                     <div className="flex flex-col">
                       <span className="font-semibold leading-tight">
                         {exp.company}

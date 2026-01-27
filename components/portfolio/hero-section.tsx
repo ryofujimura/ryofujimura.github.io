@@ -55,12 +55,12 @@ export function HeroSection() {
       )
     }
 
-    // Grid fade in
+    // Grid fade in — subtle technical lines
     if (gridRef.current) {
       gsap.fromTo(
         gridRef.current,
         { opacity: 0 },
-        { opacity: 1, duration: 2, delay: 0.3 }
+        { opacity: 0.07, duration: 2, delay: 0.3 }
       )
     }
   }, [])
@@ -73,16 +73,12 @@ export function HeroSection() {
       ref={containerRef}
       className="relative min-h-[100dvh] min-h-screen flex items-center justify-center px-4 sm:px-6 pt-[max(5rem,env(safe-area-inset-top))] pb-8 overflow-hidden"
     >
-      {/* Technical grid — subtle on mobile */}
+      {/* Brutalist technical grid — complex line pattern */}
       <div
         ref={gridRef}
-        className="absolute inset-0 opacity-0"
+        className="absolute inset-0 opacity-0 bg-brutalist-grid"
         style={{
-          backgroundImage: `
-            linear-gradient(to right, rgba(0,0,0,0.03) 1px, transparent 1px),
-            linear-gradient(to bottom, rgba(0,0,0,0.03) 1px, transparent 1px)
-          `,
-          backgroundSize: "min(60px, 12vw) min(60px, 12vw)",
+          backgroundSize: "min(48px, 10vw) min(48px, 10vw)",
           transform: `translate(${parallax.x}px, ${parallax.y}px)`,
           transition: "transform 0.3s ease-out",
         }}
@@ -125,9 +121,12 @@ export function HeroSection() {
       <div className="max-w-6xl mx-auto w-full relative z-10">
         <div className="grid lg:grid-cols-2 gap-10 sm:gap-16 items-center">
           <div className="space-y-4 sm:space-y-6 md:space-y-8">
-            {/* Leonardo folio header */}
-            <pre className="font-mono text-[8px] xs:text-[9px] sm:text-[10px] text-muted-foreground/60 overflow-x-auto py-0.5 touch-manipulation" aria-hidden>
-              FOLIO: RF.DV.HERO.001 — OBSERVATION LOG & CONCEPTUAL SKETCHES — CIRCA 2025
+            {/* Brutalist ASCII header */}
+            <pre className="font-mono text-[8px] xs:text-[9px] sm:text-[10px] text-muted-foreground/60 overflow-x-auto py-0.5 touch-manipulation whitespace-pre" aria-hidden>
+{`  ┌─────────────────────────────────────────────────────────────┐
+  │ FOLIO: RF.DV.HERO.001 — OBSERVATION LOG — CIRCA 2025          │
+  │ > status: AVAILABLE_FOR_WORK  │  locale: Irvine, CA           │
+  └─────────────────────────────────────────────────────────────┘`}
             </pre>
             <AsciiHeroLine> status: AVAILABLE_FOR_WORK</AsciiHeroLine>
 
@@ -206,26 +205,33 @@ export function HeroSection() {
               </MagneticButton>
             </div>
 
-            {/* Social — 44px tap targets */}
+            {/* Social — 44px tap targets, image icons */}
             <div className="flex flex-wrap items-center gap-3 sm:gap-6 pt-2 sm:pt-4">
               <div className="flex items-center gap-0.5 sm:gap-1">
                 {[
-                  { href: "https://github.com/ryofujimura", icon: Github, label: "GitHub" },
-                  { href: "https://linkedin.com/in/ryofujimura", icon: Linkedin, label: "LinkedIn" },
+                  { href: "https://github.com/ryofujimura", img: "/images/github.png", label: "GitHub" },
+                  { href: "https://linkedin.com/in/ryofujimura", img: "/images/linkedin.png", label: "LinkedIn" },
                   { href: "mailto:ryo.fujimura1@gmail.com", icon: Mail, label: "Email" },
-                ].map(({ href, icon: Icon, label }) => (
-                  <MagneticButton
-                    key={label}
-                    as="a"
-                    href={href}
-                    target={href.startsWith("http") ? "_blank" : undefined}
-                    rel={href.startsWith("http") ? "noopener noreferrer" : undefined}
-                    className="touch-target p-3 min-h-[44px] min-w-[44px] flex items-center justify-center text-muted-foreground hover:text-foreground border border-transparent hover:border-border transition-all"
-                  >
-                    <Icon className="w-5 h-5" />
-                    <span className="sr-only">{label}</span>
-                  </MagneticButton>
-                ))}
+                ].map((item) => {
+                  const Icon = "icon" in item ? item.icon : null
+                  return (
+                    <MagneticButton
+                      key={item.label}
+                      as="a"
+                      href={item.href}
+                      target={item.href.startsWith("http") ? "_blank" : undefined}
+                      rel={item.href.startsWith("http") ? "noopener noreferrer" : undefined}
+                      className="touch-target p-3 min-h-[44px] min-w-[44px] flex items-center justify-center text-muted-foreground hover:text-foreground border border-transparent hover:border-border transition-all"
+                    >
+                      {"img" in item ? (
+                        <img src={item.img} alt="" className="w-5 h-5 object-contain" width={20} height={20} />
+                      ) : (
+                        Icon && <Icon className="w-5 h-5" />
+                      )}
+                      <span className="sr-only">{item.label}</span>
+                    </MagneticButton>
+                  )
+                })}
               </div>
               <div className="w-px h-5 sm:h-6 bg-border shrink-0" />
               <LocationHoverText
@@ -287,10 +293,18 @@ export function HeroSection() {
                 <span>y: 200</span>
               </div>
 
-              {/* Profile placeholder */}
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="w-32 h-32 border-2 border-foreground/20 flex items-center justify-center bg-background/80">
-                  <span className="text-4xl font-black text-foreground/30">RF</span>
+              {/* Profile image — brutalist frame */}
+              <div className="absolute inset-0 flex items-center justify-center p-6">
+                <div className="relative w-40 h-40 sm:w-48 sm:h-48 border-[3px] border-foreground bg-background shadow-[6px_6px_0_0_var(--foreground)] overflow-hidden">
+                  <img
+                    src="/images/profile.jpg"
+                    alt="Ryo Fujimura"
+                    className="w-full h-full object-cover object-top"
+                    width={192}
+                    height={192}
+                  />
+                  <div className="absolute inset-0 pointer-events-none border border-foreground/20 mix-blend-overlay" />
+                  <span className="absolute bottom-1 right-1 font-mono text-[8px] text-foreground/60 bg-background/90 px-1">RF</span>
                 </div>
               </div>
             </div>

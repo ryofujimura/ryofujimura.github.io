@@ -16,6 +16,7 @@ const allProjects = [
     title: "Saboriendo Bakery Platform",
     subtitle: "Website, iOS App",
     year: "2024",
+    image: "/images/default_image.png",
     description:
       "Full-stack e-commerce using React 19, SwiftUI, Firebase. Real-time order processing, FCM/APNs push. Barcode verification (AVFoundation, JsBarcode CODE128), 11+ formats, 50%+ faster in-store lookup. Firestore collectionGroup analytics and payment dashboards. Dynamic menu, 30-min drop scheduling, bulk discounts, EN/JP/ES.",
     stats: ["50%+ lookup speedup", "11+ barcode formats", "3 languages"],
@@ -27,6 +28,7 @@ const allProjects = [
     title: "Zero Inbox",
     subtitle: "AI-Driven Email Prioritization App",
     year: "2025",
+    image: "/images/default_image.png",
     description:
       "Swift/SwiftUI email client with Google Mail API, Firebase, AI reasoning engine. 90–95% classification accuracy, 100–300ms end-to-end inference. Multi-stage decision system: top-3 actions from 20 contextual behaviors. 50–200 messages/min throughput, secure token handling, low-latency sync.",
     stats: ["95% accuracy", "200ms latency", "50–200/min"],
@@ -38,6 +40,7 @@ const allProjects = [
     title: "Project Management for Research Labs",
     subtitle: "GitHub, Website",
     year: "2025",
+    image: "/images/default_image.png",
     description:
       "Serverless orchestration for dynamic AI routing across 30+ researchers and multi-lab workflows. Sub-200ms average Cloud Functions response under concurrent load. Metadata-aware prompting for task summaries, project updates, automated decision support.",
     stats: ["<200ms response", "30+ researchers", "multi-lab"],
@@ -49,6 +52,7 @@ const allProjects = [
     title: "HTIC Shuttle",
     subtitle: "App Store, Play Store, GitHub, Website",
     year: "2025",
+    image: "/images/schedule.jpg",
     description:
       "Live shuttle tracking for 25+ daily users on iOS, Android, web. 70%+ reduction in duplicate/conflicting pickups via event serialization and state validation. Real-time sync under 100ms Firebase RTDB latency.",
     stats: ["25+ users", "70%+ reduction", "<100ms sync"],
@@ -60,6 +64,7 @@ const allProjects = [
     title: "CyberEdu",
     subtitle: "App Store, Play Store, GitHub, Website",
     year: "2025",
+    image: "/images/CyberEdu.png",
     description:
       "Synchronized iOS+Android apps for live event updates (50+ users). 99%+ cross-device sync reliability across unstable networks.",
     stats: ["50+ users", "99%+ sync", "iOS + Android"],
@@ -71,6 +76,7 @@ const allProjects = [
     title: "Whiteboard AI",
     subtitle: "GitHub, Website",
     year: "2025",
+    image: "/images/whiteboardai.png",
     description:
       "Transformer-based vision inference at 150–200ms latency; real-time CRDT-like collaboration. 5+ concurrent users (scalable to 25). Multi-user async WebSocket pipeline with queueing and cross-tab sync.",
     stats: ["150–200ms", "5+ users", "CRDT-like"],
@@ -82,6 +88,7 @@ const allProjects = [
     title: "With",
     subtitle: "GitHub",
     year: "2024–2025",
+    image: "/images/default_image.png",
     description:
       "Offline-capable LLM chat using GGUF + llama.cpp, <50ms/token local inference. 2GB+ memory savings via quantization and optimized caching/streaming. MVVM SwiftUI, advanced system prompt management.",
     stats: ["<50ms/token", "2GB+ saved", "offline"],
@@ -93,6 +100,7 @@ const allProjects = [
     title: "Ryo Fujimura Website",
     subtitle: "GitHub, Website",
     year: "2024–2025",
+    image: "/images/homepage.png",
     description:
       "Client-side performance tuning: 40–60% faster load. Modular components for rapid content iteration and clean deployment (Vercel/GitHub Pages).",
     stats: ["40–60% faster", "modular", "Vercel"],
@@ -104,6 +112,7 @@ const allProjects = [
     title: "Matcha Time",
     subtitle: "App Store, GitHub, Website",
     year: "2024",
+    image: "/images/matchatime_1.jpg",
     description:
       "Swift/SwiftUI time zone coordination tool; 50 users at launch. 4-week idea-to-launch: project planning and execution.",
     stats: ["50 users", "4-week launch", "SwiftUI"],
@@ -115,6 +124,7 @@ const allProjects = [
     title: "Schedule Mastermind",
     subtitle: "GitHub, Website",
     year: "2023–2024",
+    image: "/images/schedule.jpg",
     description:
       "Python Flask scheduler for 500+ courses with real-time conflict detection. Improved planning for 100–300+ students, 70%+ fewer scheduling errors.",
     stats: ["500+ courses", "70%+ fewer errors", "Flask"],
@@ -126,6 +136,7 @@ const allProjects = [
     title: "Shohei Home Ground",
     subtitle: "Instagram, YouTube",
     year: "2023",
+    image: "/images/shoheihomeground_1.jpg",
     description:
       "Automated daily Instagram posting (685 posts), 11K followers in 8 months. Python automation saved 2+ hours/day; consistent content and monetization.",
     stats: ["11K followers", "685 posts", "2+ hr/day saved"],
@@ -137,6 +148,7 @@ const allProjects = [
     title: "Poker Percentage",
     subtitle: "App Store, GitHub",
     year: "2022–2024",
+    image: "/images/poker.png",
     description:
       "WatchOS poker odds calculator, <10ms probability lookups via precomputed tables. Fast, reliable real-time equity insights.",
     stats: ["<10ms lookup", "WatchOS", "precomputed"],
@@ -188,6 +200,8 @@ function ProjectBlock({
   const hasAppStore = "appStore" in project.links && (project.links as { appStore?: string }).appStore
   const hasPlayStore = "playStore" in project.links && (project.links as { playStore?: string }).playStore
 
+  const thumbSrc = "image" in project ? (project as { image: string }).image : undefined
+
   return (
     <article
       ref={blockRef}
@@ -197,14 +211,21 @@ function ProjectBlock({
         "min-h-0"
       )}
     >
-      {/* Editorial label — Motorist magazine style */}
-      <div className="md:border-r-2 md:border-foreground md:min-w-[4.5rem] lg:min-w-[5.5rem] flex md:flex-col md:justify-start md:pt-6 md:pb-6 md:pl-4 md:pr-4 lg:pl-6 lg:pr-6 pt-4 pb-2 md:pt-6 md:pb-4">
-        <span className="font-mono text-[10px] xs:text-xs sm:text-sm text-muted-foreground uppercase tracking-[0.2em] md:tracking-[0.25em]">
-          Project
-        </span>
-        <span className="font-mono text-lg sm:text-xl md:text-2xl lg:text-3xl font-black text-foreground tabular-nums ml-2 md:ml-0 md:mt-1">
-          {project.id}
-        </span>
+      {/* Editorial label + project thumb */}
+      <div className="md:border-r-2 md:border-foreground md:min-w-[4.5rem] lg:min-w-[5.5rem] flex flex-row md:flex-col md:justify-start md:pt-6 md:pb-6 md:pl-4 md:pr-4 lg:pl-6 lg:pr-6 pt-4 pb-2 md:pt-6 md:pb-4 gap-3 md:gap-0 items-center md:items-stretch">
+        <div className="flex flex-col">
+          <span className="font-mono text-[10px] xs:text-xs sm:text-sm text-muted-foreground uppercase tracking-[0.2em] md:tracking-[0.25em]">
+            Project
+          </span>
+          <span className="font-mono text-lg sm:text-xl md:text-2xl lg:text-3xl font-black text-foreground tabular-nums md:mt-1">
+            {project.id}
+          </span>
+        </div>
+        {thumbSrc && (
+          <div className="w-14 h-14 sm:w-16 sm:h-16 md:mt-3 border-2 border-foreground overflow-hidden flex-shrink-0 shadow-[3px_3px_0_0_var(--foreground)]">
+            <img src={thumbSrc} alt="" className="w-full h-full object-cover" width={64} height={64} />
+          </div>
+        )}
       </div>
 
       <div className="pb-6 sm:pb-8 md:pb-8 md:pl-6 lg:pl-8 md:pr-6 lg:pr-8 md:pt-6">
