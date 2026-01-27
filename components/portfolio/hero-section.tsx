@@ -2,191 +2,152 @@
 
 import { useEffect, useRef, useState } from "react"
 import { gsap } from "gsap"
-import { ScrollTrigger } from "gsap/ScrollTrigger"
-import { GSAPText, GSAPSVG } from "@/components/gsap-text"
-import { BlueprintLines, TechnicalPattern } from "@/components/technical-grid"
+import { GSAPText } from "@/components/gsap-text"
+import { HeroBrutalistPattern } from "@/components/hero-brutalist-pattern"
+import { HeroAsciiBlock } from "@/components/hero-ascii-block"
 import { MagneticButton } from "@/components/magnetic-button"
-import { AsciiHeroLine } from "@/components/ascii-banner"
 import { ArrowDown, Github, Linkedin, Mail, ArrowRight } from "lucide-react"
 import { LocationHoverText } from "@/components/portfolio/location-hover-text"
 
-gsap.registerPlugin(ScrollTrigger)
+const HERO_ASCII_LINES = [
+  "  ┌─────────────────────────────────────────────────────────────────────────────┐",
+  "  │  RF.DV.HERO.001  │  OBSERVATION_LOG  │  CIRCA_2025                            │",
+  "  │  > status: AVAILABLE_FOR_WORK  │  locale: Irvine, CA                          │",
+  "  └─────────────────────────────────────────────────────────────────────────────┘",
+]
 
 export function HeroSection() {
-  const containerRef = useRef<HTMLDivElement>(null)
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
-  const [isTouch, setIsTouch] = useState(false)
+  const containerRef = useRef<HTMLElement>(null)
   const gridRef = useRef<HTMLDivElement>(null)
-  const linesRef = useRef<SVGSVGElement>(null)
+  const contentRef = useRef<HTMLDivElement>(null)
+  const ctaRef = useRef<HTMLDivElement>(null)
+  const scrollCueRef = useRef<HTMLDivElement>(null)
+  const [isTouch, setIsTouch] = useState(false)
 
   useEffect(() => {
-    setIsTouch("ontouchstart" in window || navigator.maxTouchPoints > 0)
+    setIsTouch(typeof window !== "undefined" && ("ontouchstart" in window || navigator.maxTouchPoints > 0))
   }, [])
-
-  useEffect(() => {
-    if (isTouch) return
-    const handleMouseMove = (e: MouseEvent) => {
-      setMousePosition({
-        x: (e.clientX / window.innerWidth - 0.5) * 2,
-        y: (e.clientY / window.innerHeight - 0.5) * 2,
-      })
-    }
-    window.addEventListener("mousemove", handleMouseMove)
-    return () => window.removeEventListener("mousemove", handleMouseMove)
-  }, [isTouch])
 
   useEffect(() => {
     if (!containerRef.current) return
 
-    // Animate the technical lines on load
-    if (linesRef.current) {
-      const paths = linesRef.current.querySelectorAll("path, line, circle")
-      gsap.fromTo(
-        paths,
-        { strokeDasharray: "0 2000", opacity: 0 },
-        {
-          strokeDasharray: "2000 0",
-          opacity: 1,
-          duration: 2.5,
-          stagger: 0.08,
-          ease: "power2.out",
-          delay: 0.5,
-        }
-      )
-    }
+    const ctx = gsap.context(() => {
+      if (gridRef.current) {
+        gsap.fromTo(gridRef.current, { opacity: 0 }, { opacity: 0.14, duration: 1.4, ease: "power2.out" })
+      }
+      if (contentRef.current) {
+        gsap.fromTo(contentRef.current, { opacity: 0 }, { opacity: 1, duration: 0.6, delay: 0.4 })
+      }
+      if (ctaRef.current) {
+        gsap.fromTo(
+          ctaRef.current.children,
+          { opacity: 0, y: 8 },
+          { opacity: 1, y: 0, duration: 0.5, stagger: 0.06, delay: 2.2, ease: "power2.out" }
+        )
+      }
+      if (scrollCueRef.current) {
+        gsap.fromTo(scrollCueRef.current, { opacity: 0 }, { opacity: 1, duration: 0.8, delay: 2.8 })
+      }
+    }, containerRef)
 
-    // Grid fade in — subtle technical lines
-    if (gridRef.current) {
-      gsap.fromTo(
-        gridRef.current,
-        { opacity: 0 },
-        { opacity: 0.07, duration: 2, delay: 0.3 }
-      )
-    }
+    return () => ctx.revert()
   }, [])
-
-  const parallax = !isTouch ? { x: mousePosition.x * 5, y: mousePosition.y * 5 } : { x: 0, y: 0 }
-  const blueprintMove = !isTouch ? { x: mousePosition.x * -20, y: -50 + mousePosition.y * -20 } : { x: 0, y: -50 }
 
   return (
     <section
       ref={containerRef}
       className="relative min-h-[100dvh] min-h-screen flex items-center justify-center px-4 sm:px-6 pt-[max(5rem,env(safe-area-inset-top))] pb-8 overflow-hidden"
     >
-      {/* Brutalist technical grid — complex line pattern */}
+      {/* Dense brutalist grid — technical lines */}
       <div
         ref={gridRef}
-        className="absolute inset-0 opacity-0 bg-brutalist-grid"
+        className="absolute inset-0 opacity-0 text-foreground"
         style={{
-          backgroundSize: "min(48px, 10vw) min(48px, 10vw)",
-          transform: `translate(${parallax.x}px, ${parallax.y}px)`,
-          transition: "transform 0.3s ease-out",
+          backgroundImage: `
+            linear-gradient(to right, currentColor 1px, transparent 1px),
+            linear-gradient(to bottom, currentColor 1px, transparent 1px)
+          `,
+          backgroundSize: "min(32px, 8vw) min(32px, 8vw)",
         }}
+        aria-hidden
       />
 
-      {/* Blueprint — desktop only to save mobile paint */}
-      <div
-        className="absolute left-0 top-1/2 -translate-y-1/2 w-[500px] h-[500px] text-foreground/10 pointer-events-none hidden md:block"
-        style={{
-          transform: `translate(${blueprintMove.x}px, ${blueprintMove.y}%)`,
-          transition: "transform 0.5s ease-out",
-        }}
-      >
-        <BlueprintLines className="w-full h-full" />
+      {/* Complex technical pattern — draws on via GSAP inside HeroBrutalistPattern */}
+      <div className="absolute inset-0 pointer-events-none text-foreground/[0.07] dark:text-foreground/[0.12]">
+        <HeroBrutalistPattern className="w-full h-full" />
       </div>
 
-      {/* Vitruvian SVG — desktop only */}
-      <GSAPSVG
-        className="absolute right-0 top-1/2 -translate-y-1/2 w-[400px] h-[400px] text-foreground/10 pointer-events-none hidden lg:block"
-        duration={3}
-        delay={1}
-      >
-        <svg viewBox="0 0 400 400" className="w-full h-full" fill="none" stroke="currentColor">
-          <circle cx="200" cy="200" r="180" strokeWidth="0.5" />
-          <circle cx="200" cy="200" r="120" strokeWidth="0.5" />
-          <rect x="60" y="60" width="280" height="280" strokeWidth="0.5" />
-          <line x1="200" y1="20" x2="200" y2="380" strokeWidth="0.3" />
-          <line x1="20" y1="200" x2="380" y2="200" strokeWidth="0.3" />
-          <circle cx="200" cy="200" r="3" fill="currentColor" />
-          <circle cx="200" cy="76" r="2" fill="currentColor" />
-          <circle cx="200" cy="324" r="2" fill="currentColor" />
-          <circle cx="76" cy="200" r="2" fill="currentColor" />
-          <circle cx="324" cy="200" r="2" fill="currentColor" />
-        </svg>
-      </GSAPSVG>
+      {/* Main content — ASCII-first brutalist layout */}
+      <div ref={contentRef} className="max-w-4xl mx-auto w-full relative z-10">
+        <div className="grid lg:grid-cols-[1fr,auto] gap-12 lg:gap-16 items-start">
+          <div className="space-y-6 sm:space-y-8">
+            {/* ASCII header block — line-by-line GSAP reveal */}
+            <HeroAsciiBlock
+              lines={HERO_ASCII_LINES}
+              delay={0.6}
+              stagger={0.08}
+              duration={0.4}
+            />
 
-      <TechnicalPattern />
-
-      {/* Main content — mobile-first, Leonardo + ASCII accent */}
-      <div className="max-w-6xl mx-auto w-full relative z-10">
-        <div className="grid lg:grid-cols-2 gap-10 sm:gap-16 items-center">
-          <div className="space-y-4 sm:space-y-6 md:space-y-8">
-            {/* Brutalist ASCII header */}
-            <pre className="font-mono text-[8px] xs:text-[9px] sm:text-[10px] text-muted-foreground/60 overflow-x-auto py-0.5 touch-manipulation whitespace-pre" aria-hidden>
-{`  ┌─────────────────────────────────────────────────────────────┐
-  │ FOLIO: RF.DV.HERO.001 — OBSERVATION LOG — CIRCA 2025          │
-  │ > status: AVAILABLE_FOR_WORK  │  locale: Irvine, CA           │
-  └─────────────────────────────────────────────────────────────┘`}
-            </pre>
-            <AsciiHeroLine> status: AVAILABLE_FOR_WORK</AsciiHeroLine>
-
-            <div className="flex items-center gap-2 sm:gap-3">
-              <div className="w-2 h-2 bg-accent animate-pulse shrink-0" />
-              <span className="text-[10px] xs:text-xs font-mono uppercase tracking-[0.2em] sm:tracking-[0.3em] text-muted-foreground">
-                Available for Work
-              </span>
-            </div>
-
+            {/* Status scramble — terminal flicker */}
             <GSAPText
               variant="scramble"
-              className="text-xs sm:text-sm font-mono uppercase tracking-[0.3em] sm:tracking-[0.5em] text-muted-foreground"
-              delay={0.2}
+              className="text-[10px] xs:text-xs font-mono uppercase tracking-[0.2em] text-muted-foreground/80"
+              delay={1.0}
+              playOnLoad
             >
-              Software Engineer & AI Researcher
+              status: AVAILABLE_FOR_WORK
             </GSAPText>
 
-            {/* Main title — responsive scale */}
-            <div className="space-y-0 sm:space-y-2">
+            {/* Name — brutalist typography, char stagger */}
+            <div className="space-y-0 leading-[0.88] tracking-[-0.04em]">
               <GSAPText
                 variant="chars"
-                className="text-4xl xs:text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black text-foreground leading-[0.9] tracking-tighter font-mono"
-                stagger={0.03}
-                duration={0.6}
+                className="text-4xl xs:text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black text-foreground font-mono"
+                stagger={0.025}
+                duration={0.5}
+                delay={1.1}
+                playOnLoad
               >
                 RYO
               </GSAPText>
               <GSAPText
                 variant="chars"
-                className="text-4xl xs:text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black text-foreground leading-[0.9] tracking-tighter font-mono"
-                delay={0.3}
-                stagger={0.03}
-                duration={0.6}
+                className="text-4xl xs:text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black text-foreground font-mono"
+                stagger={0.025}
+                duration={0.5}
+                delay={1.35}
+                playOnLoad
               >
                 FUJIMURA
               </GSAPText>
             </div>
 
+            {/* Role — words reveal */}
             <GSAPText
               variant="words"
-              className="text-base sm:text-xl md:text-2xl text-muted-foreground font-light max-w-md leading-relaxed"
-              delay={0.8}
-              stagger={0.08}
+              className="text-xs sm:text-sm font-mono uppercase tracking-[0.25em] sm:tracking-[0.35em] text-muted-foreground"
+              delay={1.7}
+              stagger={0.05}
+              duration={0.4}
+              playOnLoad
             >
-              Building intelligent systems at the intersection of AI research and real-world applications
+              Software Engineer & AI Researcher
             </GSAPText>
 
-            <div className="pt-2 sm:pt-4 border-t border-border">
-              <GSAPText
-                variant="lines"
-                className="text-xs sm:text-sm text-muted-foreground/60 font-mono italic"
-                delay={1.2}
-              >
-                &quot;// Simplicity is the ultimate sophistication.&quot; — Leonardo da Vinci
-              </GSAPText>
-            </div>
+            {/* Tagline — single line */}
+            <GSAPText
+              variant="lines"
+              className="text-sm sm:text-base text-muted-foreground/80 max-w-lg font-mono"
+              delay={1.95}
+              duration={0.5}
+              playOnLoad
+            >
+              Building intelligent systems at the intersection of AI research and real-world applications.
+            </GSAPText>
 
-            {/* CTAs — 44px+ touch targets */}
-            <div className="flex flex-col xs:flex-row flex-wrap gap-3 sm:gap-4 pt-4 sm:pt-6">
+            {/* CTAs — stagger in */}
+            <div ref={ctaRef} className="flex flex-col xs:flex-row flex-wrap gap-3 sm:gap-4 pt-2 sm:pt-4">
               <MagneticButton
                 as="a"
                 href="#projects"
@@ -205,8 +166,8 @@ export function HeroSection() {
               </MagneticButton>
             </div>
 
-            {/* Social — 44px tap targets, image icons */}
-            <div className="flex flex-wrap items-center gap-3 sm:gap-6 pt-2 sm:pt-4">
+            {/* Social + location */}
+            <div className="flex flex-wrap items-center gap-3 sm:gap-6 pt-2">
               <div className="flex items-center gap-0.5 sm:gap-1">
                 {[
                   { href: "https://github.com/ryofujimura", img: "/images/github.png", label: "GitHub" },
@@ -242,84 +203,27 @@ export function HeroSection() {
             </div>
           </div>
 
-          {/* Right column — desktop only, no 3D on touch */}
-          <div className="hidden lg:block relative">
-            <div
-              className="relative aspect-square max-w-lg mx-auto"
-              style={{
-                transform: isTouch
-                  ? "none"
-                  : `perspective(1000px) rotateY(${mousePosition.x * 5}deg) rotateX(${-mousePosition.y * 5}deg)`,
-                transition: "transform 0.3s ease-out",
-              }}
-            >
-              {/* Wireframe cube - animated */}
-              <GSAPSVG className="absolute inset-0 text-foreground" duration={2}>
-                <svg viewBox="0 0 400 400" className="w-full h-full" fill="none" stroke="currentColor" strokeWidth="1">
-                  {/* Front face */}
-                  <rect x="100" y="100" width="200" height="200" opacity="0.4" />
-                  {/* Back face */}
-                  <rect x="140" y="60" width="200" height="200" opacity="0.2" />
-                  {/* Connecting lines */}
-                  <line x1="100" y1="100" x2="140" y2="60" opacity="0.3" />
-                  <line x1="300" y1="100" x2="340" y2="60" opacity="0.3" />
-                  <line x1="100" y1="300" x2="140" y2="260" opacity="0.3" />
-                  <line x1="300" y1="300" x2="340" y2="260" opacity="0.3" />
-                </svg>
-              </GSAPSVG>
-
-              {/* Inner technical details */}
-              <GSAPSVG className="absolute inset-0 text-foreground" duration={3} delay={1}>
-                <svg viewBox="0 0 400 400" className="w-full h-full" fill="none" stroke="currentColor" strokeWidth="0.5">
-                  {/* Diagonal cross */}
-                  <line x1="100" y1="100" x2="300" y2="300" opacity="0.2" />
-                  <line x1="300" y1="100" x2="100" y2="300" opacity="0.2" />
-                  {/* Center circle */}
-                  <circle cx="200" cy="200" r="50" opacity="0.3" />
-                  <circle cx="200" cy="200" r="80" opacity="0.2" />
-                  {/* Technical marks */}
-                  <line x1="200" y1="100" x2="200" y2="120" opacity="0.4" />
-                  <line x1="200" y1="280" x2="200" y2="300" opacity="0.4" />
-                  <line x1="100" y1="200" x2="120" y2="200" opacity="0.4" />
-                  <line x1="280" y1="200" x2="300" y2="200" opacity="0.4" />
-                </svg>
-              </GSAPSVG>
-
-              {/* Floating labels */}
-              <div className="absolute top-4 left-4 text-xs font-mono text-muted-foreground/50">
-                <span>x: 200</span>
-              </div>
-              <div className="absolute bottom-4 right-4 text-xs font-mono text-muted-foreground/50">
-                <span>y: 200</span>
-              </div>
-
-              {/* Profile image — brutalist frame */}
-              <div className="absolute inset-0 flex items-center justify-center p-6">
-                <div className="relative w-40 h-40 sm:w-48 sm:h-48 border-[3px] border-foreground bg-background shadow-[6px_6px_0_0_var(--foreground)] overflow-hidden">
-                  <img
-                    src="/images/profile.jpg"
-                    alt="Ryo Fujimura"
-                    className="w-full h-full object-cover object-top"
-                    width={192}
-                    height={192}
-                  />
-                  <div className="absolute inset-0 pointer-events-none border border-foreground/20 mix-blend-overlay" />
-                  <span className="absolute bottom-1 right-1 font-mono text-[8px] text-foreground/60 bg-background/90 px-1">RF</span>
-                </div>
-              </div>
-            </div>
+          {/* Right: technical SVG + profile — desktop */}
+          <div className="hidden lg:block relative w-full max-w-[340px]">
+            <HeroTechnicalFigure />
           </div>
         </div>
       </div>
 
-      {/* Scroll — ASCII cue, below fold on small screens */}
-      <div className="absolute bottom-4 sm:bottom-8 left-1/2 -translate-x-1/2 pb-[env(safe-area-inset-bottom)]">
+      {/* Scroll cue — ASCII */}
+      <div
+        ref={scrollCueRef}
+        className="absolute bottom-4 sm:bottom-8 left-1/2 -translate-x-1/2 pb-[env(safe-area-inset-bottom)] opacity-0"
+      >
         <div className="flex flex-col items-center gap-2 sm:gap-4">
           <span className="text-[10px] font-mono uppercase tracking-[0.3em] sm:tracking-[0.4em] text-muted-foreground">
             &gt; scroll
           </span>
           <div className="w-px h-10 sm:h-16 bg-foreground/20 relative overflow-hidden">
-            <div className="absolute top-0 left-0 w-full h-6 sm:h-8 bg-foreground animate-[slideDown_2s_ease-in-out_infinite]" />
+            <div
+              className="absolute top-0 left-0 w-full h-6 sm:h-8 bg-foreground"
+              style={{ animation: "slideDown 2s ease-in-out infinite" }}
+            />
           </div>
         </div>
       </div>
@@ -332,5 +236,75 @@ export function HeroSection() {
         }
       `}</style>
     </section>
+  )
+}
+
+/** Desktop-only technical figure: draw-on SVG + brutalist profile frame */
+function HeroTechnicalFigure() {
+  const svgRef = useRef<SVGSVGElement>(null)
+
+  useEffect(() => {
+    const el = svgRef.current
+    if (!el) return
+
+    const paths = el.querySelectorAll("path, line, circle, polyline")
+    paths.forEach((p) => {
+      const el = p as SVGGeometryElement
+      if (typeof el.getTotalLength === "function") {
+        try {
+          const len = el.getTotalLength()
+          gsap.set(el, { strokeDasharray: len, strokeDashoffset: len })
+        } catch {
+          /* skip */
+        }
+      }
+    })
+
+    gsap.to(paths, {
+      strokeDashoffset: 0,
+      duration: 2.2,
+      stagger: 0.05,
+      delay: 0.8,
+      ease: "power2.inOut",
+    })
+  }, [])
+
+  return (
+    <div className="relative aspect-square">
+      <svg
+        ref={svgRef}
+        viewBox="0 0 400 400"
+        className="absolute inset-0 w-full h-full text-foreground/[0.08] dark:text-foreground/[0.12]"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="0.5"
+      >
+        <circle cx="200" cy="200" r="180" />
+        <circle cx="200" cy="200" r="120" />
+        <circle cx="200" cy="200" r="60" />
+        <line x1="200" y1="20" x2="200" y2="380" />
+        <line x1="20" y1="200" x2="380" y2="200" />
+        <line x1="50" y1="50" x2="350" y2="350" />
+        <line x1="350" y1="50" x2="50" y2="350" />
+        <path d="M 80 80 L 80 40 L 120 40" />
+        <path d="M 320 80 L 320 40 L 280 40" />
+        <path d="M 80 320 L 80 360 L 120 360" />
+        <path d="M 320 320 L 320 360 L 280 360" />
+      </svg>
+      <div className="absolute inset-0 flex items-center justify-center p-8">
+        <div className="relative w-36 h-36 sm:w-44 sm:h-44 border-[3px] border-foreground bg-background shadow-[6px_6px_0_0_var(--foreground)] overflow-hidden">
+          <img
+            src="/images/profile.jpg"
+            alt="Ryo Fujimura"
+            className="w-full h-full object-cover object-top"
+            width={176}
+            height={176}
+          />
+          <span className="absolute bottom-1 right-1 font-mono text-[8px] text-foreground/60 bg-background/90 px-1">
+            RF
+          </span>
+        </div>
+      </div>
+    </div>
   )
 }

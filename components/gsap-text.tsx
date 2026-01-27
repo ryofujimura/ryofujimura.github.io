@@ -16,6 +16,8 @@ interface GSAPTextProps {
   stagger?: number
   duration?: number
   scrub?: boolean
+  /** When true, animate on load with delay only (no ScrollTrigger). For hero sections. */
+  playOnLoad?: boolean
 }
 
 export function GSAPText({
@@ -26,6 +28,7 @@ export function GSAPText({
   stagger = 0.02,
   duration = 0.8,
   scrub = false,
+  playOnLoad = false,
 }: GSAPTextProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const hasAnimated = useRef(false)
@@ -35,6 +38,12 @@ export function GSAPText({
 
     const container = containerRef.current
     const text = children
+
+    const scrollTriggerConfig = playOnLoad
+      ? undefined
+      : scrub
+        ? { trigger: container, start: "top 85%", end: "top 30%", scrub: 1 }
+        : { trigger: container, start: "top 85%", toggleActions: "play none none none" }
 
     if (variant === "chars") {
       container.innerHTML = text
@@ -55,18 +64,7 @@ export function GSAPText({
         stagger,
         delay,
         ease: "power4.out",
-        scrollTrigger: scrub
-          ? {
-              trigger: container,
-              start: "top 85%",
-              end: "top 30%",
-              scrub: 1,
-            }
-          : {
-              trigger: container,
-              start: "top 85%",
-              toggleActions: "play none none none",
-            },
+        ...(scrollTriggerConfig ? { scrollTrigger: scrollTriggerConfig } : {}),
       })
     } else if (variant === "words") {
       container.innerHTML = text
@@ -85,18 +83,7 @@ export function GSAPText({
         stagger: stagger * 3,
         delay,
         ease: "power4.out",
-        scrollTrigger: scrub
-          ? {
-              trigger: container,
-              start: "top 85%",
-              end: "top 30%",
-              scrub: 1,
-            }
-          : {
-              trigger: container,
-              start: "top 85%",
-              toggleActions: "play none none none",
-            },
+        ...(scrollTriggerConfig ? { scrollTrigger: scrollTriggerConfig } : {}),
       })
     } else if (variant === "lines") {
       container.innerHTML = `<span class="block overflow-hidden"><span class="block translate-y-full">${text}</span></span>`
@@ -108,11 +95,7 @@ export function GSAPText({
         duration,
         delay,
         ease: "power4.out",
-        scrollTrigger: {
-          trigger: container,
-          start: "top 85%",
-          toggleActions: "play none none none",
-        },
+        ...(scrollTriggerConfig ? { scrollTrigger: scrollTriggerConfig } : {}),
       })
     } else if (variant === "scramble") {
       const chars = "!<>-_\\/[]{}—=+*^?#_ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
@@ -121,37 +104,38 @@ export function GSAPText({
 
       container.textContent = originalText.split("").map(() => chars[Math.floor(Math.random() * chars.length)]).join("")
 
+      const runScramble = () => {
+        const id = setInterval(() => {
+          container.textContent = originalText
+            .split("")
+            .map((char, index) => {
+              if (index < iteration) return char
+              return chars[Math.floor(Math.random() * chars.length)]
+            })
+            .join("")
+          if (iteration >= originalText.length) clearInterval(id)
+          iteration += 1 / 2
+        }, 30)
+      }
+
+      if (playOnLoad) {
+        hasAnimated.current = true
+        const t = setTimeout(runScramble, delay * 1000)
+        return () => clearTimeout(t)
+      }
       ScrollTrigger.create({
         trigger: container,
         start: "top 85%",
-        onEnter: () => {
-          const interval = setInterval(() => {
-            container.textContent = originalText
-              .split("")
-              .map((char, index) => {
-                if (index < iteration) {
-                  return char
-                }
-                return chars[Math.floor(Math.random() * chars.length)]
-              })
-              .join("")
-
-            if (iteration >= originalText.length) {
-              clearInterval(interval)
-            }
-
-            iteration += 1 / 2
-          }, 30)
-        },
+        onEnter: runScramble,
       })
     }
 
     hasAnimated.current = true
 
     return () => {
-      ScrollTrigger.getAll().forEach((trigger) => trigger.kill())
+      if (!playOnLoad) ScrollTrigger.getAll().forEach((t) => t.kill())
     }
-  }, [children, variant, delay, stagger, duration, scrub])
+  }, [children, variant, delay, stagger, duration, scrub, playOnLoad])
 
   return <div ref={containerRef} className={className} />
 }
