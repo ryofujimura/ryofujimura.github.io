@@ -261,7 +261,7 @@ export function HeroSection() {
             </div>
           </div>
 
-          {/* Right column — desktop only, interactive cube */}
+          {/* Right column — desktop only, interactive 3D cube */}
           <div className="hidden lg:block relative">
             <div
               className="relative aspect-square max-w-lg mx-auto cursor-grab active:cursor-grabbing"
@@ -278,50 +278,45 @@ export function HeroSection() {
               onPointerUp={handleCubePointerUp}
               onPointerLeave={handleCubePointerUp}
             >
-              {/* Wireframe cube - animated */}
-              <GSAPSVG className="absolute inset-0 text-foreground" duration={2}>
-                <svg viewBox="0 0 400 400" className="w-full h-full" fill="none" stroke="currentColor" strokeWidth="1">
-                  {/* Front face */}
-                  <rect x="100" y="100" width="200" height="200" opacity="0.4" />
-                  {/* Back face */}
-                  <rect x="140" y="60" width="200" height="200" opacity="0.2" />
-                  {/* Connecting lines */}
-                  <line x1="100" y1="100" x2="140" y2="60" opacity="0.3" />
-                  <line x1="300" y1="100" x2="340" y2="60" opacity="0.3" />
-                  <line x1="100" y1="300" x2="140" y2="260" opacity="0.3" />
-                  <line x1="300" y1="300" x2="340" y2="260" opacity="0.3" />
-                </svg>
-              </GSAPSVG>
-
-              {/* Inner technical details */}
-              <GSAPSVG className="absolute inset-0 text-foreground" duration={3} delay={1}>
-                <svg viewBox="0 0 400 400" className="w-full h-full" fill="none" stroke="currentColor" strokeWidth="0.5">
-                  {/* Diagonal cross */}
-                  <line x1="100" y1="100" x2="300" y2="300" opacity="0.2" />
-                  <line x1="300" y1="100" x2="100" y2="300" opacity="0.2" />
-                  {/* Center circle */}
-                  <circle cx="200" cy="200" r="50" opacity="0.3" />
-                  <circle cx="200" cy="200" r="80" opacity="0.2" />
-                  {/* Technical marks */}
-                  <line x1="200" y1="100" x2="200" y2="120" opacity="0.4" />
-                  <line x1="200" y1="280" x2="200" y2="300" opacity="0.4" />
-                  <line x1="100" y1="200" x2="120" y2="200" opacity="0.4" />
-                  <line x1="280" y1="200" x2="300" y2="200" opacity="0.4" />
-                </svg>
-              </GSAPSVG>
-
-              {/* Floating labels */}
-              <div className="absolute top-4 left-4 text-xs font-mono text-muted-foreground/50">
-                <span>x: 200</span>
-              </div>
-              <div className="absolute bottom-4 right-4 text-xs font-mono text-muted-foreground/50">
-                <span>y: 200</span>
-              </div>
-
-              {/* Profile placeholder */}
               <div className="absolute inset-0 flex items-center justify-center">
-                <div className="w-32 h-32 border-2 border-foreground/20 flex items-center justify-center bg-background/80">
-                  <span className="text-4xl font-black text-foreground/30">RF</span>
+                <div
+                  className="relative"
+                  style={{
+                    width: 180,
+                    height: 180,
+                    transformStyle: "preserve-3d",
+                  }}
+                >
+                  {/* Front */}
+                  <div
+                    className="absolute inset-0 border-2 border-foreground bg-background/80"
+                    style={{ transform: "translateZ(90px)" }}
+                  />
+                  {/* Back */}
+                  <div
+                    className="absolute inset-0 border-2 border-foreground/40 bg-background/40"
+                    style={{ transform: "rotateY(180deg) translateZ(90px)" }}
+                  />
+                  {/* Right */}
+                  <div
+                    className="absolute inset-0 border-2 border-foreground/60 bg-background/60"
+                    style={{ transform: "rotateY(90deg) translateZ(90px)" }}
+                  />
+                  {/* Left */}
+                  <div
+                    className="absolute inset-0 border-2 border-foreground/60 bg-background/60"
+                    style={{ transform: "rotateY(-90deg) translateZ(90px)" }}
+                  />
+                  {/* Top */}
+                  <div
+                    className="absolute inset-0 border-2 border-foreground/70 bg-background/70"
+                    style={{ transform: "rotateX(90deg) translateZ(90px)" }}
+                  />
+                  {/* Bottom */}
+                  <div
+                    className="absolute inset-0 border-2 border-foreground/40 bg-background/40"
+                    style={{ transform: "rotateX(-90deg) translateZ(90px)" }}
+                  />
                 </div>
               </div>
             </div>
