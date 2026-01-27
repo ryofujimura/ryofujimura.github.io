@@ -173,12 +173,16 @@ export function GSAPSVG({ children, className = "", duration = 2, delay = 0 }: G
 
     paths.forEach((path) => {
       const element = path as SVGGeometryElement
-      if (element.getTotalLength) {
-        const length = element.getTotalLength()
-        gsap.set(element, {
-          strokeDasharray: length,
-          strokeDashoffset: length,
-        })
+      if (typeof element.getTotalLength === "function") {
+        try {
+          const length = element.getTotalLength()
+          gsap.set(element, {
+            strokeDasharray: length,
+            strokeDashoffset: length,
+          })
+        } catch {
+          // Skip non-rendered or unsupported SVG elements
+        }
       }
     })
 
