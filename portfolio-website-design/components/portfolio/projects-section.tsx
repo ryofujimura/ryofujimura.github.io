@@ -5,25 +5,12 @@ import { gsap } from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
 import { ExternalLink, Github, ChevronDown } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { AsciiObjSplitView } from "@/components/ascii-obj-split-view"
 
 gsap.registerPlugin(ScrollTrigger)
 
 const INITIAL_VISIBLE = 4
 
-type Project = {
-  id: string
-  title: string
-  subtitle: string
-  year: string
-  description: string
-  stats: string[]
-  skills: string[]
-  links: Record<string, string>
-  objViewer?: { urls: string[] }
-}
-
-const allProjects: Project[] = [
+const allProjects = [
   {
     id: "01",
     title: "Saboriendo Bakery Platform",
@@ -156,24 +143,9 @@ const allProjects: Project[] = [
     skills: ["Swift", "WatchOS", "probability"],
     links: { github: "https://github.com/ryofujimura", appStore: "#" },
   },
-  {
-    id: "13",
-    title: "Custom 3D-Printed Mouse",
-    subtitle: "ICCPS 2025",
-    year: "2025",
-    description:
-      "Ergonomic 3D-printed mouse designs. OBJ models for mouse1 and mouse2 — interactive ASCII split view (original vs. character-based rendering) per Alex Harri’s shape-aware technique.",
-    stats: ["OBJ viewer", "ASCII split view", "ICCPS 2025"],
-    skills: ["Three.js", "OBJ", "ASCII rendering"],
-    links: { github: "https://github.com/ryofujimura", demo: "#" },
-    objViewer: { urls: ["/models/mouse1.obj", "/models/mouse2.obj"] },
-  },
 ]
 
-function projectLabelFromUrl(url: string): string {
-  const name = url.split("/").pop()?.replace(/\.obj$/i, "") ?? "model"
-  return name
-}
+type Project = (typeof allProjects)[0]
 
 function ProjectBlock({
   project,
@@ -185,9 +157,6 @@ function ProjectBlock({
   totalVisible: number
 }) {
   const blockRef = useRef<HTMLDivElement>(null)
-  const urls = project.objViewer?.urls ?? []
-  const [objIndex, setObjIndex] = useState(0)
-  const selectedUrl = urls[objIndex] ?? urls[0]
 
   useEffect(() => {
     const el = blockRef.current
@@ -278,40 +247,6 @@ function ProjectBlock({
             </span>
           ))}
         </div>
-
-        {/* OBJ + ASCII split view (Alex Harri–style) */}
-        {urls.length > 0 && (
-          <div className="mt-4 sm:mt-5">
-            {urls.length > 1 && (
-              <div className="flex flex-wrap gap-1 sm:gap-2 mb-2">
-                {urls.map((url, i) => (
-                  <button
-                    key={url}
-                    type="button"
-                    onClick={() => setObjIndex(i)}
-                    className={cn(
-                      "touch-target min-h-[44px] font-mono text-[10px] sm:text-xs uppercase tracking-wider px-2.5 py-1.5 sm:px-3 sm:py-2 border-2 transition-colors",
-                      i === objIndex
-                        ? "border-foreground bg-foreground text-background"
-                        : "border-foreground/50 text-foreground hover:border-foreground"
-                    )}
-                  >
-                    {projectLabelFromUrl(url)}
-                  </button>
-                ))}
-              </div>
-            )}
-            <AsciiObjSplitView
-              objUrl={selectedUrl}
-              className="rounded-none"
-              asciiCols={72}
-              asciiRows={36}
-              sampleQuality={2}
-              renderWidth={320}
-              renderHeight={240}
-            />
-          </div>
-        )}
 
         {/* Links — 44px touch targets */}
         <div className="flex flex-wrap gap-2 sm:gap-3 mt-4 sm:mt-5">

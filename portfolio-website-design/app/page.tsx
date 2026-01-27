@@ -3,7 +3,6 @@ import { HeroSection } from "@/components/portfolio/hero-section"
 import { AboutSection } from "@/components/portfolio/about-section"
 import { ExperienceSection } from "@/components/portfolio/experience-section"
 import { ProjectsSection } from "@/components/portfolio/projects-section"
-import { Ascii3DSection } from "@/components/portfolio/ascii-3d-section"
 import { PublicationsSection } from "@/components/portfolio/publications-section"
 import { ContactSection } from "@/components/portfolio/contact-section"
 import { Footer } from "@/components/portfolio/footer"
@@ -18,7 +17,6 @@ export default function Portfolio() {
       <AboutSection />
       <ExperienceSection />
       <ProjectsSection />
-      <Ascii3DSection />
       <PublicationsSection />
       <ContactSection />
       <Footer />
