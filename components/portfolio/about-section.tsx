@@ -133,7 +133,7 @@ export function AboutSection() {
                     />
                   </div>
                   <p className="font-mono text-[8px] sm:text-[9px] text-muted-foreground uppercase tracking-widest mt-1.5">
-                  46
+                  VR46
                   </p>
                 </div>
                 <div className="space-y-4 sm:space-y-6 min-w-0 flex-1">
@@ -159,7 +159,7 @@ export function AboutSection() {
               </div>
               {/* Stats full width — clickable cards with brutalist hover and GSAP entrance */}
               <div className="w-full" ref={statsRef}>
-                <dl className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+                <dl className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
                   {stats.map((s) => {
                     const isLink = !!s.sectionId
                     const Wrapper = isLink ? "button" : "div"
@@ -259,7 +259,7 @@ export function AboutSection() {
                     CURRENTLY
                   </p>
                   <p className="text-sm sm:text-base text-foreground/90 leading-relaxed">
-                  Undergraduate researcher at CPX Lab building mobile and on-device AI for robotics, temporal modeling, and human–robot interaction.
+                  Computer Science student specializing in mobile systems, on-device AI/ML, and full-stack engineering, with experience building production iOS/Android apps, optimized LLM inference, and real-time data pipelines across research and industry.
                   </p>
                 </div>
                 <div className="space-y-2">
@@ -267,7 +267,7 @@ export function AboutSection() {
                     LOOKING FOR
                   </p>
                   <p className="text-sm sm:text-base text-foreground/90 leading-relaxed">
-                    Roles where AI, mobile, or infra meet rigorous product and research requirements.
+                  A team where I can learn from strong engineers while contributing careful, performance-driven work on applications, applied ML, or infrastructure that values correctness, efficiency, and real-world impact.
                   </p>
                 </div>
               </div>
@@ -393,7 +393,7 @@ export function AboutSection() {
                   STACK SUMMARY
                 </p>
                 <p className="font-mono text-[11px] sm:text-sm text-foreground leading-relaxed">
-                  Python / Swift / Kotlin · React / Next.js · Firebase / Flask · PyTorch / CoreML · Docker / Linux
+                Python / Swift / Kotlin / React / Firebase / PyTorch / CoreML / On-device LLMs / CUDA / Docker
                 </p>
               </div>
             </AnimatedSection>
