@@ -82,6 +82,7 @@ export function ExperienceSection() {
   const [activeIndex, setActiveIndex] = useState(0)
   const contentRefs = useRef<(HTMLDivElement | null)[]>([])
   const entryBgRef = useRef<HTMLDivElement | null>(null)
+  const entryScanRef = useRef<HTMLDivElement | null>(null)
   const entrySvgRef = useRef<SVGSVGElement | null>(null)
   const entryLabelRef = useRef<HTMLDivElement | null>(null)
 
@@ -89,6 +90,7 @@ export function ExperienceSection() {
   useEffect(() => {
     const content = contentRefs.current[activeIndex]
     const entryBg = entryBgRef.current
+    const scan = entryScanRef.current
     const svg = entrySvgRef.current
     const label = entryLabelRef.current
     if (!content) return
@@ -104,15 +106,26 @@ export function ExperienceSection() {
       })
     }
     if (label) gsap.set(label, { opacity: 0 })
-    if (entryBg) gsap.set(entryBg, { opacity: 0, scale: 1.06 })
+    if (entryBg) gsap.set(entryBg, { opacity: 0, scale: 1.06, backgroundPosition: "120% 50%" })
+    if (scan) gsap.set(scan, { opacity: 0, y: -6 })
     gsap.set(content, { opacity: 1, y: 0 })
     const blocks = content.querySelectorAll<HTMLElement>("[data-detail-block]")
     gsap.set(blocks, { opacity: 0, y: 10 })
 
     const tl = gsap.timeline({ overwrite: true })
-    // ENTRY background image fades/scales in first (subtle, brutalist)
+    // ENTRY background image: position + opacity/scale + scanline sweep (loading feel)
     if (entryBg) {
-      tl.to(entryBg, { opacity: 0.12, scale: 1, duration: 0.45, ease: "power3.out" })
+      tl.to(entryBg, {
+        opacity: 0.12,
+        scale: 1,
+        backgroundPosition: "100% 50%",
+        duration: 0.55,
+        ease: "power3.out",
+      })
+      if (scan) {
+        tl.to(scan, { opacity: 0.18, y: 0, duration: 0.18, ease: "power2.out" }, 0.06)
+        tl.to(scan, { opacity: 0, y: 8, duration: 0.22, ease: "power2.in" }, 0.22)
+      }
     }
     // ASCII entry frame (lines + corners) draw in
     if (svg) {
@@ -167,7 +180,7 @@ export function ExperienceSection() {
               variant="words"
               className="text-3xl xs:text-4xl sm:text-5xl md:text-6xl font-black tracking-tight leading-[0.94]"
             >
-              From research to production. Systems built to ship, not demo.
+              from Research to Production. systems built to Ship, not demo.
             </GSAPText>
             <GSAPText
               variant="scramble"
@@ -333,7 +346,7 @@ export function ExperienceSection() {
               {/* ENTRY background image (moves from detail panel to header) */}
               <div
                 ref={entryBgRef}
-                className="pointer-events-none absolute inset-0 origin-center"
+                className="pointer-events-none absolute inset-0 origin-center will-change-transform"
                 style={
                   (experiences[activeIndex]?.panelImage ?? experiences[activeIndex]?.icon)
                     ? {
@@ -348,7 +361,14 @@ export function ExperienceSection() {
                     : undefined
                 }
                 aria-hidden
-              />
+              >
+                {/* Scanline sweep (GSAP) */}
+                <div
+                  ref={entryScanRef}
+                  className="absolute inset-0 opacity-0 bg-[repeating-linear-gradient(180deg,transparent,transparent_6px,theme(colors.foreground/12)_6px,theme(colors.foreground/12)_8px)]"
+                  aria-hidden
+                />
+              </div>
               <svg
                 ref={entrySvgRef}
                 className="absolute left-0 right-0 top-0 h-full w-full min-h-[3rem]"
