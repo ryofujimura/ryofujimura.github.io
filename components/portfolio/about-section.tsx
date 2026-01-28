@@ -141,7 +141,7 @@ export function AboutSection() {
                     ABOUT / SPECIMEN WISTERIA-05
                   </p>
                   <GSAPText
-                    variant="chars"
+                    variant="words"
                     className="text-3xl sm:text-4xl md:text-5xl lg:text-[3.4rem] font-black tracking-tight leading-[0.95] font-mono"
                     stagger={0.03}
                   >
