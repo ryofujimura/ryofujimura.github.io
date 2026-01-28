@@ -1,23 +1,26 @@
 "use client"
 
-import { useRef, useEffect } from "react"
+import { useRef } from "react"
 import { AnimatedSection } from "@/components/animated-section"
 import { GSAPText, GSAPSVG } from "@/components/gsap-text"
-import { LeonardoNotebook, TechnicalDrawing, SpecAnnotation } from "@/components/leonardo-notebook"
-
-const skills = {
-  Languages: ["Python", "Swift", "Kotlin", "Java", "C++", "TypeScript", "JavaScript"],
-  "AI / ML": ["PyTorch", "Transformers", "On-device LLM", "Vision Models", "CoreML"],
-  Mobile: ["iOS (SwiftUI)", "Android (Jetpack)", "WatchOS", "React Native"],
-  "Backend & Cloud": ["Firebase", "Node.js", "Flask", "REST APIs", "WebSockets"],
-  Tools: ["Git", "Docker", "Linux", "CUDA", "Vercel"],
-}
+import { LeonardoNotebook, TechnicalDrawing } from "@/components/leonardo-notebook"
+import { AboutTechnicalCanvas } from "@/components/portfolio/about-technical-canvas"
 
 const stats = [
-  { label: "Years Coding", value: "8+" },
-  { label: "Projects Shipped", value: "10+" },
-  { label: "Internships", value: "2" },
-  { label: "Publications", value: "2" },
+  { label: "YEARS_CODING", value: "8+" },
+  { label: "PROJECTS_SHIPPED", value: "10+" },
+  { label: "INTERNSHIPS", value: "2" },
+  { label: "PUBLICATIONS", value: "2" },
+]
+
+/** ASCII stats block — box-drawing, fixed width for alignment */
+const ASCII_STATS_W = 42
+const asciiStatsLines = [
+  "╔" + "═".repeat(ASCII_STATS_W) + "╗",
+  "║" + " SPEC_RF.01 │ QUANTIFIED ".padEnd(ASCII_STATS_W) + "║",
+  "╠" + "═".repeat(ASCII_STATS_W) + "╣",
+  ...stats.map((s) => "║" + ` ${s.label.padEnd(18)} │ ${String(s.value).padStart(6)} `.padEnd(ASCII_STATS_W) + "║"),
+  "╚" + "═".repeat(ASCII_STATS_W) + "╝",
 ]
 
 /** MMM. YYYY for LeonardoNotebook dates */
@@ -25,175 +28,149 @@ const currentMonthYear =
   new Date().toLocaleString("en-US", { month: "short" }) + ". " + new Date().getFullYear()
 
 export function AboutSection() {
-  const gridRef = useRef<SVGSVGElement | null>(null)
-
-  useEffect(() => {
-    if (!gridRef.current) return
-    // Technical lines subtle hover / scroll animation
-    const svg = gridRef.current
-    const lines = svg.querySelectorAll("line, circle")
-    if (!lines.length) return
-
-    import("gsap").then(({ default: gsap }) => {
-      import("gsap/ScrollTrigger").then(({ ScrollTrigger }) => {
-        gsap.registerPlugin(ScrollTrigger)
-        gsap.fromTo(
-          lines,
-          { opacity: 0, strokeDasharray: "0 300" },
-          {
-            opacity: 0.4,
-            strokeDasharray: "300 0",
-            stagger: 0.02,
-            duration: 1.6,
-            ease: "power2.out",
-            scrollTrigger: {
-              trigger: svg,
-              start: "top 85%",
-              toggleActions: "play none none none",
-            },
-          }
-        )
-      })
-    })
-  }, [])
+  const sectionRef = useRef<HTMLElement>(null)
 
   return (
     <section
+      ref={sectionRef}
       id="about"
-      className="relative py-16 sm:py-20 md:py-24 lg:py-28 px-4 sm:px-6 overflow-hidden bg-background"
+      className="relative py-20 sm:py-24 md:py-28 lg:py-32 px-4 sm:px-6 overflow-hidden bg-background"
     >
-      {/* Brutalist technical grid */}
-      <div className="pointer-events-none absolute inset-0 bg-brutalist-grid opacity-[0.04]" aria-hidden />
+      {/* Layered brutalist background: grid + technical canvas */}
+      <div className="pointer-events-none absolute inset-0 bg-brutalist-grid opacity-[0.06]" aria-hidden />
+      <AboutTechnicalCanvas sectionRef={sectionRef} />
 
-      <div className="relative z-10 max-w-5xl lg:max-w-6xl mx-auto">
-        {/* Left / Right columns — within each: top then bottom */}
-        <div className="grid md:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] gap-8 lg:gap-10 items-start">
-          {/* Left column: top = header+intro, bottom = narrative */}
-          <div className="space-y-10 sm:space-y-12">
-            {/* Top-left: profile + name + tagline + stats */}
-            <div className="space-y-4 sm:space-y-6 flex flex-col md:flex-row md:gap-6 lg:gap-8 md:items-start">
+      <div className="relative z-10 max-w-6xl mx-auto">
+        {/* ASCII section header */}
+        <div className="font-mono text-[9px] sm:text-[10px] text-foreground/70 whitespace-pre mb-10 sm:mb-14">
+          <GSAPText variant="lines" delay={0} className="block" scrub={false}>
+            {"╔══════════════════════════════════════════════════════════╗"}
+          </GSAPText>
+          <GSAPText variant="lines" delay={0.05} className="block" scrub={false}>
+            {"║  SECTOR: ABOUT  │  SPECIMEN: RF.01  │  REV: " +
+              currentMonthYear.toUpperCase().padEnd(8) +
+              "  ║"}
+          </GSAPText>
+          <GSAPText variant="lines" delay={0.1} className="block" scrub={false}>
+            {"╚══════════════════════════════════════════════════════════╝"}
+          </GSAPText>
+        </div>
+
+        <div className="grid lg:grid-cols-[1.2fr_1fr] gap-12 lg:gap-16 items-start">
+          {/* Left column: identity + ASCII stats + narrative */}
+          <div className="space-y-8 sm:space-y-10">
+            {/* Identity block: photo + name + tagline */}
+            <div className="flex flex-col sm:flex-row gap-6 sm:gap-8 items-start">
               <div className="shrink-0">
-                <div className="w-24 h-24 sm:w-28 sm:h-28 border-[3px] border-foreground bg-background shadow-[4px_4px_0_0_var(--foreground)] overflow-hidden">
+                <div className="w-28 h-28 sm:w-32 sm:h-32 border-[3px] border-foreground bg-background shadow-[6px_6px_0_0_var(--foreground)] overflow-hidden">
                   <img
                     src="/images/profile.jpg"
                     alt="Ryo Fujimura"
                     className="w-full h-full object-cover object-top"
-                    width={112}
-                    height={112}
+                    width={128}
+                    height={128}
                   />
                 </div>
-                <p className="font-mono text-[8px] sm:text-[9px] text-muted-foreground uppercase tracking-widest mt-1.5">
-                  RF-01
+                <p className="font-mono text-[8px] sm:text-[9px] text-muted-foreground uppercase tracking-[0.2em] mt-2">
+                  RF.01
                 </p>
               </div>
-              <div className="space-y-4 sm:space-y-6 min-w-0">
-                <p className="font-mono text-[10px] sm:text-xs text-muted-foreground uppercase tracking-[0.35em]">
-                  ABOUT / SPECIMEN RF-01
-                </p>
+              <div className="space-y-3 sm:space-y-4 min-w-0">
                 <GSAPText
                   variant="chars"
-                  className="text-3xl sm:text-4xl md:text-5xl lg:text-[3.4rem] font-black tracking-tight leading-[0.95] font-mono"
-                  stagger={0.03}
+                  className="text-3xl sm:text-4xl md:text-5xl lg:text-[3.2rem] font-black tracking-tight leading-[0.92] font-mono"
+                  stagger={0.025}
+                  duration={0.7}
                 >
                   RYO FUJIMURA
                 </GSAPText>
                 <GSAPText
                   variant="words"
-                  className="text-sm sm:text-base md:text-lg text-muted-foreground max-w-xl"
-                  delay={0.4}
+                  className="text-sm sm:text-base text-muted-foreground max-w-xl font-mono"
+                  delay={0.3}
+                  stagger={0.04}
                 >
                   Software engineer + AI researcher building systems that move smoothly from lab prototype to
                   production reality.
                 </GSAPText>
-
-                <div className="border-y border-foreground mt-4 sm:mt-6">
-                  <dl className="grid grid-cols-2 sm:grid-cols-4 divide-x divide-foreground/30">
-                    {stats.map((s) => (
-                      <div key={s.label} className="px-3 py-3 sm:px-4 sm:py-4">
-                        <dt className="font-mono text-[9px] sm:text-[10px] uppercase tracking-[0.18em] text-muted-foreground mb-1">
-                          {s.label}
-                        </dt>
-                        <dd className="font-mono text-xl sm:text-2xl md:text-3xl font-black">{s.value}</dd>
-                      </div>
-                    ))}
-                  </dl>
-                </div>
               </div>
             </div>
 
-            {/* Bottom-left: narrative */}
-            <div className="space-y-5 sm:space-y-6">
-            <AnimatedSection>
-              <p className="text-sm sm:text-base text-foreground/90 leading-relaxed">
-                I work where{" "}
-                <span className="font-semibold">AI research, mobile, and backend systems</span> collide. In the CPX
-                Lab at CSULB I contribute to robotics/AI projects that have shipped as{" "}
-                <span className="font-semibold">peer-reviewed publications</span>, while internships at Bose and
-                American Honda grounded me in large-scale, production constraints.
-              </p>
-            </AnimatedSection>
+            {/* ASCII stats block — brutalist frame, line-by-line GSAP */}
+            <div className="border-2 border-foreground bg-background p-3 sm:p-4 relative">
+              <div className="absolute top-0 right-0 w-8 h-8 border-l-2 border-b-2 border-foreground/40" aria-hidden />
+              <div className="absolute bottom-0 left-0 w-8 h-8 border-t-2 border-r-2 border-foreground/40" aria-hidden />
+              <div className="font-mono text-[8px] sm:text-[9px] text-foreground/90 whitespace-pre overflow-x-auto touch-manipulation tabular-nums space-y-0 [&>div]:block">
+                {asciiStatsLines.map((line, i) => (
+                  <GSAPText key={i} variant="lines" delay={0.15 + i * 0.03} className="block leading-tight">
+                    {line}
+                  </GSAPText>
+                ))}
+              </div>
+            </div>
 
-            <AnimatedSection delay={100}>
-              <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
-                The recurring pattern: take a fuzzy problem, prototype quickly, then harden the system until it can
-                be{" "}
-                <span className="font-semibold">trusted by real users</span>—whether that&apos;s a robotics team,
-                internal QA engineers, or everyday commuters checking a shuttle app.
-              </p>
-            </AnimatedSection>
+            {/* Narrative blocks — technical framing */}
+            <div className="space-y-6">
+              <div className="border-l-2 border-foreground pl-4 sm:pl-5">
+                <GSAPText variant="words" delay={0} stagger={0.035} className="text-sm sm:text-base text-foreground/90 leading-relaxed font-mono">
+                  I work where AI research, mobile, and backend systems collide. In the CPX Lab at CSULB I contribute to robotics/AI projects that have shipped as peer-reviewed publications, while internships at Bose and American Honda grounded me in large-scale, production constraints.
+                </GSAPText>
+              </div>
+              <div className="border-l-2 border-foreground/50 pl-4 sm:pl-5">
+                <GSAPText variant="words" delay={0.1} stagger={0.035} className="text-sm sm:text-base text-muted-foreground leading-relaxed font-mono">
+                  The recurring pattern: take a fuzzy problem, prototype quickly, then harden the system until it can be trusted by real users—whether that's a robotics team, internal QA engineers, or everyday commuters checking a shuttle app.
+                </GSAPText>
+              </div>
+              <div className="bg-foreground/5 border border-foreground/20 px-3 py-2 sm:px-4 sm:py-3">
+                <GSAPText variant="lines" delay={0.2} className="font-mono text-[10px] sm:text-xs text-muted-foreground/90 italic">
+                  {"// \"The noblest pleasure is the joy of understanding.\" — Leonardo da Vinci"}
+                </GSAPText>
+              </div>
+            </div>
 
-            <AnimatedSection delay={200}>
-              <p className="text-xs sm:text-sm text-muted-foreground/80 font-mono border-l-2 border-foreground/40 pl-3 sm:pl-4 italic">
-                “The noblest pleasure is the joy of understanding.” — Leonardo da Vinci
-              </p>
-            </AnimatedSection>
-
-            <AnimatedSection delay={250}>
-              <div className="grid sm:grid-cols-2 gap-4 sm:gap-5 border-t border-foreground/30 pt-4 sm:pt-5">
-                <div className="space-y-2">
-                  <p className="font-mono text-[10px] sm:text-xs uppercase tracking-[0.16em] text-muted-foreground">
-                    CURRENTLY
+            {/* Currently / Looking for — ASCII-style labels */}
+            <div className="grid sm:grid-cols-2 gap-4 sm:gap-5 border-t-2 border-foreground/30 pt-6 sm:pt-8">
+              <AnimatedSection>
+                <div className="space-y-2 border-2 border-foreground/20 p-3 sm:p-4 bg-background">
+                  <p className="font-mono text-[9px] sm:text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+                    [ CURRENTLY ]
                   </p>
                   <p className="text-sm sm:text-base text-foreground/90 leading-relaxed">
-                    Undergraduate researcher at CPX Lab exploring temporal modeling, robotics, and human–robot
-                    interaction.
+                    Undergraduate researcher at CPX Lab exploring temporal modeling, robotics, and human–robot interaction.
                   </p>
                 </div>
-                <div className="space-y-2">
-                  <p className="font-mono text-[10px] sm:text-xs uppercase tracking-[0.16em] text-muted-foreground">
-                    LOOKING FOR
+              </AnimatedSection>
+              <AnimatedSection delay={80}>
+                <div className="space-y-2 border-2 border-foreground/20 p-3 sm:p-4 bg-background">
+                  <p className="font-mono text-[9px] sm:text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+                    [ LOOKING_FOR ]
                   </p>
                   <p className="text-sm sm:text-base text-foreground/90 leading-relaxed">
                     Roles where on-device AI, mobile, or infra meet rigorous product and research requirements.
                   </p>
                 </div>
-              </div>
-            </AnimatedSection>
+              </AnimatedSection>
             </div>
           </div>
 
-          {/* Right column: top = technical SVG, bottom = notebooks */}
-          <div className="space-y-10 sm:space-y-12">
-            {/* Top-right: Technical SVG panel */}
+          {/* Right column: technical diagram SVG + pipeline ASCII notebook + stack */}
+          <div className="space-y-8 sm:space-y-10">
+            {/* Technical SVG panel — draw-in on scroll */}
             <div className="hidden sm:block">
               <div className="border-2 border-foreground bg-background p-3 sm:p-4 md:p-5 relative overflow-hidden">
-                <div className="absolute inset-0 pointer-events-none opacity-20">
-                  <GSAPSVG className="w-full h-full" duration={1.8} delay={0.4}>
-                    <svg ref={gridRef} viewBox="0 0 200 200" className="w-full h-full" stroke="currentColor">
-                      {/* Concentric circles */}
+                <div className="absolute inset-0 pointer-events-none opacity-[0.12] dark:opacity-[0.18]">
+                  <GSAPSVG className="w-full h-full" duration={1.8} delay={0.2}>
+                    <svg viewBox="0 0 200 200" className="w-full h-full" stroke="currentColor">
                       <circle cx="100" cy="100" r="80" strokeWidth="0.6" />
                       <circle cx="100" cy="100" r="52" strokeWidth="0.5" />
-                      {/* Crosshair */}
                       <line x1="100" y1="10" x2="100" y2="190" strokeWidth="0.4" />
                       <line x1="10" y1="100" x2="190" y2="100" strokeWidth="0.4" />
-                      {/* Radial lines */}
                       {Array.from({ length: 12 }).map((_, i) => {
                         const angle = (i * 30 * Math.PI) / 180
                         const x2 = Number((100 + Math.cos(angle) * 80).toFixed(2))
                         const y2 = Number((100 + Math.sin(angle) * 80).toFixed(2))
                         return <line key={i} x1="100" y1="100" x2={x2} y2={y2} strokeWidth="0.25" />
                       })}
-                      {/* Offset hexagon */}
                       {[0, 60, 120].map((start, idx) => (
                         <polygon
                           key={idx}
@@ -213,10 +190,9 @@ export function AboutSection() {
                     </svg>
                   </GSAPSVG>
                 </div>
-
                 <div className="relative space-y-2">
                   <p className="font-mono text-[9px] sm:text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
-                    SYSTEM PROFILE
+                    SYSTEM_PROFILE
                   </p>
                   <p className="font-mono text-xs sm:text-sm text-foreground">
                     Edge-friendly AI, mobile-first UX, and research-grade experimentation coexisting in one stack.
@@ -225,8 +201,6 @@ export function AboutSection() {
               </div>
             </div>
 
-            {/* Bottom-right: Leonardo notebooks + stack summary */}
-            <div className="space-y-6 sm:space-y-7">
             <AnimatedSection>
               <LeonardoNotebook folioRef="RF.DV.ABOUT.001" date={currentMonthYear}>
                 <TechnicalDrawing
@@ -260,33 +234,10 @@ export function AboutSection() {
             </AnimatedSection>
 
             <AnimatedSection delay={120}>
-              <LeonardoNotebook folioRef="RF.DV.SKILLS.002" date={currentMonthYear}>
-                <div className="space-y-3 sm:space-y-4">
-                  <p className="font-mono text-[10px] sm:text-xs text-foreground/90 font-semibold uppercase tracking-[0.18em]">
-                    TOOLING DISTRIBUTION
-                  </p>
-                  <div className="bg-secondary/10 border border-foreground/20 p-3 sm:p-4">
-                    <pre className="font-mono text-[8px] xs:text-[9px] sm:text-[10px] text-foreground/80 whitespace-pre overflow-x-auto touch-manipulation">
-{`  [ AI / ML ]      ████████ 35%
-  [ MOBILE ]       ██████   30%
-  [ BACKEND ]      █████    25%
-  [ TOOLING ]      ██       10%`}
-                    </pre>
-                  </div>
-                  <div className="space-y-1.5 sm:space-y-2">
-                    <SpecAnnotation label="AI / ML" value="35%" notes="PyTorch, Transformers, CoreML, quantization" />
-                    <SpecAnnotation label="Mobile" value="30%" notes="SwiftUI, Kotlin, on-device LLMs" />
-                    <SpecAnnotation label="Backend" value="25%" notes="Firebase, Node.js, real-time APIs" />
-                    <SpecAnnotation label="Tooling" value="10%" notes="Automation, data pipelines, infra glue" />
-                  </div>
-                </div>
-              </LeonardoNotebook>
-            </AnimatedSection>
-
-            <AnimatedSection delay={180}>
-              <div className="border border-foreground/40 px-3 py-3 sm:px-4 sm:py-4">
-                <p className="font-mono text-[10px] sm:text-xs text-muted-foreground uppercase tracking-[0.18em] mb-1">
-                  STACK SUMMARY
+              <div className="border-2 border-foreground/50 px-4 py-4 sm:px-5 sm:py-5 bg-background relative">
+                <div className="absolute top-1 right-1 w-4 h-4 border-t border-r border-foreground/50" aria-hidden />
+                <p className="font-mono text-[9px] sm:text-[10px] text-muted-foreground uppercase tracking-[0.2em] mb-2">
+                  STACK_SUMMARY
                 </p>
                 <p className="font-mono text-[11px] sm:text-sm text-foreground leading-relaxed">
                   Python / Swift / Kotlin · React / Next.js · Firebase / Flask · PyTorch / CoreML · Docker / Linux
@@ -295,7 +246,6 @@ export function AboutSection() {
             </AnimatedSection>
           </div>
         </div>
-      </div>
       </div>
     </section>
   )
