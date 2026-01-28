@@ -82,44 +82,21 @@ export function ExperienceSection() {
   const [activeIndex, setActiveIndex] = useState(0)
   const bgRefs = useRef<(HTMLDivElement | null)[]>([])
   const contentRefs = useRef<(HTMLDivElement | null)[]>([])
-  const entrySvgRef = useRef<SVGSVGElement | null>(null)
-  const entryLabelRef = useRef<HTMLDivElement | null>(null)
 
-  // GSAP: ASCII entry frame (lines + corners) draw → panel bg → content blocks stagger (no dashed-border transition)
+  // GSAP: panel bg → content blocks stagger
   useEffect(() => {
     const bg = bgRefs.current[activeIndex]
     const content = contentRefs.current[activeIndex]
-    const svg = entrySvgRef.current
-    const label = entryLabelRef.current
     if (!bg || !content) return
 
-    // Reset entry SVG geometry for draw-in
-    if (svg) {
-      const els = svg.querySelectorAll<SVGGeometryElement>("line, path")
-      els.forEach((el) => {
-        if (typeof el.getTotalLength === "function") {
-          const len = el.getTotalLength()
-          gsap.set(el, { strokeDasharray: len, strokeDashoffset: len })
-        }
-      })
-    }
-    if (label) gsap.set(label, { opacity: 0 })
     gsap.set(bg, { opacity: 0, scale: 1.12 })
     gsap.set(content, { opacity: 1, y: 0 })
     const blocks = content.querySelectorAll<HTMLElement>("[data-detail-block]")
     gsap.set(blocks, { opacity: 0, y: 10 })
 
     const tl = gsap.timeline({ overwrite: true })
-    // ASCII entry frame (lines + corners) draw in
-    if (svg) {
-      const els = svg.querySelectorAll<SVGGeometryElement>("line, path")
-      tl.to(els, { strokeDashoffset: 0, duration: 0.4, stagger: 0.04, ease: "power2.inOut" })
-    }
-    if (label) {
-      tl.to(label, { opacity: 1, duration: 0.2 }, "-=0.2")
-    }
     // Panel bg
-    tl.to(bg, { opacity: 0.09, scale: 1, duration: 0.5, ease: "power3.out" }, "-=0.15")
+    tl.to(bg, { opacity: 0.09, scale: 1, duration: 0.5, ease: "power3.out" })
     // Content blocks stagger
     tl.to(blocks, { opacity: 1, y: 0, duration: 0.4, stagger: 0.06, ease: "power3.out" }, "-=0.2")
   }, [activeIndex])
@@ -165,7 +142,7 @@ export function ExperienceSection() {
               variant="words"
               className="text-3xl xs:text-4xl sm:text-5xl md:text-6xl font-black tracking-tight leading-[0.94]"
             >
-              From research to production. Systems built to ship, not demo.
+              from Research to Production. Systems built to ship, not demo.
             </GSAPText>
             <GSAPText
               variant="scramble"
@@ -326,30 +303,6 @@ export function ExperienceSection() {
 
           {/* Detail grid */}
           <div className="relative border border-foreground bg-card shadow-none sm:shadow-[6px_6px_0_0_theme(colors.foreground)]">
-            {/* ASCII entry header: frame + line draw in with GSAP on index change */}
-            <div className="relative min-h-[3rem] border-b border-foreground/20 bg-secondary/50 px-3 py-2 sm:px-4 sm:py-2.5">
-              <svg
-                ref={entrySvgRef}
-                className="absolute left-0 right-0 top-0 h-full w-full min-h-[3rem]"
-                viewBox="0 0 320 48"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="0.75"
-                aria-hidden
-              >
-                <path d="M 0 48 L 0 0 L 320 0" className="text-foreground/50" />
-                <path d="M 320 0 L 320 48 L 0 48" className="text-foreground/50" />
-                <line x1="0" y1="24" x2="320" y2="24" className="text-foreground/40" />
-              </svg>
-              <div
-                ref={entryLabelRef}
-                className="relative z-10 font-mono text-[10px] sm:text-[11px] uppercase tracking-[0.2em] text-muted-foreground opacity-0"
-                aria-hidden
-              >
-                &gt; ENTRY {(activeIndex + 1).toString().padStart(2, "0")} // {experiences[activeIndex]?.company ?? "—"}
-              </div>
-            </div>
-
             <div className="relative p-3 sm:p-4 md:p-5 space-y-5 sm:space-y-6">
               {experiences.map((exp, index) => {
                 const isActive = index === activeIndex
@@ -357,10 +310,10 @@ export function ExperienceSection() {
                   <article
                     key={exp.company}
                     className={cn(
-                      "relative transition-[opacity,transform] duration-200 border p-1 sm:p-1.5 md:p-2",
+                      "relative transition-[opacity,transform] duration-200 border border-dashed border-transparent p-1 sm:p-1.5 md:p-2",
                       isActive
-                        ? "opacity-100 translate-y-0 border-foreground border-solid"
-                        : "opacity-0 pointer-events-none absolute inset-2 sm:inset-3 md:inset-3.5 border-transparent"
+                        ? "opacity-100 translate-y-0 border-foreground"
+                        : "opacity-0 pointer-events-none absolute inset-2 sm:inset-3 md:inset-3.5"
                     )}
                     aria-hidden={!isActive}
                   >
