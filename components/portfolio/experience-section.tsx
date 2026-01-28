@@ -343,10 +343,10 @@ export function ExperienceSection() {
           <div className="relative border border-foreground bg-card shadow-none sm:shadow-[6px_6px_0_0_theme(colors.foreground)]">
             {/* ASCII entry header: frame + line draw in with GSAP on index change */}
             <div className="relative min-h-[3rem] border-b border-foreground/20 bg-secondary/50 px-3 py-2 sm:px-4 sm:py-2.5">
-              {/* ENTRY background image (moves from detail panel to header) */}
+              {/* ENTRY background image: starts at 0, GSAP fades in on load / index change */}
               <div
                 ref={entryBgRef}
-                className="pointer-events-none absolute inset-0 origin-center will-change-transform"
+                className="pointer-events-none absolute inset-0 origin-center will-change-transform opacity-0"
                 style={
                   (experiences[activeIndex]?.panelImage ?? experiences[activeIndex]?.icon)
                     ? {
