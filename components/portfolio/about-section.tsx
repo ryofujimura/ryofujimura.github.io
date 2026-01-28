@@ -158,7 +158,7 @@ export function AboutSection() {
                 </div>
               </div>
               {/* Stats full width — clickable cards with brutalist hover and GSAP entrance */}
-              <div className="border-y border-foreground py-1 w-full" ref={statsRef}>
+              <div className="w-full" ref={statsRef}>
                 <dl className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
                   {stats.map((s) => {
                     const isLink = !!s.sectionId
