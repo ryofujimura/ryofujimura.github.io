@@ -1,11 +1,21 @@
 "use client"
 
-import { useState, useRef, useEffect } from "react"
+import { useState, useRef, useEffect, useMemo } from "react"
 import { gsap } from "gsap"
 import { GSAPText, GSAPSVG } from "@/components/gsap-text"
 import { TechnicalGrid, TechnicalPattern } from "@/components/technical-grid"
+import { SkillSurfaceGlobe } from "@/components/skill-surface-globe"
 import { ExternalLink } from "lucide-react"
 import { cn } from "@/lib/utils"
+
+function slugifyId(input: string) {
+  return input
+    .toLowerCase()
+    .trim()
+    .replace(/['"]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "")
+}
 
 // icon = index list (left rail); panelImage = ENTRY header background (optional, falls back to icon)
 const experiences = [
@@ -24,7 +34,7 @@ const experiences = [
       "Built production-grade features using Swift Concurrency, Kotlin Coroutines, Rx",
       "Collaborated with firmware, cloud, and mobile groups resolving cross-team issues",
     ],
-    skills: ["Swift", "Kotlin", "SwiftUI", "Jetpack Compose", "BLE"],
+    skills: ["Swift", "Kotlin", "Rx", "BLE", "WebSockets", "Debugging", "Automation"],
   },
   {
     title: "Software Engineer Intern",
@@ -41,7 +51,7 @@ const experiences = [
       "Delivered demos to 10+ cross-functional teams including executive leadership",
       "Profiled thermal, latency, and bandwidth tradeoffs for hybrid inference",
     ],
-    skills: ["CUDA", "PyTorch", "Llama.cpp", "Jetson", "Edge AI"],
+    skills: ["AI", "Jetson", "Quantization", "Optimization", "Latency", "Memory", "Benchmarking"],
   },
   {
     title: "Undergraduate Researcher",
@@ -58,7 +68,7 @@ const experiences = [
       "Led data collection/annotation pipelines generating 1,000+ labeled samples",
       "Created reproducible ML pipelines adopted by multiple lab members",
     ],
-    skills: ["PyTorch", "Transformers", "Python", "3D Printing", "Data Pipelines"],
+    skills: ["Research", "Robotics", "ML", "Transformers", "Prototyping", "Pipelines"],
   },
   {
     title: "Data Engineer (Freelance)",
@@ -74,7 +84,7 @@ const experiences = [
       "Designed normalization/indexing layers exposing cleaned data through internal API",
       "Enabled 30% revenue increase by converting archival content into searchable intelligence",
     ],
-    skills: ["Python", "Data Pipelines", "OCR", "API Design", "ETL"],
+    skills: ["Automation", "Data Engineering", "Normalization", "Indexing"],
   },
 ]
 
@@ -85,6 +95,53 @@ export function ExperienceSection() {
   const entryScanRef = useRef<HTMLDivElement | null>(null)
   const entrySvgRef = useRef<SVGSVGElement | null>(null)
   const entryLabelRef = useRef<HTMLDivElement | null>(null)
+
+  // Shareable deep-links per entry: #experience-<slug>
+  const experienceIds = useMemo(() => {
+    const raw = experiences.map((exp) => `experience-${slugifyId(`${exp.company}-${exp.title}`)}`)
+    const counts = new Map<string, number>()
+    return raw.map((id) => {
+      const n = counts.get(id) ?? 0
+      counts.set(id, n + 1)
+      return n === 0 ? id : `${id}-${n + 1}`
+    })
+  }, [])
+
+  const activateExperience = (index: number, opts?: { scrollToSection?: boolean; scrollBehavior?: ScrollBehavior }) => {
+    setActiveIndex(index)
+    if (typeof window === "undefined") return
+
+    const id = experienceIds[index]
+    if (id) window.history.pushState(null, "", `#${id}`)
+
+    if (!opts?.scrollToSection) return
+    const behavior = opts.scrollBehavior ?? "smooth"
+    window.requestAnimationFrame(() => {
+      document.getElementById("experience")?.scrollIntoView({ behavior, block: "start" })
+    })
+  }
+
+  useEffect(() => {
+    if (typeof window === "undefined") return
+
+    const applyHash = (hash: string, behavior: ScrollBehavior) => {
+      const clean = hash.startsWith("#") ? hash.slice(1) : hash
+      if (!clean) return
+      const idx = experienceIds.indexOf(clean)
+      if (idx < 0) return
+      setActiveIndex(idx)
+      window.requestAnimationFrame(() => {
+        // Keep scroll position at the Experience section (not the detail panel/article).
+        // This also counteracts the browser's default "jump to #id" behavior on initial load.
+        document.getElementById("experience")?.scrollIntoView({ behavior, block: "start" })
+      })
+    }
+
+    applyHash(window.location.hash, "auto")
+    const onHashChange = () => applyHash(window.location.hash, "smooth")
+    window.addEventListener("hashchange", onHashChange)
+    return () => window.removeEventListener("hashchange", onHashChange)
+  }, [experienceIds])
 
   // GSAP: ENTRY bg + ASCII frame draw → content blocks stagger
   useEffect(() => {
@@ -303,7 +360,7 @@ export function ExperienceSection() {
                 <button
                   key={exp.company}
                   type="button"
-                  onClick={() => setActiveIndex(index)}
+                  onClick={() => activateExperience(index)}
                   className={cn(
                     "group w-full text-left px-3 sm:px-4 py-3 sm:py-3.5 flex items-center justify-between gap-3 touch-target",
                     "font-mono text-[11px] sm:text-xs uppercase tracking-[0.12em]",
@@ -378,9 +435,9 @@ export function ExperienceSection() {
                 strokeWidth="0.75"
                 aria-hidden
               >
-                <path d="M 0 48 L 0 0 L 320 0" className="text-foreground/50" />
+                {/* <path d="M 0 48 L 0 0 L 320 0" className="text-foreground/50" />
                 <path d="M 320 0 L 320 48 L 0 48" className="text-foreground/50" />
-                <line x1="0" y1="24" x2="320" y2="24" className="text-foreground/40" />
+                <line x1="0" y1="24" x2="320" y2="24" className="text-foreground/40" /> */}
               </svg>
               <div
                 ref={entryLabelRef}
@@ -394,9 +451,11 @@ export function ExperienceSection() {
             <div className="relative p-3 sm:p-4 md:p-5 space-y-5 sm:space-y-6">
               {experiences.map((exp, index) => {
                 const isActive = index === activeIndex
+                const expId = experienceIds[index]
                 return (
                   <article
                     key={exp.company}
+                    id={expId}
                     className={cn(
                       "relative transition-[opacity,transform] duration-200 border border-dashed p-1 sm:p-1.5 md:p-2",
                       isActive
@@ -416,7 +475,16 @@ export function ExperienceSection() {
                     >
                       <div data-detail-block className="flex flex-wrap items-baseline justify-between gap-2">
                         <h3 className="text-xl sm:text-2xl md:text-3xl font-black tracking-tight uppercase">
-                          {exp.title}
+                          <a
+                            href={`#${expId}`}
+                            onClick={(e) => {
+                              e.preventDefault()
+                              activateExperience(index)
+                            }}
+                            className="hover:underline underline-offset-4"
+                          >
+                            {exp.title}
+                          </a>
                         </h3>
                         <p className="font-mono text-[11px] sm:text-xs text-muted-foreground uppercase tracking-[0.18em]">
                           {exp.period}
@@ -458,21 +526,9 @@ export function ExperienceSection() {
                         </ul>
 
                         <div className="space-y-3 sm:space-y-4">
-                          <div className="border border-foreground bg-secondary/60 p-3 sm:p-4">
-                            <p className="font-mono text-[10px] sm:text-[11px] text-muted-foreground uppercase tracking-[0.14em] mb-2">
-                              Skill surface
-                            </p>
-                            <div className="flex flex-wrap gap-1.5 sm:gap-2">
-                              {exp.skills.map((skill) => (
-                                <span
-                                  key={skill}
-                                  className="px-2 py-1 text-[10px] sm:text-[11px] font-mono uppercase tracking-[0.16em] bg-background text-foreground border border-foreground"
-                                >
-                                  {skill}
-                                </span>
-                              ))}
-                            </div>
-                          </div>
+                          {isActive ? (
+                            <SkillSurfaceGlobe entryIndex={index} words={exp.skills} height={100} />
+                          ) : null}
 
                           <div className="border border-dashed border-foreground/60 p-3 sm:p-4">
                             <p className="font-mono text-[10px] sm:text-[11px] text-muted-foreground uppercase tracking-[0.16em] mb-1">
