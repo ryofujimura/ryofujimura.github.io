@@ -117,11 +117,12 @@ export function ExperienceSection() {
             <div className="bg-secondary p-4 sm:p-5 md:p-6 border border-foreground shadow-[4px_4px_0_0_theme(colors.foreground)]">
               <p className="font-mono text-[11px] sm:text-xs text-muted-foreground leading-relaxed">
                 Each row below is a{" "}
-                <span className="text-foreground font-semibold">production experiment</span>: different
-                domains, same obsession with reliability, observability, and measurable impact.
+                <span className="text-foreground font-semibold">work-log entry</span> across internships,
+                research, and freelance: different environments, same obsession with reliability,
+                observability, and measurable impact.
               </p>
               <p className="font-mono text-[11px] sm:text-xs text-muted-foreground mt-3">
-                Hover or tap to lock a role. Numbers on the right are{" "}
+                Hover or tap to lock a role. Numbers on the right call out{" "}
                 <span className="text-accent font-semibold">throughput, savings, or deltas</span> – not vibes.
               </p>
 
