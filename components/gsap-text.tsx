@@ -181,9 +181,10 @@ interface GSAPSVGProps {
   className?: string
   duration?: number
   delay?: number
+  stagger?: number
 }
 
-export function GSAPSVG({ children, className = "", duration = 2, delay = 0 }: GSAPSVGProps) {
+export function GSAPSVG({ children, className = "", duration = 2, delay = 0, stagger = 0.1 }: GSAPSVGProps) {
   const svgRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -210,7 +211,7 @@ export function GSAPSVG({ children, className = "", duration = 2, delay = 0 }: G
       strokeDashoffset: 0,
       duration,
       delay,
-      stagger: 0.1,
+      stagger,
       ease: "power2.inOut",
       scrollTrigger: {
         trigger: svgRef.current,
