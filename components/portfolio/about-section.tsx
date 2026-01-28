@@ -70,7 +70,6 @@ export function AboutSection() {
     const cards = container.querySelectorAll("[data-stat-card]")
     const labels = container.querySelectorAll("[data-stat-label]")
     const values = container.querySelectorAll("[data-stat-value]")
-    const goSvgs = container.querySelectorAll("[data-stat-go-svg] path")
 
     import("gsap").then(({ default: gsap }) => {
       import("gsap/ScrollTrigger").then(({ ScrollTrigger }) => {
@@ -78,13 +77,6 @@ export function AboutSection() {
         gsap.set(cards, { opacity: 0, y: 14 })
         gsap.set(labels, { opacity: 0, y: 6 })
         gsap.set(values, { opacity: 0, y: 8 })
-        goSvgs.forEach((path) => {
-          const el = path as SVGPathElement
-          if (typeof el.getTotalLength === "function") {
-            const len = el.getTotalLength()
-            gsap.set(el, { strokeDasharray: len, strokeDashoffset: len })
-          }
-        })
 
         const tl = gsap.timeline({
           scrollTrigger: {
@@ -109,16 +101,6 @@ export function AboutSection() {
           values,
           { opacity: 1, y: 0, duration: 0.5, stagger: 0.05, ease: "power2.out" },
           "-=0.25"
-        )
-        tl.to(
-          goSvgs,
-          {
-            strokeDashoffset: 0,
-            duration: 0.5,
-            stagger: 0.04,
-            ease: "power2.inOut",
-          },
-          "-=0.2"
         )
       })
     })
@@ -223,24 +205,13 @@ export function AboutSection() {
                         >
                           {s.label}
                         </dt>
-                        <dd className="relative z-[1] flex items-baseline justify-between gap-2">
+                        <dd className="relative z-[1]">
                           <span
                             data-stat-value
                             className="font-mono text-xl sm:text-2xl md:text-3xl font-black leading-tight"
                           >
                             {s.value}
                           </span>
-                          {isLink && (
-                            <span
-                              data-stat-go-svg
-                              className="shrink-0 mt-0.5 opacity-60 group-hover:opacity-100 transition-opacity"
-                              aria-hidden
-                            >
-                              <svg viewBox="0 0 24 12" className="w-5 h-2.5 sm:w-6 sm:h-3" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="square">
-                                <path d="M0 6h18M18 6l-4-4M18 6l-4 4" />
-                              </svg>
-                            </span>
-                          )}
                         </dd>
                       </Wrapper>
                     )
