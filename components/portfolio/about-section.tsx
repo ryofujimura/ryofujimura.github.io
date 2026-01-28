@@ -205,10 +205,10 @@ export function AboutSection() {
                         >
                           {s.label}
                         </dt>
-                        <dd className="relative z-[1] flex items-start justify-end w-full text-right overflow-hidden">
+                        <dd className="relative z-[1] flex items-start justify-end w-full text-right">
                           <span
                             data-stat-value
-                            className="font-mono text-xl sm:text-2xl md:text-3xl font-black leading-tight shrink-0"
+                            className="font-mono text-xl sm:text-2xl md:text-3xl font-black leading-tight break-words whitespace-normal"
                           >
                             {s.value}
                           </span>
