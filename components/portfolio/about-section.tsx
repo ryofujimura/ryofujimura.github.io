@@ -174,7 +174,7 @@ export function AboutSection() {
                         }
                         data-stat-card
                         className={cn(
-                          "min-w-0 border bg-background px-3 py-3 sm:px-4 sm:py-4 flex flex-col justify-center relative overflow-hidden text-left",
+                          "min-w-0 border bg-background px-3 py-3 sm:px-4 sm:py-4 grid grid-rows-[1fr_1fr] min-h-[5rem] sm:min-h-[5.5rem] relative overflow-hidden text-left gap-0",
                           isLink
                             ? "border-foreground/25 cursor-pointer transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2 hover:border-foreground hover:shadow-[4px_4px_0_0_var(--foreground)] group"
                             : "border-foreground/25"
@@ -201,11 +201,11 @@ export function AboutSection() {
                         )}
                         <dt
                           data-stat-label
-                          className="font-mono text-[9px] sm:text-[10px] uppercase tracking-[0.18em] text-muted-foreground mb-1 break-words relative z-[1]"
+                          className="font-mono text-[9px] sm:text-[10px] uppercase tracking-[0.18em] text-muted-foreground break-words relative z-[1] flex items-center justify-start"
                         >
                           {s.label}
                         </dt>
-                        <dd className="relative z-[1]">
+                        <dd className="relative z-[1] flex items-center justify-start">
                           <span
                             data-stat-value
                             className="font-mono text-xl sm:text-2xl md:text-3xl font-black leading-tight"
