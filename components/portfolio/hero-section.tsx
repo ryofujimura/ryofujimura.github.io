@@ -1,46 +1,286 @@
 "use client"
 
-import { useRef, useMemo } from "react"
+import { useRef, useState, useEffect, useMemo } from "react"
+import { gsap } from "gsap"
 import { GSAPText } from "@/components/gsap-text"
 import { HeroTechnicalCanvas } from "@/components/hero-technical-canvas"
 import { MagneticButton } from "@/components/magnetic-button"
 import { useToast } from "@/hooks/use-toast"
-import { ArrowDown, ArrowRight, Github, Globe, Linkedin, Mail } from "lucide-react"
+import { ArrowDown, ArrowRight, Github, Globe, Linkedin, Mail, Mouse } from "lucide-react"
+
+const SITE_URL = "https://ryofujimura.github.io/"
 
 // Exact-length lines so the terminal block is always a complete rectangle
-const ASCII_W = 65
+const ASCII_W = 70
 const ASCII_MOBILE_W = 32
+
+// Verbs under "mode:" — rotate every few seconds with vertical GSAP slide
+const MODE_VERBS = [
+  "BUILD",
+  "SHIP",
+  "DEBUG",
+  "DEPLOY",
+  "DESIGN",
+  "RESEARCH",
+  "SCALE",
+  "OPTIMIZE",
+  "ITERATE",
+]
+const MODE_ROTATE_MS = 2600
+const VERB_SLOT_CH_DESKTOP = 11
+const VERB_SLOT_CH_MOBILE = 7
 
 function revLabel() {
   const d = new Date()
   return `${d.toLocaleDateString("en-US", { month: "short" })}. ${d.getFullYear()}`
 }
 
-const SITE_URL = "https://ryofujimura.github.io/"
+function padVerb(verb: string, width: number) {
+  return verb.padEnd(width).slice(0, width)
+}
+
+const LOC_DEFAULT = "IRVINE_CA"
+const LOC_HOVER = "OPEN_TO_RELOCATE"
+const LOC_SLOT_CH_DESKTOP = 16
+const LOC_SLOT_CH_MOBILE = 16
+
+/** Hover: LOC text vertical-slides to "OPEN_TO_RELOCATE". GSAP-driven. */
+function LocHoverReveal({
+  defaultText,
+  hoverText,
+  slotWidthCh,
+  className = "",
+}: {
+  defaultText: string
+  hoverText: string
+  slotWidthCh: number
+  className?: string
+}) {
+  const wrapperRef = useRef<HTMLSpanElement>(null)
+  const defaultRef = useRef<HTMLSpanElement>(null)
+  const hoverRef = useRef<HTMLSpanElement>(null)
+  const isHoveredRef = useRef(false)
+
+  useEffect(() => {
+    const hoverEl = hoverRef.current
+    if (hoverEl) gsap.set(hoverEl, { yPercent: 100 })
+  }, [])
+
+  const handleEnter = () => {
+    if (isHoveredRef.current) return
+    isHoveredRef.current = true
+    const out = defaultRef.current
+    const in_ = hoverRef.current
+    if (!out || !in_) return
+    gsap.to(out, { yPercent: -100, duration: 0.28, ease: "power2.inOut" })
+    gsap.to(in_, { yPercent: 0, duration: 0.28, ease: "power2.inOut" })
+  }
+
+  const handleLeave = () => {
+    if (!isHoveredRef.current) return
+    isHoveredRef.current = false
+    const out = hoverRef.current
+    const in_ = defaultRef.current
+    if (!out || !in_) return
+    gsap.to(out, { yPercent: -100, duration: 0.28, ease: "power2.inOut" })
+    gsap.to(in_, {
+      yPercent: 0,
+      duration: 0.28,
+      ease: "power2.inOut",
+      onComplete: () => {
+        gsap.set(out, { yPercent: 100 })
+      },
+    })
+  }
+
+  const def = padVerb(defaultText, slotWidthCh)
+  const hov = padVerb(hoverText, slotWidthCh)
+
+  return (
+    <span
+      ref={wrapperRef}
+      className={`inline-block overflow-hidden align-top cursor-default ${className}`}
+      style={{ height: "1em", minWidth: `${slotWidthCh}ch` }}
+      onMouseEnter={handleEnter}
+      onMouseLeave={handleLeave}
+      onFocus={handleEnter}
+      onBlur={handleLeave}
+      tabIndex={0}
+      role="text"
+      aria-label={`${defaultText}; hover for ${hoverText.replace(/_/g, " ")}`}
+    >
+      <span className="block relative w-full" style={{ height: "1em" }}>
+        <span
+          ref={defaultRef}
+          className="absolute left-0 top-0 w-full tabular-nums whitespace-pre"
+          style={{ minWidth: `${slotWidthCh}ch` }}
+        >
+          {def}
+        </span>
+        <span
+          ref={hoverRef}
+          className="absolute left-0 top-0 w-full tabular-nums whitespace-pre"
+          style={{ minWidth: `${slotWidthCh}ch` }}
+        >
+          {hov}
+        </span>
+      </span>
+    </span>
+  )
+}
+
+/** Two-slot vertical slide: current verb slides up, next slides up from below. GSAP-driven. */
+function ModeVerbRotator({
+  verbs,
+  slotWidthCh,
+  className = "",
+}: {
+  verbs: string[]
+  slotWidthCh: number
+  className?: string
+}) {
+  const [index, setIndex] = useState(0)
+  const [activeSlot, setActiveSlot] = useState(0)
+  const activeSlotRef = useRef(0)
+  const slot0Ref = useRef<HTMLSpanElement>(null)
+  const slot1Ref = useRef<HTMLSpanElement>(null)
+
+  // Initial positions: slot0 in view (0), slot1 below (100%)
+  useEffect(() => {
+    const s1 = slot1Ref.current
+    if (s1) gsap.set(s1, { yPercent: 100 })
+  }, [])
+
+  // Single interval; ref tracks which slot is in view so we don’t reset timer every tick
+  useEffect(() => {
+    if (verbs.length <= 1) return
+    const tick = () => {
+      const outSlot = activeSlotRef.current === 0 ? slot0Ref.current : slot1Ref.current
+      const inSlot = activeSlotRef.current === 0 ? slot1Ref.current : slot0Ref.current
+      if (!outSlot || !inSlot) return
+      const n = verbs.length
+      gsap.to(outSlot, {
+        yPercent: -100,
+        duration: 0.32,
+        ease: "power2.inOut",
+      })
+      gsap.to(inSlot, {
+        yPercent: 0,
+        duration: 0.32,
+        ease: "power2.inOut",
+        onComplete: () => {
+          activeSlotRef.current = 1 - activeSlotRef.current
+          setIndex((i) => (i + 1) % n)
+          setActiveSlot(activeSlotRef.current)
+          gsap.set(outSlot, { yPercent: 100 })
+        },
+      })
+    }
+    const id = setInterval(tick, MODE_ROTATE_MS)
+    return () => clearInterval(id)
+  }, [verbs.length])
+
+  const n = verbs.length
+  const text0 = padVerb(verbs[activeSlot === 0 ? index % n : (index + 1) % n], slotWidthCh)
+  const text1 = padVerb(verbs[activeSlot === 0 ? (index + 1) % n : index % n], slotWidthCh)
+
+  return (
+    <span
+      className={`inline-block overflow-hidden align-top ${className}`}
+      style={{ height: "1em", minWidth: `${slotWidthCh}ch` }}
+      aria-live="polite"
+      aria-atomic
+    >
+      <span className="block relative w-full" style={{ height: "1em" }}>
+        <span
+          ref={slot0Ref}
+          className="absolute left-0 top-0 w-full tabular-nums whitespace-pre"
+          style={{ minWidth: `${slotWidthCh}ch` }}
+        >
+          {text0}
+        </span>
+        <span
+          ref={slot1Ref}
+          className="absolute left-0 top-0 w-full tabular-nums whitespace-pre"
+          style={{ minWidth: `${slotWidthCh}ch` }}
+        >
+          {text1}
+        </span>
+      </span>
+    </span>
+  )
+}
 
 export function HeroSection() {
   const asciiBlockRef = useRef<HTMLDivElement>(null)
+  const socialIconsRef = useRef<HTMLDivElement>(null)
   const { toast } = useToast()
 
+  const rev = revLabel()
   const asciiHeaderLines = useMemo(() => {
-    const rev = revLabel()
     return [
       "╔" + "═".repeat(ASCII_W) + "╗",
-      "║" + "   SYS_ID: RF.001   │   CLASS: ENGINEER   │   LOC: IRVINE_CA".padEnd(ASCII_W) + "║",
-      "║" + (`   mode: BUILD      │   status: AVAILABLE │   rev: ${rev}`).padEnd(ASCII_W) + "║",
+      null, // line 1 = custom LOC hover reveal
+      null, // line 2 = custom mode + rotator
       "╚" + "═".repeat(ASCII_W) + "╝",
     ]
   }, [])
   const asciiHeaderLinesMobile = useMemo(() => {
-    const rev = revLabel()
     return [
       "╔" + "═".repeat(ASCII_MOBILE_W) + "╗",
-      "║" + " RF.001 │ ENG │ IRVINE_CA".padEnd(ASCII_MOBILE_W) + "║",
-      "║" + (` AVAILABLE │ BUILD │ ${rev}`).padEnd(ASCII_MOBILE_W) + "║",
+      null,
+      null,
       "╚" + "═".repeat(ASCII_MOBILE_W) + "╝",
     ]
   }, [])
+  const locLineLeftDesktop = "║   SYS_ID: RF.001   │   CLASS: ENGINEER   │   LOC: "
+  const locLineRightDesktop = " ".repeat(3) + "║"
+  const locLineLeftMobile = " RF.001 │ ENG │ "
+  const locLineRightMobile = "║"
+  const modeLineLeftDesktop = "║   mode: "
+  const modeLineRightDesktop = ("│   status: AVAILABLE │   rev: " + rev).padEnd(50) + "║"
+  const modeLineLeftMobile = " AVAILABLE │ "
+  const modeLineRightMobile = ((" │ " + rev).slice(0, 11)).padEnd(11)
 
+  const locLineDesktopRef = useRef<HTMLSpanElement>(null)
+  const locLineMobileRef = useRef<HTMLSpanElement>(null)
+  const modeLineDesktopRef = useRef<HTMLSpanElement>(null)
+  const modeLineMobileRef = useRef<HTMLSpanElement>(null)
+
+  // GSAP: line 1 (LOC) and line 2 (mode) entrance — same stagger as other ASCII lines
+  useEffect(() => {
+    const run = () => {
+      const animate = (el: HTMLSpanElement | null, delay: number, duration: number) => {
+        if (!el) return
+        gsap.fromTo(el, { y: "100%" }, { y: 0, delay, duration, ease: "power4.out" })
+      }
+      animate(locLineDesktopRef.current, 0.15 + 1 * 0.06, 0.4)
+      animate(locLineMobileRef.current, 0.15 + 1 * 0.06, 0.35)
+      animate(modeLineDesktopRef.current, 0.15 + 2 * 0.06, 0.4)
+      animate(modeLineMobileRef.current, 0.15 + 2 * 0.06, 0.35)
+    }
+    const t = setTimeout(run, 0)
+    return () => clearTimeout(t)
+  }, [])
+
+  // GSAP: stagger-in social icons (GitHub, LinkedIn, Email, Globe)
+  useEffect(() => {
+    if (!socialIconsRef.current) return
+    const icons = socialIconsRef.current.querySelectorAll("[data-social-icon]")
+    if (icons.length === 0) return
+    gsap.fromTo(
+      icons,
+      { opacity: 0, y: 10 },
+      { opacity: 1, y: 0, duration: 0.45, delay: 1.55, stagger: 0.07, ease: "power3.out" }
+    )
+  }, [])
+
+  const copySiteUrl = () => {
+    if (typeof navigator !== "undefined" && navigator.clipboard?.writeText) {
+      navigator.clipboard.writeText("https://ryofujimura.github.io/")
+      toast({ title: "Copied!", description: "https://ryofujimura.github.io/" })
+    }
+  }
 
   return (
     <section
@@ -59,35 +299,106 @@ export function HeroSection() {
             className="font-mono text-foreground/50 whitespace-pre tabular-nums touch-manipulation w-full min-w-0"
             style={{ fontFamily: "ui-monospace, monospace" }}
           >
-            {/* Mobile: 34-char block, complete rectangle; horizontal scroll on narrow viewports */}
+            {/* Mobile: 34-char block; line 1 = LOC hover, line 2 = mode verb rotator */}
             <div className="block sm:hidden text-[9px] leading-tight overflow-x-auto scrollbar-hide" style={{ minWidth: "34ch" }}>
-              {asciiHeaderLinesMobile.map((line, i) => (
-                <GSAPText
-                  key={`m-${i}`}
-                  variant="lines"
-                  delay={0.15 + i * 0.06}
-                  duration={0.35}
-                  immediate
-                  className="block leading-tight"
-                >
-                  {line}
-                </GSAPText>
-              ))}
+              {asciiHeaderLinesMobile.map((line, i) =>
+                line === null && i === 1 ? (
+                  <div key="m-1" className="block overflow-hidden leading-tight">
+                    <span
+                      ref={locLineMobileRef}
+                      className="block translate-y-full"
+                      style={{ fontFamily: "ui-monospace, monospace" }}
+                    >
+                      {"║"}
+                      {locLineLeftMobile}
+                      <LocHoverReveal
+                        defaultText={LOC_DEFAULT}
+                        hoverText={LOC_HOVER}
+                        slotWidthCh={LOC_SLOT_CH_MOBILE}
+                        className="text-foreground/50"
+                      />
+                      {locLineRightMobile}
+                    </span>
+                  </div>
+                ) : line === null && i === 2 ? (
+                  <div key="m-2" className="block overflow-hidden leading-tight">
+                    <span
+                      ref={modeLineMobileRef}
+                      className="block translate-y-full"
+                      style={{ fontFamily: "ui-monospace, monospace" }}
+                    >
+                      {modeLineLeftMobile}
+                      <ModeVerbRotator
+                        verbs={MODE_VERBS}
+                        slotWidthCh={VERB_SLOT_CH_MOBILE}
+                        className="text-foreground/50"
+                      />
+                      {modeLineRightMobile}
+                    </span>
+                  </div>
+                ) : (
+                  <GSAPText
+                    key={`m-${i}`}
+                    variant="lines"
+                    delay={0.15 + i * 0.06}
+                    duration={0.35}
+                    immediate
+                    className="block leading-tight"
+                  >
+                    {line ?? ""}
+                  </GSAPText>
+                )
+              )}
             </div>
-            {/* Desktop: 67-char block, horizontal scroll if ever needed */}
+            {/* Desktop: 67-char block; line 1 = LOC hover, line 2 = mode verb rotator */}
             <div className="hidden sm:block text-[10px] sm:text-[11px] leading-tight overflow-x-auto scrollbar-hide" style={{ minWidth: "min(100%, 67ch)" }}>
-              {asciiHeaderLines.map((line, i) => (
-                <GSAPText
-                  key={`d-${i}`}
-                  variant="lines"
-                  delay={0.15 + i * 0.06}
-                  duration={0.4}
-                  immediate
-                  className="block leading-tight"
-                >
-                  {line}
-                </GSAPText>
-              ))}
+              {asciiHeaderLines.map((line, i) =>
+                line === null && i === 1 ? (
+                  <div key="d-1" className="block overflow-hidden leading-tight">
+                    <span
+                      ref={locLineDesktopRef}
+                      className="block translate-y-full"
+                      style={{ fontFamily: "ui-monospace, monospace" }}
+                    >
+                      {locLineLeftDesktop}
+                      <LocHoverReveal
+                        defaultText={LOC_DEFAULT}
+                        hoverText={LOC_HOVER}
+                        slotWidthCh={LOC_SLOT_CH_DESKTOP}
+                        className="text-foreground/50"
+                      />
+                      {locLineRightDesktop}
+                    </span>
+                  </div>
+                ) : line === null && i === 2 ? (
+                  <div key="d-2" className="block overflow-hidden leading-tight">
+                    <span
+                      ref={modeLineDesktopRef}
+                      className="block translate-y-full"
+                      style={{ fontFamily: "ui-monospace, monospace" }}
+                    >
+                      {modeLineLeftDesktop}
+                      <ModeVerbRotator
+                        verbs={MODE_VERBS}
+                        slotWidthCh={VERB_SLOT_CH_DESKTOP}
+                        className="text-foreground/50"
+                      />
+                      {modeLineRightDesktop}
+                    </span>
+                  </div>
+                ) : (
+                  <GSAPText
+                    key={`d-${i}`}
+                    variant="lines"
+                    delay={0.15 + i * 0.06}
+                    duration={0.4}
+                    immediate
+                    className="block leading-tight"
+                  >
+                    {line ?? ""}
+                  </GSAPText>
+                )
+              )}
             </div>
           </div>
 
@@ -154,7 +465,7 @@ export function HeroSection() {
           <div className="flex flex-col sm:flex-row flex-wrap gap-2 sm:gap-4 pt-3 sm:pt-6 w-full sm:w-auto">
             <MagneticButton
               as="a"
-              href="#projects"
+              href="#experience"
               className="touch-target group relative inline-flex items-center justify-center gap-1.5 sm:gap-3 px-5 sm:px-8 py-3 sm:py-4 min-h-[48px] text-xs sm:text-sm font-mono uppercase tracking-wider text-primary-foreground bg-primary border-2 border-primary hover:bg-transparent hover:text-primary transition-all duration-300"
             >
               View Work
@@ -170,40 +481,37 @@ export function HeroSection() {
             </MagneticButton>
           </div>
 
-          {/* Social — monotone Lucide icons; globe copies site URL */}
-          <div className="flex flex-wrap items-center gap-0.5 sm:gap-1 pt-2 sm:pt-4">
+          {/* Social — monotone Lucide icons; GSAP stagger-in; globe copies site URL */}
+          <div ref={socialIconsRef} className="flex flex-wrap items-center gap-0.5 sm:gap-1 pt-2 sm:pt-4">
             {[
-              { href: "https://github.com/ryofujimura", Icon: Github, label: "GitHub" },
-              { href: "https://linkedin.com/in/ryofujimura", Icon: Linkedin, label: "LinkedIn" },
-              { href: "mailto:ryo.fujimura1@gmail.com", Icon: Mail, label: "Email" },
-            ].map(({ href, Icon, label }) => (
-              <MagneticButton
-                key={label}
-                as="a"
-                href={href}
-                target={href.startsWith("http") ? "_blank" : undefined}
-                rel={href.startsWith("http") ? "noopener noreferrer" : undefined}
-                className="touch-target p-3 min-h-[44px] min-w-[44px] flex items-center justify-center text-muted-foreground hover:text-foreground border border-transparent hover:border-border transition-all [&_svg]:stroke-current"
-              >
-                <Icon className="w-5 h-5 shrink-0" strokeWidth={1.5} />
-                <span className="sr-only">{label}</span>
-              </MagneticButton>
+              { href: "https://github.com/ryofujimura", Icon: Github, label: "GitHub", external: true },
+              { href: "https://linkedin.com/in/ryofujimura", Icon: Linkedin, label: "LinkedIn", external: true },
+              { href: "mailto:ryo.fujimura1@gmail.com", Icon: Mail, label: "Email", external: false },
+            ].map(({ href, Icon, label, external }) => (
+              <span key={label} data-social-icon className="inline-flex">
+                <MagneticButton
+                  as="a"
+                  href={href}
+                  target={external ? "_blank" : undefined}
+                  rel={external ? "noopener noreferrer" : undefined}
+                  className="touch-target p-3 min-h-[44px] min-w-[44px] flex items-center justify-center text-muted-foreground hover:text-foreground border border-transparent hover:border-border transition-all [&_svg]:stroke-current"
+                >
+                  <Icon className="w-5 h-5 shrink-0" strokeWidth={1.5} />
+                  <span className="sr-only">{label}</span>
+                </MagneticButton>
+              </span>
             ))}
-            <MagneticButton
-              as="button"
-              onClick={async () => {
-                try {
-                  await navigator.clipboard.writeText(SITE_URL)
-                  toast({ title: "Copied!" })
-                } catch {
-                  toast({ title: "Copy failed", variant: "destructive" })
-                }
-              }}
-              className="touch-target p-3 min-h-[44px] min-w-[44px] flex items-center justify-center text-muted-foreground hover:text-foreground border border-transparent hover:border-border transition-all [&_svg]:stroke-current"
-              aria-label="Copy site URL"
-            >
-              <Globe className="w-5 h-5 shrink-0" strokeWidth={1.5} />
-            </MagneticButton>
+            <span data-social-icon className="inline-flex">
+              <MagneticButton
+                as="button"
+                onClick={copySiteUrl}
+                cursorText="COPY"
+                className="touch-target p-3 min-h-[44px] min-w-[44px] flex items-center justify-center text-muted-foreground hover:text-foreground border border-transparent hover:border-border transition-all [&_svg]:stroke-current"
+                aria-label="Copy site URL"
+              >
+                <Globe className="w-5 h-5 shrink-0" strokeWidth={1.5} />
+              </MagneticButton>
+            </span>
           </div>
         </div>
       </div>
@@ -211,8 +519,9 @@ export function HeroSection() {
       {/* Scroll cue — ASCII; compact on mobile */}
       <div className="absolute bottom-3 sm:bottom-8 left-1/2 -translate-x-1/2 pb-[env(safe-area-inset-bottom)]">
         <div className="flex flex-col items-center gap-1.5 sm:gap-4">
-          <span className="text-[9px] sm:text-[10px] font-mono uppercase tracking-[0.25em] sm:tracking-[0.4em] text-muted-foreground">
-            &gt; scroll
+          <span className="inline-flex items-center gap-1 text-[9px] sm:text-[10px] font-mono uppercase tracking-[0.25em] sm:tracking-[0.4em] text-muted-foreground">
+            <Mouse className="w-3 h-3 shrink-0" strokeWidth={1.5} />
+            scroll
           </span>
           <div className="w-px h-8 sm:h-16 bg-foreground/20 relative overflow-hidden">
             <div
