@@ -201,14 +201,14 @@ export function AboutSection() {
                         )}
                         <dt
                           data-stat-label
-                          className="font-mono text-[9px] sm:text-[10px] uppercase tracking-[0.18em] text-muted-foreground break-words relative z-[1] flex items-start justify-start w-full"
+                          className="font-mono text-[9px] sm:text-[10px] uppercase tracking-[0.18em] text-muted-foreground relative z-[1] flex items-start justify-start w-full truncate"
                         >
                           {s.label}
                         </dt>
-                        <dd className="relative z-[1] flex items-start justify-end w-full text-right">
+                        <dd className="relative z-[1] flex items-start justify-end w-full text-right overflow-hidden">
                           <span
                             data-stat-value
-                            className="font-mono text-xl sm:text-2xl md:text-3xl font-black leading-tight"
+                            className="font-mono text-xl sm:text-2xl md:text-3xl font-black leading-tight shrink-0"
                           >
                             {s.value}
                           </span>
