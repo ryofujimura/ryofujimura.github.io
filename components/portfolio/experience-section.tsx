@@ -14,7 +14,7 @@ const experiences = [
     company: "Bose Corporation",
     companyFull: "Bose Corporation",
     companyUrl: "https://bose.com",
-    icon: "/images/bose_1.svg",
+    icon: "/images/bose_logo.svg",
     panelImage: "/images/bose_1.svg",
     period: "Jun 2025 – Aug 2025",
     description: "Engineered internal Bluetooth debugging tools adopted by 1,000+ engineers, accelerating cross-platform testing.",
@@ -31,7 +31,7 @@ const experiences = [
     company: "Honda Motor Co.",
     companyFull: "American Honda Motor Co., Inc.",
     companyUrl: "https://honda.com",
-    icon: "/images/hondalogo.svg",
+    icon: "/images/honda.svg",
     panelImage: "/images/hondalogo.svg",
     period: "Jun 2024 – Aug 2024",
     description: "Prototyped next-generation on-device AI using Jetson Orin Nano, evaluating automotive-grade compute constraints.",
@@ -49,7 +49,7 @@ const experiences = [
     companyFull: "CPX at California State University, Long Beach",
     companyUrl: "https://csulbcpx.web.app/",
     icon: "/images/CSU-Longbeach.svg",
-    panelImage: "/images/CSU-Longbeach.svg",
+    panelImage: "/images/lb.csulb.png",
     period: "Aug 2024 – Present",
     description: "Contributing to a 30+ person robotics/AI research group, supporting two peer-reviewed publications (ICCPS 2025, ICRA 2026).",
     highlights: [
@@ -329,13 +329,13 @@ export function ExperienceSection() {
                     )}
                     aria-hidden={!isActive}
                   >
-                    {/* Index icon as light-opacity background at top — GSAP animates on appear */}
+                    {/* Panel logo as light-opacity background at bottom — GSAP animates on appear */}
                     <div
                       ref={(el) => {
                         bgRefs.current[index] = el
                       }}
                       className={cn(
-                        "absolute inset-x-0 top-0 h-28 sm:h-36 md:h-40 pointer-events-none overflow-hidden border-b border-foreground/10 origin-top",
+                        "absolute inset-x-0 bottom-0 h-28 sm:h-36 md:h-40 pointer-events-none overflow-hidden border-t border-foreground/10 origin-bottom",
                         isActive && "opacity-0"
                       )}
                       style={
@@ -343,10 +343,10 @@ export function ExperienceSection() {
                           ? {
                               backgroundImage: `url(${exp.panelImage ?? exp.icon})`,
                               backgroundSize: "contain",
-                              backgroundPosition: "top center",
+                              backgroundPosition: "bottom center",
                               backgroundRepeat: "no-repeat",
-                              maskImage: "linear-gradient(to bottom, black 40%, transparent 100%)",
-                              WebkitMaskImage: "linear-gradient(to bottom, black 40%, transparent 100%)",
+                              maskImage: "linear-gradient(to top, black 40%, transparent 100%)",
+                              WebkitMaskImage: "linear-gradient(to top, black 40%, transparent 100%)",
                             }
                           : undefined
                       }
