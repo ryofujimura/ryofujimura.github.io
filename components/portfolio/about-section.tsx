@@ -116,7 +116,7 @@ export function AboutSection() {
 
       <div className="relative z-10 max-w-5xl lg:max-w-6xl mx-auto">
         {/* Left / Right columns — within each: top then bottom */}
-        <div className="grid md:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] gap-8 lg:gap-10 items-start">
+        <div className="grid lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] gap-8 lg:gap-10 items-start">
           {/* Left column: top = header+intro, bottom = narrative */}
           <div className="space-y-10 sm:space-y-12">
             {/* Top-left: profile + name + description (left/right), then stats full width */}
@@ -159,7 +159,7 @@ export function AboutSection() {
               </div>
               {/* Stats full width — clickable cards with brutalist hover and GSAP entrance */}
               <div className="w-full" ref={statsRef}>
-                <dl className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
+                <dl className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
                   {stats.map((s) => {
                     const isLink = !!s.sectionId
                     const Wrapper = isLink ? "button" : "div"
