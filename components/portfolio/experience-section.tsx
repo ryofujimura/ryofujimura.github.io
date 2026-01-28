@@ -82,33 +82,46 @@ export function ExperienceSection() {
   const [activeIndex, setActiveIndex] = useState(0)
   const bgRefs = useRef<(HTMLDivElement | null)[]>([])
   const contentRefs = useRef<(HTMLDivElement | null)[]>([])
+  const entrySvgRef = useRef<SVGSVGElement | null>(null)
+  const entryLabelRef = useRef<HTMLDivElement | null>(null)
 
-  // GSAP: animate active detail panel background + content on index change
+  // GSAP: ASCII entry frame (lines + corners) draw → panel bg → content blocks stagger (no dashed-border transition)
   useEffect(() => {
     const bg = bgRefs.current[activeIndex]
     const content = contentRefs.current[activeIndex]
+    const svg = entrySvgRef.current
+    const label = entryLabelRef.current
     if (!bg || !content) return
 
+    // Reset entry SVG geometry for draw-in
+    if (svg) {
+      const els = svg.querySelectorAll<SVGGeometryElement>("line, path")
+      els.forEach((el) => {
+        if (typeof el.getTotalLength === "function") {
+          const len = el.getTotalLength()
+          gsap.set(el, { strokeDasharray: len, strokeDashoffset: len })
+        }
+      })
+    }
+    if (label) gsap.set(label, { opacity: 0 })
     gsap.set(bg, { opacity: 0, scale: 1.12 })
-    gsap.set(content, { opacity: 0, y: 14 })
+    gsap.set(content, { opacity: 1, y: 0 })
+    const blocks = content.querySelectorAll<HTMLElement>("[data-detail-block]")
+    gsap.set(blocks, { opacity: 0, y: 10 })
 
     const tl = gsap.timeline({ overwrite: true })
-    tl.to(bg, {
-      opacity: 0.09,
-      scale: 1,
-      duration: 0.7,
-      ease: "power3.out",
-    })
-    tl.to(
-      content,
-      {
-        opacity: 1,
-        y: 0,
-        duration: 0.5,
-        ease: "power3.out",
-      },
-      "-=0.35"
-    )
+    // ASCII entry frame (lines + corners) draw in
+    if (svg) {
+      const els = svg.querySelectorAll<SVGGeometryElement>("line, path")
+      tl.to(els, { strokeDashoffset: 0, duration: 0.4, stagger: 0.04, ease: "power2.inOut" })
+    }
+    if (label) {
+      tl.to(label, { opacity: 1, duration: 0.2 }, "-=0.2")
+    }
+    // Panel bg
+    tl.to(bg, { opacity: 0.09, scale: 1, duration: 0.5, ease: "power3.out" }, "-=0.15")
+    // Content blocks stagger
+    tl.to(blocks, { opacity: 1, y: 0, duration: 0.4, stagger: 0.06, ease: "power3.out" }, "-=0.2")
   }, [activeIndex])
 
   const roleCount = experiences.length
@@ -313,7 +326,29 @@ export function ExperienceSection() {
 
           {/* Detail grid */}
           <div className="relative border border-foreground bg-card shadow-none sm:shadow-[6px_6px_0_0_theme(colors.foreground)]">
-            <div className="absolute inset-x-0 top-0 h-8 bg-[repeating-linear-gradient(90deg,transparent,transparent_6px,theme(colors.foreground/10)_6px,theme(colors.foreground/10)_8px)] opacity-60 pointer-events-none" />
+            {/* ASCII entry header: frame + line draw in with GSAP on index change */}
+            <div className="relative min-h-[3rem] border-b border-foreground/20 bg-secondary/50 px-3 py-2 sm:px-4 sm:py-2.5">
+              <svg
+                ref={entrySvgRef}
+                className="absolute left-0 right-0 top-0 h-full w-full min-h-[3rem]"
+                viewBox="0 0 320 48"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="0.75"
+                aria-hidden
+              >
+                <path d="M 0 48 L 0 0 L 320 0" className="text-foreground/50" />
+                <path d="M 320 0 L 320 48 L 0 48" className="text-foreground/50" />
+                <line x1="0" y1="24" x2="320" y2="24" className="text-foreground/40" />
+              </svg>
+              <div
+                ref={entryLabelRef}
+                className="relative z-10 font-mono text-[10px] sm:text-[11px] uppercase tracking-[0.2em] text-muted-foreground opacity-0"
+                aria-hidden
+              >
+                &gt; ENTRY {(activeIndex + 1).toString().padStart(2, "0")} // {experiences[activeIndex]?.company ?? "—"}
+              </div>
+            </div>
 
             <div className="relative p-3 sm:p-4 md:p-5 space-y-5 sm:space-y-6">
               {experiences.map((exp, index) => {
@@ -322,10 +357,10 @@ export function ExperienceSection() {
                   <article
                     key={exp.company}
                     className={cn(
-                      "relative transition-all duration-300 border border-dashed border-transparent p-1 sm:p-1.5 md:p-2",
+                      "relative transition-[opacity,transform] duration-200 border p-1 sm:p-1.5 md:p-2",
                       isActive
-                        ? "opacity-100 translate-y-0 border-foreground"
-                        : "opacity-0 pointer-events-none absolute inset-2 sm:inset-3 md:inset-3.5"
+                        ? "opacity-100 translate-y-0 border-foreground border-solid"
+                        : "opacity-0 pointer-events-none absolute inset-2 sm:inset-3 md:inset-3.5 border-transparent"
                     )}
                     aria-hidden={!isActive}
                   >
@@ -361,7 +396,7 @@ export function ExperienceSection() {
                         isActive && "opacity-0"
                       )}
                     >
-                      <div className="flex flex-wrap items-baseline justify-between gap-2">
+                      <div data-detail-block className="flex flex-wrap items-baseline justify-between gap-2">
                         <h3 className="text-xl sm:text-2xl md:text-3xl font-black tracking-tight uppercase">
                           {exp.title}
                         </h3>
@@ -370,7 +405,7 @@ export function ExperienceSection() {
                         </p>
                       </div>
 
-                      <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+                      <div data-detail-block className="flex flex-wrap items-center gap-2 sm:gap-3">
                         <a
                           href={exp.companyUrl}
                           target="_blank"
@@ -387,11 +422,11 @@ export function ExperienceSection() {
                         </span>
                       </div>
 
-                      <p className="text-sm sm:text-base text-muted-foreground leading-relaxed max-w-2xl">
+                      <p data-detail-block className="text-sm sm:text-base text-muted-foreground leading-relaxed max-w-2xl">
                         {exp.description}
                       </p>
 
-                      <div className="grid gap-3 sm:gap-4 md:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] items-start">
+                      <div data-detail-block className="grid gap-3 sm:gap-4 md:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] items-start">
                         <ul className="space-y-2.5 sm:space-y-3">
                           {exp.highlights.map((highlight, i) => (
                             <li
