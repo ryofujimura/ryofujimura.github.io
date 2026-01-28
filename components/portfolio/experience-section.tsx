@@ -1,6 +1,5 @@
 "use client"
 
-import Image from "next/image"
 import { useState, useRef, useEffect } from "react"
 import { gsap } from "gsap"
 import { GSAPText, GSAPSVG } from "@/components/gsap-text"
@@ -17,6 +16,7 @@ const experiences = [
     icon: "/images/bose_logo.svg",
     panelImage: "/images/bose_1.svg",
     mediaImages: ["/images/bose_2.JPG", "/images/bose_3.JPG"],
+    mediaLabels: ["Campus", "Lab"],
     period: "Jun 2025 – Aug 2025",
     description: "Engineered internal Bluetooth debugging tools adopted by 1,000+ engineers, accelerating cross-platform testing.",
     highlights: [
@@ -34,6 +34,7 @@ const experiences = [
     icon: "/images/honda.svg",
     panelImage: "/images/hondalogo.svg",
     mediaImages: ["/images/honda.svg", "/images/hondalogo.svg"],
+    mediaLabels: ["Vehicle Lab", "AI Demo"],
     period: "Jun 2024 – Aug 2024",
     description: "Prototyped next-generation on-device AI using Jetson Orin Nano, evaluating automotive-grade compute constraints.",
     highlights: [
@@ -51,6 +52,7 @@ const experiences = [
     icon: "/images/CSU-Longbeach.svg",
     panelImage: "/images/lb.csulb.png",
     mediaImages: ["/images/CSU-Longbeach.svg", "/images/lb.csulb.png"],
+    mediaLabels: ["CSULB Campus", "CPX Lab"],
     period: "Aug 2024 – Present",
     description: "Contributing to a 30+ person robotics/AI research group, supporting two peer-reviewed publications (ICCPS 2025, ICRA 2026).",
     highlights: [
@@ -68,6 +70,7 @@ const experiences = [
     icon: "/images/cusco.svg",
     panelImage: "/images/cusco.svg",
     mediaImages: ["/images/cusco.svg"],
+    mediaLabels: ["CUSCO HQ"],
     period: "Oct 2021 – May 2024",
     description: "Built Python-based extraction pipelines processing 11,500+ legacy files spanning PDFs, images, and mixed formats.",
     highlights: [
@@ -426,27 +429,22 @@ export function ExperienceSection() {
 
                       <div data-detail-block className="flex flex-wrap items-center gap-2 sm:gap-3">
                         {Array.isArray((exp as any).mediaImages) && (exp as any).mediaImages.length > 0 ? (
-                          <div className="inline-flex items-center gap-1.5">
-                            {(exp as any).mediaImages.slice(0, 3).map((src: string, i: number) => (
-                              <a
-                                key={`${exp.company}-media-${i}`}
-                                href={src}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="inline-flex h-10 w-10 items-center justify-center border border-foreground bg-background hover:bg-foreground/90 transition-colors overflow-hidden"
-                              >
-                                <div className="relative h-8 w-8">
-                                  <Image
-                                    src={src}
-                                    alt=""
-                                    fill
-                                    className="object-contain"
-                                    sizes="32px"
-                                    loading="lazy"
-                                  />
-                                </div>
-                              </a>
-                            ))}
+                          <div className="inline-flex flex-wrap items-center gap-1.5">
+                            {(exp as any).mediaImages.slice(0, 3).map((src: string, i: number) => {
+                              const labels = (exp as any).mediaLabels as string[] | undefined
+                              const label = labels?.[i] ?? `View ${i + 1}`
+                              return (
+                                <a
+                                  key={`${exp.company}-media-${i}`}
+                                  href={src}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="inline-flex items-center justify-center border border-foreground bg-background px-2.5 py-1.5 text-[10px] sm:text-[11px] font-mono uppercase tracking-[0.14em] hover:bg-foreground hover:text-background transition-colors"
+                                >
+                                  {label}
+                                </a>
+                              )
+                            })}
                           </div>
                         ) : (
                           <span className="font-mono text-[11px] sm:text-xs uppercase tracking-[0.16em]">
