@@ -19,6 +19,10 @@ export const metadata: Metadata = {
     description: 'Software engineer specializing in AI/ML, mobile development, and full-stack engineering.',
     type: 'website',
   },
+  icons: {
+    icon: '/images/rflogoblack.png',
+    apple: '/images/rflogoblack.png',
+  },
 }
 
 export const viewport: Viewport = {
@@ -27,23 +31,6 @@ export const viewport: Viewport = {
   maximumScale: 5,
   viewportFit: 'cover',
   themeColor: '#f8f9fa',
-  icons: {
-    icon: [
-      {
-        url: '/icon-light-32x32.png',
-        media: '(prefers-color-scheme: light)',
-      },
-      {
-        url: '/icon-dark-32x32.png',
-        media: '(prefers-color-scheme: dark)',
-      },
-      {
-        url: '/icon.svg',
-        type: 'image/svg+xml',
-      },
-    ],
-    apple: '/apple-icon.png',
-  },
 }
 
 export default function RootLayout({
