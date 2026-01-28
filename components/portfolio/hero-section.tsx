@@ -24,8 +24,8 @@ export function HeroSection() {
     const rev = revLabel()
     return [
       "╔" + "═".repeat(ASCII_W) + "╗",
-      "║" + "  SYS_ID: RF.001  │  CLASS: ENGINEER  │  LOC: IRVINE_CA".padEnd(ASCII_W) + "║",
-      "║" + (`  > status: AVAILABLE  │  mode: BUILD  │  rev: ${rev}`).padEnd(ASCII_W) + "║",
+      "║" + "   SYS_ID: RF.001   │   CLASS: ENGINEER   │   LOC: IRVINE_CA".padEnd(ASCII_W) + "║",
+      "║" + (`   mode: BUILD      │   status: AVAILABLE │   rev: ${rev}`).padEnd(ASCII_W) + "║",
       "╚" + "═".repeat(ASCII_W) + "╝",
     ]
   }, [])
@@ -48,13 +48,15 @@ export function HeroSection() {
       className="relative min-h-[100dvh] min-h-screen flex items-center justify-center px-3 sm:px-6 pt-[max(4rem,env(safe-area-inset-top))] pb-6 sm:pb-8 overflow-hidden"
       aria-label="Hero"
     >
+      {/* Section: Hero */}
+      {/* Subsection: Background canvas */}
       <div className="hidden sm:block absolute inset-0">
         <HeroTechnicalCanvas />
       </div>
 
       <div className="relative z-10 w-full max-w-5xl mx-auto px-0">
         <div className="flex flex-col items-start gap-4 sm:gap-6 md:gap-8">
-          {/* ASCII terminal block — complete rectangle; mobile = short, desktop = full */}
+          {/* Subsection: ASCII terminal block — complete rectangle; mobile = short, desktop = full */}
           <div
             ref={asciiBlockRef}
             className="font-mono text-foreground/50 whitespace-pre tabular-nums touch-manipulation w-full min-w-0"
@@ -92,7 +94,7 @@ export function HeroSection() {
             </div>
           </div>
 
-          {/* Role line — scramble then hold */}
+          {/* Subsection: Role line — scramble then hold */}
           <GSAPText
             variant="scramble"
             delay={0.5}
@@ -102,7 +104,7 @@ export function HeroSection() {
             Software Engineer & AI Researcher
           </GSAPText>
 
-          {/* Name — brutalist type, char stagger; mobile-tighter */}
+          {/* Subsection: Name — brutalist type, char stagger; mobile-tighter */}
           <div className="space-y-0 leading-[0.88]">
             <GSAPText
               variant="chars"
@@ -126,7 +128,7 @@ export function HeroSection() {
             </GSAPText>
           </div>
 
-          {/* Tagline — word reveal */}
+          {/* Subsection: Tagline — word reveal */}
           <GSAPText
             variant="words"
             delay={1.25}
@@ -138,7 +140,7 @@ export function HeroSection() {
             Building systems at the intersection of AI research and real-world applications.
           </GSAPText>
 
-          {/* ASCII divider + quote */}
+          {/* Subsection: ASCII divider + quote */}
           <div className="pt-2 sm:pt-4 border-t border-foreground/20 w-full max-w-xl">
             <GSAPText
               variant="lines"
@@ -151,7 +153,7 @@ export function HeroSection() {
             </GSAPText>
           </div>
 
-          {/* CTAs — blocky brutalist buttons; mobile stacking, 44px+ touch */}
+          {/* Subsection: CTAs — blocky brutalist buttons; mobile stacking, 44px+ touch */}
           <div className="flex flex-col sm:flex-row flex-wrap gap-2 sm:gap-4 pt-3 sm:pt-6 w-full sm:w-auto">
             <MagneticButton
               as="a"
@@ -171,7 +173,7 @@ export function HeroSection() {
             </MagneticButton>
           </div>
 
-          {/* Social — monotone Lucide icons; location tap = Open to relocate on mobile */}
+          {/* Subsection: Social — monotone Lucide icons; location tap = Open to relocate on mobile */}
           <div className="flex flex-wrap items-center gap-2 sm:gap-6 pt-2 sm:pt-4">
             <div className="flex items-center gap-0.5 sm:gap-1">
               {[
@@ -203,7 +205,7 @@ export function HeroSection() {
         </div>
       </div>
 
-      {/* Scroll cue — ASCII; compact on mobile */}
+      {/* Subsection: Scroll cue — ASCII; compact on mobile */}
       <div className="absolute bottom-3 sm:bottom-8 left-1/2 -translate-x-1/2 pb-[env(safe-area-inset-bottom)]">
         <div className="flex flex-col items-center gap-1.5 sm:gap-4">
           <span className="text-[9px] sm:text-[10px] font-mono uppercase tracking-[0.25em] sm:tracking-[0.4em] text-muted-foreground">

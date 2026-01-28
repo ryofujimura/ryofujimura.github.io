@@ -211,7 +211,7 @@ function ProjectBlock({
         "min-h-0"
       )}
     >
-      {/* Editorial label + project thumb */}
+      {/* Subsection: Editorial label + project thumb */}
       <div className="md:border-r-2 md:border-foreground md:min-w-[4.5rem] lg:min-w-[5.5rem] flex flex-row md:flex-col md:justify-start md:pt-6 md:pb-6 md:pl-4 md:pr-4 lg:pl-6 lg:pr-6 pt-4 pb-2 md:pt-6 md:pb-4 gap-3 md:gap-0 items-center md:items-stretch">
         <div className="flex flex-col">
           <span className="font-mono text-[10px] xs:text-xs sm:text-sm text-muted-foreground uppercase tracking-[0.2em] md:tracking-[0.25em]">
@@ -228,6 +228,7 @@ function ProjectBlock({
         )}
       </div>
 
+      {/* Subsection: Project content — title, subtitle, description */}
       <div className="pb-6 sm:pb-8 md:pb-8 md:pl-6 lg:pl-8 md:pr-6 lg:pr-8 md:pt-6">
         <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 mb-2">
           <h3 className="text-xl sm:text-2xl md:text-3xl font-black text-foreground leading-tight tracking-tight font-mono uppercase">
@@ -244,7 +245,7 @@ function ProjectBlock({
           {project.description}
         </p>
 
-        {/* Stats bar — brutalist */}
+        {/* Subsection: Stats bar — brutalist */}
         {project.stats && project.stats.length > 0 && (
           <div className="flex flex-wrap gap-2 mb-4 sm:mb-5">
             {project.stats.map((s) => (
@@ -258,6 +259,7 @@ function ProjectBlock({
           </div>
         )}
 
+        {/* Subsection: Skills tags */}
         <div className="flex flex-wrap items-center gap-2 sm:gap-3">
           {project.skills.map((skill) => (
             <span
@@ -269,7 +271,7 @@ function ProjectBlock({
           ))}
         </div>
 
-        {/* Links — 44px touch targets */}
+        {/* Subsection: Links — Source, Demo, App Store, Play Store (44px touch targets) */}
         <div className="flex flex-wrap gap-2 sm:gap-3 mt-4 sm:mt-5">
           {hasGithub && (
             <a
@@ -355,8 +357,11 @@ export function ProjectsSection() {
         "pb-[max(2rem,env(safe-area-inset-bottom))]",
         "bg-background"
       )}
+      aria-label="Projects"
     >
+      {/* Section: Projects */}
       <div className="max-w-4xl lg:max-w-5xl mx-auto">
+        {/* Subsection: Section heading — Work / Projects */}
         <div ref={headingRef} className="mb-10 sm:mb-14 md:mb-16">
           <p className="font-mono text-[10px] sm:text-xs text-muted-foreground uppercase tracking-[0.25em] mb-2">
             — Work
@@ -367,6 +372,7 @@ export function ProjectsSection() {
           <div className="mt-4 sm:mt-6 h-1 w-16 sm:w-24 bg-foreground" />
         </div>
 
+        {/* Subsection: Projects list — project blocks */}
         <div className="border-t-2 border-foreground">
           {displayed.map((project, index) => (
             <ProjectBlock
@@ -378,6 +384,7 @@ export function ProjectsSection() {
           ))}
         </div>
 
+        {/* Subsection: Show-all button (when not all projects visible) */}
         {!showAll && remaining > 0 && (
           <div className="mt-8 sm:mt-10 flex justify-center">
             <button
@@ -397,6 +404,7 @@ export function ProjectsSection() {
           </div>
         )}
 
+        {/* Subsection: Contact link (when all projects shown) */}
         {showAll && (
           <div className="mt-10 sm:mt-12 text-center">
             <a

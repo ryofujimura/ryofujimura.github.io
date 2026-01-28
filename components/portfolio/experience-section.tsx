@@ -79,14 +79,17 @@ export function ExperienceSection() {
     <section
       id="experience"
       className="relative py-16 sm:py-24 md:py-32 lg:py-40 px-3 sm:px-6 bg-background overflow-hidden border-y border-foreground"
+      aria-label="Experience"
     >
-      {/* Brutalist technical chrome */}
+      {/* Section: Experience */}
+      {/* Subsection: Brutalist technical chrome + grid */}
       <TechnicalPattern />
       <div className="pointer-events-none absolute inset-4 opacity-10 hidden sm:block">
         <TechnicalGrid className="w-full h-full text-foreground" />
       </div>
 
       <div className="max-w-6xl mx-auto relative z-10">
+        {/* Subsection: Header — operational log label + title + intro panel */}
         <header className="grid gap-6 sm:gap-8 md:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] items-start mb-10 sm:mb-14 md:mb-16">
           <div className="space-y-3 sm:space-y-4">
             <GSAPText
@@ -151,9 +154,9 @@ export function ExperienceSection() {
           </div>
         </header>
 
-        {/* Matrix layout */}
+        {/* Subsection: Matrix layout — index rail + detail panel */}
         <div className="grid gap-6 lg:grid-cols-[minmax(220px,260px)_minmax(0,1fr)]">
-          {/* Index rail */}
+          {/* Subsection: Index rail — role list */}
           <div className="space-y-3">
             <div className="flex items-center justify-between border-b border-foreground pb-2">
               <span className="font-mono text-[11px] uppercase tracking-[0.3em]">
@@ -205,7 +208,7 @@ export function ExperienceSection() {
             </div>
           </div>
 
-          {/* Detail grid */}
+          {/* Subsection: Detail grid — active role content (highlights, skills, signal summary) */}
           <div className="relative border border-foreground bg-card shadow-none sm:shadow-[6px_6px_0_0_theme(colors.foreground)]">
             <div className="absolute inset-x-0 top-0 h-8 bg-[repeating-linear-gradient(90deg,transparent,transparent_6px,theme(colors.foreground/10)_6px,theme(colors.foreground/10)_8px)] opacity-60 pointer-events-none" />
 
