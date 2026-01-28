@@ -1,28 +1,13 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useRef, useEffect } from "react"
+import { gsap } from "gsap"
 import { GSAPText, GSAPSVG } from "@/components/gsap-text"
 import { TechnicalGrid, TechnicalPattern } from "@/components/technical-grid"
 import { ExternalLink } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 const experiences = [
-  {
-    title: "Undergraduate Researcher",
-    company: "CPX Lab, CSULB",
-    companyFull: "California State University, Long Beach",
-    companyUrl: "https://csulb.edu",
-    icon: "/images/cs_research.svg",
-    period: "Aug 2024 – Present",
-    description: "Contributing to a 30+ person robotics/AI research group, supporting two peer-reviewed publications (ICCPS 2025, ICRA 2026).",
-    highlights: [
-      "Developed transformer-based classifiers improving task accuracy by 25% and supporting real-time robotic actuation",
-      "Built 3D-printed prototypes (10 iterations) and sensor-integrated hardware systems",
-      "Led data collection/annotation pipelines generating 1,000+ labeled samples",
-      "Created reproducible ML pipelines adopted by multiple lab members",
-    ],
-    skills: ["PyTorch", "Transformers", "Python", "3D Printing", "Data Pipelines"],
-  },
   {
     title: "Android / iOS Development Intern",
     company: "Bose Corporation",
@@ -37,11 +22,11 @@ const experiences = [
       "Built production-grade features using Swift Concurrency, Kotlin Coroutines, Rx",
       "Collaborated with firmware, cloud, and mobile groups resolving cross-team issues",
     ],
-    skills: ["Swift", "Kotlin", "SwiftUI", "Jetpack Compose", "Bluetooth"],
+    skills: ["Swift", "Kotlin", "SwiftUI", "Jetpack Compose", "BLE"],
   },
   {
     title: "Software Engineer Intern",
-    company: "American Honda",
+    company: "Honda Motor Co.",
     companyFull: "American Honda Motor Co., Inc.",
     companyUrl: "https://honda.com",
     icon: "/images/honda.svg",
@@ -54,6 +39,22 @@ const experiences = [
       "Profiled thermal, latency, and bandwidth tradeoffs for hybrid inference",
     ],
     skills: ["CUDA", "PyTorch", "Llama.cpp", "Jetson", "Edge AI"],
+  },
+  {
+    title: "Undergraduate Researcher",
+    company: "CPX Lab",
+    companyFull: "CPX at California State University, Long Beach",
+    companyUrl: "https://csulbcpx.web.app/",
+    icon: "/images/CSU-Longbeach.svg",
+    period: "Aug 2024 – Present",
+    description: "Contributing to a 30+ person robotics/AI research group, supporting two peer-reviewed publications (ICCPS 2025, ICRA 2026).",
+    highlights: [
+      "Developed transformer-based classifiers improving task accuracy by 25% and supporting real-time robotic actuation",
+      "Built 3D-printed prototypes (10 iterations) and sensor-integrated hardware systems",
+      "Led data collection/annotation pipelines generating 1,000+ labeled samples",
+      "Created reproducible ML pipelines adopted by multiple lab members",
+    ],
+    skills: ["PyTorch", "Transformers", "Python", "3D Printing", "Data Pipelines"],
   },
   {
     title: "Data Engineer (Freelance)",
@@ -74,22 +75,58 @@ const experiences = [
 
 export function ExperienceSection() {
   const [activeIndex, setActiveIndex] = useState(0)
+  const articleContentRefs = useRef<(HTMLDivElement | null)[]>([])
+
+  // GSAP: animate detail panel content when active index changes
+  useEffect(() => {
+    const el = articleContentRefs.current[activeIndex]
+    if (!el) return
+    const title = el.querySelector("[data-exp-title]")
+    const term = el.querySelector("[data-exp-term]")
+    const imageBlock = el.querySelector("[data-exp-image-block]")
+    const body = el.querySelector("[data-exp-body]")
+    const svgDeco = el.querySelectorAll("[data-exp-svg] path, [data-exp-svg] line, [data-exp-svg] rect")
+
+    gsap.set([title, term, imageBlock, body], { opacity: 0, y: 12 })
+    if (svgDeco.length) gsap.set(svgDeco, { opacity: 0 })
+
+    const tl = gsap.timeline({ defaults: { ease: "power3.out" } })
+    tl.to(title, { opacity: 1, y: 0, duration: 0.32 })
+      .to(term, { opacity: 1, y: 0, duration: 0.28 }, "-=0.2")
+      .to(imageBlock, { opacity: 1, y: 0, duration: 0.3 }, "-=0.24")
+      .to(svgDeco, { opacity: 0.5, duration: 0.4, stagger: 0.03 }, "-=0.35")
+      .to(body, { opacity: 1, y: 0, duration: 0.35 }, "-=0.2")
+  }, [activeIndex])
+
+  const roleCount = experiences.length
+  const chartLeft = 34
+  const chartRight = 366
+  const chartTop = 14
+  const chartBottom = 66
+  const chartWidth = chartRight - chartLeft
+  const step = chartWidth / Math.max(1, roleCount - 1)
+
+  const barLevels = experiences.map((_, i) => {
+    const t = roleCount <= 1 ? 1 : i / (roleCount - 1)
+    return Math.round(2 + t * 4) // 2..6 blocks (simple growth signal)
+  })
+
+  const xCenters = experiences.map((_, i) => chartLeft + i * step)
+  const barTops = barLevels.map((lvl) => chartBottom - lvl * 6 + 2)
+  const trendPoints = xCenters.map((x, i) => `${x},${barTops[i]}`).join(" ")
 
   return (
     <section
       id="experience"
       className="relative py-16 sm:py-24 md:py-32 lg:py-40 px-3 sm:px-6 bg-background overflow-hidden border-y border-foreground"
-      aria-label="Experience"
     >
-      {/* Section: Experience */}
-      {/* Subsection: Brutalist technical chrome + grid */}
+      {/* Brutalist technical chrome */}
       <TechnicalPattern />
       <div className="pointer-events-none absolute inset-4 opacity-10 hidden sm:block">
         <TechnicalGrid className="w-full h-full text-foreground" />
       </div>
 
       <div className="max-w-6xl mx-auto relative z-10">
-        {/* Subsection: Header — operational log label + title + intro panel */}
         <header className="grid gap-6 sm:gap-8 md:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] items-start mb-10 sm:mb-14 md:mb-16">
           <div className="space-y-3 sm:space-y-4">
             <GSAPText
@@ -100,9 +137,9 @@ export function ExperienceSection() {
             </GSAPText>
             <GSAPText
               variant="words"
-              className="text-3xl xs:text-4xl sm:text-5xl md:text-6xl font-black tracking-tight leading-[0.9]"
+              className="text-3xl xs:text-4xl sm:text-5xl md:text-6xl font-black tracking-tight leading-[0.94]"
             >
-              Brutalist deployment history, tuned for real constraints.
+              From research to production. Systems built to ship, not demo.
             </GSAPText>
             <GSAPText
               variant="scramble"
@@ -121,43 +158,95 @@ export function ExperienceSection() {
                 research, and freelance: different environments, same obsession with reliability,
                 observability, and measurable impact.
               </p>
-              <p className="font-mono text-[11px] sm:text-xs text-muted-foreground mt-3">
-                Hover or tap to lock a role. Numbers on the right call out{" "}
+              <p className="hidden sm:block font-mono text-[11px] sm:text-xs text-muted-foreground mt-3">
+                Hover or tap to lock a role. In the detail panel, the metrics call out{" "}
                 <span className="text-accent font-semibold">throughput, savings, or deltas</span> – not vibes.
               </p>
 
-              <GSAPSVG className="mt-4 hidden w-full h-20 text-foreground/40 sm:block">
+              <GSAPSVG className="mt-4 w-full h-20 text-foreground/40">
                 <svg viewBox="0 0 400 80" className="w-full h-full" fill="none" stroke="currentColor">
-                  <line x1="10" y1="70" x2="390" y2="70" strokeWidth="0.75" />
-                  {experiences.map((_, i) => {
-                    const x = 40 + i * 80
+                  {/* ASCII-terminal frame */}
+                  <rect x="10" y="10" width="380" height="60" strokeWidth="0.9" />
+                  <rect x="16" y="16" width="368" height="48" strokeWidth="0.6" opacity="0.55" />
+
+                  {/* Scanlines + tick marks */}
+                  {Array.from({ length: 11 }).map((_, i) => {
+                    const x = 20 + i * 34
                     return (
-                      <g key={i}>
-                        <circle cx={x} cy="40" r="6" strokeWidth="1" />
+                      <line
+                        key={`scan-${i}`}
+                        x1={x}
+                        y1={16}
+                        x2={x}
+                        y2={64}
+                        strokeWidth="0.5"
+                        opacity="0.25"
+                      />
+                    )
+                  })}
+                  {Array.from({ length: 6 }).map((_, i) => {
+                    const y = 20 + i * 8
+                    return (
+                     <line
+                        key={`row-${i}`}
+                        x1={16}
+                        y1={y}
+                        x2={384}
+                        y2={y}
+                        strokeWidth="0.5"
+                        opacity="0.15"
+                      /> 
+                    )
+                  })}
+
+                  {/* Axes */}
+                  <line x1={chartLeft} y1={chartTop} x2={chartLeft} y2={chartBottom} strokeWidth="0.0" />
+                  <line x1={chartLeft} y1={chartBottom} x2={chartRight} y2={chartBottom} strokeWidth="0.75" />
+
+                  {/* Bars built from blocks (ASCII looks) */}
+                  {barLevels.map((lvl, i) => {
+                    const x = xCenters[i] - 10
+                    return (
+                      <g key={`bar-${i}`}>
                         <line
-                          x1={x}
-                          y1="40"
-                          x2={x}
-                          y2="70"
+                          x1={xCenters[i]}
+                          y1={chartBottom}
+                          x2={xCenters[i]}
+                          y2={chartBottom + 3}
                           strokeWidth="0.75"
+                          opacity="0.8"
                         />
+                        {Array.from({ length: lvl }).map((_, j) => {
+                          const y = chartBottom - (j + 1) * 6
+                          return (
+                            <rect
+                              key={`blk-${i}-${j}`}
+                              x={x}
+                              y={y}
+                              width="20"
+                              height="5"
+                              strokeWidth="0.75"
+                              fill="currentColor"
+                              opacity={0.08 + j * 0.02}
+                            />
+                          )
+                        })}
+                        <circle cx={xCenters[i]} cy={barTops[i]} r="2.5" strokeWidth="0.9" opacity="0.7" />
                       </g>
                     )
                   })}
-                  <polyline
-                    points="40,38 120,30 200,24 280,28 360,20"
-                    strokeWidth="0.75"
-                    opacity="0.5"
-                  />
-                </svg>
+
+                  {/* Growth trend (simple, upward) */}
+                  <polyline points={trendPoints} strokeWidth="1.1" opacity="0.6" />
+                   </svg>
               </GSAPSVG>
             </div>
           </div>
         </header>
 
-        {/* Subsection: Matrix layout — index rail + detail panel */}
+        {/* Matrix layout */}
         <div className="grid gap-6 lg:grid-cols-[minmax(220px,260px)_minmax(0,1fr)]">
-          {/* Subsection: Index rail — role list */}
+          {/* Index rail */}
           <div className="space-y-3">
             <div className="flex items-center justify-between border-b border-foreground pb-2">
               <span className="font-mono text-[11px] uppercase tracking-[0.3em]">
@@ -209,7 +298,7 @@ export function ExperienceSection() {
             </div>
           </div>
 
-          {/* Subsection: Detail grid — active role content (highlights, skills, signal summary) */}
+          {/* Detail grid */}
           <div className="relative border border-foreground bg-card shadow-none sm:shadow-[6px_6px_0_0_theme(colors.foreground)]">
             <div className="absolute inset-x-0 top-0 h-8 bg-[repeating-linear-gradient(90deg,transparent,transparent_6px,theme(colors.foreground/10)_6px,theme(colors.foreground/10)_8px)] opacity-60 pointer-events-none" />
 
@@ -227,38 +316,100 @@ export function ExperienceSection() {
                     )}
                     aria-hidden={!isActive}
                   >
-                    <div className="flex flex-col gap-3 sm:gap-4">
-                      <div className="flex flex-wrap items-baseline justify-between gap-2">
-                        <h3 className="text-xl sm:text-2xl md:text-3xl font-black tracking-tight uppercase">
-                          {exp.title}
-                        </h3>
-                        <p className="font-mono text-[11px] sm:text-xs text-muted-foreground uppercase tracking-[0.18em]">
-                          {exp.period}
-                        </p>
-                      </div>
+                    <div
+                      ref={(el) => {
+                        articleContentRefs.current[index] = el
+                      }}
+                      className="flex flex-col gap-3 sm:gap-4"
+                    >
+                      {/* Top row: title + term (left), index image in brutalist frame (right) */}
+                      <div className="flex flex-wrap items-start justify-between gap-4">
+                        <div className="min-w-0 flex-1">
+                          <h3
+                            data-exp-title
+                            className="text-xl sm:text-2xl md:text-3xl font-black tracking-tight uppercase"
+                          >
+                            {exp.title}
+                          </h3>
+                          <p
+                            data-exp-term
+                            className="font-mono text-[11px] sm:text-xs text-muted-foreground uppercase tracking-[0.18em] mt-1"
+                          >
+                            <span className="text-muted-foreground/60">// TERM </span>
+                            {exp.period}
+                          </p>
+                        </div>
 
-                      <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-                        <a
-                          href={exp.companyUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1.5 border border-foreground px-2.5 py-1.5 text-[11px] sm:text-xs font-mono uppercase tracking-[0.16em] hover:bg-foreground hover:text-background transition-colors"
+                        {/* Index image — same as list; brutalist frame, ASCII label, technical lines */}
+                        <div
+                          data-exp-image-block
+                          className="relative shrink-0 border border-foreground bg-secondary shadow-[3px_3px_0_0_theme(colors.foreground)]"
                         >
-                          <span>{exp.companyFull}</span>
-                          <ExternalLink className="w-3.5 h-3.5" />
-                        </a>
-                        <span className="h-px flex-1 bg-foreground/30" />
-                        <span className="font-mono text-[11px] sm:text-xs text-muted-foreground">
-                          Highlights: {exp.highlights.length.toString().padStart(2, "0")} // Skills:{" "}
-                          {exp.skills.length.toString().padStart(2, "0")}
-                        </span>
+                          <div className="absolute -top-2 left-2 px-1.5 py-0.5 bg-background border border-foreground font-mono text-[9px] uppercase tracking-wider text-muted-foreground">
+                            [ INDEX_REF ]
+                          </div>
+                          <div className="p-2 sm:p-3 flex items-center justify-center w-20 h-20 sm:w-24 sm:h-24">
+                            {"icon" in exp && exp.icon ? (
+                              <img
+                                src={exp.icon}
+                                alt=""
+                                className="h-10 w-10 sm:h-12 sm:w-12 object-contain"
+                                width={48}
+                                height={48}
+                              />
+                            ) : (
+                              <span className="font-mono text-2xl text-muted-foreground">
+                                {index.toString().padStart(2, "0")}
+                              </span>
+                            )}
+                          </div>
+                          {/* Technical SVG frame — scanlines + corners; GSAP draw */}
+                          <svg
+                            data-exp-svg
+                            className="pointer-events-none absolute inset-0 w-full h-full text-foreground/50"
+                            viewBox="0 0 96 96"
+                            fill="none"
+                            stroke="currentColor"
+                          >
+                            <rect x="2" y="2" width="92" height="92" strokeWidth="0.8" />
+                            <rect x="6" y="6" width="84" height="84" strokeWidth="0.4" opacity="0.7" />
+                            {[14, 28, 42, 56, 70].map((y) => (
+                              <line key={`h-${y}`} x1="6" y1={y} x2="90" y2={y} strokeWidth="0.35" opacity="0.25" />
+                            ))}
+                            {[20, 40, 60, 80].map((x) => (
+                              <line key={`v-${x}`} x1={x} y1="6" x2={x} y2="90" strokeWidth="0.35" opacity="0.2" />
+                            ))}
+                            <path d="M0 12V0h12M0 84v12h12" fill="none" stroke="currentColor" strokeWidth="0.6" opacity="0.5" transform="translate(2,2)" />
+                            <path d="M96 12V0H84M96 84v12H84" fill="none" stroke="currentColor" strokeWidth="0.6" opacity="0.5" transform="translate(-2,2)" />
+                            <line x1="0" y1="0" x2="96" y2="96" strokeWidth="0.3" opacity="0.2" />
+                            <line x1="96" y1="0" x2="0" y2="96" strokeWidth="0.3" opacity="0.2" />
+                          </svg>
+                        </div>
                       </div>
 
-                      <p className="text-sm sm:text-base text-muted-foreground leading-relaxed max-w-2xl">
-                        {exp.description}
-                      </p>
+                      <div data-exp-body className="space-y-4">
+                        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+                          <a
+                            href={exp.companyUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1.5 border border-foreground px-2.5 py-1.5 text-[11px] sm:text-xs font-mono uppercase tracking-[0.16em] hover:bg-foreground hover:text-background transition-colors"
+                          >
+                            <span>{exp.companyFull}</span>
+                            <ExternalLink className="w-3.5 h-3.5" />
+                          </a>
+                          <span className="h-px flex-1 bg-foreground/30" />
+                          <span className="font-mono text-[11px] sm:text-xs text-muted-foreground">
+                            Highlights: {exp.highlights.length.toString().padStart(2, "0")} // Skills:{" "}
+                            {exp.skills.length.toString().padStart(2, "0")}
+                          </span>
+                        </div>
 
-                      <div className="grid gap-3 sm:gap-4 md:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] items-start">
+                        <p className="text-sm sm:text-base text-muted-foreground leading-relaxed max-w-2xl">
+                          {exp.description}
+                        </p>
+
+                        <div className="grid gap-3 sm:gap-4 md:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] items-start">
                         <ul className="space-y-2.5 sm:space-y-3">
                           {exp.highlights.map((highlight, i) => (
                             <li
@@ -299,6 +450,7 @@ export function ExperienceSection() {
                               under bandwidth, hardware, or organizational constraints.
                             </p>
                           </div>
+                        </div>
                         </div>
                       </div>
                     </div>
