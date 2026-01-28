@@ -3,7 +3,8 @@
 import { useRef, useEffect } from "react"
 import { AnimatedSection } from "@/components/animated-section"
 import { GSAPText, GSAPSVG } from "@/components/gsap-text"
-import { LeonardoNotebook, TechnicalDrawing, SpecAnnotation } from "@/components/leonardo-notebook"
+import { LeonardoNotebook, TechnicalDrawing } from "@/components/leonardo-notebook"
+import { cn } from "@/lib/utils"
 
 const skills = {
   Languages: ["Python", "Swift", "Kotlin", "Java", "C++", "TypeScript", "JavaScript"],
@@ -13,23 +14,29 @@ const skills = {
   Tools: ["Git", "Docker", "Linux", "CUDA", "Vercel"],
 }
 
-const stats = [
+type StatItem = { label: string; value: string; sectionId?: string }
+const stats: StatItem[] = [
   { label: "Years Coding", value: "8+" },
-  { label: "Projects Shipped", value: "10+" },
-  { label: "Internships", value: "2" },
-  { label: "Publications", value: "2" },
+  { label: "Internships", value: "2", sectionId: "experience" },
+  { label: "Projects Shipped", value: "10+", sectionId: "projects" },
+  { label: "Publications", value: "2", sectionId: "publications" },
 ]
 
 /** MMM. YYYY for LeonardoNotebook dates */
 const currentMonthYear =
   new Date().toLocaleString("en-US", { month: "short" }) + ". " + new Date().getFullYear()
 
+function scrollToSection(sectionId: string) {
+  const el = document.getElementById(sectionId)
+  el?.scrollIntoView({ behavior: "smooth", block: "start" })
+}
+
 export function AboutSection() {
   const gridRef = useRef<SVGSVGElement | null>(null)
+  const statsRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
     if (!gridRef.current) return
-    // Technical lines subtle hover / scroll animation
     const svg = gridRef.current
     const lines = svg.querySelectorAll("line, circle")
     if (!lines.length) return
@@ -57,78 +64,192 @@ export function AboutSection() {
     })
   }, [])
 
+  useEffect(() => {
+    if (!statsRef.current) return
+    const container = statsRef.current
+    const cards = container.querySelectorAll("[data-stat-card]")
+    const labels = container.querySelectorAll("[data-stat-label]")
+    const values = container.querySelectorAll("[data-stat-value]")
+    const goSvgs = container.querySelectorAll("[data-stat-go-svg] path")
+
+    import("gsap").then(({ default: gsap }) => {
+      import("gsap/ScrollTrigger").then(({ ScrollTrigger }) => {
+        gsap.registerPlugin(ScrollTrigger)
+        gsap.set(cards, { opacity: 0, y: 14 })
+        gsap.set(labels, { opacity: 0, y: 6 })
+        gsap.set(values, { opacity: 0, y: 8 })
+        goSvgs.forEach((path) => {
+          const el = path as SVGPathElement
+          if (typeof el.getTotalLength === "function") {
+            const len = el.getTotalLength()
+            gsap.set(el, { strokeDasharray: len, strokeDashoffset: len })
+          }
+        })
+
+        const tl = gsap.timeline({
+          scrollTrigger: {
+            trigger: container,
+            start: "top 82%",
+            toggleActions: "play none none none",
+          },
+        })
+        tl.to(cards, {
+          opacity: 1,
+          y: 0,
+          duration: 0.6,
+          stagger: 0.1,
+          ease: "power3.out",
+        })
+        tl.to(
+          labels,
+          { opacity: 1, y: 0, duration: 0.4, stagger: 0.05, ease: "power2.out" },
+          "-=0.35"
+        )
+        tl.to(
+          values,
+          { opacity: 1, y: 0, duration: 0.5, stagger: 0.05, ease: "power2.out" },
+          "-=0.25"
+        )
+        tl.to(
+          goSvgs,
+          {
+            strokeDashoffset: 0,
+            duration: 0.5,
+            stagger: 0.04,
+            ease: "power2.inOut",
+          },
+          "-=0.2"
+        )
+      })
+    })
+  }, [])
+
   return (
     <section
       id="about"
       className="relative py-16 sm:py-20 md:py-24 lg:py-28 px-4 sm:px-6 overflow-hidden bg-background"
-      aria-label="About"
     >
-      {/* Section: About */}
-      {/* Subsection: Brutalist technical grid */}
+      {/* Brutalist technical grid */}
       <div className="pointer-events-none absolute inset-0 bg-brutalist-grid opacity-[0.04]" aria-hidden />
 
       <div className="relative z-10 max-w-5xl lg:max-w-6xl mx-auto">
-        {/* Subsection: Left / Right columns — within each: top then bottom */}
+        {/* Left / Right columns — within each: top then bottom */}
         <div className="grid md:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] gap-8 lg:gap-10 items-start">
-          {/* Subsection: Left column — header+intro, then narrative */}
+          {/* Left column: top = header+intro, bottom = narrative */}
           <div className="space-y-10 sm:space-y-12">
-            {/* Subsection: Profile + name + tagline + stats */}
-            <div className="space-y-4 sm:space-y-6 flex flex-col md:flex-row md:gap-6 lg:gap-8 md:items-start">
-              <div className="shrink-0">
-                <div className="w-24 h-24 sm:w-28 sm:h-28 border-[3px] border-foreground bg-background shadow-[4px_4px_0_0_var(--foreground)] overflow-hidden">
-                  <img
-                    src="/images/profile.jpg"
-                    alt="Ryo Fujimura"
-                    className="w-full h-full object-cover object-top"
-                    width={112}
-                    height={112}
-                  />
+            {/* Top-left: profile + name + description (left/right), then stats full width */}
+            <div className="space-y-4 sm:space-y-6">
+              <div className="flex flex-col md:flex-row md:gap-6 lg:gap-8 md:items-start">
+                <div className="shrink-0">
+                  <div className="w-24 h-24 sm:w-28 sm:h-28 border-[3px] border-foreground bg-background shadow-[4px_4px_0_0_var(--foreground)] overflow-hidden">
+                    <img
+                      src="/images/profile.jpg"
+                      alt="Ryo Fujimura"
+                      className="w-full h-full object-cover object-top"
+                      width={112}
+                      height={112}
+                    />
+                  </div>
+                  <p className="font-mono text-[8px] sm:text-[9px] text-muted-foreground uppercase tracking-widest mt-1.5">
+                  46
+                  </p>
                 </div>
-                <p className="font-mono text-[8px] sm:text-[9px] text-muted-foreground uppercase tracking-widest mt-1.5">
-                  RF-01
-                </p>
+                <div className="space-y-4 sm:space-y-6 min-w-0 flex-1">
+                  <p className="font-mono text-[10px] sm:text-xs text-muted-foreground uppercase tracking-[0.35em]">
+                    ABOUT / SPECIMEN WISTERIA-05
+                  </p>
+                  <GSAPText
+                    variant="chars"
+                    className="text-3xl sm:text-4xl md:text-5xl lg:text-[3.4rem] font-black tracking-tight leading-[0.95] font-mono"
+                    stagger={0.03}
+                  >
+                    RYO FUJIMURA
+                  </GSAPText>
+                  <GSAPText
+                    variant="words"
+                    className="text-sm sm:text-base md:text-lg text-muted-foreground max-w-xl"
+                    delay={0.4}
+                  >
+                    Software engineer + AI researcher building systems that move smoothly from lab prototype to
+                    production reality.
+                  </GSAPText>
+                </div>
               </div>
-              <div className="space-y-4 sm:space-y-6 min-w-0">
-                <p className="font-mono text-[10px] sm:text-xs text-muted-foreground uppercase tracking-[0.35em]">
-                  ABOUT / SPECIMEN RF-01
-                </p>
-                <GSAPText
-                  variant="chars"
-                  className="text-3xl sm:text-4xl md:text-5xl lg:text-[3.4rem] font-black tracking-tight leading-[0.95] font-mono"
-                  stagger={0.03}
-                >
-                  RYO FUJIMURA
-                </GSAPText>
-                <GSAPText
-                  variant="words"
-                  className="text-sm sm:text-base md:text-lg text-muted-foreground max-w-xl"
-                  delay={0.4}
-                >
-                  Software engineer + AI researcher building systems that move smoothly from lab prototype to
-                  production reality.
-                </GSAPText>
-
-                <div className="border-y border-foreground mt-4 sm:mt-6 py-1">
-                  <dl className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
-                    {stats.map((s) => (
-                      <div
+              {/* Stats full width — clickable cards with brutalist hover and GSAP entrance */}
+              <div className="border-y border-foreground py-1 w-full" ref={statsRef}>
+                <dl className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+                  {stats.map((s) => {
+                    const isLink = !!s.sectionId
+                    const Wrapper = isLink ? "button" : "div"
+                    return (
+                      <Wrapper
                         key={s.label}
-                        className="min-w-0 border border-foreground/25 bg-background px-3 py-3 sm:px-4 sm:py-4 flex flex-col justify-center"
+                        type={isLink ? "button" : undefined}
+                        onClick={
+                          isLink && s.sectionId
+                            ? () => scrollToSection(s.sectionId!)
+                            : undefined
+                        }
+                        data-stat-card
+                        className={cn(
+                          "min-w-0 border bg-background px-3 py-3 sm:px-4 sm:py-4 flex flex-col justify-center relative overflow-hidden text-left",
+                          isLink
+                            ? "border-foreground/25 cursor-pointer transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2 hover:border-foreground hover:shadow-[4px_4px_0_0_var(--foreground)] group"
+                            : "border-foreground/25"
+                        )}
+                        aria-label={isLink && s.sectionId ? `Jump to ${s.label} section` : undefined}
                       >
-                        <dt className="font-mono text-[9px] sm:text-[10px] uppercase tracking-[0.18em] text-muted-foreground mb-1 break-words">
+                        {/* Technical pattern overlay on hover — diagonal/cross lines */}
+                        {isLink && (
+                          <svg
+                            className="absolute inset-0 w-full h-full pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-foreground/10"
+                            viewBox="0 0 48 48"
+                            fill="none"
+                            aria-hidden
+                          >
+                            <line x1="0" y1="0" x2="48" y2="48" stroke="currentColor" strokeWidth="0.5" />
+                            <line x1="48" y1="0" x2="0" y2="48" stroke="currentColor" strokeWidth="0.5" />
+                            {[12, 24, 36].map((n) => (
+                              <line key={`h-${n}`} x1="0" y1={n} x2="48" y2={n} stroke="currentColor" strokeWidth="0.25" />
+                            ))}
+                            {[12, 24, 36].map((n) => (
+                              <line key={`v-${n}`} x1={n} y1="0" x2={n} y2="48" stroke="currentColor" strokeWidth="0.25" />
+                            ))}
+                          </svg>
+                        )}
+                        <dt
+                          data-stat-label
+                          className="font-mono text-[9px] sm:text-[10px] uppercase tracking-[0.18em] text-muted-foreground mb-1 break-words relative z-[1]"
+                        >
                           {s.label}
                         </dt>
-                        <dd className="font-mono text-xl sm:text-2xl md:text-3xl font-black leading-tight">
-                          {s.value}
+                        <dd className="relative z-[1] flex items-baseline justify-between gap-2">
+                          <span
+                            data-stat-value
+                            className="font-mono text-xl sm:text-2xl md:text-3xl font-black leading-tight"
+                          >
+                            {s.value}
+                          </span>
+                          {isLink && (
+                            <span
+                              data-stat-go-svg
+                              className="shrink-0 mt-0.5 opacity-60 group-hover:opacity-100 transition-opacity"
+                              aria-hidden
+                            >
+                              <svg viewBox="0 0 24 12" className="w-5 h-2.5 sm:w-6 sm:h-3" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="square">
+                                <path d="M0 6h18M18 6l-4-4M18 6l-4 4" />
+                              </svg>
+                            </span>
+                          )}
                         </dd>
-                      </div>
-                    ))}
-                  </dl>
-                </div>
+                      </Wrapper>
+                    )
+                  })}
+                </dl>
               </div>
             </div>
 
-            {/* Subsection: Narrative (bio + quote + currently/looking-for) */}
+            {/* Bottom-left: narrative */}
             <div className="space-y-5 sm:space-y-6">
             <AnimatedSection>
               <p className="text-sm sm:text-base text-foreground/90 leading-relaxed">
@@ -162,8 +283,7 @@ export function AboutSection() {
                     CURRENTLY
                   </p>
                   <p className="text-sm sm:text-base text-foreground/90 leading-relaxed">
-                    Undergraduate researcher at CPX Lab exploring temporal modeling, robotics, and human–robot
-                    interaction.
+                  Undergraduate researcher at CPX Lab building mobile and on-device AI for robotics, temporal modeling, and human–robot interaction.
                   </p>
                 </div>
                 <div className="space-y-2">
@@ -171,7 +291,7 @@ export function AboutSection() {
                     LOOKING FOR
                   </p>
                   <p className="text-sm sm:text-base text-foreground/90 leading-relaxed">
-                    Roles where on-device AI, mobile, or infra meet rigorous product and research requirements.
+                    Roles where AI, mobile, or infra meet rigorous product and research requirements.
                   </p>
                 </div>
               </div>
@@ -179,9 +299,9 @@ export function AboutSection() {
             </div>
           </div>
 
-          {/* Subsection: Right column — technical SVG, then notebooks */}
+          {/* Right column: top = technical SVG, bottom = notebooks */}
           <div className="space-y-10 sm:space-y-12">
-            {/* Subsection: Technical SVG panel */}
+            {/* Top-right: Technical SVG panel */}
             <div className="hidden sm:block">
               <div className="border-2 border-foreground bg-background p-3 sm:p-4 md:p-5 relative overflow-hidden">
                 <div className="absolute inset-0 pointer-events-none opacity-20">
@@ -226,13 +346,14 @@ export function AboutSection() {
                     SYSTEM PROFILE
                   </p>
                   <p className="font-mono text-xs sm:text-sm text-foreground">
-                    Edge-friendly AI, mobile-first UX, and research-grade experimentation coexisting in one stack.
+                  Full-stack mobile & AI engineer focused on Local LLMs, real-time systems, and scalable pipelines
+
                   </p>
                 </div>
               </div>
             </div>
 
-            {/* Subsection: Leonardo notebooks + stack summary */}
+            {/* Bottom-right: Leonardo notebooks + stack summary */}
             <div className="space-y-6 sm:space-y-7">
             <AnimatedSection>
               <LeonardoNotebook folioRef="RF.DV.ABOUT.001" date={currentMonthYear}>
@@ -257,11 +378,11 @@ export function AboutSection() {
                     "+--------+--------+   +--------+--------+",
                   ].join("\n")}
                   measurements={[
-                    { label: "Latency", value: "−40%", unit: " vs. baseline" },
-                    { label: "Memory", value: "−3GB", unit: " footprint" },
-                    { label: "Accuracy", value: "95%", unit: " task" },
+                    { label: "AI / ML", value: "2+ yrs.", unit: " PyTorch, Transformers, quantization" },
+                    { label: "Mobile", value: "4+ yrs.", unit: " Swift, SwiftUI, Kotlin, CoreML" },
+                    { label: "Backend", value: "3+ yrs.", unit: " REST APIs, Cloud Functions, Node.js" },
                   ]}
-                  notes="Typical workflow from research model to on-device deployment while preserving behavior."
+                  notes="Typical workflow from research model to deployment while preserving behavior."
                 />
               </LeonardoNotebook>
             </AnimatedSection>
