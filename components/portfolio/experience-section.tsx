@@ -1,21 +1,11 @@
 "use client"
 
-import { useState, useRef, useEffect, useMemo } from "react"
+import { useState, useRef, useEffect } from "react"
 import { gsap } from "gsap"
 import { GSAPText, GSAPSVG } from "@/components/gsap-text"
 import { TechnicalGrid, TechnicalPattern } from "@/components/technical-grid"
 import { SkillSurfaceGlobe } from "@/components/skill-surface-globe"
-import { ExternalLink } from "lucide-react"
 import { cn } from "@/lib/utils"
-
-function slugifyId(input: string) {
-  return input
-    .toLowerCase()
-    .trim()
-    .replace(/['"]/g, "")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/(^-|-$)/g, "")
-}
 
 // icon = index list (left rail); panelImage = ENTRY header background (optional, falls back to icon)
 const experiences = [
@@ -23,9 +13,9 @@ const experiences = [
     title: "Android / iOS Development Intern",
     company: "Bose Corporation",
     companyFull: "Bose Corporation",
-    companyUrl: "https://bose.com",
     icon: "/images/bose_logo.svg",
     panelImage: "/images/bose_1.svg",
+    mediaImages: ["/images/bose_logo.svg", "/images/bose_1.svg"],
     period: "Jun 2025 – Aug 2025",
     description: "Engineered internal Bluetooth debugging tools adopted by 1,000+ engineers, accelerating cross-platform testing.",
     highlights: [
@@ -40,9 +30,9 @@ const experiences = [
     title: "Software Engineer Intern",
     company: "Honda Motor Co.",
     companyFull: "American Honda Motor Co., Inc.",
-    companyUrl: "https://honda.com",
     icon: "/images/honda.svg",
     panelImage: "/images/hondalogo.svg",
+    mediaImages: ["/images/honda.svg", "/images/hondalogo.svg"],
     period: "Jun 2024 – Aug 2024",
     description: "Prototyped next-generation on-device AI using Jetson Orin Nano, evaluating automotive-grade compute constraints.",
     highlights: [
@@ -57,9 +47,9 @@ const experiences = [
     title: "Undergraduate Researcher",
     company: "CPX Lab",
     companyFull: "CPX at California State University, Long Beach",
-    companyUrl: "https://csulbcpx.web.app/",
     icon: "/images/CSU-Longbeach.svg",
     panelImage: "/images/lb.csulb.png",
+    mediaImages: ["/images/CSU-Longbeach.svg", "/images/lb.csulb.png"],
     period: "Aug 2024 – Present",
     description: "Contributing to a 30+ person robotics/AI research group, supporting two peer-reviewed publications (ICCPS 2025, ICRA 2026).",
     highlights: [
@@ -74,9 +64,9 @@ const experiences = [
     title: "Data Engineer (Freelance)",
     company: "CUSCO USA",
     companyFull: "CUSCO USA Inc.",
-    companyUrl: "#",
     icon: "/images/cusco.svg",
     panelImage: "/images/cusco.svg",
+    mediaImages: ["/images/cusco.svg"],
     period: "Oct 2021 – May 2024",
     description: "Built Python-based extraction pipelines processing 11,500+ legacy files spanning PDFs, images, and mixed formats.",
     highlights: [
@@ -95,68 +85,6 @@ export function ExperienceSection() {
   const entryScanRef = useRef<HTMLDivElement | null>(null)
   const entrySvgRef = useRef<SVGSVGElement | null>(null)
   const entryLabelRef = useRef<HTMLDivElement | null>(null)
-
-  // Shareable deep-links per entry: #experience-<slug>
-  const experienceIds = useMemo(() => {
-    const raw = experiences.map((exp) => `experience-${slugifyId(`${exp.company}-${exp.title}`)}`)
-    const counts = new Map<string, number>()
-    return raw.map((id) => {
-      const n = counts.get(id) ?? 0
-      counts.set(id, n + 1)
-      return n === 0 ? id : `${id}-${n + 1}`
-    })
-  }, [])
-
-  const isMobileViewport = () => {
-    if (typeof window === "undefined") return false
-    // Tailwind's `sm` breakpoint is 640px.
-    return window.matchMedia("(max-width: 639px)").matches
-  }
-
-  const activateExperience = (index: number, opts?: { source?: "ui" | "hash"; scrollBehavior?: ScrollBehavior }) => {
-    setActiveIndex(index)
-    if (typeof window === "undefined") return
-
-    const id = experienceIds[index]
-    if (id) window.history.pushState(null, "", `#${id}`)
-
-    const behavior = opts?.scrollBehavior ?? "smooth"
-    window.requestAnimationFrame(() => {
-      // Mobile: jump to the active detail entry so content is immediately visible.
-      // Desktop: keep the user anchored in the Experience section (no jump into the panel).
-      if (isMobileViewport()) {
-        document.getElementById(id)?.scrollIntoView({ behavior, block: "start" })
-      } else if (opts?.source === "hash") {
-        document.getElementById("experience")?.scrollIntoView({ behavior, block: "start" })
-      }
-    })
-  }
-
-  useEffect(() => {
-    if (typeof window === "undefined") return
-
-    const applyHash = (hash: string, behavior: ScrollBehavior) => {
-      const clean = hash.startsWith("#") ? hash.slice(1) : hash
-      if (!clean) return
-      const idx = experienceIds.indexOf(clean)
-      if (idx < 0) return
-      setActiveIndex(idx)
-      window.requestAnimationFrame(() => {
-        // Mobile: show the active detail entry.
-        // Desktop: counteract the browser's default "jump to #id" so we stay at the section.
-        if (isMobileViewport()) {
-          document.getElementById(clean)?.scrollIntoView({ behavior, block: "start" })
-        } else {
-          document.getElementById("experience")?.scrollIntoView({ behavior, block: "start" })
-        }
-      })
-    }
-
-    applyHash(window.location.hash, "auto")
-    const onHashChange = () => applyHash(window.location.hash, "smooth")
-    window.addEventListener("hashchange", onHashChange)
-    return () => window.removeEventListener("hashchange", onHashChange)
-  }, [experienceIds])
 
   // GSAP: ENTRY bg + ASCII frame draw → content blocks stagger
   useEffect(() => {
@@ -375,7 +303,7 @@ export function ExperienceSection() {
                 <button
                   key={exp.company}
                   type="button"
-                  onClick={() => activateExperience(index, { source: "ui" })}
+                  onClick={() => setActiveIndex(index)}
                   className={cn(
                     "group w-full text-left px-3 sm:px-4 py-3 sm:py-3.5 flex items-center justify-between gap-3 touch-target",
                     "font-mono text-[11px] sm:text-xs uppercase tracking-[0.12em]",
@@ -466,11 +394,9 @@ export function ExperienceSection() {
             <div className="relative p-3 sm:p-4 md:p-5 space-y-5 sm:space-y-6">
               {experiences.map((exp, index) => {
                 const isActive = index === activeIndex
-                const expId = experienceIds[index]
                 return (
                   <article
                     key={exp.company}
-                    id={expId}
                     className={cn(
                       "relative transition-[opacity,transform] duration-200 border border-dashed p-1 sm:p-1.5 md:p-2",
                       isActive
@@ -490,16 +416,7 @@ export function ExperienceSection() {
                     >
                       <div data-detail-block className="flex flex-wrap items-baseline justify-between gap-2">
                         <h3 className="text-xl sm:text-2xl md:text-3xl font-black tracking-tight uppercase">
-                          <a
-                            href={`#${expId}`}
-                            onClick={(e) => {
-                              e.preventDefault()
-                              activateExperience(index, { source: "ui" })
-                            }}
-                            className="hover:underline underline-offset-4"
-                          >
-                            {exp.title}
-                          </a>
+                          {exp.title}
                         </h3>
                         <p className="font-mono text-[11px] sm:text-xs text-muted-foreground uppercase tracking-[0.18em]">
                           {exp.period}
@@ -507,15 +424,25 @@ export function ExperienceSection() {
                       </div>
 
                       <div data-detail-block className="flex flex-wrap items-center gap-2 sm:gap-3">
-                        <a
-                          href={exp.companyUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1.5 border border-foreground px-2.5 py-1.5 text-[11px] sm:text-xs font-mono uppercase tracking-[0.16em] hover:bg-foreground hover:text-background transition-colors"
-                        >
-                          <span>{exp.companyFull}</span>
-                          <ExternalLink className="w-3.5 h-3.5" />
-                        </a>
+                        {Array.isArray((exp as any).mediaImages) && (exp as any).mediaImages.length > 0 ? (
+                          <div className="inline-flex items-center gap-1.5">
+                            {(exp as any).mediaImages.slice(0, 3).map((src: string, i: number) => (
+                              <a
+                                key={`${exp.company}-media-${i}`}
+                                href={src}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex h-8 w-8 items-center justify-center border border-foreground bg-background hover:bg-foreground hover:text-background transition-colors overflow-hidden"
+                              >
+                                <img src={src} alt="" className="h-6 w-6 object-contain" />
+                              </a>
+                            ))}
+                          </div>
+                        ) : (
+                          <span className="font-mono text-[11px] sm:text-xs uppercase tracking-[0.16em]">
+                            {exp.companyFull}
+                          </span>
+                        )}
                         <span className="h-px flex-1 bg-foreground/30" />
                         <span className="font-mono text-[11px] sm:text-xs text-muted-foreground">
                           Highlights: {exp.highlights.length.toString().padStart(2, "0")} // Skills:{" "}
