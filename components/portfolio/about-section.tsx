@@ -116,7 +116,7 @@ export function AboutSection() {
 
       <div className="relative z-10 max-w-5xl lg:max-w-6xl mx-auto">
         {/* Left / Right columns — within each: top then bottom */}
-        <div className="grid lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] gap-8 lg:gap-10 items-start">
+        <div className="grid md:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] gap-8 lg:gap-10 items-start">
           {/* Left column: top = header+intro, bottom = narrative */}
           <div className="space-y-10 sm:space-y-12">
             {/* Top-left: profile + name + description (left/right), then stats full width */}
@@ -201,7 +201,7 @@ export function AboutSection() {
                         )}
                         <dt
                           data-stat-label
-                          className="font-mono text-[9px] sm:text-[10px] uppercase tracking-[0.18em] text-muted-foreground relative z-[1] flex items-start justify-start w-full truncate"
+                          className="font-mono text-[9px] sm:text-[10px] uppercase tracking-[0.18em] text-muted-foreground relative z-[1] flex items-start justify-start w-full break-words whitespace-normal"
                         >
                           {s.label}
                         </dt>
