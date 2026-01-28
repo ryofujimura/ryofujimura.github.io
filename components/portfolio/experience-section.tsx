@@ -107,17 +107,28 @@ export function ExperienceSection() {
     })
   }, [])
 
-  const activateExperience = (index: number, opts?: { scrollToSection?: boolean; scrollBehavior?: ScrollBehavior }) => {
+  const isMobileViewport = () => {
+    if (typeof window === "undefined") return false
+    // Tailwind's `sm` breakpoint is 640px.
+    return window.matchMedia("(max-width: 639px)").matches
+  }
+
+  const activateExperience = (index: number, opts?: { source?: "ui" | "hash"; scrollBehavior?: ScrollBehavior }) => {
     setActiveIndex(index)
     if (typeof window === "undefined") return
 
     const id = experienceIds[index]
     if (id) window.history.pushState(null, "", `#${id}`)
 
-    if (!opts?.scrollToSection) return
-    const behavior = opts.scrollBehavior ?? "smooth"
+    const behavior = opts?.scrollBehavior ?? "smooth"
     window.requestAnimationFrame(() => {
-      document.getElementById("experience")?.scrollIntoView({ behavior, block: "start" })
+      // Mobile: jump to the active detail entry so content is immediately visible.
+      // Desktop: keep the user anchored in the Experience section (no jump into the panel).
+      if (isMobileViewport()) {
+        document.getElementById(id)?.scrollIntoView({ behavior, block: "start" })
+      } else if (opts?.source === "hash") {
+        document.getElementById("experience")?.scrollIntoView({ behavior, block: "start" })
+      }
     })
   }
 
@@ -131,9 +142,13 @@ export function ExperienceSection() {
       if (idx < 0) return
       setActiveIndex(idx)
       window.requestAnimationFrame(() => {
-        // Keep scroll position at the Experience section (not the detail panel/article).
-        // This also counteracts the browser's default "jump to #id" behavior on initial load.
-        document.getElementById("experience")?.scrollIntoView({ behavior, block: "start" })
+        // Mobile: show the active detail entry.
+        // Desktop: counteract the browser's default "jump to #id" so we stay at the section.
+        if (isMobileViewport()) {
+          document.getElementById(clean)?.scrollIntoView({ behavior, block: "start" })
+        } else {
+          document.getElementById("experience")?.scrollIntoView({ behavior, block: "start" })
+        }
       })
     }
 
@@ -360,7 +375,7 @@ export function ExperienceSection() {
                 <button
                   key={exp.company}
                   type="button"
-                  onClick={() => activateExperience(index)}
+                  onClick={() => activateExperience(index, { source: "ui" })}
                   className={cn(
                     "group w-full text-left px-3 sm:px-4 py-3 sm:py-3.5 flex items-center justify-between gap-3 touch-target",
                     "font-mono text-[11px] sm:text-xs uppercase tracking-[0.12em]",
@@ -479,7 +494,7 @@ export function ExperienceSection() {
                             href={`#${expId}`}
                             onClick={(e) => {
                               e.preventDefault()
-                              activateExperience(index)
+                              activateExperience(index, { source: "ui" })
                             }}
                             className="hover:underline underline-offset-4"
                           >
