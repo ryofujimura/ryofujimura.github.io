@@ -201,11 +201,11 @@ export function AboutSection() {
                         )}
                         <dt
                           data-stat-label
-                          className="font-mono text-[9px] sm:text-[10px] uppercase tracking-[0.18em] text-muted-foreground break-words relative z-[1] flex items-center justify-start"
+                          className="font-mono text-[9px] sm:text-[10px] uppercase tracking-[0.18em] text-muted-foreground break-words relative z-[1] flex items-start justify-start w-full"
                         >
                           {s.label}
                         </dt>
-                        <dd className="relative z-[1] flex items-center justify-start">
+                        <dd className="relative z-[1] flex items-start justify-end w-full text-right">
                           <span
                             data-stat-value
                             className="font-mono text-xl sm:text-2xl md:text-3xl font-black leading-tight"
