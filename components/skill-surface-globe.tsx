@@ -27,7 +27,7 @@ export function SkillSurfaceGlobe({ entryIndex, words, height = 220, className }
     >
       {/* Brutalist ASCII overlay label (static so it never disappears between entries) */}
       <div className="pointer-events-none absolute inset-x-2 top-2 z-20 flex items-start justify-between gap-2">
-        <div className="font-mono text-[9px] sm:text-[10px] uppercase tracking-[0.28em] bg-background/85 text-foreground px-2 py-1 border border-dashed border-foreground/80">
+        <div className="font-mono text-[9px] sm:text-[10px] uppercase tracking-[0.28em] bg-background/85 text-muted-foreground px-2 py-1 border border-dashed border-foreground/80">
           skills
         </div>
       </div>
