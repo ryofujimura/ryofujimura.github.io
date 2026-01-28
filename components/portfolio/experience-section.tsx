@@ -75,27 +75,35 @@ const experiences = [
 
 export function ExperienceSection() {
   const [activeIndex, setActiveIndex] = useState(0)
-  const articleContentRefs = useRef<(HTMLDivElement | null)[]>([])
+  const bgRefs = useRef<(HTMLDivElement | null)[]>([])
+  const contentRefs = useRef<(HTMLDivElement | null)[]>([])
 
-  // GSAP: animate detail panel content when active index changes
+  // GSAP: animate active detail panel background + content on index change
   useEffect(() => {
-    const el = articleContentRefs.current[activeIndex]
-    if (!el) return
-    const title = el.querySelector("[data-exp-title]")
-    const term = el.querySelector("[data-exp-term]")
-    const imageBlock = el.querySelector("[data-exp-image-block]")
-    const body = el.querySelector("[data-exp-body]")
-    const svgDeco = el.querySelectorAll("[data-exp-svg] path, [data-exp-svg] line, [data-exp-svg] rect")
+    const bg = bgRefs.current[activeIndex]
+    const content = contentRefs.current[activeIndex]
+    if (!bg || !content) return
 
-    gsap.set([title, term, imageBlock, body], { opacity: 0, y: 12 })
-    if (svgDeco.length) gsap.set(svgDeco, { opacity: 0 })
+    gsap.set(bg, { opacity: 0, scale: 1.12 })
+    gsap.set(content, { opacity: 0, y: 14 })
 
-    const tl = gsap.timeline({ defaults: { ease: "power3.out" } })
-    tl.to(title, { opacity: 1, y: 0, duration: 0.32 })
-      .to(term, { opacity: 1, y: 0, duration: 0.28 }, "-=0.2")
-      .to(imageBlock, { opacity: 1, y: 0, duration: 0.3 }, "-=0.24")
-      .to(svgDeco, { opacity: 0.5, duration: 0.4, stagger: 0.03 }, "-=0.35")
-      .to(body, { opacity: 1, y: 0, duration: 0.35 }, "-=0.2")
+    const tl = gsap.timeline({ overwrite: true })
+    tl.to(bg, {
+      opacity: 0.09,
+      scale: 1,
+      duration: 0.7,
+      ease: "power3.out",
+    })
+    tl.to(
+      content,
+      {
+        opacity: 1,
+        y: 0,
+        duration: 0.5,
+        ease: "power3.out",
+      },
+      "-=0.35"
+    )
   }, [activeIndex])
 
   const roleCount = experiences.length
@@ -302,114 +310,83 @@ export function ExperienceSection() {
           <div className="relative border border-foreground bg-card shadow-none sm:shadow-[6px_6px_0_0_theme(colors.foreground)]">
             <div className="absolute inset-x-0 top-0 h-8 bg-[repeating-linear-gradient(90deg,transparent,transparent_6px,theme(colors.foreground/10)_6px,theme(colors.foreground/10)_8px)] opacity-60 pointer-events-none" />
 
-            <div className="relative p-4 sm:p-6 md:p-7 space-y-5 sm:space-y-6">
+            <div className="relative p-3 sm:p-4 md:p-5 space-y-5 sm:space-y-6">
               {experiences.map((exp, index) => {
                 const isActive = index === activeIndex
                 return (
                   <article
                     key={exp.company}
                     className={cn(
-                      "transition-all duration-300 border border-dashed border-transparent",
+                      "relative transition-all duration-300 border border-dashed border-transparent p-1 sm:p-1.5 md:p-2",
                       isActive
                         ? "opacity-100 translate-y-0 border-foreground"
-                        : "opacity-0 pointer-events-none absolute inset-4"
+                        : "opacity-0 pointer-events-none absolute inset-2 sm:inset-3 md:inset-3.5"
                     )}
                     aria-hidden={!isActive}
                   >
+                    {/* Index icon as light-opacity background at top — GSAP animates on appear */}
                     <div
                       ref={(el) => {
-                        articleContentRefs.current[index] = el
+                        bgRefs.current[index] = el
                       }}
-                      className="flex flex-col gap-3 sm:gap-4"
+                      className={cn(
+                        "absolute inset-x-0 top-0 h-28 sm:h-36 md:h-40 pointer-events-none overflow-hidden border-b border-foreground/10 origin-top",
+                        isActive && "opacity-0"
+                      )}
+                      style={
+                        exp.icon
+                          ? {
+                              backgroundImage: `url(${exp.icon})`,
+                              backgroundSize: "contain",
+                              backgroundPosition: "top center",
+                              backgroundRepeat: "no-repeat",
+                              maskImage: "linear-gradient(to bottom, black 40%, transparent 100%)",
+                              WebkitMaskImage: "linear-gradient(to bottom, black 40%, transparent 100%)",
+                            }
+                          : undefined
+                      }
+                      aria-hidden
+                    />
+                    <div
+                      ref={(el) => {
+                        contentRefs.current[index] = el
+                      }}
+                      className={cn(
+                        "relative z-10 flex flex-col gap-3 sm:gap-4",
+                        isActive && "opacity-0"
+                      )}
                     >
-                      {/* Top row: title + term (left), index image in brutalist frame (right) */}
-                      <div className="flex flex-wrap items-start justify-between gap-4">
-                        <div className="min-w-0 flex-1">
-                          <h3
-                            data-exp-title
-                            className="text-xl sm:text-2xl md:text-3xl font-black tracking-tight uppercase"
-                          >
-                            {exp.title}
-                          </h3>
-                          <p
-                            data-exp-term
-                            className="font-mono text-[11px] sm:text-xs text-muted-foreground uppercase tracking-[0.18em] mt-1"
-                          >
-                            <span className="text-muted-foreground/60">// TERM </span>
-                            {exp.period}
-                          </p>
-                        </div>
-
-                        {/* Index image — same as list; brutalist frame, ASCII label, technical lines */}
-                        <div
-                          data-exp-image-block
-                          className="relative shrink-0 border border-foreground bg-secondary shadow-[3px_3px_0_0_theme(colors.foreground)]"
-                        >
-                          <div className="absolute -top-2 left-2 px-1.5 py-0.5 bg-background border border-foreground font-mono text-[9px] uppercase tracking-wider text-muted-foreground">
-                            [ INDEX_REF ]
-                          </div>
-                          <div className="p-2 sm:p-3 flex items-center justify-center w-20 h-20 sm:w-24 sm:h-24">
-                            {"icon" in exp && exp.icon ? (
-                              <img
-                                src={exp.icon}
-                                alt=""
-                                className="h-10 w-10 sm:h-12 sm:w-12 object-contain"
-                                width={48}
-                                height={48}
-                              />
-                            ) : (
-                              <span className="font-mono text-2xl text-muted-foreground">
-                                {index.toString().padStart(2, "0")}
-                              </span>
-                            )}
-                          </div>
-                          {/* Technical SVG frame — scanlines + corners; GSAP draw */}
-                          <svg
-                            data-exp-svg
-                            className="pointer-events-none absolute inset-0 w-full h-full text-foreground/50"
-                            viewBox="0 0 96 96"
-                            fill="none"
-                            stroke="currentColor"
-                          >
-                            <rect x="2" y="2" width="92" height="92" strokeWidth="0.8" />
-                            <rect x="6" y="6" width="84" height="84" strokeWidth="0.4" opacity="0.7" />
-                            {[14, 28, 42, 56, 70].map((y) => (
-                              <line key={`h-${y}`} x1="6" y1={y} x2="90" y2={y} strokeWidth="0.35" opacity="0.25" />
-                            ))}
-                            {[20, 40, 60, 80].map((x) => (
-                              <line key={`v-${x}`} x1={x} y1="6" x2={x} y2="90" strokeWidth="0.35" opacity="0.2" />
-                            ))}
-                            <path d="M0 12V0h12M0 84v12h12" fill="none" stroke="currentColor" strokeWidth="0.6" opacity="0.5" transform="translate(2,2)" />
-                            <path d="M96 12V0H84M96 84v12H84" fill="none" stroke="currentColor" strokeWidth="0.6" opacity="0.5" transform="translate(-2,2)" />
-                            <line x1="0" y1="0" x2="96" y2="96" strokeWidth="0.3" opacity="0.2" />
-                            <line x1="96" y1="0" x2="0" y2="96" strokeWidth="0.3" opacity="0.2" />
-                          </svg>
-                        </div>
+                      <div className="flex flex-wrap items-baseline justify-between gap-2">
+                        <h3 className="text-xl sm:text-2xl md:text-3xl font-black tracking-tight uppercase">
+                          {exp.title}
+                        </h3>
+                        <p className="font-mono text-[11px] sm:text-xs text-muted-foreground uppercase tracking-[0.18em]">
+                          {exp.period}
+                        </p>
                       </div>
 
-                      <div data-exp-body className="space-y-4">
-                        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-                          <a
-                            href={exp.companyUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1.5 border border-foreground px-2.5 py-1.5 text-[11px] sm:text-xs font-mono uppercase tracking-[0.16em] hover:bg-foreground hover:text-background transition-colors"
-                          >
-                            <span>{exp.companyFull}</span>
-                            <ExternalLink className="w-3.5 h-3.5" />
-                          </a>
-                          <span className="h-px flex-1 bg-foreground/30" />
-                          <span className="font-mono text-[11px] sm:text-xs text-muted-foreground">
-                            Highlights: {exp.highlights.length.toString().padStart(2, "0")} // Skills:{" "}
-                            {exp.skills.length.toString().padStart(2, "0")}
-                          </span>
-                        </div>
+                      <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+                        <a
+                          href={exp.companyUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1.5 border border-foreground px-2.5 py-1.5 text-[11px] sm:text-xs font-mono uppercase tracking-[0.16em] hover:bg-foreground hover:text-background transition-colors"
+                        >
+                          <span>{exp.companyFull}</span>
+                          <ExternalLink className="w-3.5 h-3.5" />
+                        </a>
+                        <span className="h-px flex-1 bg-foreground/30" />
+                        <span className="font-mono text-[11px] sm:text-xs text-muted-foreground">
+                          Highlights: {exp.highlights.length.toString().padStart(2, "0")} // Skills:{" "}
+                          {exp.skills.length.toString().padStart(2, "0")}
+                        </span>
+                      </div>
 
-                        <p className="text-sm sm:text-base text-muted-foreground leading-relaxed max-w-2xl">
-                          {exp.description}
-                        </p>
+                      <p className="text-sm sm:text-base text-muted-foreground leading-relaxed max-w-2xl">
+                        {exp.description}
+                      </p>
 
-                        <div className="grid gap-3 sm:gap-4 md:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] items-start">
+                      <div className="grid gap-3 sm:gap-4 md:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] items-start">
                         <ul className="space-y-2.5 sm:space-y-3">
                           {exp.highlights.map((highlight, i) => (
                             <li
@@ -450,7 +427,6 @@ export function ExperienceSection() {
                               under bandwidth, hardware, or organizational constraints.
                             </p>
                           </div>
-                        </div>
                         </div>
                       </div>
                     </div>
