@@ -1,5 +1,6 @@
 "use client"
 
+import Image from "next/image"
 import { useState, useRef, useEffect } from "react"
 import { gsap } from "gsap"
 import { GSAPText, GSAPSVG } from "@/components/gsap-text"
@@ -425,16 +426,25 @@ export function ExperienceSection() {
 
                       <div data-detail-block className="flex flex-wrap items-center gap-2 sm:gap-3">
                         {Array.isArray((exp as any).mediaImages) && (exp as any).mediaImages.length > 0 ? (
-                          <div className="inline-flex items-center gap-2 sm:gap-2.5">
+                          <div className="inline-flex items-center gap-1.5">
                             {(exp as any).mediaImages.slice(0, 3).map((src: string, i: number) => (
                               <a
                                 key={`${exp.company}-media-${i}`}
                                 href={src}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="inline-flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center border border-foreground bg-background hover:bg-foreground hover:text-background transition-colors overflow-hidden"
+                                className="inline-flex h-10 w-10 items-center justify-center border border-foreground bg-background hover:bg-foreground/90 transition-colors overflow-hidden"
                               >
-                                <img src={src} alt="" className="h-full w-full object-contain" />
+                                <div className="relative h-8 w-8">
+                                  <Image
+                                    src={src}
+                                    alt=""
+                                    fill
+                                    className="object-contain"
+                                    sizes="32px"
+                                    loading="lazy"
+                                  />
+                                </div>
                               </a>
                             ))}
                           </div>
