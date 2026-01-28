@@ -1,11 +1,11 @@
 "use client"
 
-import { useRef, useState, useEffect, useMemo } from "react"
+import { useRef, useMemo } from "react"
 import { GSAPText } from "@/components/gsap-text"
 import { HeroTechnicalCanvas } from "@/components/hero-technical-canvas"
 import { MagneticButton } from "@/components/magnetic-button"
-import { LocationHoverText } from "@/components/portfolio/location-hover-text"
-import { ArrowDown, ArrowRight, Github, Linkedin, Mail } from "lucide-react"
+import { useToast } from "@/hooks/use-toast"
+import { ArrowDown, ArrowRight, Github, Globe, Linkedin, Mail } from "lucide-react"
 
 // Exact-length lines so the terminal block is always a complete rectangle
 const ASCII_W = 65
@@ -16,9 +16,11 @@ function revLabel() {
   return `${d.toLocaleDateString("en-US", { month: "short" })}. ${d.getFullYear()}`
 }
 
+const SITE_URL = "https://ryofujimura.github.io/"
+
 export function HeroSection() {
-  const [isTouch, setIsTouch] = useState(false)
   const asciiBlockRef = useRef<HTMLDivElement>(null)
+  const { toast } = useToast()
 
   const asciiHeaderLines = useMemo(() => {
     const rev = revLabel()
@@ -39,24 +41,19 @@ export function HeroSection() {
     ]
   }, [])
 
-  useEffect(() => {
-    setIsTouch(typeof window !== "undefined" && ("ontouchstart" in window || navigator.maxTouchPoints > 0))
-  }, [])
 
   return (
     <section
       className="relative min-h-[100dvh] min-h-screen flex items-center justify-center px-3 sm:px-6 pt-[max(4rem,env(safe-area-inset-top))] pb-6 sm:pb-8 overflow-hidden"
       aria-label="Hero"
     >
-      {/* Section: Hero */}
-      {/* Subsection: Background canvas */}
       <div className="hidden sm:block absolute inset-0">
         <HeroTechnicalCanvas />
       </div>
 
       <div className="relative z-10 w-full max-w-5xl mx-auto px-0">
         <div className="flex flex-col items-start gap-4 sm:gap-6 md:gap-8">
-          {/* Subsection: ASCII terminal block — complete rectangle; mobile = short, desktop = full */}
+          {/* ASCII terminal block — complete rectangle; mobile = short, desktop = full */}
           <div
             ref={asciiBlockRef}
             className="font-mono text-foreground/50 whitespace-pre tabular-nums touch-manipulation w-full min-w-0"
@@ -94,7 +91,7 @@ export function HeroSection() {
             </div>
           </div>
 
-          {/* Subsection: Role line — scramble then hold */}
+          {/* Role line — scramble then hold */}
           <GSAPText
             variant="scramble"
             delay={0.5}
@@ -104,7 +101,7 @@ export function HeroSection() {
             Software Engineer & AI Researcher
           </GSAPText>
 
-          {/* Subsection: Name — brutalist type, char stagger; mobile-tighter */}
+          {/* Name — brutalist type, char stagger; mobile-tighter */}
           <div className="space-y-0 leading-[0.88]">
             <GSAPText
               variant="chars"
@@ -128,7 +125,7 @@ export function HeroSection() {
             </GSAPText>
           </div>
 
-          {/* Subsection: Tagline — word reveal */}
+          {/* Tagline — word reveal */}
           <GSAPText
             variant="words"
             delay={1.25}
@@ -140,7 +137,7 @@ export function HeroSection() {
             Building systems at the intersection of AI research and real-world applications.
           </GSAPText>
 
-          {/* Subsection: ASCII divider + quote */}
+          {/* ASCII divider + quote */}
           <div className="pt-2 sm:pt-4 border-t border-foreground/20 w-full max-w-xl">
             <GSAPText
               variant="lines"
@@ -153,7 +150,7 @@ export function HeroSection() {
             </GSAPText>
           </div>
 
-          {/* Subsection: CTAs — blocky brutalist buttons; mobile stacking, 44px+ touch */}
+          {/* CTAs — blocky brutalist buttons; mobile stacking, 44px+ touch */}
           <div className="flex flex-col sm:flex-row flex-wrap gap-2 sm:gap-4 pt-3 sm:pt-6 w-full sm:w-auto">
             <MagneticButton
               as="a"
@@ -173,39 +170,45 @@ export function HeroSection() {
             </MagneticButton>
           </div>
 
-          {/* Subsection: Social — monotone Lucide icons; location tap = Open to relocate on mobile */}
-          <div className="flex flex-wrap items-center gap-2 sm:gap-6 pt-2 sm:pt-4">
-            <div className="flex items-center gap-0.5 sm:gap-1">
-              {[
-                { href: "https://github.com/ryofujimura", Icon: Github, label: "GitHub" },
-                { href: "https://linkedin.com/in/ryofujimura", Icon: Linkedin, label: "LinkedIn" },
-                { href: "mailto:ryo.fujimura1@gmail.com", Icon: Mail, label: "Email" },
-              ].map(({ href, Icon, label }) => (
-                <MagneticButton
-                  key={label}
-                  as="a"
-                  href={href}
-                  target={href.startsWith("http") ? "_blank" : undefined}
-                  rel={href.startsWith("http") ? "noopener noreferrer" : undefined}
-                  className="touch-target p-3 min-h-[44px] min-w-[44px] flex items-center justify-center text-muted-foreground hover:text-foreground border border-transparent hover:border-border transition-all [&_svg]:stroke-current"
-                >
-                  <Icon className="w-5 h-5 shrink-0" strokeWidth={1.5} />
-                  <span className="sr-only">{label}</span>
-                </MagneticButton>
-              ))}
-            </div>
-            <div className="w-px h-5 sm:h-6 bg-border shrink-0" />
-            <LocationHoverText
-              defaultWords={["Irvine", ", ", "CA"]}
-              hoverWords={["Open", " to", " relocate"]}
-              toggleOnTap={isTouch}
-              className="text-[9px] sm:text-[10px] md:text-xs font-mono text-muted-foreground"
-            />
+          {/* Social — monotone Lucide icons; globe copies site URL */}
+          <div className="flex flex-wrap items-center gap-0.5 sm:gap-1 pt-2 sm:pt-4">
+            {[
+              { href: "https://github.com/ryofujimura", Icon: Github, label: "GitHub" },
+              { href: "https://linkedin.com/in/ryofujimura", Icon: Linkedin, label: "LinkedIn" },
+              { href: "mailto:ryo.fujimura1@gmail.com", Icon: Mail, label: "Email" },
+            ].map(({ href, Icon, label }) => (
+              <MagneticButton
+                key={label}
+                as="a"
+                href={href}
+                target={href.startsWith("http") ? "_blank" : undefined}
+                rel={href.startsWith("http") ? "noopener noreferrer" : undefined}
+                className="touch-target p-3 min-h-[44px] min-w-[44px] flex items-center justify-center text-muted-foreground hover:text-foreground border border-transparent hover:border-border transition-all [&_svg]:stroke-current"
+              >
+                <Icon className="w-5 h-5 shrink-0" strokeWidth={1.5} />
+                <span className="sr-only">{label}</span>
+              </MagneticButton>
+            ))}
+            <MagneticButton
+              as="button"
+              onClick={async () => {
+                try {
+                  await navigator.clipboard.writeText(SITE_URL)
+                  toast({ title: "Copied!" })
+                } catch {
+                  toast({ title: "Copy failed", variant: "destructive" })
+                }
+              }}
+              className="touch-target p-3 min-h-[44px] min-w-[44px] flex items-center justify-center text-muted-foreground hover:text-foreground border border-transparent hover:border-border transition-all [&_svg]:stroke-current"
+              aria-label="Copy site URL"
+            >
+              <Globe className="w-5 h-5 shrink-0" strokeWidth={1.5} />
+            </MagneticButton>
           </div>
         </div>
       </div>
 
-      {/* Subsection: Scroll cue — ASCII; compact on mobile */}
+      {/* Scroll cue — ASCII; compact on mobile */}
       <div className="absolute bottom-3 sm:bottom-8 left-1/2 -translate-x-1/2 pb-[env(safe-area-inset-bottom)]">
         <div className="flex flex-col items-center gap-1.5 sm:gap-4">
           <span className="text-[9px] sm:text-[10px] font-mono uppercase tracking-[0.25em] sm:tracking-[0.4em] text-muted-foreground">
