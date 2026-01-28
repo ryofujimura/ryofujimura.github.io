@@ -6,7 +6,7 @@ import { GSAPText } from "@/components/gsap-text"
 import { HeroTechnicalCanvas } from "@/components/hero-technical-canvas"
 import { MagneticButton } from "@/components/magnetic-button"
 import { useToast } from "@/hooks/use-toast"
-import { ArrowDown, ArrowRight, Github, Globe, Linkedin, Mail, Mouse } from "lucide-react"
+import { ArrowDown, ArrowRight, Check, Github, Globe, Linkedin, Mail, Mouse } from "lucide-react"
 
 const SITE_URL = "https://ryofujimura.github.io/"
 
@@ -215,6 +215,7 @@ export function HeroSection() {
   const asciiBlockRef = useRef<HTMLDivElement>(null)
   const socialIconsRef = useRef<HTMLDivElement>(null)
   const { toast } = useToast()
+  const [copied, setCopied] = useState(false)
 
   const rev = revLabel()
   const asciiHeaderLines = useMemo(() => {
@@ -277,8 +278,10 @@ export function HeroSection() {
 
   const copySiteUrl = () => {
     if (typeof navigator !== "undefined" && navigator.clipboard?.writeText) {
-      navigator.clipboard.writeText("https://ryofujimura.github.io/")
-      toast({ title: "Copied!", description: "https://ryofujimura.github.io/" })
+      navigator.clipboard.writeText(SITE_URL)
+      setCopied(true)
+      toast({ title: "Copied!", description: SITE_URL })
+      window.setTimeout(() => setCopied(false), 1200)
     }
   }
 
@@ -507,9 +510,22 @@ export function HeroSection() {
                 onClick={copySiteUrl}
                 cursorText="COPY"
                 className="touch-target p-3 min-h-[44px] min-w-[44px] flex items-center justify-center text-muted-foreground hover:text-foreground border border-transparent hover:border-border transition-all [&_svg]:stroke-current"
-                aria-label="Copy site URL"
+                aria-label={copied ? "Site URL copied" : "Copy site URL"}
               >
-                <Globe className="w-5 h-5 shrink-0" strokeWidth={1.5} />
+                <span className="relative w-5 h-5 shrink-0">
+                  <Globe
+                    className={`absolute inset-0 w-5 h-5 transition-all duration-200 ${
+                      copied ? "opacity-0 scale-75" : "opacity-100 scale-100"
+                    }`}
+                    strokeWidth={1.5}
+                  />
+                  <Check
+                    className={`absolute inset-0 w-5 h-5 transition-all duration-200 ${
+                      copied ? "opacity-100 scale-100" : "opacity-0 scale-75"
+                    }`}
+                    strokeWidth={1.8}
+                  />
+                </span>
               </MagneticButton>
             </span>
           </div>
