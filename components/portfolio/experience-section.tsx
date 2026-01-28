@@ -7,6 +7,7 @@ import { TechnicalGrid, TechnicalPattern } from "@/components/technical-grid"
 import { ExternalLink } from "lucide-react"
 import { cn } from "@/lib/utils"
 
+// icon = index list (left rail); panelImage = detail panel background (optional, falls back to icon)
 const experiences = [
   {
     title: "Android / iOS Development Intern",
@@ -14,6 +15,7 @@ const experiences = [
     companyFull: "Bose Corporation",
     companyUrl: "https://bose.com",
     icon: "/images/bose_1.svg",
+    panelImage: "/images/bose_1.svg",
     period: "Jun 2025 – Aug 2025",
     description: "Engineered internal Bluetooth debugging tools adopted by 1,000+ engineers, accelerating cross-platform testing.",
     highlights: [
@@ -29,7 +31,8 @@ const experiences = [
     company: "Honda Motor Co.",
     companyFull: "American Honda Motor Co., Inc.",
     companyUrl: "https://honda.com",
-    icon: "/images/honda.svg",
+    icon: "/images/hondalogo.svg",
+    panelImage: "/images/hondalogo.svg",
     period: "Jun 2024 – Aug 2024",
     description: "Prototyped next-generation on-device AI using Jetson Orin Nano, evaluating automotive-grade compute constraints.",
     highlights: [
@@ -46,6 +49,7 @@ const experiences = [
     companyFull: "CPX at California State University, Long Beach",
     companyUrl: "https://csulbcpx.web.app/",
     icon: "/images/CSU-Longbeach.svg",
+    panelImage: "/images/CSU-Longbeach.svg",
     period: "Aug 2024 – Present",
     description: "Contributing to a 30+ person robotics/AI research group, supporting two peer-reviewed publications (ICCPS 2025, ICRA 2026).",
     highlights: [
@@ -62,6 +66,7 @@ const experiences = [
     companyFull: "CUSCO USA Inc.",
     companyUrl: "#",
     icon: "/images/cusco.svg",
+    panelImage: "/images/cusco.svg",
     period: "Oct 2021 – May 2024",
     description: "Built Python-based extraction pipelines processing 11,500+ legacy files spanning PDFs, images, and mixed formats.",
     highlights: [
@@ -334,9 +339,9 @@ export function ExperienceSection() {
                         isActive && "opacity-0"
                       )}
                       style={
-                        exp.icon
+                        (exp.panelImage ?? exp.icon)
                           ? {
-                              backgroundImage: `url(${exp.icon})`,
+                              backgroundImage: `url(${exp.panelImage ?? exp.icon})`,
                               backgroundSize: "contain",
                               backgroundPosition: "top center",
                               backgroundRepeat: "no-repeat",
