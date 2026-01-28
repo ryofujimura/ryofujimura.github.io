@@ -158,7 +158,7 @@ export function AboutSection() {
                 </div>
               </div>
               {/* Stats full width — clickable cards with brutalist hover and GSAP entrance */}
-              <div className="w-full" ref={statsRef}>
+              <div className="w-full border-t border-foreground/40 mt-4 pt-4" ref={statsRef}>
                 <dl className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
                   {stats.map((s) => {
                     const isLink = !!s.sectionId
@@ -221,7 +221,7 @@ export function AboutSection() {
             </div>
 
             {/* Bottom-left: narrative */}
-            <div className="space-y-5 sm:space-y-6">
+            <div className="space-y-5 sm:space-y-6 border-t border-foreground/40 pt-4">
             <AnimatedSection>
               <p className="text-sm sm:text-base text-foreground/90 leading-relaxed">
                 I work where{" "}
