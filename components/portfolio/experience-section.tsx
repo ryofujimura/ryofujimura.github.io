@@ -7,7 +7,7 @@ import { TechnicalGrid, TechnicalPattern } from "@/components/technical-grid"
 import { ExternalLink } from "lucide-react"
 import { cn } from "@/lib/utils"
 
-// icon = index list (left rail); panelImage = detail panel background (optional, falls back to icon)
+// icon = index list (left rail); panelImage = ENTRY header background (optional, falls back to icon)
 const experiences = [
   {
     title: "Android / iOS Development Intern",
@@ -80,18 +80,18 @@ const experiences = [
 
 export function ExperienceSection() {
   const [activeIndex, setActiveIndex] = useState(0)
-  const bgRefs = useRef<(HTMLDivElement | null)[]>([])
   const contentRefs = useRef<(HTMLDivElement | null)[]>([])
+  const entryBgRef = useRef<HTMLDivElement | null>(null)
   const entrySvgRef = useRef<SVGSVGElement | null>(null)
   const entryLabelRef = useRef<HTMLDivElement | null>(null)
 
-  // GSAP: ASCII entry frame (lines + corners) draw → panel bg → content blocks stagger (no dashed-border transition)
+  // GSAP: ENTRY bg + ASCII frame draw → content blocks stagger
   useEffect(() => {
-    const bg = bgRefs.current[activeIndex]
     const content = contentRefs.current[activeIndex]
+    const entryBg = entryBgRef.current
     const svg = entrySvgRef.current
     const label = entryLabelRef.current
-    if (!bg || !content) return
+    if (!content) return
 
     // Reset entry SVG geometry for draw-in
     if (svg) {
@@ -104,22 +104,24 @@ export function ExperienceSection() {
       })
     }
     if (label) gsap.set(label, { opacity: 0 })
-    gsap.set(bg, { opacity: 0, scale: 1.12 })
+    if (entryBg) gsap.set(entryBg, { opacity: 0, scale: 1.06 })
     gsap.set(content, { opacity: 1, y: 0 })
     const blocks = content.querySelectorAll<HTMLElement>("[data-detail-block]")
     gsap.set(blocks, { opacity: 0, y: 10 })
 
     const tl = gsap.timeline({ overwrite: true })
+    // ENTRY background image fades/scales in first (subtle, brutalist)
+    if (entryBg) {
+      tl.to(entryBg, { opacity: 0.12, scale: 1, duration: 0.45, ease: "power3.out" })
+    }
     // ASCII entry frame (lines + corners) draw in
     if (svg) {
       const els = svg.querySelectorAll<SVGGeometryElement>("line, path")
-      tl.to(els, { strokeDashoffset: 0, duration: 0.4, stagger: 0.04, ease: "power2.inOut" })
+      tl.to(els, { strokeDashoffset: 0, duration: 0.4, stagger: 0.04, ease: "power2.inOut" }, entryBg ? "-=0.25" : undefined)
     }
     if (label) {
       tl.to(label, { opacity: 1, duration: 0.2 }, "-=0.2")
     }
-    // Panel bg
-    tl.to(bg, { opacity: 0.09, scale: 1, duration: 0.5, ease: "power3.out" }, "-=0.15")
     // Content blocks stagger
     tl.to(blocks, { opacity: 1, y: 0, duration: 0.4, stagger: 0.06, ease: "power3.out" }, "-=0.2")
   }, [activeIndex])
@@ -328,6 +330,25 @@ export function ExperienceSection() {
           <div className="relative border border-foreground bg-card shadow-none sm:shadow-[6px_6px_0_0_theme(colors.foreground)]">
             {/* ASCII entry header: frame + line draw in with GSAP on index change */}
             <div className="relative min-h-[3rem] border-b border-foreground/20 bg-secondary/50 px-3 py-2 sm:px-4 sm:py-2.5">
+              {/* ENTRY background image (moves from detail panel to header) */}
+              <div
+                ref={entryBgRef}
+                className="pointer-events-none absolute inset-0 origin-center"
+                style={
+                  (experiences[activeIndex]?.panelImage ?? experiences[activeIndex]?.icon)
+                    ? {
+                        backgroundImage: `url(${experiences[activeIndex]?.panelImage ?? experiences[activeIndex]?.icon})`,
+                        backgroundSize: "contain",
+                        backgroundPosition: "right center",
+                        backgroundRepeat: "no-repeat",
+                        filter: "contrast(1.05)",
+                        maskImage: "linear-gradient(90deg, transparent 0%, black 35%, black 100%)",
+                        WebkitMaskImage: "linear-gradient(90deg, transparent 0%, black 35%, black 100%)",
+                      }
+                    : undefined
+                }
+                aria-hidden
+              />
               <svg
                 ref={entrySvgRef}
                 className="absolute left-0 right-0 top-0 h-full w-full min-h-[3rem]"
@@ -357,36 +378,13 @@ export function ExperienceSection() {
                   <article
                     key={exp.company}
                     className={cn(
-                      "relative transition-[opacity,transform] duration-200 border p-1 sm:p-1.5 md:p-2",
+                      "relative transition-[opacity,transform] duration-200 border border-dashed p-1 sm:p-1.5 md:p-2",
                       isActive
-                        ? "opacity-100 translate-y-0 border-foreground border-solid"
+                        ? "opacity-100 translate-y-0 border-foreground"
                         : "opacity-0 pointer-events-none absolute inset-2 sm:inset-3 md:inset-3.5 border-transparent"
                     )}
                     aria-hidden={!isActive}
                   >
-                    {/* Panel logo as light-opacity background at bottom — GSAP animates on appear */}
-                    <div
-                      ref={(el) => {
-                        bgRefs.current[index] = el
-                      }}
-                      className={cn(
-                        "absolute inset-x-0 bottom-0 h-28 sm:h-36 md:h-40 pointer-events-none overflow-hidden border-t border-foreground/10 origin-bottom",
-                        isActive && "opacity-0"
-                      )}
-                      style={
-                        (exp.panelImage ?? exp.icon)
-                          ? {
-                              backgroundImage: `url(${exp.panelImage ?? exp.icon})`,
-                              backgroundSize: "contain",
-                              backgroundPosition: "bottom center",
-                              backgroundRepeat: "no-repeat",
-                              maskImage: "linear-gradient(to top, black 40%, transparent 100%)",
-                              WebkitMaskImage: "linear-gradient(to top, black 40%, transparent 100%)",
-                            }
-                          : undefined
-                      }
-                      aria-hidden
-                    />
                     <div
                       ref={(el) => {
                         contentRefs.current[index] = el
