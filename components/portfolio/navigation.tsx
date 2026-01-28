@@ -106,7 +106,7 @@ export function Navigation() {
             </MagneticButton>
 
             {/* Desktop navigation */}
-            <div className="hidden md:flex items-center gap-1 p-1.5 rounded-full bg-secondary/50 backdrop-blur-sm border border-border relative overflow-hidden">
+            <div className="hidden lg:flex items-center gap-1 p-1.5 rounded-full bg-secondary/50 backdrop-blur-sm border border-border relative overflow-hidden">
               {/* Animated pill indicator under nav bar */}
               {indicatorStyle && (
                 <span
@@ -146,7 +146,7 @@ export function Navigation() {
                 as="a"
                 href="mailto:ryo.fujimura1@gmail.com"
                 cursorText="Email"
-                className="hidden md:inline-flex px-5 py-2.5 text-sm font-medium text-primary-foreground bg-primary rounded-full hover:shadow-lg hover:shadow-primary/20 transition-all duration-300"
+                className="hidden lg:inline-flex px-5 py-2.5 text-sm font-medium text-primary-foreground bg-primary rounded-full hover:shadow-lg hover:shadow-primary/20 transition-all duration-300"
               >
                 Get in Touch
               </MagneticButton>
@@ -155,7 +155,7 @@ export function Navigation() {
               <button
                 type="button"
                 aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
-                className="md:hidden touch-target min-h-[44px] min-w-[44px] flex items-center justify-center p-2 text-foreground"
+                className="lg:hidden touch-target min-h-[44px] min-w-[44px] flex items-center justify-center p-2 text-foreground"
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               >
                 {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -168,7 +168,7 @@ export function Navigation() {
       {/* Mobile menu — safe area + 44px taps */}
       <div
         className={cn(
-          "fixed inset-0 z-40 bg-background/95 backdrop-blur-xl md:hidden transition-all duration-500 pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]",
+          "fixed inset-0 z-40 bg-background/95 backdrop-blur-xl lg:hidden transition-all duration-500 pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]",
           isMobileMenuOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
         )}
       >
