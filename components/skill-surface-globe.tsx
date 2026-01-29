@@ -44,7 +44,7 @@ export function SkillSurfaceGlobe({ entryIndex, words, height: heightProp = 220,
       ref={fillHeight ? containerRef : undefined}
       className={cn(
         "relative border border-foreground bg-secondary/60 p-3 sm:p-4 overflow-hidden",
-        "shadow-[4px_4px_0_0_theme(colors.foreground)] sm:shadow-[6px_6px_0_0_theme(colors.foreground)]",
+        "shadow-[4px_4px_0_0_theme(colors.foreground/50%)] sm:shadow-[6px_6px_0_0_theme(colors.foreground/50%)]",
         fillHeight && "h-full min-h-0",
         className
       )}
