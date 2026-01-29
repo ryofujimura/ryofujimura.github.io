@@ -487,7 +487,7 @@ export function ExperienceSection() {
 
           <div className="relative">
             <div className="absolute inset-0 border border-dashed border-foreground/30 pointer-events-none" />
-            <div className="bg-secondary p-4 sm:p-5 md:p-6 border border-foreground shadow-[4px_4px_0_0_theme(colors.foreground)]">
+            <div className="hidden md:block bg-secondary p-4 sm:p-5 md:p-6 border border-foreground shadow-[4px_4px_0_0_theme(colors.foreground)]">
               <p className="font-mono text-[11px] sm:text-xs text-muted-foreground leading-relaxed">
                 Each row below is a{" "}
                 <span className="text-foreground font-semibold">work-log entry</span> across internships,
