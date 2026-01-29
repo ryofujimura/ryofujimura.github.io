@@ -625,7 +625,7 @@ export function ExperienceSection() {
             >
               <div className={cn(
                 "divide-y divide-foreground bg-secondary",
-                listExpanded && hasIndexOverflow && "border-t border-b"
+                listExpanded && hasIndexOverflow && "shadow-[inset_0_1px_0_0_hsl(var(--foreground)),inset_0_-1px_0_0_hsl(var(--foreground))]"
               )}>
               {/* First N items always visible */}
               {experiences.slice(0, INITIAL_INDEX_VISIBLE).map((exp, index) => (
