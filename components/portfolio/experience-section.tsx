@@ -16,7 +16,7 @@ const experiences = [
     icon: "/images/bose_logo.svg",
     panelImage: "/images/bose_1.svg",
     mediaImages: ["/images/bose_2.JPG", "/images/bose_3.JPG"],
-    mediaLabels: ["Campus", "Lab"],
+    mediaLabels: ["Proof 1", "Proof 2"],
     period: "Jun 2025 – Aug 2025",
     description: "Engineered internal Bluetooth debugging tools adopted by 1,000+ engineers, accelerating cross-platform testing.",
     highlights: [
@@ -25,16 +25,16 @@ const experiences = [
       "Built production-grade features using Swift Concurrency, Kotlin Coroutines, Rx",
       "Collaborated with firmware, cloud, and mobile groups resolving cross-team issues",
     ],
-    skills: ["Swift", "Kotlin", "Rx", "BLE", "WebSockets", "Debugging", "Automation"],
-  },
+    skills: [ "iOS (SwiftUI)", "Kotlin (Android)", "App Architecture", "BLE", "WebSocket", "APIs", "Debugging", "Environment Validation", "Configuration Management"] 
+    },
   {
     title: "Software Engineer Intern",
     company: "Honda Motor Co.",
     companyFull: "American Honda Motor Co., Inc.",
     icon: "/images/honda.svg",
     panelImage: "/images/hondalogo.svg",
-    mediaImages: ["/images/honda.svg", "/images/hondalogo.svg"],
-    mediaLabels: ["Vehicle Lab", "AI Demo"],
+    mediaImages: ["/images/honda_1.jpg", "/images/honda_3.jpg"],
+    mediaLabels: ["Proof 1", "Proof 2"],
     period: "Jun 2024 – Aug 2024",
     description: "Prototyped next-generation on-device AI using Jetson Orin Nano, evaluating automotive-grade compute constraints.",
     highlights: [
@@ -43,7 +43,7 @@ const experiences = [
       "Delivered demos to 10+ cross-functional teams including executive leadership",
       "Profiled thermal, latency, and bandwidth tradeoffs for hybrid inference",
     ],
-    skills: ["AI", "Jetson", "Quantization", "Optimization", "Latency", "Memory", "Benchmarking"],
+    skills: ["On-Device AI","NVIDIA Jetson","Embedded GPU","LLM Deployment","Optimization","Quantization","Latency","Memory Management","Benchmarking" ] 
   },
   {
     title: "Undergraduate Researcher",
@@ -51,8 +51,8 @@ const experiences = [
     companyFull: "CPX at California State University, Long Beach",
     icon: "/images/CSU-Longbeach.svg",
     panelImage: "/images/lb.csulb.png",
-    mediaImages: ["/images/CSU-Longbeach.svg", "/images/lb.csulb.png"],
-    mediaLabels: ["CSULB Campus", "CPX Lab"],
+    mediaImages: ["/images/ACMIEEEICCPS2025.pdf", "/images/ICRA2026.pdf"],
+    mediaLabels: ["Proof 1", "Proof 2"],
     period: "Aug 2024 – Present",
     description: "Contributing to a 30+ person robotics/AI research group, supporting two peer-reviewed publications (ICCPS 2025, ICRA 2026).",
     highlights: [
@@ -61,16 +61,16 @@ const experiences = [
       "Led data collection/annotation pipelines generating 1,000+ labeled samples",
       "Created reproducible ML pipelines adopted by multiple lab members",
     ],
-    skills: ["Research", "Robotics", "ML", "Transformers", "Prototyping", "Pipelines"],
-  },
+    skills: [ "Human-Computer Interaction", "Human-Robot Interaction", "Robotic Actuation", "Safety-Critical Systems", "Embedded Systems", "3D Printing", "CAD Design", "Servo Motor", "Raspberry Pi", "Signal Temporal Logic", "Machine Learning Classification" ]
+    },
   {
     title: "Data Engineer (Freelance)",
     company: "CUSCO USA",
     companyFull: "CUSCO USA Inc.",
-    icon: "/images/cusco.svg",
+    icon: "/images/cusco_c.svg",
     panelImage: "/images/cusco.svg",
-    mediaImages: ["/images/cusco.svg"],
-    mediaLabels: ["CUSCO HQ"],
+    mediaImages: ["/images/cusco_1.jpg"],
+    mediaLabels: ["Proof 1"],
     period: "Oct 2021 – May 2024",
     description: "Built Python-based extraction pipelines processing 11,500+ legacy files spanning PDFs, images, and mixed formats.",
     highlights: [
@@ -78,17 +78,25 @@ const experiences = [
       "Designed normalization/indexing layers exposing cleaned data through internal API",
       "Enabled 30% revenue increase by converting archival content into searchable intelligence",
     ],
-    skills: ["Automation", "Data Engineering", "Normalization", "Indexing"],
-  },
+    skills: [ "Data Engineering", "Python", "Data Extraction", "Data Normalization", "API Development", "Automation", "Batch Processing", "Information Retrieval", "Workflow Optimization"]
+    },
 ]
 
 export function ExperienceSection() {
   const [activeIndex, setActiveIndex] = useState(0)
+  const [showAll, setShowAll] = useState(false)
   const contentRefs = useRef<(HTMLDivElement | null)[]>([])
   const entryBgRef = useRef<HTMLDivElement | null>(null)
   const entryScanRef = useRef<HTMLDivElement | null>(null)
   const entrySvgRef = useRef<SVGSVGElement | null>(null)
   const entryLabelRef = useRef<HTMLDivElement | null>(null)
+  const hiddenItemsRef = useRef<(HTMLButtonElement | null)[]>([])
+  const arrowButtonRef = useRef<HTMLButtonElement | null>(null)
+  const arrowSvgRef = useRef<SVGSVGElement | null>(null)
+
+  const INITIAL_VISIBLE = 3
+  const displayed = showAll ? experiences : experiences.slice(0, INITIAL_VISIBLE)
+  const remaining = experiences.length - INITIAL_VISIBLE
 
   // GSAP: ENTRY bg + ASCII frame draw → content blocks stagger
   useEffect(() => {
@@ -142,6 +150,87 @@ export function ExperienceSection() {
     // Content blocks stagger
     tl.to(blocks, { opacity: 1, y: 0, duration: 0.4, stagger: 0.06, ease: "power3.out" }, "-=0.2")
   }, [activeIndex])
+
+  // GSAP: Animate hidden items appearing when showAll becomes true
+  useEffect(() => {
+    if (!showAll || remaining <= 0) return
+
+    // Wait for DOM to update and refs to be set
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        const hiddenItems = hiddenItemsRef.current.filter(Boolean)
+        const arrowButton = arrowButtonRef.current
+        const arrowSvg = arrowSvgRef.current
+
+        if (hiddenItems.length === 0) return
+
+        const ctx = gsap.context(() => {
+          // Hide arrow button
+          if (arrowButton) {
+            gsap.to(arrowButton, {
+              opacity: 0,
+              y: -8,
+              height: 0,
+              marginTop: 0,
+              paddingTop: 0,
+              paddingBottom: 0,
+              duration: 0.3,
+              ease: "power2.in",
+              onComplete: () => {
+                if (arrowButton) arrowButton.style.display = "none"
+              },
+            })
+          }
+
+          // Animate arrow SVG lines out
+          if (arrowSvg) {
+            const lines = arrowSvg.querySelectorAll<SVGLineElement>("line")
+            lines.forEach((line) => {
+              const len = line.getTotalLength()
+              gsap.set(line, { strokeDasharray: len, strokeDashoffset: 0 })
+            })
+            gsap.to(lines, {
+              strokeDashoffset: (i, el) => {
+                const len = el.getTotalLength()
+                return len
+              },
+              opacity: 0,
+              duration: 0.25,
+              stagger: 0.03,
+              ease: "power2.in",
+            })
+          }
+
+          // Show hidden items with stagger
+          hiddenItems.forEach((item) => {
+            if (item) {
+              gsap.set(item, { opacity: 0, y: -12, height: 0, overflow: "hidden" })
+            }
+          })
+          
+          const tl = gsap.timeline({ delay: 0.15 })
+          tl.to(hiddenItems, {
+            height: "auto",
+            duration: 0.4,
+            ease: "power2.out",
+          })
+          tl.to(
+            hiddenItems,
+            {
+              opacity: 1,
+              y: 0,
+              duration: 0.5,
+              stagger: 0.08,
+              ease: "power3.out",
+            },
+            "-=0.3"
+          )
+        })
+
+        return () => ctx.revert()
+      })
+    })
+  }, [showAll, remaining])
 
   const roleCount = experiences.length
   const chartLeft = 34
@@ -303,29 +392,39 @@ export function ExperienceSection() {
             </div>
 
             <div className="border border-foreground divide-y divide-foreground bg-secondary">
-              {experiences.map((exp, index) => (
-                <button
-                  key={exp.company}
-                  type="button"
-                  onClick={() => setActiveIndex(index)}
-                  className={cn(
-                    "group w-full text-left px-3 sm:px-4 py-3 sm:py-3.5 flex items-center justify-between gap-3 touch-target",
-                    "font-mono text-[11px] sm:text-xs uppercase tracking-[0.12em]",
-                    activeIndex === index
-                      ? "bg-accent text-accent-foreground"
-                      : "bg-secondary hover:bg-foreground hover:text-background"
-                  )}
-                >
-                  <div className="flex items-center gap-2 sm:gap-3">
-                    {"icon" in exp && exp.icon ? (
-                      <span className="flex h-8 w-8 shrink-0 items-center justify-center border border-current overflow-hidden bg-background/80">
-                        <img src={exp.icon} alt="" className="h-5 w-5 object-contain" width={20} height={20} />
-                      </span>
-                    ) : (
-                      <span className="inline-flex h-5 w-5 items-center justify-center border border-current">
-                        {index.toString().padStart(2, "0")}
-                      </span>
+              {displayed.map((exp, displayIndex) => {
+                const index = experiences.findIndex((e) => e.company === exp.company)
+                const isHidden = index >= INITIAL_VISIBLE
+                return (
+                  <button
+                    key={exp.company}
+                    ref={(el) => {
+                      if (isHidden) {
+                        const refIndex = index - INITIAL_VISIBLE
+                        hiddenItemsRef.current[refIndex] = el
+                      }
+                    }}
+                    type="button"
+                    onClick={() => setActiveIndex(index)}
+                    className={cn(
+                      "group w-full text-left px-3 sm:px-4 py-3 sm:py-3.5 flex items-center justify-between gap-3 touch-target",
+                      "font-mono text-[11px] sm:text-xs uppercase tracking-[0.12em]",
+                      "transition-colors",
+                      activeIndex === index
+                        ? "bg-accent text-accent-foreground"
+                        : "bg-secondary hover:bg-foreground hover:text-background"
                     )}
+                  >
+                    <div className="flex items-center gap-2 sm:gap-3">
+                      {"icon" in exp && exp.icon ? (
+                        <span className="flex h-8 w-8 shrink-0 items-center justify-center border border-current overflow-hidden bg-background/80">
+                          <img src={exp.icon} alt="" className="h-5 w-5 object-contain" width={20} height={20} />
+                        </span>
+                      ) : (
+                        <span className="inline-flex h-5 w-5 items-center justify-center border border-current">
+                          {index.toString().padStart(2, "0")}
+                        </span>
+                      )}
                     <div className="flex flex-col">
                       <span className="font-semibold leading-tight">
                         {exp.company}
@@ -339,7 +438,74 @@ export function ExperienceSection() {
                     {exp.period}
                   </span>
                 </button>
-              ))}
+              )})}
+              
+              {/* Brutalist down arrow button — ASCII art with technical lines */}
+              {!showAll && remaining > 0 && (
+                <button
+                  ref={arrowButtonRef}
+                  type="button"
+                  onClick={() => setShowAll(true)}
+                  className="group w-full border-t border-foreground bg-secondary hover:bg-foreground hover:text-background transition-all duration-200 relative overflow-hidden"
+                  aria-label={`Show ${remaining} more experience${remaining > 1 ? "s" : ""}`}
+                >
+                  {/* Technical pattern overlay */}
+                  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
+                    <div className="absolute inset-0 bg-[repeating-linear-gradient(45deg,transparent,transparent_4px,currentColor_4px,currentColor_8px)] opacity-[0.03]" />
+                    <div className="absolute inset-0 bg-[repeating-linear-gradient(-45deg,transparent,transparent_4px,currentColor_4px,currentColor_8px)] opacity-[0.03]" />
+                  </div>
+
+                  <div className="relative z-10 px-3 sm:px-4 py-4 sm:py-5 flex flex-col items-center gap-3">
+                    {/* ASCII arrow with technical lines */}
+                    <GSAPSVG className="w-16 h-12 text-foreground/70 group-hover:text-foreground transition-colors">
+                      <svg
+                        ref={arrowSvgRef}
+                        viewBox="0 0 64 48"
+                        className="w-full h-full"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="1.2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        {/* Technical frame */}
+                        <line x1="8" y1="8" x2="56" y2="8" opacity="0.4" />
+                        <line x1="8" y1="40" x2="56" y2="40" opacity="0.4" />
+                        <line x1="8" y1="8" x2="8" y2="40" opacity="0.3" />
+                        <line x1="56" y1="8" x2="56" y2="40" opacity="0.3" />
+                        
+                        {/* Diagonal technical lines */}
+                        <line x1="12" y1="12" x2="52" y2="36" opacity="0.2" strokeWidth="0.8" />
+                        <line x1="52" y1="12" x2="12" y2="36" opacity="0.2" strokeWidth="0.8" />
+                        
+                        {/* Down arrow (ASCII style) */}
+                        <line x1="32" y1="16" x2="32" y2="32" />
+                        <line x1="24" y1="24" x2="32" y2="32" />
+                        <line x1="40" y1="24" x2="32" y2="32" />
+                        
+                        {/* Arrow tip accent */}
+                        <line x1="28" y1="28" x2="32" y2="32" strokeWidth="1.5" />
+                        <line x1="36" y1="28" x2="32" y2="32" strokeWidth="1.5" />
+                      </svg>
+                    </GSAPSVG>
+
+                    {/* ASCII text label */}
+                    <div className="font-mono text-[10px] sm:text-[11px] uppercase tracking-[0.2em] text-muted-foreground group-hover:text-foreground transition-colors">
+                      <div className="text-center">
+                        <span className="opacity-80">┌─</span>
+                        <span className="mx-1 font-semibold">LOAD MORE</span>
+                        <span className="opacity-80">─┐</span>
+                      </div>
+                      <div className="text-center mt-1 opacity-60 text-[9px]">
+                        [{remaining.toString().padStart(2, "0")} ENTRY{remaining > 1 ? "IES" : ""}]
+                      </div>
+                    </div>
+
+                    {/* Technical scanline effect */}
+                    <div className="absolute inset-0 bg-[repeating-linear-gradient(180deg,transparent,transparent_2px,currentColor_2px,currentColor_4px)] opacity-0 group-hover:opacity-[0.02] transition-opacity duration-300 pointer-events-none" />
+                  </div>
+                </button>
+              )}
             </div>
           </div>
 
@@ -350,7 +516,7 @@ export function ExperienceSection() {
               {/* ENTRY background image: starts at 0, GSAP fades in on load / index change */}
               <div
                 ref={entryBgRef}
-                className="pointer-events-none absolute inset-0 origin-center will-change-transform opacity-0"
+                className="pointer-events-none absolute inset-[3px] origin-center will-change-transform opacity-0"
                 style={
                   (experiences[activeIndex]?.panelImage ?? experiences[activeIndex]?.icon)
                     ? {
