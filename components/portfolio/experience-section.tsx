@@ -617,16 +617,12 @@ export function ExperienceSection() {
               {experiences.length > INITIAL_INDEX_VISIBLE && (
                 <div
                   ref={moreItemsContainerRef}
-                  className={cn(
-                    "overflow-hidden",
-                    // Hide the divide-y border during animation to prevent gray bar flash
-                    (!listExpanded || !expandAnimationDone) && "!border-t-0"
-                  )}
+                  className="overflow-hidden"
                   style={
                     !listExpanded
-                      ? { maxHeight: 0, overflow: "hidden" }
+                      ? { maxHeight: 0, overflow: "hidden", borderTopWidth: 0 }
                       : !expandAnimationDone
-                        ? { height: 0, overflow: "hidden" }
+                        ? { height: 0, overflow: "hidden", borderTopWidth: 0 }
                         : undefined
                   }
                 >
