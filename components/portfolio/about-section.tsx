@@ -147,14 +147,14 @@ export function AboutSection() {
                   >
                     RYO FUJIMURA
                   </GSAPText>
-                  <GSAPText
+                  {/* <GSAPText
                     variant="words"
                     className="text-sm sm:text-base md:text-lg text-muted-foreground max-w-xl"
                     delay={0.4}
                   >
                     Software engineer + AI researcher building systems that move smoothly from lab prototype to
                     production reality.
-                  </GSAPText>
+                  </GSAPText> */}
                 </div>
               </div>
               {/* Stats full width — clickable cards with brutalist hover and GSAP entrance */}
