@@ -439,9 +439,15 @@ export function ExperienceSection() {
   }, [])
 
   // Detect overflow in index list to conditionally show bottom bar
+  // Only check after expand animation is done to prevent flicker
   useEffect(() => {
     const el = indexListRef.current
     if (!el) return
+    // Don't show overflow bar while animation is in progress
+    if (listExpanded && !expandAnimationDone) {
+      setHasIndexOverflow(false)
+      return
+    }
     const checkOverflow = () => {
       setHasIndexOverflow(el.scrollHeight > el.clientHeight)
     }
