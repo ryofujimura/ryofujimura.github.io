@@ -203,7 +203,7 @@ export function ExperienceSection() {
     tl.to(blocks, { opacity: 1, y: 0, duration: 0.4, stagger: 0.06, ease: "power3.out" }, "-=0.2")
   }, [activeIndex])
 
-  // GSAP: Animate hidden items appearing when showAll becomes true
+  // GSAP: Simple shutter slide-down animation for hidden items
   useEffect(() => {
     if (!showAll || remaining <= 0) return
 
@@ -212,333 +212,52 @@ export function ExperienceSection() {
       requestAnimationFrame(() => {
         const hiddenItems = hiddenItemsRef.current.filter(Boolean)
         const arrowButton = arrowButtonRef.current
-        const arrowSvg = arrowSvgRef.current
 
         if (hiddenItems.length === 0) return
 
         const ctx = gsap.context(() => {
-          const masterTimeline = gsap.timeline()
+          const tl = gsap.timeline()
 
-          // Phase 1: Dramatic arrow button collapse with scale and rotation
+          // Hide arrow button quickly
           if (arrowButton) {
-            const arrowContent = arrowButton.querySelector("div.relative.z-10")
-            const arrowText = arrowButton.querySelectorAll("div.font-mono")
-            
-            // Animate text labels out first
-            if (arrowText.length > 0) {
-              masterTimeline.to(arrowText, {
-                opacity: 0,
-                y: -4,
-                duration: 0.2,
-                stagger: 0.05,
-                ease: "power2.in",
-              }, 0)
-            }
-
-            // Animate arrow SVG lines out with sophisticated timing
-            if (arrowSvg) {
-              const lines = arrowSvg.querySelectorAll<SVGLineElement>("line")
-              // Group lines: frame first, then diagonals, then arrow
-              const frameLines: SVGLineElement[] = []
-              const diagonalLines: SVGLineElement[] = []
-              const arrowLines: SVGLineElement[] = []
-              
-              lines.forEach((line) => {
-                const len = line.getTotalLength()
-                gsap.set(line, { strokeDasharray: len, strokeDashoffset: 0 })
-                const x1 = parseFloat(line.getAttribute("x1") || "0")
-                const y1 = parseFloat(line.getAttribute("y1") || "0")
-                const x2 = parseFloat(line.getAttribute("x2") || "0")
-                const y2 = parseFloat(line.getAttribute("y2") || "0")
-                
-                // Categorize lines
-                if ((x1 === 8 || x1 === 56 || y1 === 8 || y1 === 40) && 
-                    (x2 === 8 || x2 === 56 || y2 === 8 || y2 === 40)) {
-                  frameLines.push(line)
-                } else if (Math.abs(x1 - x2) === Math.abs(y1 - y2)) {
-                  diagonalLines.push(line)
-                } else {
-                  arrowLines.push(line)
-                }
-              })
-
-              // Animate frame lines out
-              if (frameLines.length > 0) {
-                masterTimeline.to(frameLines, {
-                  strokeDashoffset: (i, el) => el.getTotalLength(),
-                  opacity: 0,
-                  duration: 0.3,
-                  stagger: 0.02,
-                  ease: "power2.in",
-                }, 0.1)
-              }
-
-              // Animate diagonal lines
-              if (diagonalLines.length > 0) {
-                masterTimeline.to(diagonalLines, {
-                  strokeDashoffset: (i, el) => el.getTotalLength(),
-                  opacity: 0,
-                  scale: 0.8,
-                  transformOrigin: "center center",
-                  duration: 0.25,
-                  stagger: 0.03,
-                  ease: "power2.in",
-                }, 0.15)
-              }
-
-              // Animate arrow lines last (most dramatic)
-              if (arrowLines.length > 0) {
-                masterTimeline.to(arrowLines, {
-                  strokeDashoffset: (i, el) => el.getTotalLength(),
-                  opacity: 0,
-                  scale: 0.6,
-                  y: 8,
-                  transformOrigin: "center bottom",
-                  duration: 0.35,
-                  stagger: 0.04,
-                  ease: "back.in(1.2)",
-                }, 0.2)
-              }
-            }
-
-            // Collapse button container with scale and rotation
-            masterTimeline.to(
-              arrowButton,
-              {
-                opacity: 0,
-                scale: 0.95,
-                rotation: -0.5,
-                y: -12,
-                height: 0,
-                marginTop: 0,
-                paddingTop: 0,
-                paddingBottom: 0,
-                borderTopWidth: 0,
-                duration: 0.5,
-                ease: "power3.in",
-                onComplete: () => {
-                  if (arrowButton) arrowButton.style.display = "none"
-                },
+            tl.to(arrowButton, {
+              opacity: 0,
+              height: 0,
+              paddingTop: 0,
+              paddingBottom: 0,
+              marginTop: 0,
+              borderTopWidth: 0,
+              duration: 0.3,
+              ease: "power2.in",
+              onComplete: () => {
+                if (arrowButton) arrowButton.style.display = "none"
               },
-              0.25
-            )
+            })
           }
 
-          // Phase 2: Reveal hidden items with sophisticated animations
-          hiddenItems.forEach((item, idx) => {
-            if (!item) return
-
-            // Get child elements by structure (more reliable)
-            const flexContainer = item.querySelector("div.flex.items-center")
-            const iconContainer = flexContainer?.querySelector("span") || null
-            const iconImg = item.querySelector("img")
-            const textContainer = flexContainer?.querySelector("div.flex.flex-col")
-            const companyText = textContainer?.querySelector("span.font-semibold") || null
-            const titleText = textContainer?.querySelector("span.opacity-70") || null
-            const periodText = Array.from(item.querySelectorAll("span")).find(
-              (el) => el.classList.contains("hidden") && el.classList.contains("sm:inline-flex")
-            ) || null
-            const border = item
-
-            // Set initial states
-            gsap.set(item, {
-              opacity: 0,
-              y: -20,
-              height: 0,
-              overflow: "hidden",
-              scale: 0.98,
-            })
-            
-            if (iconContainer) {
-              gsap.set(iconContainer, { opacity: 0, scale: 0.8, rotation: -5 })
-            }
-            if (iconImg) {
-              gsap.set(iconImg, { opacity: 0, scale: 0.6 })
-            }
-            if (companyText) {
-              gsap.set(companyText, { opacity: 0, x: -8 })
-            }
-            if (titleText) {
-              gsap.set(titleText, { opacity: 0, x: -6 })
-            }
-            if (periodText) {
-              gsap.set(periodText, { opacity: 0, x: 8 })
-            }
-            if (border) {
-              gsap.set(border, { borderTopColor: "transparent" })
+          // Set initial states for all hidden items (shutter closed)
+          hiddenItems.forEach((item) => {
+            if (item) {
+              gsap.set(item, {
+                opacity: 0,
+                height: 0,
+                overflow: "hidden",
+              })
             }
           })
 
-          // Create reveal timeline with sophisticated stagger
-          const revealDelay = 0.4
-          const itemStagger = 0.12
-
-          hiddenItems.forEach((item, idx) => {
-            if (!item) return
-
-            const flexContainer = item.querySelector("div.flex.items-center")
-            const iconContainer = flexContainer?.querySelector("span") || null
-            const iconImg = item.querySelector("img")
-            const textContainer = flexContainer?.querySelector("div.flex.flex-col")
-            const companyText = textContainer?.querySelector("span.font-semibold") || null
-            const titleText = textContainer?.querySelector("span.opacity-70") || null
-            const periodText = Array.from(item.querySelectorAll("span")).find(
-              (el) => el.classList.contains("hidden") && el.classList.contains("sm:inline-flex")
-            ) || null
-            const border = item
-
-            const itemStart = revealDelay + idx * itemStagger
-            const itemTimeline = gsap.timeline({ delay: itemStart })
-
-            // Expand height first
-            itemTimeline.to(item, {
+          // Shutter slide-down: expand height and fade in with stagger
+          tl.to(
+            hiddenItems,
+            {
               height: "auto",
+              opacity: 1,
               duration: 0.5,
+              stagger: 0.1,
               ease: "power2.out",
-            })
-
-            // Fade in border
-            itemTimeline.to(
-              border,
-              {
-                borderTopColor: "currentColor",
-                duration: 0.3,
-                ease: "power2.out",
-              },
-              0
-            )
-
-            // Main item reveal
-            itemTimeline.to(
-              item,
-              {
-                opacity: 1,
-                y: 0,
-                scale: 1,
-                duration: 0.6,
-                ease: "power3.out",
-              },
-              0.1
-            )
-
-            // Icon animation (bounce in)
-            if (iconContainer) {
-              itemTimeline.to(
-                iconContainer,
-                {
-                  opacity: 1,
-                  scale: 1,
-                  rotation: 0,
-                  duration: 0.4,
-                  ease: "back.out(1.4)",
-                },
-                0.2
-              )
-            }
-            if (iconImg) {
-              itemTimeline.to(
-                iconImg,
-                {
-                  opacity: 1,
-                  scale: 1,
-                  duration: 0.35,
-                  ease: "power2.out",
-                },
-                0.25
-              )
-            }
-
-            // Text animations (slide in from sides)
-            if (companyText) {
-              itemTimeline.to(
-                companyText,
-                {
-                  opacity: 1,
-                  x: 0,
-                  duration: 0.45,
-                  ease: "power3.out",
-                },
-                0.3
-              )
-            }
-            if (titleText) {
-              itemTimeline.to(
-                titleText,
-                {
-                  opacity: 1,
-                  x: 0,
-                  duration: 0.4,
-                  ease: "power3.out",
-                },
-                0.35
-              )
-            }
-            if (periodText) {
-              itemTimeline.to(
-                periodText,
-                {
-                  opacity: 1,
-                  x: 0,
-                  duration: 0.4,
-                  ease: "power3.out",
-                },
-                0.4
-              )
-            }
-
-            // Add scanline sweep effect (technical reveal)
-            const scanline = document.createElement("div")
-            scanline.className = "absolute inset-0 pointer-events-none overflow-hidden"
-            scanline.style.background = "repeating-linear-gradient(180deg, transparent, transparent 2px, currentColor 2px, currentColor 4px)"
-            scanline.style.opacity = "0.12"
-            scanline.style.mixBlendMode = "multiply"
-            item.style.position = "relative"
-            item.appendChild(scanline)
-
-            itemTimeline.fromTo(
-              scanline,
-              { y: "-100%" },
-              {
-                y: "100%",
-                duration: 0.5,
-                ease: "power2.inOut",
-                onComplete: () => {
-                  scanline.remove()
-                },
-              },
-              0.2
-            )
-
-            // Add technical diagonal pattern reveal
-            const diagonalPattern = document.createElement("div")
-            diagonalPattern.className = "absolute inset-0 pointer-events-none"
-            diagonalPattern.style.background = "repeating-linear-gradient(45deg, transparent, transparent 8px, currentColor 8px, currentColor 9px)"
-            diagonalPattern.style.opacity = "0"
-            diagonalPattern.style.mixBlendMode = "overlay"
-            item.appendChild(diagonalPattern)
-
-            itemTimeline.to(
-              diagonalPattern,
-              {
-                opacity: 0.04,
-                duration: 0.6,
-                ease: "power2.out",
-                onComplete: () => {
-                  setTimeout(() => {
-                    gsap.to(diagonalPattern, {
-                      opacity: 0,
-                      duration: 0.4,
-                      ease: "power2.in",
-                      onComplete: () => diagonalPattern.remove(),
-                    })
-                  }, 300)
-                },
-              },
-              0.3
-            )
-          })
-
-          masterTimeline.add(() => {}, revealDelay + hiddenItems.length * itemStagger + 0.6)
+            },
+            0.2
+          )
         })
 
         return () => ctx.revert()
