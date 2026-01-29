@@ -298,6 +298,8 @@ export function ExperienceSection() {
   const [detailPanelHeight, setDetailPanelHeight] = useState(0)
   const [isLg, setIsLg] = useState(false)
   const isMobile = useIsMobile()
+  const indexListRef = useRef<HTMLDivElement | null>(null)
+  const [hasIndexOverflow, setHasIndexOverflow] = useState(false)
 
   // GSAP: ENTRY bg + ASCII frame draw → content blocks stagger
   useEffect(() => {
@@ -435,6 +437,19 @@ export function ExperienceSection() {
     setIsLg(mql.matches)
     return () => mql.removeEventListener("change", onChange)
   }, [])
+
+  // Detect overflow in index list to conditionally show bottom bar
+  useEffect(() => {
+    const el = indexListRef.current
+    if (!el) return
+    const checkOverflow = () => {
+      setHasIndexOverflow(el.scrollHeight > el.clientHeight)
+    }
+    checkOverflow()
+    const ro = new ResizeObserver(checkOverflow)
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [listExpanded, expandAnimationDone])
 
   const roleCount = experiences.length
   const chartLeft = 34
@@ -606,6 +621,7 @@ export function ExperienceSection() {
             </div>
 
             <div
+              ref={indexListRef}
               className={cn(
                 "flex flex-col min-h-0 space-y-3",
                 isLg && detailPanelHeight > 0 && "lg:flex-1 lg:min-h-0 lg:overflow-y-auto lg:scrollbar-hide"
@@ -715,8 +731,8 @@ export function ExperienceSection() {
               </button>
             )}
             </div>
-            {/* Bottom frame bar (lg only): sticks to bottom of scroll frame, always visible */}
-            {isLg && detailPanelHeight > 0 && (
+            {/* Bottom frame bar (lg only): only show when index list has scroll overflow */}
+            {isLg && detailPanelHeight > 0 && hasIndexOverflow && (
               <div
                 className="shrink-0 border-t-2 border-foreground bg-secondary h-1.5"
                 aria-hidden
