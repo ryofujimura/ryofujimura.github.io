@@ -389,15 +389,27 @@ export function ExperienceSection() {
   }, [listExpanded])
 
 
-  // Measure detail panel height for index rail max-height on lg (side-by-side)
+  // Measure detail panel height for index rail max-height on lg (side-by-side); throttle to avoid layout thrash
   useEffect(() => {
     const el = detailPanelRef.current
     if (!el) return
+    let rafId: number | null = null
+    let lastH = 0
     const ro = new ResizeObserver((entries) => {
-      for (const e of entries) setDetailPanelHeight(e.contentRect.height)
+      const h = entries[0]?.contentRect.height ?? 0
+      if (h === lastH) return
+      lastH = h
+      if (rafId != null) cancelAnimationFrame(rafId)
+      rafId = requestAnimationFrame(() => {
+        setDetailPanelHeight(lastH)
+        rafId = null
+      })
     })
     ro.observe(el)
-    return () => ro.disconnect()
+    return () => {
+      if (rafId != null) cancelAnimationFrame(rafId)
+      ro.disconnect()
+    }
   }, [])
 
   // lg breakpoint (1024px) for side-by-side layout

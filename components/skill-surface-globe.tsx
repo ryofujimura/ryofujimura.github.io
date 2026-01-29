@@ -1,10 +1,15 @@
 "use client"
 
+import dynamic from "next/dynamic"
 import { useEffect, useRef, useState } from "react"
 import { GSAPSVG } from "@/components/gsap-text"
 import { TechnicalGrid } from "@/components/technical-grid"
 import { cn } from "@/lib/utils"
-import { SphereCanvas } from "@/components/sphere-canvas"
+
+const SphereCanvas = dynamic(() => import("@/components/sphere-canvas").then((m) => ({ default: m.SphereCanvas })), {
+  ssr: false,
+  loading: () => <div className="w-full min-h-[100px] animate-pulse bg-foreground/5" aria-hidden />,
+})
 
 export type SkillSurfaceGlobeProps = {
   entryIndex: number
@@ -25,14 +30,25 @@ export function SkillSurfaceGlobe({ entryIndex, words, height: heightProp = 220,
   useEffect(() => {
     if (!fillHeight || !containerRef.current) return
     const el = containerRef.current
+    let rafId: number | null = null
+    let lastH = 0
     const ro = new ResizeObserver((entries) => {
-      for (const e of entries) {
-        const h = e.contentRect.height
-        setObservedHeight(Math.max(FALLBACK_HEIGHT, Math.round(h)))
-      }
+      const entry = entries[0]
+      if (!entry) return
+      const h = Math.max(FALLBACK_HEIGHT, Math.round(entry.contentRect.height))
+      if (h === lastH) return
+      lastH = h
+      if (rafId != null) cancelAnimationFrame(rafId)
+      rafId = requestAnimationFrame(() => {
+        setObservedHeight(lastH)
+        rafId = null
+      })
     })
     ro.observe(el)
-    return () => ro.disconnect()
+    return () => {
+      if (rafId != null) cancelAnimationFrame(rafId)
+      ro.disconnect()
+    }
   }, [fillHeight])
 
   const globeCx = 200
@@ -44,7 +60,7 @@ export function SkillSurfaceGlobe({ entryIndex, words, height: heightProp = 220,
       ref={fillHeight ? containerRef : undefined}
       className={cn(
         "relative border border-foreground bg-secondary/60 p-3 sm:p-4 overflow-hidden",
-        "shadow-[4px_4px_0_0_theme(colors.foreground/50%)] sm:shadow-[6px_6px_0_0_theme(colors.foreground/50%)]",
+        "shadow-[1.5px_1.5px_0_0_theme(colors.foreground/50%)] sm:shadow-[4.5px_4.5px_0_0_theme(colors.foreground/50%)]",
         fillHeight && "h-full min-h-0",
         className
       )}

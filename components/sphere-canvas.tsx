@@ -206,13 +206,18 @@ export function SphereCanvas({ words, height = 220, className = "" }: SphereCanv
     resizeCanvas()
     createSpherePoints()
 
-    // Prefer ResizeObserver to track container changes (detail panel responsive)
+    // Prefer ResizeObserver to track container changes; throttle to one update per frame
     let ro: ResizeObserver | null = null
+    let resizeRafId: number | null = null
     const wrapper = wrapperRef.current
     if (wrapper && "ResizeObserver" in window) {
       ro = new ResizeObserver(() => {
-        resizeCanvas()
-        draw()
+        if (resizeRafId != null) return
+        resizeRafId = requestAnimationFrame(() => {
+          resizeCanvas()
+          draw()
+          resizeRafId = null
+        })
       })
       ro.observe(wrapper)
     } else {
@@ -227,6 +232,7 @@ export function SphereCanvas({ words, height = 220, className = "" }: SphereCanv
     }
 
     return () => {
+      if (resizeRafId != null) cancelAnimationFrame(resizeRafId)
       if (ro) ro.disconnect()
       else window.removeEventListener("resize", resizeCanvas)
       if (rafRef.current != null) window.cancelAnimationFrame(rafRef.current)
