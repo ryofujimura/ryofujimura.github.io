@@ -20,7 +20,7 @@ function IndexRowButton({
   withDataAttrs = false,
   hideTopLine = false,
 }: {
-  exp: { company: string; title: string; period: string; icon?: string }
+  exp: { company: string; title: string; shortTitle?: string; period: string; icon?: string }
   index: number
   activeIndex: number
   setActiveIndex: (i: number) => void
@@ -95,7 +95,7 @@ function IndexRowButton({
             {...(dataAttrs["data-index-title"] ? { "data-index-title": true } : {})}
             className="text-[10px] sm:text-[11px] opacity-70 leading-tight"
           >
-            {exp.title}
+            {exp.shortTitle ?? exp.title}
           </span>
         </div>
       </div>
@@ -113,6 +113,7 @@ function IndexRowButton({
 const experiences = [
   {
     title: "Android / iOS Development Intern",
+    shortTitle: "Android / iOS Development",
     company: "Bose Corporation",
     companyFull: "Bose Corporation",
     icon: "/images/bose_logo.svg",
@@ -131,6 +132,7 @@ const experiences = [
     },
   {
     title: "Software Engineer Intern",
+    shortTitle: "Software Engineer",
     company: "Honda Motor Co.",
     companyFull: "American Honda Motor Co., Inc.",
     icon: "/images/honda.svg",
@@ -149,13 +151,14 @@ const experiences = [
   },
   {
     title: "Undergraduate Researcher",
+    shortTitle: "Undergraduate",
     company: "CPX Lab",
     companyFull: "California State University, Long Beach",
     icon: "/images/CSU-Longbeach.svg",
     panelImage: "/images/lb.csulb.png",
     mediaImages: ["/images/ACMIEEEICCPS2025.pdf", "/images/ICRA2026.pdf"],
     mediaLabels: ["Proof 1", "Proof 2"],
-    period: "Aug 2024 PRESENT",
+    period: `Aug 2024 ${new Date().toLocaleDateString("en-US", { month: "short", year: "numeric" })}`,
     description: "Contributing to a 30+ person robotics/AI research group, supporting two peer-reviewed publications (ICCPS 2025, ICRA 2026).",
     highlights: [
       "Developed transformer-based classifiers improving task accuracy by 25% and supporting real-time robotic actuation",
@@ -167,6 +170,7 @@ const experiences = [
   },
   {
     "title": "Tokai Shuttle (Freelance)",
+    "shortTitle": "Tokai Shuttle",
     "company": "HTIC",
     "companyFull": "Hawaii Tokai International College",
     "icon": "/images/HTIC-icon.svg",
@@ -199,6 +203,7 @@ const experiences = [
   },
   {
     title: "Data Engineer (Freelance)",
+    shortTitle: "Data Engineer",
     company: "CUSCO USA",
     companyFull: "CUSCO USA Inc.",
     icon: "/images/cusco_c.svg",
@@ -216,6 +221,7 @@ const experiences = [
   },
   {
     title: "Specialist (Retail Store)",
+    shortTitle: "Specialist",
     company: "Apple Inc.",
     companyFull: "Apple Inc.",
     icon: "/images/apple.svg",
@@ -240,6 +246,7 @@ const experiences = [
   },
   {
     title: "Specialist (Retail Store)",
+    shortTitle: "Specialist",
     company: "Nespresso ",
     companyFull: "Nespresso",
     icon: "/images/nespresso-icon.svg",
