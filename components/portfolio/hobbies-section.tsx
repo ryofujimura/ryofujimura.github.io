@@ -375,17 +375,15 @@ export function HobbiesSection() {
       ref={sectionRef}
       id="hobbies"
       className="relative py-16 sm:py-20 md:py-28 lg:py-36 px-4 sm:px-5 overflow-hidden bg-background border-t border-b border-foreground/10"
-      aria-label="Hobbies & Interests"
     >
-      {/* Section: Hobbies */}
-      {/* Subsection: Load animation line — draws when section enters view */}
+      {/* Load animation line — draws when section enters view */}
       <div
         ref={loadLineRef}
         className="absolute top-0 left-0 right-0 h-0.5 bg-foreground/30 origin-left"
         aria-hidden
       />
 
-      {/* Subsection: Brutalist grid + registration marks */}
+      {/* Brutalist grid + registration marks */}
       <div
         className="pointer-events-none absolute inset-0 opacity-[0.06] mix-blend-soft-light"
         aria-hidden
@@ -399,7 +397,7 @@ export function HobbiesSection() {
       <div className="pointer-events-none absolute top-6 right-4 sm:right-6 w-10 h-10 border border-dashed border-foreground/40" aria-hidden />
       <div className="pointer-events-none absolute bottom-8 left-1/2 -translate-x-1/2 w-24 h-1 bg-foreground/20" aria-hidden />
 
-      {/* Subsection: Background technical SVG — draws in on scroll */}
+      {/* Background technical SVG — draws in on scroll */}
       <GSAPSVG
         className="pointer-events-none absolute inset-0 left-[55%] top-0 w-[45%] max-w-[520px] text-foreground/[0.055] hidden lg:block"
         duration={2.2}
@@ -409,7 +407,7 @@ export function HobbiesSection() {
       </GSAPSVG>
 
       <div className="relative z-10 max-w-6xl mx-auto">
-        {/* Subsection: Header — ASCII section label + GSAP title + index table */}
+        {/* Header — ASCII section label + GSAP title */}
         <div className="mb-12 sm:mb-16 md:mb-20 flex flex-col md:flex-row md:items-end md:justify-between gap-8">
           <div className="space-y-4 max-w-2xl">
             <pre
@@ -433,7 +431,7 @@ export function HobbiesSection() {
               Off-screen: making, capture, motion, and built form — from additive fabrication to brutalist aesthetics.
             </GSAPText>
           </div>
-          {/* Subsection: ASCII index table */}
+          {/* ASCII index table */}
           <div className="md:w-[280px] lg:w-[320px] shrink-0">
             <AnimatedSection delay={80}>
               <pre
@@ -457,14 +455,14 @@ export function HobbiesSection() {
           </div>
         </div>
 
-        {/* Subsection: Hobby grid — click to expand more-info */}
+        {/* Hobby grid — click to expand more-info */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
           {hobbies.map((hobby, index) => (
             <HobbyCard key={hobby.id} hobby={hobby} index={index} />
           ))}
         </div>
 
-        {/* Subsection: Footer line — ASCII note */}
+        {/* Footer line — ASCII note */}
         <AnimatedSection delay={560} className="mt-10 sm:mt-12">
           <pre
             className="font-mono text-[9px] xs:text-[10px] text-muted-foreground/70 border-t border-foreground/10 pt-4 whitespace-pre"
