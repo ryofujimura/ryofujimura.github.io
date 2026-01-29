@@ -750,7 +750,7 @@ export function ExperienceSection() {
               </div>
             </div>
 
-            <div className="relative flex-1 min-h-0 overflow-y-auto p-3 sm:p-4 md:p-5 space-y-5 sm:space-y-6">
+            <div className="relative p-3 sm:p-4 md:p-5 space-y-5 sm:space-y-6">
               {experiences.map((exp, index) => {
                 const isActive = index === activeIndex
                 return (
