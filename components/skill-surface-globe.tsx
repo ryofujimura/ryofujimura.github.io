@@ -1,5 +1,6 @@
 "use client"
 
+import { useEffect, useRef, useState } from "react"
 import { GSAPSVG } from "@/components/gsap-text"
 import { TechnicalGrid } from "@/components/technical-grid"
 import { cn } from "@/lib/utils"
@@ -10,18 +11,41 @@ export type SkillSurfaceGlobeProps = {
   words: string[]
   height?: number
   className?: string
+  /** When true (e.g. on laptop), height is driven by container (right column matches left). */
+  fillHeight?: boolean
 }
 
-export function SkillSurfaceGlobe({ entryIndex, words, height = 220, className }: SkillSurfaceGlobeProps) {
+const FALLBACK_HEIGHT = 100
+
+export function SkillSurfaceGlobe({ entryIndex, words, height: heightProp = 220, className, fillHeight }: SkillSurfaceGlobeProps) {
+  const containerRef = useRef<HTMLDivElement | null>(null)
+  const [observedHeight, setObservedHeight] = useState(FALLBACK_HEIGHT)
+  const height = fillHeight ? observedHeight : heightProp
+
+  useEffect(() => {
+    if (!fillHeight || !containerRef.current) return
+    const el = containerRef.current
+    const ro = new ResizeObserver((entries) => {
+      for (const e of entries) {
+        const h = e.contentRect.height
+        setObservedHeight(Math.max(FALLBACK_HEIGHT, Math.round(h)))
+      }
+    })
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [fillHeight])
+
   const globeCx = 200
   const globeCy = Math.round(height / 2)
   const globeR = 92
 
-  return (
+  const content = (
     <div
+      ref={fillHeight ? containerRef : undefined}
       className={cn(
         "relative border border-foreground bg-secondary/60 p-3 sm:p-4 overflow-hidden",
         "shadow-[4px_4px_0_0_theme(colors.foreground)] sm:shadow-[6px_6px_0_0_theme(colors.foreground)]",
+        fillHeight && "h-full min-h-0",
         className
       )}
     >
@@ -73,5 +97,6 @@ export function SkillSurfaceGlobe({ entryIndex, words, height = 220, className }
       </div>
     </div>
   )
+  return content
 }
 

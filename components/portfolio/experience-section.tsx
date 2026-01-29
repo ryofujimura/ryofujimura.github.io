@@ -5,6 +5,7 @@ import { gsap } from "gsap"
 import { GSAPText, GSAPSVG } from "@/components/gsap-text"
 import { TechnicalGrid, TechnicalPattern } from "@/components/technical-grid"
 import { SkillSurfaceGlobe } from "@/components/skill-surface-globe"
+import { useIsMobile } from "@/hooks/use-mobile"
 import { cn } from "@/lib/utils"
 
 const INITIAL_INDEX_VISIBLE = 3
@@ -281,6 +282,7 @@ export function ExperienceSection() {
   const detailPanelRef = useRef<HTMLDivElement | null>(null)
   const [detailPanelHeight, setDetailPanelHeight] = useState(0)
   const [isLg, setIsLg] = useState(false)
+  const isMobile = useIsMobile()
 
   // GSAP: ENTRY bg + ASCII frame draw → content blocks stagger
   useEffect(() => {
@@ -817,7 +819,7 @@ export function ExperienceSection() {
                         {exp.description}
                       </p>
 
-                      <div data-detail-block className="grid gap-3 sm:gap-4 md:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] items-start">
+                      <div data-detail-block className="grid gap-3 sm:gap-4 md:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] items-start md:items-stretch">
                         <ul className="space-y-2.5 sm:space-y-3">
                           {exp.highlights.map((highlight, i) => (
                             <li
@@ -830,17 +832,9 @@ export function ExperienceSection() {
                           ))}
                         </ul>
 
-                        <div className="space-y-3 sm:space-y-4">
+                        <div className="space-y-3 sm:space-y-4 min-h-0 md:min-h-0 md:h-full">
                           {isActive ? (
-                            <SkillSurfaceGlobe
-                              entryIndex={index}
-                              words={exp.skills}
-                              height={
-                                isLg && detailPanelHeight > 0
-                                  ? Math.max(100, Math.min(280, detailPanelHeight - 160))
-                                  : 100
-                              }
-                            />
+                            <SkillSurfaceGlobe entryIndex={index} words={exp.skills} className="md:h-full" fillHeight={!isMobile} />
                           ) : null}
 
                         </div>
