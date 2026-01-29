@@ -225,7 +225,7 @@ const experiences = [
     description: "Drove top-tier Apple Retail performance by converting high-volume customer interactions into measurable growth across attach rates, customer satisfaction, and connected ecosystem adoption.",
     highlights: [
       "Achieved 47% AppleCare attach and 54% accessory attach, consistently outperforming store benchmarks across iPhone, iPad, Mac, and Watch",
-      "Maintained elite customer experience metrics with 41-customer promoter streak achieving 100 TMS",
+      "Maintained elite customer experience metrics with 41-customer promoter streak achieving 100 TMS customer feedback score",
     ],
     skills: [
       "Customer Service",
@@ -685,6 +685,13 @@ export function ExperienceSection() {
               </button>
             )}
             </div>
+            {/* Bottom frame bar (lg only): sits under scroll view */}
+            {isLg && detailPanelHeight > 0 && (
+              <div
+                className="shrink-0 border-t-2 border-foreground bg-secondary h-1.5"
+                aria-hidden
+              />
+            )}
           </div>
 
           {/* Detail grid */}
