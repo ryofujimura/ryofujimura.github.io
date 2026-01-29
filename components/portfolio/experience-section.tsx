@@ -596,15 +596,6 @@ export function ExperienceSection() {
                 : undefined
             }
           >
-            <div className="flex shrink-0 items-center justify-between border-b border-foreground pb-2">
-              <span className="font-mono text-[11px] uppercase tracking-[0.3em]">
-                Index
-              </span>
-              <span className="font-mono text-[11px] text-muted-foreground">
-                0{experiences.length}
-              </span>
-            </div>
-
             <div
               className={cn(
                 "flex flex-col min-h-0 space-y-3",
