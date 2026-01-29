@@ -113,9 +113,9 @@ function IndexRowButton({
 // icon = index list (left rail); panelImage = ENTRY header background (optional, falls back to icon)
 const experiences = [
   {
-    title: "Android / iOS Development Intern",
-    shortTitle: "Android / iOS Development",
-    company: "Bose Corporation",
+    title: "Android / iOS Developer",
+    shortTitle: "Internship",
+    company: "Bose Corp.",
     companyFull: "Bose Corporation",
     icon: "/images/bose_logo.svg",
     panelImage: "/images/bose_1.svg",
@@ -127,14 +127,12 @@ const experiences = [
     highlights: [
       "Reduced QA mismatch-version detection time by 40–60%, shortening release cycles",
       "Eliminated 10+ hours/week of debugging overhead through automation",
-      "Built production-grade features using Swift Concurrency, Kotlin Coroutines, Rx",
-      "Collaborated with firmware, cloud, and mobile groups resolving cross-team issues",
     ],
     skills: [ "iOS (SwiftUI)", "Kotlin (Android)", "App Architecture", "BLE", "WebSocket", "APIs", "Debugging", "Environment Validation", "Configuration Management"] 
     },
   {
-    title: "Software Engineer Intern",
-    shortTitle: "Software Engineer",
+    title: "Software Engineer",
+    shortTitle: "Internship",
     company: "Honda Motor",
     companyFull: "American Honda Motor Co., Inc.",
     icon: "/images/honda.svg",
@@ -154,7 +152,7 @@ const experiences = [
   },
   {
     title: "Undergraduate Researcher",
-    shortTitle: "Undergraduate Researcher",
+    shortTitle: "Research",
     company: "CPX Lab",
     companyFull: "California State University, Long Beach",
     icon: "/images/CSU-Longbeach.svg",
@@ -173,8 +171,8 @@ const experiences = [
     skills: [ "Human-Computer Interaction", "Human-Robot Interaction", "Robotic Actuation", "Safety-Critical Systems", "Embedded Systems", "3D Printing", "CAD Design", "Servo Motor", "Raspberry Pi", "Signal Temporal Logic", "Machine Learning Classification" ]
   },
   {
-    "title": "Software Engineer (Freelance)",
-    "shortTitle": "Software Engineer",
+    "title": "Software Engineer",
+    "shortTitle": "Freelance",
     "company": "HTIC",
     "companyFull": "Hawaii Tokai International College",
     "icon": "/images/HTIC-icon.svg",
@@ -207,8 +205,8 @@ const experiences = [
     ]
   },
   {
-    title: "Data Engineer (Freelance)",
-    shortTitle: "Data Engineer",
+    title: "Data Engineer",
+    shortTitle: "Freelance",
     company: "CUSCO USA",
     companyFull: "CUSCO USA Inc.",
     icon: "/images/cusco_c.svg",
@@ -226,8 +224,8 @@ const experiences = [
     skills: [ "Data Engineering", "Python", "Data Extraction", "Data Normalization", "API Development", "Automation", "Batch Processing", "Information Retrieval", "Workflow Optimization"]
   },
   {
-    title: "Specialist (Retail Store)",
-    shortTitle: "Specialist",
+    title: "Seasonal Specialist",
+    shortTitle: "Part-Time",
     company: "Apple Inc.",
     companyFull: "Apple Inc.",
     icon: "/images/apple.svg",
@@ -252,8 +250,8 @@ const experiences = [
     ]
   },
   {
-    title: "Specialist (Retail Store)",
-    shortTitle: "Specialist",
+    title: "Retail Sales Associate",
+    shortTitle: "Part-Time",
     company: "Nespresso ",
     companyFull: "Nespresso",
     icon: "/images/nespresso-icon.svg",
@@ -620,12 +618,12 @@ export function ExperienceSection() {
               ref={indexListRef}
               className={cn(
                 "flex flex-col min-h-0 space-y-3",
+                listExpanded && hasIndexOverflow && "border-t border-b",
                 isLg && detailPanelHeight > 0 && "lg:flex-1 lg:min-h-0 lg:overflow-y-auto lg:scrollbar-hide"
               )}
             >
               <div className={cn(
-                "relative divide-y divide-foreground bg-secondary",
-                listExpanded && hasIndexOverflow && "shadow-[inset_0_2px_0_0_hsl(var(--foreground)),inset_0_-2px_0_0_hsl(var(--foreground))]"
+                "border divide-y divide-foreground bg-secondary",
               )}>
               {/* First N items always visible */}
               {experiences.slice(0, INITIAL_INDEX_VISIBLE).map((exp, index) => (
