@@ -17,6 +17,7 @@ function IndexRowButton({
   setActiveIndex,
   ref: rowRef,
   withDataAttrs = false,
+  hideTopLine = false,
 }: {
   exp: { company: string; title: string; period: string; icon?: string }
   index: number
@@ -24,6 +25,7 @@ function IndexRowButton({
   setActiveIndex: (i: number) => void
   ref?: React.Ref<HTMLButtonElement | null>
   withDataAttrs?: boolean
+  hideTopLine?: boolean
 }) {
   const dataAttrs = withDataAttrs
     ? {
@@ -47,18 +49,23 @@ function IndexRowButton({
           : "bg-secondary hover:bg-foreground hover:text-background"
       )}
     >
-      {/* Left-edge technical line: GSAP line-draw when withDataAttrs */}
-      {withDataAttrs && (
-        <svg
-          className="absolute left-0 top-0 bottom-0 w-px text-foreground/60 pointer-events-none"
-          viewBox="0 0 1 48"
-          preserveAspectRatio="none"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1"
+      {/* Horizontal line: GSAP scaleX reveal (one solid line) when withDataAttrs; skip on first expanded row */}
+      {withDataAttrs && !hideTopLine && (
+        <div
+          data-index-line-wrap
+          className="absolute left-0 right-0 top-0 h-px w-full origin-left pointer-events-none"
         >
-          <path data-index-line d="M0.5 0v48" vectorEffect="non-scaling-stroke" />
-        </svg>
+          <svg
+            className="h-full w-full text-foreground/60"
+            viewBox="0 0 48 1"
+            preserveAspectRatio="none"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1"
+          >
+            <path d="M0 0.5h48" vectorEffect="non-scaling-stroke" />
+          </svg>
+        </div>
       )}
       <div className="flex items-center gap-2 sm:gap-3">
         {"icon" in exp && exp.icon ? (
@@ -93,7 +100,7 @@ function IndexRowButton({
       </div>
       <span
         {...(dataAttrs["data-index-period"] ? { "data-index-period": true } : {})}
-        className="hidden sm:inline-flex text-[10px] opacity-80"
+        className="hidden sm:inline-flex text-[10px] opacity-80 text-right"
       >
         {exp.period}
       </span>
@@ -111,7 +118,7 @@ const experiences = [
     panelImage: "/images/bose_1.svg",
     mediaImages: ["/images/bose_2.JPG", "/images/bose_3.JPG"],
     mediaLabels: ["Proof 1", "Proof 2"],
-    period: "Jun 2025 – Aug 2025",
+    period: "Jun 2025 Aug 2025",
     description: "Engineered internal Bluetooth debugging tools adopted by 1,000+ engineers, accelerating cross-platform testing.",
     highlights: [
       "Reduced QA mismatch-version detection time by 40–60%, shortening release cycles",
@@ -129,7 +136,7 @@ const experiences = [
     panelImage: "/images/hondalogo.svg",
     mediaImages: ["/images/honda_1.jpg", "/images/honda_3.jpg"],
     mediaLabels: ["Proof 1", "Proof 2"],
-    period: "Jun 2024 – Aug 2024",
+    period: "Jun 2024 Aug 2024",
     description: "Prototyped next-generation on-device AI using Jetson Orin Nano, evaluating automotive-grade compute constraints.",
     highlights: [
       "Reduced Llama3 8B inference latency by 20–40% via mixed-precision quantization",
@@ -142,12 +149,12 @@ const experiences = [
   {
     title: "Undergraduate Researcher",
     company: "CPX Lab",
-    companyFull: "CPX at California State University, Long Beach",
+    companyFull: "California State University, Long Beach",
     icon: "/images/CSU-Longbeach.svg",
     panelImage: "/images/lb.csulb.png",
     mediaImages: ["/images/ACMIEEEICCPS2025.pdf", "/images/ICRA2026.pdf"],
     mediaLabels: ["Proof 1", "Proof 2"],
-    period: "Aug 2024 – Present",
+    period: "Aug 2024 PRESENT",
     description: "Contributing to a 30+ person robotics/AI research group, supporting two peer-reviewed publications (ICCPS 2025, ICRA 2026).",
     highlights: [
       "Developed transformer-based classifiers improving task accuracy by 25% and supporting real-time robotic actuation",
@@ -156,7 +163,39 @@ const experiences = [
       "Created reproducible ML pipelines adopted by multiple lab members",
     ],
     skills: [ "Human-Computer Interaction", "Human-Robot Interaction", "Robotic Actuation", "Safety-Critical Systems", "Embedded Systems", "3D Printing", "CAD Design", "Servo Motor", "Raspberry Pi", "Signal Temporal Logic", "Machine Learning Classification" ]
-    },
+  },
+  {
+    "title": "Tokai Shuttle (Freelance)",
+    "company": "HTIC",
+    "companyFull": "Hawaii Tokai International College",
+    "icon": "/images/HTIC-icon.svg",
+    "panelImage": "/images/HTIC-logo.svg",
+    "mediaImages": ["https://apps.apple.com/us/app/htic-shuttle/id6747784542", "https://tokaishuttle.web.app/app-release.apk", "https://tokaishuttle.web.app/"],
+    "mediaLabels": ["iOS", "Android", "Website"],
+    "period": "Mar 2025 Nov 2025",
+    "description": "Built a real-time shuttle tracking and stop-request system with a web dashboard, driver iOS app, and student iOS/Android apps, powered by Firebase Firestore for live location and requests.",
+    "highlights": [
+      "Implemented real-time bus location and ETA updates with 10s refresh and stale detection",
+      "Designed a reliable driver workflow with slide-to-complete stops and session persistence",
+      "Enabled authenticated student pickup/drop-off requests with one active request per user",
+      "Shipped web, driver iOS, and student iOS/Android apps using a shared Firestore schema",
+      "Deployed via Firebase Hosting with CI; built App Store assets and automation tooling"
+    ],
+    "skills": [
+      "SwiftUI",
+      "Kotlin",
+      "Firebase",
+      "Firestore",
+      "Real-time Data",
+      "MVVM",
+      "REST/API",
+      "Leaflet",
+      "Tailwind CSS",
+      "GitHub Actions",
+      "Location Services",
+      "Authentication"
+    ]
+  },
   {
     title: "Data Engineer (Freelance)",
     company: "CUSCO USA",
@@ -165,7 +204,7 @@ const experiences = [
     panelImage: "/images/cusco.svg",
     mediaImages: ["/images/cusco_1.jpg"],
     mediaLabels: ["Proof 1"],
-    period: "Oct 2021 – May 2024",
+    period: "OCT 2021 MAY 2024",
     description: "Built Python-based extraction pipelines processing 11,500+ legacy files spanning PDFs, images, and mixed formats.",
     highlights: [
       "Delivered 5–10× faster processing vs. manual workflows with 1–3% error rate",
@@ -175,55 +214,54 @@ const experiences = [
     skills: [ "Data Engineering", "Python", "Data Extraction", "Data Normalization", "API Development", "Automation", "Batch Processing", "Information Retrieval", "Workflow Optimization"]
   },
   {
-    title: "Data E1ngineer (Freelance)",
-    company: "CUSC1O USA",
-    companyFull: "CUSCO USA Inc.",
-    icon: "/images/cusco_c.svg",
-    panelImage: "/images/cusco.svg",
+    title: "Specialist (Retail Store)",
+    company: "Apple Inc.",
+    companyFull: "Apple Inc.",
+    icon: "/images/apple.svg",
+    panelImage: "/images/apple.svg",
     mediaImages: ["/images/cusco_1.jpg"],
     mediaLabels: ["Proof 1"],
-    period: "Oct 2021 – May 2024",
-    description: "Built Python-based extraction pipelines processing 11,500+ legacy files spanning PDFs, images, and mixed formats.",
+    period: "SEP 2025 JAN 2026",
+    description: "Drove top-tier Apple Retail performance by converting high-volume customer interactions into measurable growth across attach rates, customer satisfaction, and connected ecosystem adoption.",
     highlights: [
-      "Delivered 5–10× faster processing vs. manual workflows with 1–3% error rate",
-      "Designed normalization/indexing layers exposing cleaned data through internal API",
-      "Enabled 30% revenue increase by converting archival content into searchable intelligence",
+      "Achieved 47% AppleCare attach and 54% accessory attach, consistently outperforming store benchmarks across iPhone, iPad, Mac, and Watch",
+      "Maintained elite customer experience metrics with 41-customer promoter streak achieving 100 TMS",
     ],
-    skills: [ "Data Engineering", "Python", "Data Extraction", "Data Normalization", "API Development", "Automation", "Batch Processing", "Information Retrieval", "Workflow Optimization"]
+    skills: [
+      "Customer Service",
+      "Performance Metrics",
+      "Revenue Attachment Strategy",
+      "Cross-Product Solution Selling",
+      "KPI-Driven Execution",
+      "Customer Retention & Advocacy",
+      "Operational Consistency",
+    ]
   },
   {
-    title: "Data E2ngineer (Freelance)",
-    company: "CUSC2O USA",
-    companyFull: "CUSCO USA Inc.",
-    icon: "/images/cusco_c.svg",
-    panelImage: "/images/cusco.svg",
-    mediaImages: ["/images/cusco_1.jpg"],
-    mediaLabels: ["Proof 1"],
-    period: "Oct 2021 – May 2024",
-    description: "Built Python-based extraction pipelines processing 11,500+ legacy files spanning PDFs, images, and mixed formats.",
+    title: "Specialist (Retail Store)",
+    company: "Nespresso ",
+    companyFull: "Nespresso",
+    icon: "/images/nespresso-icon.svg",
+    panelImage: "/images/nespresso-logo.svg",
+    mediaImages: [],
+    mediaLabels: [],
+    period: "SEP 2024 MAY 2025",
+    description: "Drove top-ranked sales performance in a premium retail environment by translating customer preferences into high-value, subscription-based coffee and equipment solutions while upholding brand standards and sustainability initiatives.",
     highlights: [
-      "Delivered 5–10× faster processing vs. manual workflows with 1–3% error rate",
-      "Designed normalization/indexing layers exposing cleaned data through internal API",
-      "Enabled 30% revenue increase by converting archival content into searchable intelligence",
+      "Ranked #1 in Q4 2024 sales performance across the U.S. Southwest region by exceeding regional benchmarks through consultative selling",
+      "Generated the boutique’s highest subscription enrollment over a 30-week period, accelerating recurring revenue and long-term customer retention",
+      "Delivered the highest average basket value by pairing customer taste profiles with tailored machine, coffee, and accessory recommendations",
     ],
-    skills: [ "Data Engineering", "Python", "Data Extraction", "Data Normalization", "API Development", "Automation", "Batch Processing", "Information Retrieval", "Workflow Optimization"]
-  },
-  {
-    title: "Data3 Engineer (Freelance)",
-    company: "CUSC3O USA",
-    companyFull: "CUSCO USA Inc.",
-    icon: "/images/cusco_c.svg",
-    panelImage: "/images/cusco.svg",
-    mediaImages: ["/images/cusco_1.jpg"],
-    mediaLabels: ["Proof 1"],
-    period: "Oct 2021 – May 2024",
-    description: "Built Python-based extraction pipelines processing 11,500+ legacy files spanning PDFs, images, and mixed formats.",
-    highlights: [
-      "Delivered 5–10× faster processing vs. manual workflows with 1–3% error rate",
-      "Designed normalization/indexing layers exposing cleaned data through internal API",
-      "Enabled 30% revenue increase by converting archival content into searchable intelligence",
-    ],
-    skills: [ "Data Engineering", "Python", "Data Extraction", "Data Normalization", "API Development", "Automation", "Batch Processing", "Information Retrieval", "Workflow Optimization"]
+    skills: [
+      "Consultative Sales",
+      "Subscription Revenue Growth",
+      "Customer Preference Analysis",
+      "Average Order Value Optimization",
+      "Customer Retention Strategy",
+      "Premium Brand Representation",
+      "Sustainability Advocacy",
+      "In-Store Experience Leadership"
+    ]
   },
 ]
 
@@ -240,6 +278,9 @@ export function ExperienceSection() {
   const loadMoreButtonRef = useRef<HTMLButtonElement | null>(null)
   const loadMoreArrowRef = useRef<SVGSVGElement | null>(null)
   const [expandAnimationDone, setExpandAnimationDone] = useState(false)
+  const detailPanelRef = useRef<HTMLDivElement | null>(null)
+  const [detailPanelHeight, setDetailPanelHeight] = useState(0)
+  const [isLg, setIsLg] = useState(false)
 
   // GSAP: ENTRY bg + ASCII frame draw → content blocks stagger
   useEffect(() => {
@@ -307,13 +348,10 @@ export function ExperienceSection() {
       gsap.set(row, { opacity: 0, y: 12 })
       const icon = row.querySelector("[data-index-icon]")
       const textBlocks = row.querySelectorAll("[data-index-company], [data-index-title], [data-index-period]")
-      const lineSvg = row.querySelector("[data-index-line]") as SVGPathElement | null
+      const lineWrap = row.querySelector("[data-index-line-wrap]") as HTMLElement | null
       if (icon) gsap.set(icon, { scale: 0.6, opacity: 0 })
       textBlocks.forEach((el) => gsap.set(el, { opacity: 0, y: 6 }))
-      if (lineSvg && typeof lineSvg.getTotalLength === "function") {
-        const len = lineSvg.getTotalLength()
-        gsap.set(lineSvg, { strokeDasharray: len, strokeDashoffset: len })
-      }
+      if (lineWrap) gsap.set(lineWrap, { scaleX: 0, transformOrigin: "left center" })
     })
 
     const tl = gsap.timeline({ overwrite: true })
@@ -330,11 +368,11 @@ export function ExperienceSection() {
       tl.to(row, { opacity: 1, y: 0, duration: 0.35, ease: "power3.out" }, start)
       const icon = row.querySelector("[data-index-icon]")
       const textBlocks = row.querySelectorAll("[data-index-company], [data-index-title], [data-index-period]")
-      const lineSvg = row.querySelector("[data-index-line]") as SVGPathElement | null
+      const lineWrap = row.querySelector("[data-index-line-wrap]") as HTMLElement | null
       if (icon) tl.to(icon, { scale: 1, opacity: 1, duration: 0.28, ease: "back.out(1.4)" }, start + 0.05)
       tl.to(textBlocks, { opacity: 1, y: 0, duration: 0.22, stagger: 0.04, ease: "power2.out" }, start + 0.08)
-      if (lineSvg && typeof lineSvg.getTotalLength === "function") {
-        tl.to(lineSvg, { strokeDashoffset: 0, duration: 0.3, ease: "power2.inOut" }, start + 0.1)
+      if (lineWrap) {
+        tl.to(lineWrap, { scaleX: 1, duration: 0.35, ease: "power2.out" }, start + 0.1)
       }
     })
 
@@ -347,6 +385,26 @@ export function ExperienceSection() {
       }
     })
   }, [listExpanded])
+
+  // Measure detail panel height for index rail max-height on lg (side-by-side)
+  useEffect(() => {
+    const el = detailPanelRef.current
+    if (!el) return
+    const ro = new ResizeObserver((entries) => {
+      for (const e of entries) setDetailPanelHeight(e.contentRect.height)
+    })
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
+
+  // lg breakpoint (1024px) for side-by-side layout
+  useEffect(() => {
+    const mql = window.matchMedia("(min-width: 1024px)")
+    const onChange = () => setIsLg(mql.matches)
+    mql.addEventListener("change", onChange)
+    setIsLg(mql.matches)
+    return () => mql.removeEventListener("change", onChange)
+  }, [])
 
   const roleCount = experiences.length
   const chartLeft = 34
@@ -495,10 +553,20 @@ export function ExperienceSection() {
         </header>
 
         {/* Matrix layout */}
-        <div className="grid gap-6 lg:grid-cols-[minmax(220px,260px)_minmax(0,1fr)]">
-          {/* Index rail */}
-          <div className="space-y-3">
-            <div className="flex items-center justify-between border-b border-foreground pb-2">
+        <div className="grid gap-6 lg:grid-cols-[minmax(220px,260px)_minmax(0,1fr)] lg:items-start">
+          {/* Index rail: on lg, height matches detail panel and list scrolls */}
+          <div
+            className={cn(
+              "flex flex-col",
+              isLg && detailPanelHeight > 0 ? "lg:flex lg:flex-col" : "space-y-3"
+            )}
+            style={
+              isLg && detailPanelHeight > 0
+                ? { height: detailPanelHeight, maxHeight: detailPanelHeight }
+                : undefined
+            }
+          >
+            <div className="flex shrink-0 items-center justify-between border-b border-foreground pb-2">
               <span className="font-mono text-[11px] uppercase tracking-[0.3em]">
                 Index
               </span>
@@ -507,7 +575,13 @@ export function ExperienceSection() {
               </span>
             </div>
 
-            <div className="border border-foreground divide-y divide-foreground bg-secondary">
+            <div
+              className={cn(
+                "flex flex-col min-h-0 space-y-3",
+                isLg && detailPanelHeight > 0 && "lg:flex-1 lg:min-h-0 lg:overflow-y-auto"
+              )}
+            >
+              <div className="border border-foreground divide-y divide-foreground bg-secondary shrink-0">
               {/* First N items always visible */}
               {experiences.slice(0, INITIAL_INDEX_VISIBLE).map((exp, index) => (
                 <IndexRowButton
@@ -544,6 +618,7 @@ export function ExperienceSection() {
                           moreItemsRowRefs.current[sliceIndex] = el
                         }}
                         withDataAttrs
+                        hideTopLine={sliceIndex === 0}
                       />
                     )
                   })}
@@ -609,10 +684,14 @@ export function ExperienceSection() {
                 <span className="text-muted-foreground">more</span>
               </button>
             )}
+            </div>
           </div>
 
           {/* Detail grid */}
-          <div className="relative border border-foreground bg-card shadow-none sm:shadow-[6px_6px_0_0_theme(colors.foreground)]">
+          <div
+            ref={detailPanelRef}
+            className="relative border border-foreground bg-card shadow-none sm:shadow-[6px_6px_0_0_theme(colors.foreground)]"
+          >
             {/* ASCII entry header: frame + line draw in with GSAP on index change */}
             <div className="relative min-h-[3rem] border-b border-foreground/20 bg-secondary/50 px-3 py-2 sm:px-4 sm:py-2.5">
               {/* ENTRY background image: starts at 0, GSAP fades in on load / index change */}
@@ -659,7 +738,7 @@ export function ExperienceSection() {
                 className="relative z-10 font-mono text-[10px] sm:text-[11px] uppercase tracking-[0.2em] text-muted-foreground opacity-0"
                 aria-hidden
               >
-                &gt; ENTRY {(activeIndex + 1).toString().padStart(2, "0")} // {experiences[activeIndex]?.company ?? "—"}
+                &gt; ENTRY {(experiences.length - activeIndex).toString().padStart(2, "0")} // {experiences[activeIndex]?.companyFull ?? "—"}
               </div>
             </div>
 
@@ -748,17 +827,6 @@ export function ExperienceSection() {
                             <SkillSurfaceGlobe entryIndex={index} words={exp.skills} height={100} />
                           ) : null}
 
-                          <div className="border border-dashed border-foreground/60 p-3 sm:p-4">
-                            <p className="font-mono text-[10px] sm:text-[11px] text-muted-foreground uppercase tracking-[0.16em] mb-1">
-                              Signal summary
-                            </p>
-                            <p className="font-mono text-[10px] sm:text-[11px] text-muted-foreground/80 leading-relaxed">
-                              ΔLatency, ΔThroughput, ΔReliability vary per role, but constant is{" "}
-                              <span className="text-foreground font-semibold">shipping rigorously
-                              measured systems</span>{" "}
-                              under bandwidth, hardware, or organizational constraints.
-                            </p>
-                          </div>
                         </div>
                       </div>
                     </div>
