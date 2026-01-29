@@ -32,7 +32,7 @@ const VERB_SLOT_CH_MOBILE = 7
 
 function revLabel() {
   const d = new Date()
-  return `${d.toLocaleDateString("en-US", { month: "short" })}. ${d.getFullYear()}`
+  return `${d.toLocaleDateString("en-US", { month: "long" })} ${d.getFullYear()}`
 }
 
 function padVerb(verb: string, width: number) {
