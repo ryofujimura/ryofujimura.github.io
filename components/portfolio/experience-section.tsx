@@ -832,7 +832,15 @@ export function ExperienceSection() {
 
                         <div className="space-y-3 sm:space-y-4">
                           {isActive ? (
-                            <SkillSurfaceGlobe entryIndex={index} words={exp.skills} height={100} />
+                            <SkillSurfaceGlobe
+                              entryIndex={index}
+                              words={exp.skills}
+                              height={
+                                isLg && detailPanelHeight > 0
+                                  ? Math.max(100, Math.min(280, detailPanelHeight - 160))
+                                  : 100
+                              }
+                            />
                           ) : null}
 
                         </div>
