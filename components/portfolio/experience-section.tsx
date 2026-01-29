@@ -588,7 +588,8 @@ export function ExperienceSection() {
           <div
             className={cn(
               "flex flex-col",
-              isLg && detailPanelHeight > 0 ? "lg:flex lg:flex-col" : "space-y-3"
+              listExpanded && "border",
+              isLg && detailPanelHeight > 0 ? "scrollbar-hide lg:flex lg:flex-col" : "space-y-3"
             )}
             style={
               isLg && detailPanelHeight > 0
