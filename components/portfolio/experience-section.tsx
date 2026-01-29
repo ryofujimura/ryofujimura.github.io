@@ -279,6 +279,7 @@ export function ExperienceSection() {
   const loadMoreArrowRef = useRef<SVGSVGElement | null>(null)
   const [expandAnimationDone, setExpandAnimationDone] = useState(false)
   const detailPanelRef = useRef<HTMLDivElement | null>(null)
+  const bottomFrameBarRef = useRef<HTMLDivElement | null>(null)
   const [detailPanelHeight, setDetailPanelHeight] = useState(0)
   const [isLg, setIsLg] = useState(false)
 
@@ -385,6 +386,20 @@ export function ExperienceSection() {
       }
     })
   }, [listExpanded])
+
+  // GSAP: bottom frame bar — only show when expanded, animate in
+  useEffect(() => {
+    if (!listExpanded || !isLg || detailPanelHeight <= 0) return
+    const bar = bottomFrameBarRef.current
+    if (!bar) return
+    gsap.set(bar, { scaleY: 0, transformOrigin: "bottom", opacity: 1 })
+    gsap.to(bar, {
+      scaleY: 1,
+      duration: 0.35,
+      ease: "power2.out",
+      delay: 0.2,
+    })
+  }, [listExpanded, isLg, detailPanelHeight])
 
   // Measure detail panel height for index rail max-height on lg (side-by-side)
   useEffect(() => {
@@ -685,10 +700,11 @@ export function ExperienceSection() {
               </button>
             )}
             </div>
-            {/* Bottom frame bar (lg only): sits under scroll view */}
-            {isLg && detailPanelHeight > 0 && (
+            {/* Bottom frame bar (lg only): shows when Load more clicked, GSAP animate in */}
+            {isLg && detailPanelHeight > 0 && listExpanded && (
               <div
-                className="shrink-0 border-t-2 border-foreground bg-secondary h-1.5"
+                ref={bottomFrameBarRef}
+                className="shrink-0 border-t-2 border-foreground bg-secondary h-1.5 origin-bottom"
                 aria-hidden
               />
             )}
