@@ -49,15 +49,12 @@ export function ContactSection() {
   }, [])
 
   return (
-    <section
-      id="contact"
+    <section 
+      id="contact" 
       ref={containerRef}
       className="relative py-20 sm:py-24 md:py-32 lg:py-40 px-4 sm:px-6 overflow-hidden"
-      aria-label="Contact"
     >
-      {/* Section: Contact */}
-      {/* Subsection: Gradient background (mouse-reactive) */}
-      <div
+      <div 
         className="absolute inset-0 opacity-30 transition-opacity duration-500 pointer-events-none"
         style={{
           background: `radial-gradient(circle at ${mousePosition.x}% ${mousePosition.y}%, rgba(var(--accent-rgb, 100, 180, 200), 0.15) 0%, transparent 50%)`,
@@ -65,14 +62,12 @@ export function ContactSection() {
       />
 
       <div className="max-w-4xl mx-auto text-center relative z-10">
-        {/* Subsection: ASCII section header (What's Next?) */}
         <AnimatedSection>
           <div className="flex justify-center mb-6 sm:mb-8">
             <AsciiSectionHeader number="05" title="What's Next?" />
           </div>
         </AnimatedSection>
 
-        {/* Subsection: Title — Let's Work Together */}
         <div className="mb-6 sm:mb-8">
           <RevealText
             text="Let's Work Together"
@@ -81,7 +76,6 @@ export function ContactSection() {
           />
         </div>
 
-        {/* Subsection: Intro text */}
         <AnimatedSection delay={200}>
           <p className="text-base sm:text-lg md:text-xl text-muted-foreground leading-relaxed max-w-2xl mx-auto mb-8 sm:mb-12 px-1">
             I&apos;m currently looking for new opportunities in software engineering and AI research. 
@@ -89,7 +83,6 @@ export function ContactSection() {
           </p>
         </AnimatedSection>
 
-        {/* Subsection: Primary CTA — Say Hello */}
         <AnimatedSection delay={300}>
           <MagneticButton
             as="a"
@@ -103,7 +96,6 @@ export function ContactSection() {
           </MagneticButton>
         </AnimatedSection>
 
-        {/* Subsection: Social links — GitHub, LinkedIn, Email */}
         <AnimatedSection delay={400}>
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 sm:gap-4 mt-10 sm:mt-16 max-w-md sm:max-w-none mx-auto">
             {socialLinks.map((link) => (
@@ -124,7 +116,7 @@ export function ContactSection() {
           </div>
         </AnimatedSection>
 
-        {/* Subsection: Location — Irvine, CA / Open to relocate */}
+        {/* Location */}
         <AnimatedSection delay={500}>
           <div className="flex items-center justify-center gap-2 mt-8 sm:mt-12 text-muted-foreground font-mono text-sm">
             <MapPin className="w-4 h-4 shrink-0" />
