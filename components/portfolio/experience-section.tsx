@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef, useEffect } from "react"
+import { useState, useRef, useEffect, useCallback } from "react"
 import { gsap } from "gsap"
 import { GSAPText, GSAPSVG } from "@/components/gsap-text"
 import { TechnicalGrid, TechnicalPattern } from "@/components/technical-grid"
@@ -63,10 +63,27 @@ const experiences = [
     ],
     skills: [ "Human-Computer Interaction", "Human-Robot Interaction", "Robotic Actuation", "Safety-Critical Systems", "Embedded Systems", "3D Printing", "CAD Design", "Servo Motor", "Raspberry Pi", "Signal Temporal Logic", "Machine Learning Classification" ]
     },
+  {
+    title: "Data Engineer (Freelance)",
+    company: "CUSCO USA",
+    companyFull: "CUSCO USA Inc.",
+    icon: "/images/cusco_c.svg",
+    panelImage: "/images/cusco.svg",
+    mediaImages: ["/images/cusco_1.jpg"],
+    mediaLabels: ["Proof 1"],
+    period: "Oct 2021 – May 2024",
+    description: "Built Python-based extraction pipelines processing 11,500+ legacy files spanning PDFs, images, and mixed formats.",
+    highlights: [
+      "Delivered 5–10× faster processing vs. manual workflows with 1–3% error rate",
+      "Designed normalization/indexing layers exposing cleaned data through internal API",
+      "Enabled 30% revenue increase by converting archival content into searchable intelligence",
+    ],
+    skills: [ "Data Engineering", "Python", "Data Extraction", "Data Normalization", "API Development", "Automation", "Batch Processing", "Information Retrieval", "Workflow Optimization"]
+    },
     {
-      title: "Data Engineer (Freelance)",
-      company: "CUSCO USA",
-      companyFull: "CUSCO USA Inc.",
+      title: "D1ata Engineer (Freelance)",
+      company: "CUSC1O USA",
+      companyFull: "CUS1CO USA Inc.",
       icon: "/images/cusco_c.svg",
       panelImage: "/images/cusco.svg",
       mediaImages: ["/images/cusco_1.jpg"],
@@ -79,76 +96,40 @@ const experiences = [
         "Enabled 30% revenue increase by converting archival content into searchable intelligence",
       ],
       skills: [ "Data Engineering", "Python", "Data Extraction", "Data Normalization", "API Development", "Automation", "Batch Processing", "Information Retrieval", "Workflow Optimization"]
-      },
-      {
-        title: "Data Engineer (Freelance)",
-        company: "CUSCO USA",
-        companyFull: "CUSCO USA Inc.",
-        icon: "/images/cusco_c.svg",
-        panelImage: "/images/cusco.svg",
-        mediaImages: ["/images/cusco_1.jpg"],
-        mediaLabels: ["Proof 1"],
-        period: "Oct 2021 – May 2024",
-        description: "Built Python-based extraction pipelines processing 11,500+ legacy files spanning PDFs, images, and mixed formats.",
-        highlights: [
-          "Delivered 5–10× faster processing vs. manual workflows with 1–3% error rate",
-          "Designed normalization/indexing layers exposing cleaned data through internal API",
-          "Enabled 30% revenue increase by converting archival content into searchable intelligence",
-        ],
-        skills: [ "Data Engineering", "Python", "Data Extraction", "Data Normalization", "API Development", "Automation", "Batch Processing", "Information Retrieval", "Workflow Optimization"]
-        },
-        {
-          title: "Data Engineer (Freelance)",
-          company: "CUSCO USA",
-          companyFull: "CUSCO USA Inc.",
-          icon: "/images/cusco_c.svg",
-          panelImage: "/images/cusco.svg",
-          mediaImages: ["/images/cusco_1.jpg"],
-          mediaLabels: ["Proof 1"],
-          period: "Oct 2021 – May 2024",
-          description: "Built Python-based extraction pipelines processing 11,500+ legacy files spanning PDFs, images, and mixed formats.",
-          highlights: [
-            "Delivered 5–10× faster processing vs. manual workflows with 1–3% error rate",
-            "Designed normalization/indexing layers exposing cleaned data through internal API",
-            "Enabled 30% revenue increase by converting archival content into searchable intelligence",
-          ],
-          skills: [ "Data Engineering", "Python", "Data Extraction", "Data Normalization", "API Development", "Automation", "Batch Processing", "Information Retrieval", "Workflow Optimization"]
-          },
-          {
-            title: "Data Engineer (Freelance)",
-            company: "CUSCO USA",
-            companyFull: "CUSCO USA Inc.",
-            icon: "/images/cusco_c.svg",
-            panelImage: "/images/cusco.svg",
-            mediaImages: ["/images/cusco_1.jpg"],
-            mediaLabels: ["Proof 1"],
-            period: "Oct 2021 – May 2024",
-            description: "Built Python-based extraction pipelines processing 11,500+ legacy files spanning PDFs, images, and mixed formats.",
-            highlights: [
-              "Delivered 5–10× faster processing vs. manual workflows with 1–3% error rate",
-              "Designed normalization/indexing layers exposing cleaned data through internal API",
-              "Enabled 30% revenue increase by converting archival content into searchable intelligence",
-            ],
-            skills: [ "Data Engineering", "Python", "Data Extraction", "Data Normalization", "API Development", "Automation", "Batch Processing", "Information Retrieval", "Workflow Optimization"]
-            },
-            
+    },
+    {
+      title: "Data 2Engineer (Freelance)",
+      company: "CUS2CO USA",
+      companyFull: "CU2SCO USA Inc.",
+      icon: "/images/cusco_c.svg",
+      panelImage: "/images/cusco.svg",
+      mediaImages: ["/images/cusco_1.jpg"],
+      mediaLabels: ["Proof 1"],
+      period: "Oct 2021 – May 2024",
+      description: "Built Python-based extraction pipelines processing 11,500+ legacy files spanning PDFs, images, and mixed formats.",
+      highlights: [
+        "Delivered 5–10× faster processing vs. manual workflows with 1–3% error rate",
+        "Designed normalization/indexing layers exposing cleaned data through internal API",
+        "Enabled 30% revenue increase by converting archival content into searchable intelligence",
+      ],
+      skills: [ "Data Engineering", "Python", "Data Extraction", "Data Normalization", "API Development", "Automation", "Batch Processing", "Information Retrieval", "Workflow Optimization"]
+    },
 ]
+
+const INITIAL_INDEX_VISIBLE = 3
 
 export function ExperienceSection() {
   const [activeIndex, setActiveIndex] = useState(0)
-  const [showAll, setShowAll] = useState(false)
+  const [visibleCount, setVisibleCount] = useState(INITIAL_INDEX_VISIBLE)
+  const prevVisibleCountRef = useRef(INITIAL_INDEX_VISIBLE)
   const contentRefs = useRef<(HTMLDivElement | null)[]>([])
+  const indexItemRefs = useRef<(HTMLButtonElement | null)[]>([])
+  const loadMoreBtnRef = useRef<HTMLButtonElement | null>(null)
+  const loadMoreArrowRef = useRef<SVGSVGElement | null>(null)
   const entryBgRef = useRef<HTMLDivElement | null>(null)
   const entryScanRef = useRef<HTMLDivElement | null>(null)
   const entrySvgRef = useRef<SVGSVGElement | null>(null)
   const entryLabelRef = useRef<HTMLDivElement | null>(null)
-  const hiddenItemsRef = useRef<(HTMLButtonElement | null)[]>([])
-  const arrowButtonRef = useRef<HTMLButtonElement | null>(null)
-  const arrowSvgRef = useRef<SVGSVGElement | null>(null)
-
-  const INITIAL_VISIBLE = 3
-  const displayed = showAll ? experiences : experiences.slice(0, INITIAL_VISIBLE)
-  const remaining = experiences.length - INITIAL_VISIBLE
 
   // GSAP: ENTRY bg + ASCII frame draw → content blocks stagger
   useEffect(() => {
@@ -203,67 +184,76 @@ export function ExperienceSection() {
     tl.to(blocks, { opacity: 1, y: 0, duration: 0.4, stagger: 0.06, ease: "power3.out" }, "-=0.2")
   }, [activeIndex])
 
-  // GSAP: Simple shutter slide-down animation for hidden items
+  // Load more: animate newly revealed index items (text + line draw)
   useEffect(() => {
-    if (!showAll || remaining <= 0) return
+    const prev = prevVisibleCountRef.current
+    if (visibleCount <= prev || visibleCount > experiences.length) {
+      prevVisibleCountRef.current = visibleCount
+      return
+    }
+    const newIndices = Array.from(
+      { length: visibleCount - prev },
+      (_, i) => prev + i
+    )
+    const newItems = newIndices
+      .map((i) => indexItemRefs.current[i])
+      .filter((el): el is HTMLButtonElement => el != null)
+    if (newItems.length === 0) {
+      prevVisibleCountRef.current = visibleCount
+      return
+    }
 
-    // Wait for DOM to update and refs to be set
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        const hiddenItems = hiddenItemsRef.current.filter(Boolean)
-        const arrowButton = arrowButtonRef.current
-
-        if (hiddenItems.length === 0) return
-
-        const ctx = gsap.context(() => {
-          const tl = gsap.timeline()
-
-          // Hide arrow button quickly
-          if (arrowButton) {
-            tl.to(arrowButton, {
-              opacity: 0,
-              height: 0,
-              paddingTop: 0,
-              paddingBottom: 0,
-              marginTop: 0,
-              borderTopWidth: 0,
-              duration: 0.3,
-              ease: "power2.in",
-              onComplete: () => {
-                if (arrowButton) arrowButton.style.display = "none"
-              },
-            })
-          }
-
-          // Set initial states for all hidden items (shutter closed)
-          hiddenItems.forEach((item) => {
-            if (item) {
-              gsap.set(item, {
-                opacity: 0,
-                height: 0,
-                overflow: "hidden",
-              })
-            }
-          })
-
-          // Shutter slide-down: expand height and fade in with stagger
-          tl.to(
-            hiddenItems,
-            {
-              height: "auto",
-              opacity: 1,
-              duration: 0.5,
-              stagger: 0.1,
-              ease: "power2.out",
-            },
-            0.2
-          )
-        })
-
-        return () => ctx.revert()
-      })
+    // Set initial state for new items
+    newItems.forEach((el) => {
+      gsap.set(el, { opacity: 0, y: 16 })
+      const line = el.querySelector<SVGLineElement>("[data-index-line]")
+      if (line && typeof line.getTotalLength === "function") {
+        const len = line.getTotalLength()
+        gsap.set(line, { strokeDasharray: len, strokeDashoffset: len })
+      }
     })
-  }, [showAll, remaining])
+
+    const tl = gsap.timeline({ overwrite: true })
+    newIndices.forEach((idx, i) => {
+      const el = indexItemRefs.current[idx]
+      const line = el?.querySelector<SVGLineElement>("[data-index-line]")
+      const pos = i * 0.08
+      tl.to(el, {
+        opacity: 1,
+        y: 0,
+        duration: 0.5,
+        ease: "power3.out",
+      }, pos)
+      if (line) {
+        tl.to(line, {
+          strokeDashoffset: 0,
+          duration: 0.35,
+          ease: "power2.inOut",
+        }, pos)
+      }
+    })
+
+    prevVisibleCountRef.current = visibleCount
+  }, [visibleCount])
+
+  const handleLoadMore = useCallback(() => {
+    const arrow = loadMoreArrowRef.current
+    if (arrow) {
+      const path = arrow.querySelector<SVGPathElement>("[data-arrow-path]")
+      if (path && typeof path.getTotalLength === "function") {
+        const len = path.getTotalLength()
+        gsap.set(path, { strokeDasharray: len, strokeDashoffset: len })
+        gsap.to(path, {
+          strokeDashoffset: 0,
+          duration: 0.35,
+          ease: "power2.inOut",
+          onComplete: () => setVisibleCount(experiences.length),
+        })
+        return
+      }
+    }
+    setVisibleCount(experiences.length)
+  }, [])
 
   const roleCount = experiences.length
   const chartLeft = 34
@@ -413,7 +403,7 @@ export function ExperienceSection() {
 
         {/* Matrix layout */}
         <div className="grid gap-6 lg:grid-cols-[minmax(220px,260px)_minmax(0,1fr)]">
-          {/* Index rail */}
+          {/* Index rail: first 3 visible, load-more reveals rest with GSAP */}
           <div className="space-y-3">
             <div className="flex items-center justify-between border-b border-foreground pb-2">
               <span className="font-mono text-[11px] uppercase tracking-[0.3em]">
@@ -425,39 +415,51 @@ export function ExperienceSection() {
             </div>
 
             <div className="border border-foreground divide-y divide-foreground bg-secondary">
-              {displayed.map((exp, displayIndex) => {
-                const index = experiences.findIndex((e) => e.company === exp.company)
-                const isHidden = index >= INITIAL_VISIBLE
-                return (
-                  <button
-                    key={exp.company}
-                    ref={(el) => {
-                      if (isHidden) {
-                        const refIndex = index - INITIAL_VISIBLE
-                        hiddenItemsRef.current[refIndex] = el
-                      }
-                    }}
-                    type="button"
-                    onClick={() => setActiveIndex(index)}
-                    className={cn(
-                      "group w-full text-left px-3 sm:px-4 py-3 sm:py-3.5 flex items-center justify-between gap-3 touch-target",
-                      "font-mono text-[11px] sm:text-xs uppercase tracking-[0.12em]",
-                      "transition-colors",
-                      activeIndex === index
-                        ? "bg-accent text-accent-foreground"
-                        : "bg-secondary hover:bg-foreground hover:text-background"
-                    )}
+              {experiences.slice(0, visibleCount).map((exp, index) => (
+                <button
+                  key={exp.company}
+                  ref={(el) => {
+                    indexItemRefs.current[index] = el
+                  }}
+                  type="button"
+                  onClick={() => setActiveIndex(index)}
+                  className={cn(
+                    "group relative w-full text-left px-3 sm:px-4 py-3 sm:py-3.5 flex items-center justify-between gap-3 touch-target overflow-hidden",
+                    "font-mono text-[11px] sm:text-xs uppercase tracking-[0.12em]",
+                    index >= INITIAL_INDEX_VISIBLE && "opacity-0 translate-y-4",
+                    activeIndex === index
+                      ? "bg-accent text-accent-foreground"
+                      : "bg-secondary hover:bg-foreground hover:text-background"
+                  )}
+                >
+                  {/* Left-edge technical line: draws in on load-more */}
+                  <svg
+                    className="absolute left-0 top-0 bottom-0 w-px text-foreground/60 pointer-events-none"
+                    viewBox="0 0 1 100"
+                    preserveAspectRatio="none"
+                    aria-hidden
                   >
-                    <div className="flex items-center gap-2 sm:gap-3">
-                      {"icon" in exp && exp.icon ? (
-                        <span className="flex h-8 w-8 shrink-0 items-center justify-center border border-current overflow-hidden bg-background/80">
-                          <img src={exp.icon} alt="" className="h-5 w-5 object-contain" width={20} height={20} />
-                        </span>
-                      ) : (
-                        <span className="inline-flex h-5 w-5 items-center justify-center border border-current">
-                          {index.toString().padStart(2, "0")}
-                        </span>
-                      )}
+                    <line
+                      data-index-line
+                      x1="0.5"
+                      y1="0"
+                      x2="0.5"
+                      y2="100"
+                      stroke="currentColor"
+                      strokeWidth="1"
+                      fill="none"
+                    />
+                  </svg>
+                  <div className="flex items-center gap-2 sm:gap-3 pl-1">
+                    {"icon" in exp && exp.icon ? (
+                      <span className="flex h-8 w-8 shrink-0 items-center justify-center border border-current overflow-hidden bg-background/80">
+                        <img src={exp.icon} alt="" className="h-5 w-5 object-contain" width={20} height={20} />
+                      </span>
+                    ) : (
+                      <span className="inline-flex h-5 w-5 items-center justify-center border border-current">
+                        {index.toString().padStart(2, "0")}
+                      </span>
+                    )}
                     <div className="flex flex-col">
                       <span className="font-semibold leading-tight">
                         {exp.company}
@@ -471,75 +473,42 @@ export function ExperienceSection() {
                     {exp.period}
                   </span>
                 </button>
-              )})}
-              
-              {/* Brutalist down arrow button — ASCII art with technical lines */}
-              {!showAll && remaining > 0 && (
-                <button
-                  ref={arrowButtonRef}
-                  type="button"
-                  onClick={() => setShowAll(true)}
-                  className="group w-full border-t border-foreground bg-secondary hover:bg-foreground hover:text-background transition-all duration-200 relative overflow-hidden"
-                  aria-label={`Show ${remaining} more experience${remaining > 1 ? "s" : ""}`}
-                >
-                  {/* Technical pattern overlay */}
-                  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
-                    <div className="absolute inset-0 bg-[repeating-linear-gradient(45deg,transparent,transparent_4px,currentColor_4px,currentColor_8px)] opacity-[0.03]" />
-                    <div className="absolute inset-0 bg-[repeating-linear-gradient(-45deg,transparent,transparent_4px,currentColor_4px,currentColor_8px)] opacity-[0.03]" />
-                  </div>
-
-                  <div className="relative z-10 px-3 sm:px-4 py-4 sm:py-5 flex flex-col items-center gap-3">
-                    {/* ASCII arrow with technical lines */}
-                    <GSAPSVG className="w-16 h-12 text-foreground/70 group-hover:text-foreground transition-colors">
-                      <svg
-                        ref={arrowSvgRef}
-                        viewBox="0 0 64 48"
-                        className="w-full h-full"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="1.2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        {/* Technical frame */}
-                        <line x1="8" y1="8" x2="56" y2="8" opacity="0.4" />
-                        <line x1="8" y1="40" x2="56" y2="40" opacity="0.4" />
-                        <line x1="8" y1="8" x2="8" y2="40" opacity="0.3" />
-                        <line x1="56" y1="8" x2="56" y2="40" opacity="0.3" />
-                        
-                        {/* Diagonal technical lines */}
-                        <line x1="12" y1="12" x2="52" y2="36" opacity="0.2" strokeWidth="0.8" />
-                        <line x1="52" y1="12" x2="12" y2="36" opacity="0.2" strokeWidth="0.8" />
-                        
-                        {/* Down arrow (ASCII style) */}
-                        <line x1="32" y1="16" x2="32" y2="32" />
-                        <line x1="24" y1="24" x2="32" y2="32" />
-                        <line x1="40" y1="24" x2="32" y2="32" />
-                        
-                        {/* Arrow tip accent */}
-                        <line x1="28" y1="28" x2="32" y2="32" strokeWidth="1.5" />
-                        <line x1="36" y1="28" x2="32" y2="32" strokeWidth="1.5" />
-                      </svg>
-                    </GSAPSVG>
-
-                    {/* ASCII text label */}
-                    <div className="font-mono text-[10px] sm:text-[11px] uppercase tracking-[0.2em] text-muted-foreground group-hover:text-foreground transition-colors">
-                      <div className="text-center">
-                        <span className="opacity-80">┌─</span>
-                        <span className="mx-1 font-semibold">LOAD MORE</span>
-                        <span className="opacity-80">─┐</span>
-                      </div>
-                      <div className="text-center mt-1 opacity-60 text-[9px]">
-                        [{remaining.toString().padStart(2, "0")} ENTRY{remaining > 1 ? "IES" : ""}]
-                      </div>
-                    </div>
-
-                    {/* Technical scanline effect */}
-                    <div className="absolute inset-0 bg-[repeating-linear-gradient(180deg,transparent,transparent_2px,currentColor_2px,currentColor_4px)] opacity-0 group-hover:opacity-[0.02] transition-opacity duration-300 pointer-events-none" />
-                  </div>
-                </button>
-              )}
+              ))}
             </div>
+
+            {/* Load more: down arrow, brutalist; animates new rows on click */}
+            {experiences.length > INITIAL_INDEX_VISIBLE && visibleCount < experiences.length && (
+              <div className="border border-foreground border-t-0 bg-secondary">
+                <button
+                  ref={loadMoreBtnRef}
+                  type="button"
+                  onClick={handleLoadMore}
+                  className={cn(
+                    "relative w-full flex items-center justify-center gap-3 py-3 sm:py-3.5 font-mono text-[11px] uppercase tracking-[0.25em]",
+                    "bg-secondary hover:bg-foreground hover:text-background transition-colors touch-target",
+                    "focus:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                  )}
+                  aria-label="Show more experience entries"
+                >
+                  <span className="text-muted-foreground hover:text-inherit">
+                    LOAD_MORE // +{experiences.length - visibleCount}
+                  </span>
+                  <svg
+                    ref={loadMoreArrowRef}
+                    className="w-5 h-5 text-foreground shrink-0"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="square"
+                    strokeLinejoin="miter"
+                    aria-hidden
+                  >
+                    <path d="M12 4v16M6 10l6 6 6-6" data-arrow-path />
+                  </svg>
+                </button>
+              </div>
+            )}
           </div>
 
           {/* Detail grid */}
