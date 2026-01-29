@@ -39,10 +39,8 @@ export function PublicationsSection() {
     <section
       id="publications"
       className="relative py-16 sm:py-20 md:py-28 lg:py-36 px-4 sm:px-5 overflow-hidden bg-background border-t border-b border-foreground/10"
-      aria-label="Research & Publications"
     >
-      {/* Section: Publications */}
-      {/* Subsection: Brutalist background grid + registration marks */}
+      {/* Brutalist background grid + registration marks */}
       <div
         className="pointer-events-none absolute inset-0 opacity-[0.06] mix-blend-soft-light"
         aria-hidden
@@ -55,7 +53,7 @@ export function PublicationsSection() {
       <div className="pointer-events-none absolute -top-6 left-4 sm:left-6 h-12 w-12 sm:h-16 sm:w-16 border border-foreground/40" aria-hidden />
       <div className="pointer-events-none absolute bottom-8 right-4 sm:right-6 h-8 w-8 sm:h-10 sm:w-10 border border-dashed border-foreground/30" aria-hidden />
 
-      {/* Subsection: Technical SVG field – draws in with GSAPSVG */}
+      {/* Technical SVG field – draws in with GSAPSVG */}
       <GSAPSVG className="pointer-events-none absolute inset-y-24 right-[-18%] hidden lg:block w-[260px] lg:w-[320px] xl:w-[360px] text-foreground/40">
         <svg viewBox="0 0 220 260" className="w-full h-full" fill="none" stroke="currentColor" strokeWidth="0.5">
           {/* swirling flow inspired by hair / water studies */}
@@ -80,14 +78,14 @@ export function PublicationsSection() {
       </GSAPSVG>
 
       <div className="relative z-10 max-w-6xl mx-auto">
-        {/* Subsection: Header — research log label + title + experiment index notebook */}
+        {/* Header */}
         <div className="mb-10 sm:mb-14 md:mb-18 flex flex-col md:flex-row md:items-end gap-6 md:gap-10">
           <div className="space-y-3 sm:space-y-4 max-w-xl">
             <p className="font-mono text-[10px] sm:text-xs uppercase tracking-[0.28em] text-muted-foreground">
               RESEARCH LOG / SERIES 04
             </p>
             <GSAPText
-              variant="chars"
+              variant="words"
               stagger={0.025}
               className="text-[1.9rem] sm:text-4xl md:text-5xl lg:text-[3.1rem] font-black leading-[0.9] tracking-tight font-mono"
             >
@@ -122,9 +120,9 @@ export function PublicationsSection() {
           </div>
         </div>
 
-        {/* Subsection: Main grid — timeline list + sidebar */}
+        {/* Main grid: brutalist timeline + spec sheet */}
         <div className="grid lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] gap-8 sm:gap-10 lg:gap-14">
-          {/* Subsection: Timeline-style publication list */}
+          {/* Left: timeline-style list */}
           <div className="space-y-6 sm:space-y-7">
             {publications.map((pub, index) => (
               <AnimatedSection key={pub.id} delay={index * 120}>
@@ -186,7 +184,7 @@ export function PublicationsSection() {
             ))}
           </div>
 
-          {/* Subsection: Research service + metric snapshot */}
+          {/* Right: research service + meta spec */}
           <div className="space-y-6 sm:space-y-7">
             <AnimatedSection>
               <LeonardoNotebook folioRef="RF.RP.SERVICE.001" date="2026">
