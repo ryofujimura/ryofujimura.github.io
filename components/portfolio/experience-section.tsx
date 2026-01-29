@@ -620,11 +620,13 @@ export function ExperienceSection() {
               ref={indexListRef}
               className={cn(
                 "flex flex-col min-h-0 space-y-3",
-                listExpanded && hasIndexOverflow && "border",
                 isLg && detailPanelHeight > 0 && "lg:flex-1 lg:min-h-0 lg:overflow-y-auto lg:scrollbar-hide"
               )}
             >
-              <div className="border divide-y divide-foreground bg-secondary ">
+              <div className={cn(
+                "divide-y divide-foreground bg-secondary",
+                listExpanded && hasIndexOverflow && "border-t border-b"
+              )}>
               {/* First N items always visible */}
               {experiences.slice(0, INITIAL_INDEX_VISIBLE).map((exp, index) => (
                 <IndexRowButton
