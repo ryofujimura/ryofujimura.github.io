@@ -101,10 +101,10 @@ function IndexRowButton({
       </div>
       <div
         {...(dataAttrs["data-index-period"] ? { "data-index-period": true } : {})}
-        className="hidden sm:flex flex-col items-end text-[10px] opacity-80 text-right"
+        className="hidden sm:flex flex-col items-end text-[10px] opacity-80 text-right shrink-0"
       >
-        <span>{exp.startDate}</span>
-        <span>{exp.endDate}</span>
+        <span className="whitespace-nowrap">{exp.startDate}</span>
+        <span className="whitespace-nowrap">{exp.endDate}</span>
       </div>
     </button>
   )
