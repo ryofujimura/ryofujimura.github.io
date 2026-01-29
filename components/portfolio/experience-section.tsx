@@ -602,7 +602,7 @@ export function ExperienceSection() {
                 isLg && detailPanelHeight > 0 && "lg:flex-1 lg:min-h-0 lg:overflow-y-auto lg:scrollbar-hide"
               )}
             >
-              <div className="border-x border-foreground divide-y divide-foreground bg-secondary shrink-0">
+              <div className="divide-y divide-foreground bg-secondary ">
               {/* First N items always visible */}
               {experiences.slice(0, INITIAL_INDEX_VISIBLE).map((exp, index) => (
                 <IndexRowButton
@@ -617,7 +617,11 @@ export function ExperienceSection() {
               {experiences.length > INITIAL_INDEX_VISIBLE && (
                 <div
                   ref={moreItemsContainerRef}
-                  className="overflow-hidden"
+                  className={cn(
+                    "overflow-hidden",
+                    // Hide the divide-y border during animation to prevent gray bar flash
+                    (!listExpanded || !expandAnimationDone) && "!border-t-0"
+                  )}
                   style={
                     !listExpanded
                       ? { maxHeight: 0, overflow: "hidden" }
