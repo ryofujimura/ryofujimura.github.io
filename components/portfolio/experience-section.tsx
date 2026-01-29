@@ -606,7 +606,7 @@ export function ExperienceSection() {
             <div
               className={cn(
                 "flex flex-col min-h-0 space-y-3",
-                isLg && detailPanelHeight > 0 && "lg:flex-1 lg:min-h-0 lg:overflow-y-auto"
+                isLg && detailPanelHeight > 0 && "lg:flex-1 lg:min-h-0 lg:overflow-y-auto lg:scrollbar-hide"
               )}
             >
               <div className="border border-foreground divide-y divide-foreground bg-secondary shrink-0">
@@ -713,8 +713,8 @@ export function ExperienceSection() {
               </button>
             )}
             </div>
-            {/* Bottom frame bar (lg only): shows after list expansion is complete, no animation */}
-            {isLg && detailPanelHeight > 0 && expandAnimationDone && (
+            {/* Bottom frame bar (lg only): sticks to bottom of scroll frame, always visible */}
+            {isLg && detailPanelHeight > 0 && (
               <div
                 className="shrink-0 border-t-2 border-foreground bg-secondary h-1.5"
                 aria-hidden
