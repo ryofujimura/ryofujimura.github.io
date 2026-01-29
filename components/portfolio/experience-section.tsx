@@ -1,11 +1,105 @@
 "use client"
 
-import { useState, useRef, useEffect, useCallback } from "react"
+import { useState, useRef, useEffect } from "react"
 import { gsap } from "gsap"
 import { GSAPText, GSAPSVG } from "@/components/gsap-text"
 import { TechnicalGrid, TechnicalPattern } from "@/components/technical-grid"
 import { SkillSurfaceGlobe } from "@/components/skill-surface-globe"
 import { cn } from "@/lib/utils"
+
+const INITIAL_INDEX_VISIBLE = 3
+
+// Reusable index list row: optional ref + data attrs for GSAP "load more" animation
+function IndexRowButton({
+  exp,
+  index,
+  activeIndex,
+  setActiveIndex,
+  ref: rowRef,
+  withDataAttrs = false,
+}: {
+  exp: { company: string; title: string; period: string; icon?: string }
+  index: number
+  activeIndex: number
+  setActiveIndex: (i: number) => void
+  ref?: React.Ref<HTMLButtonElement | null>
+  withDataAttrs?: boolean
+}) {
+  const dataAttrs = withDataAttrs
+    ? {
+        "data-index-icon": true,
+        "data-index-company": true,
+        "data-index-title": true,
+        "data-index-period": true,
+        "data-index-line": true,
+      }
+    : {}
+  return (
+    <button
+      ref={rowRef}
+      type="button"
+      onClick={() => setActiveIndex(index)}
+      className={cn(
+        "group relative w-full text-left px-3 sm:px-4 py-3 sm:py-3.5 flex items-center justify-between gap-3 touch-target",
+        "font-mono text-[11px] sm:text-xs uppercase tracking-[0.12em]",
+        activeIndex === index
+          ? "bg-accent text-accent-foreground"
+          : "bg-secondary hover:bg-foreground hover:text-background"
+      )}
+    >
+      {/* Left-edge technical line: GSAP line-draw when withDataAttrs */}
+      {withDataAttrs && (
+        <svg
+          className="absolute left-0 top-0 bottom-0 w-px text-foreground/60 pointer-events-none"
+          viewBox="0 0 1 48"
+          preserveAspectRatio="none"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1"
+        >
+          <path data-index-line d="M0.5 0v48" vectorEffect="non-scaling-stroke" />
+        </svg>
+      )}
+      <div className="flex items-center gap-2 sm:gap-3">
+        {"icon" in exp && exp.icon ? (
+          <span
+            {...(dataAttrs["data-index-icon"] ? { "data-index-icon": true } : {})}
+            className="flex h-8 w-8 shrink-0 items-center justify-center border border-current overflow-hidden bg-background/80"
+          >
+            <img src={exp.icon} alt="" className="h-5 w-5 object-contain" width={20} height={20} />
+          </span>
+        ) : (
+          <span
+            {...(dataAttrs["data-index-icon"] ? { "data-index-icon": true } : {})}
+            className="inline-flex h-5 w-5 items-center justify-center border border-current"
+          >
+            {index.toString().padStart(2, "0")}
+          </span>
+        )}
+        <div className="flex flex-col">
+          <span
+            {...(dataAttrs["data-index-company"] ? { "data-index-company": true } : {})}
+            className="font-semibold leading-tight"
+          >
+            {exp.company}
+          </span>
+          <span
+            {...(dataAttrs["data-index-title"] ? { "data-index-title": true } : {})}
+            className="text-[10px] sm:text-[11px] opacity-70 leading-tight"
+          >
+            {exp.title}
+          </span>
+        </div>
+      </div>
+      <span
+        {...(dataAttrs["data-index-period"] ? { "data-index-period": true } : {})}
+        className="hidden sm:inline-flex text-[10px] opacity-80"
+      >
+        {exp.period}
+      </span>
+    </button>
+  )
+}
 
 // icon = index list (left rail); panelImage = ENTRY header background (optional, falls back to icon)
 const experiences = [
@@ -79,57 +173,73 @@ const experiences = [
       "Enabled 30% revenue increase by converting archival content into searchable intelligence",
     ],
     skills: [ "Data Engineering", "Python", "Data Extraction", "Data Normalization", "API Development", "Automation", "Batch Processing", "Information Retrieval", "Workflow Optimization"]
-    },
-    {
-      title: "D1ata Engineer (Freelance)",
-      company: "CUSC1O USA",
-      companyFull: "CUS1CO USA Inc.",
-      icon: "/images/cusco_c.svg",
-      panelImage: "/images/cusco.svg",
-      mediaImages: ["/images/cusco_1.jpg"],
-      mediaLabels: ["Proof 1"],
-      period: "Oct 2021 – May 2024",
-      description: "Built Python-based extraction pipelines processing 11,500+ legacy files spanning PDFs, images, and mixed formats.",
-      highlights: [
-        "Delivered 5–10× faster processing vs. manual workflows with 1–3% error rate",
-        "Designed normalization/indexing layers exposing cleaned data through internal API",
-        "Enabled 30% revenue increase by converting archival content into searchable intelligence",
-      ],
-      skills: [ "Data Engineering", "Python", "Data Extraction", "Data Normalization", "API Development", "Automation", "Batch Processing", "Information Retrieval", "Workflow Optimization"]
-    },
-    {
-      title: "Data 2Engineer (Freelance)",
-      company: "CUS2CO USA",
-      companyFull: "CU2SCO USA Inc.",
-      icon: "/images/cusco_c.svg",
-      panelImage: "/images/cusco.svg",
-      mediaImages: ["/images/cusco_1.jpg"],
-      mediaLabels: ["Proof 1"],
-      period: "Oct 2021 – May 2024",
-      description: "Built Python-based extraction pipelines processing 11,500+ legacy files spanning PDFs, images, and mixed formats.",
-      highlights: [
-        "Delivered 5–10× faster processing vs. manual workflows with 1–3% error rate",
-        "Designed normalization/indexing layers exposing cleaned data through internal API",
-        "Enabled 30% revenue increase by converting archival content into searchable intelligence",
-      ],
-      skills: [ "Data Engineering", "Python", "Data Extraction", "Data Normalization", "API Development", "Automation", "Batch Processing", "Information Retrieval", "Workflow Optimization"]
-    },
+  },
+  {
+    title: "Data E1ngineer (Freelance)",
+    company: "CUSC1O USA",
+    companyFull: "CUSCO USA Inc.",
+    icon: "/images/cusco_c.svg",
+    panelImage: "/images/cusco.svg",
+    mediaImages: ["/images/cusco_1.jpg"],
+    mediaLabels: ["Proof 1"],
+    period: "Oct 2021 – May 2024",
+    description: "Built Python-based extraction pipelines processing 11,500+ legacy files spanning PDFs, images, and mixed formats.",
+    highlights: [
+      "Delivered 5–10× faster processing vs. manual workflows with 1–3% error rate",
+      "Designed normalization/indexing layers exposing cleaned data through internal API",
+      "Enabled 30% revenue increase by converting archival content into searchable intelligence",
+    ],
+    skills: [ "Data Engineering", "Python", "Data Extraction", "Data Normalization", "API Development", "Automation", "Batch Processing", "Information Retrieval", "Workflow Optimization"]
+  },
+  {
+    title: "Data E2ngineer (Freelance)",
+    company: "CUSC2O USA",
+    companyFull: "CUSCO USA Inc.",
+    icon: "/images/cusco_c.svg",
+    panelImage: "/images/cusco.svg",
+    mediaImages: ["/images/cusco_1.jpg"],
+    mediaLabels: ["Proof 1"],
+    period: "Oct 2021 – May 2024",
+    description: "Built Python-based extraction pipelines processing 11,500+ legacy files spanning PDFs, images, and mixed formats.",
+    highlights: [
+      "Delivered 5–10× faster processing vs. manual workflows with 1–3% error rate",
+      "Designed normalization/indexing layers exposing cleaned data through internal API",
+      "Enabled 30% revenue increase by converting archival content into searchable intelligence",
+    ],
+    skills: [ "Data Engineering", "Python", "Data Extraction", "Data Normalization", "API Development", "Automation", "Batch Processing", "Information Retrieval", "Workflow Optimization"]
+  },
+  {
+    title: "Data3 Engineer (Freelance)",
+    company: "CUSC3O USA",
+    companyFull: "CUSCO USA Inc.",
+    icon: "/images/cusco_c.svg",
+    panelImage: "/images/cusco.svg",
+    mediaImages: ["/images/cusco_1.jpg"],
+    mediaLabels: ["Proof 1"],
+    period: "Oct 2021 – May 2024",
+    description: "Built Python-based extraction pipelines processing 11,500+ legacy files spanning PDFs, images, and mixed formats.",
+    highlights: [
+      "Delivered 5–10× faster processing vs. manual workflows with 1–3% error rate",
+      "Designed normalization/indexing layers exposing cleaned data through internal API",
+      "Enabled 30% revenue increase by converting archival content into searchable intelligence",
+    ],
+    skills: [ "Data Engineering", "Python", "Data Extraction", "Data Normalization", "API Development", "Automation", "Batch Processing", "Information Retrieval", "Workflow Optimization"]
+  },
 ]
-
-const INITIAL_INDEX_VISIBLE = 3
 
 export function ExperienceSection() {
   const [activeIndex, setActiveIndex] = useState(0)
-  const [visibleCount, setVisibleCount] = useState(INITIAL_INDEX_VISIBLE)
-  const prevVisibleCountRef = useRef(INITIAL_INDEX_VISIBLE)
+  const [listExpanded, setListExpanded] = useState(false)
   const contentRefs = useRef<(HTMLDivElement | null)[]>([])
-  const indexItemRefs = useRef<(HTMLButtonElement | null)[]>([])
-  const loadMoreBtnRef = useRef<HTMLButtonElement | null>(null)
-  const loadMoreArrowRef = useRef<SVGSVGElement | null>(null)
   const entryBgRef = useRef<HTMLDivElement | null>(null)
   const entryScanRef = useRef<HTMLDivElement | null>(null)
   const entrySvgRef = useRef<SVGSVGElement | null>(null)
   const entryLabelRef = useRef<HTMLDivElement | null>(null)
+  const moreItemsContainerRef = useRef<HTMLDivElement | null>(null)
+  const moreItemsRowRefs = useRef<(HTMLButtonElement | null)[]>([])
+  const loadMoreButtonRef = useRef<HTMLButtonElement | null>(null)
+  const loadMoreArrowRef = useRef<SVGSVGElement | null>(null)
+  const [expandAnimationDone, setExpandAnimationDone] = useState(false)
 
   // GSAP: ENTRY bg + ASCII frame draw → content blocks stagger
   useEffect(() => {
@@ -184,76 +294,59 @@ export function ExperienceSection() {
     tl.to(blocks, { opacity: 1, y: 0, duration: 0.4, stagger: 0.06, ease: "power3.out" }, "-=0.2")
   }, [activeIndex])
 
-  // Load more: animate newly revealed index items (text + line draw)
+  // GSAP: expand "more" index list — height reveal then stagger rows (text + SVG line-draw)
   useEffect(() => {
-    const prev = prevVisibleCountRef.current
-    if (visibleCount <= prev || visibleCount > experiences.length) {
-      prevVisibleCountRef.current = visibleCount
-      return
-    }
-    const newIndices = Array.from(
-      { length: visibleCount - prev },
-      (_, i) => prev + i
-    )
-    const newItems = newIndices
-      .map((i) => indexItemRefs.current[i])
-      .filter((el): el is HTMLButtonElement => el != null)
-    if (newItems.length === 0) {
-      prevVisibleCountRef.current = visibleCount
-      return
-    }
+    if (!listExpanded || !moreItemsContainerRef.current) return
+    const container = moreItemsContainerRef.current
+    const rows = moreItemsRowRefs.current.filter(Boolean) as HTMLElement[]
+    if (rows.length === 0) return
 
-    // Set initial state for new items
-    newItems.forEach((el) => {
-      gsap.set(el, { opacity: 0, y: 16 })
-      const line = el.querySelector<SVGLineElement>("[data-index-line]")
-      if (line && typeof line.getTotalLength === "function") {
-        const len = line.getTotalLength()
-        gsap.set(line, { strokeDasharray: len, strokeDashoffset: len })
+    // Start collapsed for animation
+    gsap.set(container, { height: 0, overflow: "hidden" })
+    rows.forEach((row) => {
+      gsap.set(row, { opacity: 0, y: 12 })
+      const icon = row.querySelector("[data-index-icon]")
+      const textBlocks = row.querySelectorAll("[data-index-company], [data-index-title], [data-index-period]")
+      const lineSvg = row.querySelector("[data-index-line]") as SVGPathElement | null
+      if (icon) gsap.set(icon, { scale: 0.6, opacity: 0 })
+      textBlocks.forEach((el) => gsap.set(el, { opacity: 0, y: 6 }))
+      if (lineSvg && typeof lineSvg.getTotalLength === "function") {
+        const len = lineSvg.getTotalLength()
+        gsap.set(lineSvg, { strokeDasharray: len, strokeDashoffset: len })
       }
     })
 
     const tl = gsap.timeline({ overwrite: true })
-    newIndices.forEach((idx, i) => {
-      const el = indexItemRefs.current[idx]
-      const line = el?.querySelector<SVGLineElement>("[data-index-line]")
-      const pos = i * 0.08
-      tl.to(el, {
-        opacity: 1,
-        y: 0,
-        duration: 0.5,
-        ease: "power3.out",
-      }, pos)
-      if (line) {
-        tl.to(line, {
-          strokeDashoffset: 0,
-          duration: 0.35,
-          ease: "power2.inOut",
-        }, pos)
+    // Expand container to auto height
+    tl.to(container, {
+      height: "auto",
+      duration: 0.5,
+      ease: "power3.inOut",
+      overflow: "visible",
+    })
+    // Stagger each row: row slide + opacity, then inner content (icon, text, line draw)
+    rows.forEach((row, i) => {
+      const start = 0.5 + i * 0.12
+      tl.to(row, { opacity: 1, y: 0, duration: 0.35, ease: "power3.out" }, start)
+      const icon = row.querySelector("[data-index-icon]")
+      const textBlocks = row.querySelectorAll("[data-index-company], [data-index-title], [data-index-period]")
+      const lineSvg = row.querySelector("[data-index-line]") as SVGPathElement | null
+      if (icon) tl.to(icon, { scale: 1, opacity: 1, duration: 0.28, ease: "back.out(1.4)" }, start + 0.05)
+      tl.to(textBlocks, { opacity: 1, y: 0, duration: 0.22, stagger: 0.04, ease: "power2.out" }, start + 0.08)
+      if (lineSvg && typeof lineSvg.getTotalLength === "function") {
+        tl.to(lineSvg, { strokeDashoffset: 0, duration: 0.3, ease: "power2.inOut" }, start + 0.1)
       }
     })
 
-    prevVisibleCountRef.current = visibleCount
-  }, [visibleCount])
-
-  const handleLoadMore = useCallback(() => {
-    const arrow = loadMoreArrowRef.current
-    if (arrow) {
-      const path = arrow.querySelector<SVGPathElement>("[data-arrow-path]")
-      if (path && typeof path.getTotalLength === "function") {
-        const len = path.getTotalLength()
-        gsap.set(path, { strokeDasharray: len, strokeDashoffset: len })
-        gsap.to(path, {
-          strokeDashoffset: 0,
-          duration: 0.35,
-          ease: "power2.inOut",
-          onComplete: () => setVisibleCount(experiences.length),
-        })
-        return
+    // Button unmounts on expand; arrow draw could run on click before setState if desired
+    tl.add(() => {
+      setExpandAnimationDone(true)
+      if (container.style) {
+        container.style.height = ""
+        container.style.overflow = ""
       }
-    }
-    setVisibleCount(experiences.length)
-  }, [])
+    })
+  }, [listExpanded])
 
   const roleCount = experiences.length
   const chartLeft = 34
@@ -403,7 +496,7 @@ export function ExperienceSection() {
 
         {/* Matrix layout */}
         <div className="grid gap-6 lg:grid-cols-[minmax(220px,260px)_minmax(0,1fr)]">
-          {/* Index rail: first 3 visible, load-more reveals rest with GSAP */}
+          {/* Index rail */}
           <div className="space-y-3">
             <div className="flex items-center justify-between border-b border-foreground pb-2">
               <span className="font-mono text-[11px] uppercase tracking-[0.3em]">
@@ -415,99 +508,106 @@ export function ExperienceSection() {
             </div>
 
             <div className="border border-foreground divide-y divide-foreground bg-secondary">
-              {experiences.slice(0, visibleCount).map((exp, index) => (
-                <button
+              {/* First N items always visible */}
+              {experiences.slice(0, INITIAL_INDEX_VISIBLE).map((exp, index) => (
+                <IndexRowButton
                   key={exp.company}
-                  ref={(el) => {
-                    indexItemRefs.current[index] = el
-                  }}
-                  type="button"
-                  onClick={() => setActiveIndex(index)}
-                  className={cn(
-                    "group relative w-full text-left px-3 sm:px-4 py-3 sm:py-3.5 flex items-center justify-between gap-3 touch-target overflow-hidden",
-                    "font-mono text-[11px] sm:text-xs uppercase tracking-[0.12em]",
-                    index >= INITIAL_INDEX_VISIBLE && "opacity-0 translate-y-4",
-                    activeIndex === index
-                      ? "bg-accent text-accent-foreground"
-                      : "bg-secondary hover:bg-foreground hover:text-background"
-                  )}
-                >
-                  {/* Left-edge technical line: draws in on load-more */}
-                  <svg
-                    className="absolute left-0 top-0 bottom-0 w-px text-foreground/60 pointer-events-none"
-                    viewBox="0 0 1 100"
-                    preserveAspectRatio="none"
-                    aria-hidden
-                  >
-                    <line
-                      data-index-line
-                      x1="0.5"
-                      y1="0"
-                      x2="0.5"
-                      y2="100"
-                      stroke="currentColor"
-                      strokeWidth="1"
-                      fill="none"
-                    />
-                  </svg>
-                  <div className="flex items-center gap-2 sm:gap-3 pl-1">
-                    {"icon" in exp && exp.icon ? (
-                      <span className="flex h-8 w-8 shrink-0 items-center justify-center border border-current overflow-hidden bg-background/80">
-                        <img src={exp.icon} alt="" className="h-5 w-5 object-contain" width={20} height={20} />
-                      </span>
-                    ) : (
-                      <span className="inline-flex h-5 w-5 items-center justify-center border border-current">
-                        {index.toString().padStart(2, "0")}
-                      </span>
-                    )}
-                    <div className="flex flex-col">
-                      <span className="font-semibold leading-tight">
-                        {exp.company}
-                      </span>
-                      <span className="text-[10px] sm:text-[11px] opacity-70 leading-tight">
-                        {exp.title}
-                      </span>
-                    </div>
-                  </div>
-                  <span className="hidden sm:inline-flex text-[10px] opacity-80">
-                    {exp.period}
-                  </span>
-                </button>
+                  exp={exp}
+                  index={index}
+                  activeIndex={activeIndex}
+                  setActiveIndex={setActiveIndex}
+                />
               ))}
-            </div>
-
-            {/* Load more: down arrow, brutalist; animates new rows on click */}
-            {experiences.length > INITIAL_INDEX_VISIBLE && visibleCount < experiences.length && (
-              <div className="border border-foreground border-t-0 bg-secondary">
-                <button
-                  ref={loadMoreBtnRef}
-                  type="button"
-                  onClick={handleLoadMore}
-                  className={cn(
-                    "relative w-full flex items-center justify-center gap-3 py-3 sm:py-3.5 font-mono text-[11px] uppercase tracking-[0.25em]",
-                    "bg-secondary hover:bg-foreground hover:text-background transition-colors touch-target",
-                    "focus:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-                  )}
-                  aria-label="Show more experience entries"
+              {/* More items: collapsible, GSAP-animated on expand (start at 0 height to avoid flash) */}
+              {experiences.length > INITIAL_INDEX_VISIBLE && (
+                <div
+                  ref={moreItemsContainerRef}
+                  className="overflow-hidden"
+                  style={
+                    !listExpanded
+                      ? { maxHeight: 0, overflow: "hidden" }
+                      : !expandAnimationDone
+                        ? { height: 0, overflow: "hidden" }
+                        : undefined
+                  }
                 >
-                  <span className="text-muted-foreground hover:text-inherit">
-                    LOAD_MORE // +{experiences.length - visibleCount}
-                  </span>
-                  <svg
-                    ref={loadMoreArrowRef}
-                    className="w-5 h-5 text-foreground shrink-0"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="square"
-                    strokeLinejoin="miter"
-                    aria-hidden
-                  >
-                    <path d="M12 4v16M6 10l6 6 6-6" data-arrow-path />
-                  </svg>
-                </button>
-              </div>
+                  {experiences.slice(INITIAL_INDEX_VISIBLE).map((exp, sliceIndex) => {
+                    const index = INITIAL_INDEX_VISIBLE + sliceIndex
+                    return (
+                      <IndexRowButton
+                        key={exp.company}
+                        exp={exp}
+                        index={index}
+                        activeIndex={activeIndex}
+                        setActiveIndex={setActiveIndex}
+                        ref={(el) => {
+                          moreItemsRowRefs.current[sliceIndex] = el
+                        }}
+                        withDataAttrs
+                      />
+                    )
+                  })}
+                </div>
+              )}
+            </div>
+            {/* Show more: down arrow, brutalist + technical lines */}
+            {experiences.length > INITIAL_INDEX_VISIBLE && !listExpanded && (
+              <button
+                ref={loadMoreButtonRef}
+                type="button"
+                onClick={() => {
+                  // Animate arrow path draw then expand list
+                  const arrow = loadMoreArrowRef.current
+                  const path = arrow?.querySelector("[data-arrow-path]") as SVGPathElement | null
+                  if (path && typeof path.getTotalLength === "function") {
+                    const len = path.getTotalLength()
+                    gsap.set(path, { strokeDasharray: len, strokeDashoffset: len })
+                    gsap.to(path, {
+                      strokeDashoffset: 0,
+                      duration: 0.4,
+                      ease: "power2.inOut",
+                      onComplete: () => setListExpanded(true),
+                    })
+                  } else {
+                    setListExpanded(true)
+                  }
+                }}
+                className={cn(
+                  "mt-3 w-full relative border-2 border-foreground bg-secondary font-mono text-[11px] uppercase tracking-[0.2em]",
+                  "flex items-center justify-center gap-2 py-3 px-4",
+                  "hover:bg-foreground hover:text-background transition-colors",
+                  "shadow-[3px_3px_0_0_theme(colors.foreground)] active:shadow-none active:translate-x-[2px] active:translate-y-[2px]"
+                )}
+                aria-label="Show more experience entries"
+              >
+                {/* Brutalist corner brackets + diagonal lines */}
+                <svg className="absolute left-2 top-2 w-4 h-4 text-foreground/40 pointer-events-none" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+                  <path d="M0 6V0h6M0 10v6h6" />
+                </svg>
+                <svg className="absolute right-2 top-2 w-4 h-4 text-foreground/40 pointer-events-none" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+                  <path d="M16 6V0h-6M16 10v6h-6" />
+                </svg>
+                <span className="text-muted-foreground">Load</span>
+                <svg
+                  ref={loadMoreArrowRef}
+                  className="w-5 h-5 text-foreground"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="square"
+                  aria-hidden
+                >
+                  <path
+                    d="M12 5v14M6 11l6 6 6-6"
+                    strokeDasharray="1 1"
+                    data-arrow-path
+                  />
+                  <line x1="4" y1="12" x2="8" y2="12" strokeWidth="0.75" opacity="0.4" />
+                  <line x1="16" y1="12" x2="20" y2="12" strokeWidth="0.75" opacity="0.4" />
+                </svg>
+                <span className="text-muted-foreground">more</span>
+              </button>
             )}
           </div>
 
