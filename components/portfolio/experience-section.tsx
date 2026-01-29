@@ -99,12 +99,13 @@ function IndexRowButton({
           </span>
         </div>
       </div>
-      <span
+      <div
         {...(dataAttrs["data-index-period"] ? { "data-index-period": true } : {})}
-        className="hidden sm:inline-flex text-[10px] opacity-80 text-right"
+        className="hidden sm:flex flex-col items-end text-[10px] opacity-80 text-right"
       >
-        {exp.startDate} - {exp.endDate}
-      </span>
+        <span>{exp.startDate}</span>
+        <span>{exp.endDate}</span>
+      </div>
     </button>
   )
 }
@@ -806,9 +807,7 @@ export function ExperienceSection() {
                           {exp.title}
                         </h3>
                         <div className="flex flex-col items-end font-mono text-[11px] sm:text-xs text-muted-foreground uppercase tracking-[0.18em]">
-                          <span>{exp.startDate}</span>
-                          <span>-</span>
-                          <span>{exp.endDate}</span>
+                          <span>{exp.startDate} - {exp.endDate}</span>
                         </div>
                       </div>
 
