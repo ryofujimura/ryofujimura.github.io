@@ -279,7 +279,6 @@ export function ExperienceSection() {
   const loadMoreArrowRef = useRef<SVGSVGElement | null>(null)
   const [expandAnimationDone, setExpandAnimationDone] = useState(false)
   const detailPanelRef = useRef<HTMLDivElement | null>(null)
-  const bottomFrameBarRef = useRef<HTMLDivElement | null>(null)
   const [detailPanelHeight, setDetailPanelHeight] = useState(0)
   const [isLg, setIsLg] = useState(false)
 
@@ -387,18 +386,6 @@ export function ExperienceSection() {
     })
   }, [listExpanded])
 
-  // GSAP: bottom frame bar — matches index list expand (0.5s, power3.inOut)
-  useEffect(() => {
-    if (!listExpanded || !isLg || detailPanelHeight <= 0) return
-    const bar = bottomFrameBarRef.current
-    if (!bar) return
-    gsap.set(bar, { scaleY: 0, transformOrigin: "bottom", opacity: 1 })
-    gsap.to(bar, {
-      scaleY: 1,
-      duration: 0.5,
-      ease: "power3.inOut",
-    })
-  }, [listExpanded, isLg, detailPanelHeight])
 
   // Compute max detail panel height across all experiences so the panel doesn't resize when switching
   const measureMaxDetailHeight = () => {
@@ -426,16 +413,14 @@ export function ExperienceSection() {
   useEffect(() => {
     const panel = detailPanelRef.current
     if (!panel) return
-    // Run after layout so all article refs are measured
+    // Run after layout so all article refs are measured. Do NOT observe the panel:
+    // setting its height would trigger ResizeObserver and cause an infinite grow loop.
     const raf = requestAnimationFrame(() => {
       requestAnimationFrame(measureMaxDetailHeight)
     })
-    const ro = new ResizeObserver(measureMaxDetailHeight)
-    ro.observe(panel)
     window.addEventListener("resize", measureMaxDetailHeight)
     return () => {
       cancelAnimationFrame(raf)
-      ro.disconnect()
       window.removeEventListener("resize", measureMaxDetailHeight)
     }
   }, [])
@@ -728,11 +713,10 @@ export function ExperienceSection() {
               </button>
             )}
             </div>
-            {/* Bottom frame bar (lg only): shows when Load more clicked, GSAP animate in */}
-            {isLg && detailPanelHeight > 0 && listExpanded && (
+            {/* Bottom frame bar (lg only): shows after list expansion is complete, no animation */}
+            {isLg && detailPanelHeight > 0 && expandAnimationDone && (
               <div
-                ref={bottomFrameBarRef}
-                className="shrink-0 border-t-2 border-foreground bg-secondary h-1.5 origin-bottom"
+                className="shrink-0 border-t-2 border-foreground bg-secondary h-1.5"
                 aria-hidden
               />
             )}
