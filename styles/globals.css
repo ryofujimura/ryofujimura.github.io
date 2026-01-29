@@ -122,10 +122,4 @@
   body {
     @apply bg-background text-foreground;
   }
-  :where(h1, h2, h3, h4, h5, h6, p, span) {
-    text-wrap: balance;
-    hyphens: none;
-    word-break: normal;
-    overflow-wrap: normal;
-  }
 }
