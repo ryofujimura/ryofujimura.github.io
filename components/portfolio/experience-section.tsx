@@ -20,7 +20,7 @@ function IndexRowButton({
   withDataAttrs = false,
   hideTopLine = false,
 }: {
-  exp: { company: string; title: string; shortTitle?: string; period: string; icon?: string }
+  exp: { company: string; title: string; shortTitle?: string; startDate: string; endDate: string; icon?: string }
   index: number
   activeIndex: number
   setActiveIndex: (i: number) => void
@@ -103,7 +103,7 @@ function IndexRowButton({
         {...(dataAttrs["data-index-period"] ? { "data-index-period": true } : {})}
         className="hidden sm:inline-flex text-[10px] opacity-80 text-right"
       >
-        {exp.period}
+        {exp.startDate} - {exp.endDate}
       </span>
     </button>
   )
@@ -120,7 +120,8 @@ const experiences = [
     panelImage: "/images/bose_1.svg",
     mediaImages: ["/images/bose_2.JPG", "/images/bose_3.JPG"],
     mediaLabels: ["Proof 1", "Proof 2"],
-    period: "Jun 2025 Aug 2025",
+    startDate: "Jun 2025",
+    endDate: "Aug 2025",
     description: "Engineered internal Bluetooth debugging tools adopted by 1,000+ engineers, accelerating cross-platform testing.",
     highlights: [
       "Reduced QA mismatch-version detection time by 40–60%, shortening release cycles",
@@ -133,13 +134,14 @@ const experiences = [
   {
     title: "Software Engineer Intern",
     shortTitle: "Software Engineer",
-    company: "Honda Motor Co.",
+    company: "Honda Motor",
     companyFull: "American Honda Motor Co., Inc.",
     icon: "/images/honda.svg",
     panelImage: "/images/hondalogo.svg",
     mediaImages: ["/images/honda_1.jpg", "/images/honda_3.jpg"],
     mediaLabels: ["Proof 1", "Proof 2"],
-    period: "Jun 2024 Aug 2024",
+    startDate: "Jun 2024",
+    endDate: "Aug 2024",
     description: "Prototyped next-generation on-device AI using Jetson Orin Nano, evaluating automotive-grade compute constraints.",
     highlights: [
       "Reduced Llama3 8B inference latency by 20–40% via mixed-precision quantization",
@@ -151,14 +153,15 @@ const experiences = [
   },
   {
     title: "Undergraduate Researcher",
-    shortTitle: "Undergraduate",
+    shortTitle: "Undergraduate Researcher",
     company: "CPX Lab",
     companyFull: "California State University, Long Beach",
     icon: "/images/CSU-Longbeach.svg",
     panelImage: "/images/lb.csulb.png",
     mediaImages: ["/images/ACMIEEEICCPS2025.pdf", "/images/ICRA2026.pdf"],
     mediaLabels: ["Proof 1", "Proof 2"],
-    period: `Aug 2024 ${new Date().toLocaleDateString("en-US", { month: "short", year: "numeric" })}`,
+    startDate: "Aug 2024",
+    endDate: new Date().toLocaleDateString("en-US", { month: "short", year: "numeric" }),
     description: "Contributing to a 30+ person robotics/AI research group, supporting two peer-reviewed publications (ICCPS 2025, ICRA 2026).",
     highlights: [
       "Developed transformer-based classifiers improving task accuracy by 25% and supporting real-time robotic actuation",
@@ -169,15 +172,16 @@ const experiences = [
     skills: [ "Human-Computer Interaction", "Human-Robot Interaction", "Robotic Actuation", "Safety-Critical Systems", "Embedded Systems", "3D Printing", "CAD Design", "Servo Motor", "Raspberry Pi", "Signal Temporal Logic", "Machine Learning Classification" ]
   },
   {
-    "title": "Tokai Shuttle (Freelance)",
-    "shortTitle": "Tokai Shuttle",
+    "title": "Software Engineer (Freelance)",
+    "shortTitle": "Software Engineer",
     "company": "HTIC",
     "companyFull": "Hawaii Tokai International College",
     "icon": "/images/HTIC-icon.svg",
     "panelImage": "/images/HTIC-logo.svg",
     "mediaImages": ["https://apps.apple.com/us/app/htic-shuttle/id6747784542", "https://tokaishuttle.web.app/app-release.apk", "https://tokaishuttle.web.app/"],
     "mediaLabels": ["iOS", "Android", "Website"],
-    "period": "Mar 2025 Nov 2025",
+    "startDate": "Mar 2025",
+    "endDate": "Nov 2025",
     "description": "Built a real-time shuttle tracking and stop-request system with a web dashboard, driver iOS app, and student iOS/Android apps, powered by Firebase Firestore for live location and requests.",
     "highlights": [
       "Implemented real-time bus location and ETA updates with 10s refresh and stale detection",
@@ -210,7 +214,8 @@ const experiences = [
     panelImage: "/images/cusco.svg",
     mediaImages: ["/images/cusco_1.jpg"],
     mediaLabels: ["Proof 1"],
-    period: "OCT 2021 MAY 2024",
+    startDate: "Oct 2021",
+    endDate: "May 2024",
     description: "Built Python-based extraction pipelines processing 11,500+ legacy files spanning PDFs, images, and mixed formats.",
     highlights: [
       "Delivered 5–10× faster processing vs. manual workflows with 1–3% error rate",
@@ -228,7 +233,8 @@ const experiences = [
     panelImage: "/images/apple.svg",
     mediaImages: ["/images/cusco_1.jpg"],
     mediaLabels: ["Proof 1"],
-    period: "SEP 2025 JAN 2026",
+    startDate: "Sep 2025",
+    endDate: "Jan 2026",
     description: "Drove top-tier Apple Retail performance by converting high-volume customer interactions into measurable growth across attach rates, customer satisfaction, and connected ecosystem adoption.",
     highlights: [
       "Achieved 47% AppleCare attach and 54% accessory attach, consistently outperforming store benchmarks across iPhone, iPad, Mac, and Watch",
@@ -253,7 +259,8 @@ const experiences = [
     panelImage: "/images/nespresso-logo.svg",
     mediaImages: [],
     mediaLabels: [],
-    period: "SEP 2024 MAY 2025",
+    startDate: "Sep 2024",
+    endDate: "May 2025",
     description: "Drove top-ranked sales performance in a premium retail environment by translating customer preferences into high-value, subscription-based coffee and equipment solutions while upholding brand standards and sustainability initiatives.",
     highlights: [
       "Ranked #1 in Q4 2024 sales performance across the U.S. Southwest region by exceeding regional benchmarks through consultative selling",
@@ -794,13 +801,15 @@ export function ExperienceSection() {
                         isActive && "opacity-0"
                       )}
                     >
-                      <div data-detail-block className="flex flex-wrap items-baseline justify-between gap-2">
+                      <div data-detail-block className="flex flex-wrap items-start justify-between gap-2">
                         <h3 className="text-xl sm:text-2xl md:text-3xl font-black tracking-tight uppercase">
                           {exp.title}
                         </h3>
-                        <p className="font-mono text-[11px] sm:text-xs text-muted-foreground uppercase tracking-[0.18em]">
-                          {exp.period}
-                        </p>
+                        <div className="flex flex-col items-end font-mono text-[11px] sm:text-xs text-muted-foreground uppercase tracking-[0.18em]">
+                          <span>{exp.startDate}</span>
+                          <span>-</span>
+                          <span>{exp.endDate}</span>
+                        </div>
                       </div>
 
                       <div data-detail-block className="flex flex-wrap items-center gap-2 sm:gap-3">
