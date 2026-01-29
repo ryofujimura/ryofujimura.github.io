@@ -387,7 +387,7 @@ export function ExperienceSection() {
     })
   }, [listExpanded])
 
-  // GSAP: bottom frame bar — only show when expanded, animate in
+  // GSAP: bottom frame bar — matches index list expand (0.5s, power3.inOut)
   useEffect(() => {
     if (!listExpanded || !isLg || detailPanelHeight <= 0) return
     const bar = bottomFrameBarRef.current
@@ -395,21 +395,49 @@ export function ExperienceSection() {
     gsap.set(bar, { scaleY: 0, transformOrigin: "bottom", opacity: 1 })
     gsap.to(bar, {
       scaleY: 1,
-      duration: 0.35,
-      ease: "power2.out",
-      delay: 0.2,
+      duration: 0.5,
+      ease: "power3.inOut",
     })
   }, [listExpanded, isLg, detailPanelHeight])
 
-  // Measure detail panel height for index rail max-height on lg (side-by-side)
+  // Compute max detail panel height across all experiences so the panel doesn't resize when switching
+  const measureMaxDetailHeight = () => {
+    const panel = detailPanelRef.current
+    if (!panel) return
+    const header = panel.firstElementChild as HTMLElement | null
+    const contentWrapper = panel.children[1] as HTMLElement | null
+    if (!header || !contentWrapper) return
+    let maxArticleHeight = 0
+    for (let i = 0; i < experiences.length; i++) {
+      const contentEl = contentRefs.current[i]
+      const article = contentEl?.parentElement
+      if (article) {
+        const h = article.getBoundingClientRect().height
+        if (h > maxArticleHeight) maxArticleHeight = h
+      }
+    }
+    const style = getComputedStyle(contentWrapper)
+    const paddingY =
+      (parseFloat(style.paddingTop) || 0) + (parseFloat(style.paddingBottom) || 0)
+    const total = header.getBoundingClientRect().height + maxArticleHeight + paddingY
+    setDetailPanelHeight(Math.ceil(total))
+  }
+
   useEffect(() => {
-    const el = detailPanelRef.current
-    if (!el) return
-    const ro = new ResizeObserver((entries) => {
-      for (const e of entries) setDetailPanelHeight(e.contentRect.height)
+    const panel = detailPanelRef.current
+    if (!panel) return
+    // Run after layout so all article refs are measured
+    const raf = requestAnimationFrame(() => {
+      requestAnimationFrame(measureMaxDetailHeight)
     })
-    ro.observe(el)
-    return () => ro.disconnect()
+    const ro = new ResizeObserver(measureMaxDetailHeight)
+    ro.observe(panel)
+    window.addEventListener("resize", measureMaxDetailHeight)
+    return () => {
+      cancelAnimationFrame(raf)
+      ro.disconnect()
+      window.removeEventListener("resize", measureMaxDetailHeight)
+    }
   }, [])
 
   // lg breakpoint (1024px) for side-by-side layout
@@ -710,10 +738,15 @@ export function ExperienceSection() {
             )}
           </div>
 
-          {/* Detail grid */}
+          {/* Detail grid: fixed height = max of all experience panels so it doesn't resize when switching */}
           <div
             ref={detailPanelRef}
-            className="relative border border-foreground bg-card shadow-none sm:shadow-[6px_6px_0_0_theme(colors.foreground)]"
+            className="relative border border-foreground bg-card shadow-none sm:shadow-[6px_6px_0_0_theme(colors.foreground)] flex flex-col"
+            style={
+              detailPanelHeight > 0
+                ? { minHeight: detailPanelHeight, height: detailPanelHeight }
+                : undefined
+            }
           >
             {/* ASCII entry header: frame + line draw in with GSAP on index change */}
             <div className="relative min-h-[3rem] border-b border-foreground/20 bg-secondary/50 px-3 py-2 sm:px-4 sm:py-2.5">
@@ -765,7 +798,7 @@ export function ExperienceSection() {
               </div>
             </div>
 
-            <div className="relative p-3 sm:p-4 md:p-5 space-y-5 sm:space-y-6">
+            <div className="relative flex-1 min-h-0 overflow-y-auto p-3 sm:p-4 md:p-5 space-y-5 sm:space-y-6">
               {experiences.map((exp, index) => {
                 const isActive = index === activeIndex
                 return (
