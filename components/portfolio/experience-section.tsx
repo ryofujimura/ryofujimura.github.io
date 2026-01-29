@@ -602,7 +602,7 @@ export function ExperienceSection() {
                 isLg && detailPanelHeight > 0 && "lg:flex-1 lg:min-h-0 lg:overflow-y-auto lg:scrollbar-hide"
               )}
             >
-              <div className="border border-foreground divide-y divide-foreground bg-secondary shrink-0">
+              <div className="border-x border-foreground divide-y divide-foreground bg-secondary shrink-0">
               {/* First N items always visible */}
               {experiences.slice(0, INITIAL_INDEX_VISIBLE).map((exp, index) => (
                 <IndexRowButton
