@@ -868,7 +868,7 @@ export function ExperienceSection() {
                         {exp.description}
                       </p>
 
-                      <div data-detail-block className="grid gap-3 sm:gap-4 md:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] items-start md:items-stretch pb-2 sm:pb-3 md:pb-4">
+                      <div data-detail-block className="grid gap-3 sm:gap-4 md:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] items-start md:items-stretch">
                         <ul className="space-y-5 sm:space-y-6">
                           {exp.highlights.map((highlight, i) => (
                             <li
