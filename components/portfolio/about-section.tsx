@@ -259,9 +259,9 @@ export function AboutSection() {
                     CURRENTLY
                   </p>
                   <ul className="text-sm sm:text-base text-foreground/90 leading-relaxed space-y-1 list-disc list-inside">
-                    <li>CS student at CSULB</li>
-                    <li>Focus: mobile systems, on-device AI/ML, full-stack</li>
-                    <li>Building iOS/Android apps, LLM inference, data pipelines</li>
+                    <li>Student: CSULB Computer Science</li>
+                    <li>Focus: On-device AI/ML</li>
+                    <li>Builds: Mobile Apps, Full-stack Webs</li>
                   </ul>
                 </div>
                 <div className="space-y-2">
@@ -269,9 +269,9 @@ export function AboutSection() {
                     LOOKING FOR
                   </p>
                   <ul className="text-sm sm:text-base text-foreground/90 leading-relaxed space-y-1 list-disc list-inside">
-                    <li>Team with strong engineers to learn from</li>
-                    <li>Hands-on work in apps, applied ML, or infrastructure</li>
-                    <li>Environment valuing correctness and real-world impact</li>
+                    <li>Strong engineers to learn from</li>
+                    <li>Apps, ML, or infrastructure work</li>
+                    <li>Real-world impact</li>
                   </ul>
                 </div>
               </div>
