@@ -8,20 +8,24 @@ import { SkillSurfaceGlobe } from "@/components/skill-surface-globe"
 import { useIsMobile } from "@/hooks/use-mobile"
 import { cn } from "@/lib/utils"
 
-// Helper to bold numbers in highlight strings
-function highlightWithBoldNumbers(text: string) {
-  // Match numbers including ranges (40–60%), percentages, units (3GB+), decimals, etc.
-  const parts = text.split(/(\d[\d,\.]*[+%]?[-–]\d[\d,\.]*[+%]?|~?\d[\d,\.]*[+%A-Za-z]*)/g)
-  return parts.map((part, i) => {
-    // Check if this part is a number/range pattern
-    if (/^\d|^~?\d/.test(part)) {
-      return <strong key={i} className="font-bold">{part}</strong>
-    }
-    return part
-  })
-}
-
 const INITIAL_INDEX_VISIBLE = 3
+
+// Helper to bold numbers in highlight text
+function BoldNumbers({ text }: { text: string }) {
+  // Match numbers including decimals, percentages, ranges (–), and special chars like #, ×, +
+  const parts = text.split(/(\d+(?:[–-]\d+)?%?×?|\d+\+?|#\d+|\d+\/\d+)/g)
+  return (
+    <>
+      {parts.map((part, i) =>
+        /\d/.test(part) ? (
+          <strong key={i} className="font-bold">{part}</strong>
+        ) : (
+          <span key={i}>{part}</span>
+        )
+      )}
+    </>
+  )
+}
 
 // Reusable index list row: optional ref + data attrs for GSAP "load more" animation
 function IndexRowButton({
@@ -138,9 +142,9 @@ const experiences = [
     endDate: "Aug 2025",
     description: "Engineered internal Bluetooth debugging tools adopted by 1,000+ engineers, to debug, improve, and reduce QA friction.",
     highlights: [
-      "40–60% faster QA mismatch detection",
-      "~70% faster onboarding w/ codename UI",
-      "10+ hrs/week saved via automation",
+      "Cut QA detection time by 40–60%, faster cycles",
+      "Reduced onboarding lookup time by ~70% via UI",
+      "Saved 10+ hours/week via debugging automation",
     ],
     skills: [ "iOS (SwiftUI)", "Kotlin (Android)", "App Architecture", "BLE", "WebSocket", "APIs", "Debugging", "Environment Validation", "Configuration Management"] 
     },
@@ -157,9 +161,9 @@ const experiences = [
     endDate: "Aug 2024",
     description: "Prototyped open-source on-device AI using Jetson Orin Nano, evaluating automotive-grade compute constraints.",
     highlights: [
-      "20–40% faster Llama3 8B via quant",
-      "3GB+ RAM saved for OEM deployment",
-      "Demoed to 10+ teams incl. execs",
+      "Cut Llama3 8B latency 20–40% with quantization",
+      "Achieved over 3GB RAM savings for OEM deploy",
+      "Delivered demos to 10+ cross-functional teams",
     ],
     skills: ["On-Device AI","NVIDIA Jetson","Embedded GPU","LLM Deployment","Optimization","Quantization","Latency","Memory Management","Benchmarking" ] 
   },
@@ -176,9 +180,9 @@ const experiences = [
     endDate: new Date().toLocaleDateString("en-US", { month: "short", year: "numeric" }),
     description: "Contributing to a 30+ person robotics/AI research group, supporting two peer-reviewed publications (ICCPS 2025, ICRA 2026).",
     highlights: [
-      "25% accuracy boost via transformers",
-      "Built 10+ 3D-printed prototypes",
-      "ML pipelines adopted lab-wide",
+      "Improved task accuracy by 25% via classifier",
+      "Built 10 iterations of 3D-printed prototypes",
+      "Created reproducible ML pipelines for the lab",
     ],
     skills: [ "Human-Computer Interaction", "Human-Robot Interaction", "Robotic Actuation", "Safety-Critical Systems", "Embedded Systems", "3D Printing", "CAD Design", "Servo Motor", "Raspberry Pi", "Signal Temporal Logic", "Machine Learning Classification" ]
   },
@@ -195,9 +199,9 @@ const experiences = [
     "endDate": "Nov 2025",
     "description": "Built a real-time shuttle tracking and stop-request system with a web dashboard, driver iOS app, and student iOS/Android apps, powered by Firebase for live updates.",
     "highlights": [
-      "Built real-time request sync, cutting waits 30min",
-      "Implemented driver-safe state machine, 80% adoption",
-      "Shipped multi-platform MVP in 43 days",
+      "Launched multi-platform shuttle MVP in 43 days",
+      "Cut rider wait times by 30 min with tracking",
+      "Achieved 80% adoption rate and 8/10 usability",
     ],
     
     "skills": [
@@ -228,9 +232,9 @@ const experiences = [
     endDate: "May 2024",
     description: "Built Python-based extraction pipelines processing 11,500+ legacy files spanning PDFs, images, and mixed formats.",
     highlights: [
-      "5–10× faster processing, 1–3% error",
-      "Built normalization + API layers",
-      "30% revenue lift via searchable data",
+      "Delivered 5–10× faster processing, 1–3% error",
+      "Built normalization layers exposing clean API",
+      "Enabled 30% revenue increase via search index",
     ],
     skills: [ "Data Engineering", "Python", "Data Extraction", "Data Normalization", "API Development", "Automation", "Batch Processing", "Information Retrieval", "Workflow Optimization"]
   },
@@ -247,9 +251,9 @@ const experiences = [
     endDate: "Jan 2026",
     description: "Drove top-tier Apple Retail performance by converting high-volume customer interactions into measurable sales, attach-rate, and CX outcomes.",
     highlights: [
-      "47% AppleCare, 54% accessory attach",
-      "Exceeded benchmarks on all devices",
-      "100 TMS, 41-customer promoter streak",
+      "Delivered 47% AppleCare and 54% accessory rate",
+      "Exceeded store benchmarks on iPhone, iPad, Mac",
+      "Maintained 100 TMS with a 41-promoter streak",
     ],
     skills: [
       "Customer Service",
@@ -274,9 +278,9 @@ const experiences = [
     endDate: "May 2025",
     description: "Drove top-ranked sales in a premium retail setting by matching customer preferences with high-value coffee, equipment, and subscription solutions.",
     highlights: [
-      "Ranked #1 Q4 2024 in U.S. Southwest",
-      "Led subscription enrollment 30 weeks",
-      "Highest avg basket via pairing",
+      "Ranked #1 Q4 2024 sales in the U.S. Southwest",
+      "Led subscription enrollment over 30-week span",
+      "Achieved highest average basket with pairing",
     ],
     skills: [
       "Consultative Sales",
@@ -865,14 +869,13 @@ export function ExperienceSection() {
                       </p>
 
                       <div data-detail-block className="grid gap-3 sm:gap-4 md:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] items-start md:items-stretch">
-                        <ul className="space-y-2.5 sm:space-y-3">
+                        <ul className="space-y-5 sm:space-y-6">
                           {exp.highlights.map((highlight, i) => (
                             <li
                               key={i}
-                              className="flex gap-3 text-xs sm:text-sm text-foreground/90 min-h-[2.5rem] sm:min-h-[3rem] py-2 sm:py-3 items-center"
+                              className="text-xs sm:text-sm text-foreground/90 py-2"
                             >
-                              <span className="h-3 w-3 shrink-0 border border-foreground bg-accent/20" />
-                              <span className="leading-relaxed">{highlightWithBoldNumbers(highlight)}</span>
+                              <span className="leading-relaxed"><BoldNumbers text={highlight} /></span>
                             </li>
                           ))}
                         </ul>
