@@ -4,38 +4,87 @@ import { useEffect, useRef, useMemo } from "react"
 import { gsap } from "gsap"
 
 /**
- * Award-winning brutalist technical animation for hero section right side.
- * Features complex geometric patterns, measurement lines, data fragments,
+ * Award-winning brutalist AI/ML themed animation for hero section right side.
+ * Features neural network nodes, tensor visualizations, data flow paths,
  * and sophisticated GSAP entrance animations.
  */
 export function HeroBrutalistRight() {
   const containerRef = useRef<HTMLDivElement>(null)
   const mainSvgRef = useRef<SVGSVGElement>(null)
-  const textGroupRef = useRef<SVGGElement>(null)
-  const measurementsRef = useRef<SVGGElement>(null)
-  const geometryRef = useRef<SVGGElement>(null)
-  const dataFragmentsRef = useRef<SVGGElement>(null)
-  const glitchRef = useRef<SVGGElement>(null)
+  const neuralNetRef = useRef<SVGGElement>(null)
+  const connectionsRef = useRef<SVGGElement>(null)
+  const tensorGridRef = useRef<SVGGElement>(null)
+  const dataFlowRef = useRef<SVGGElement>(null)
+  const textLabelsRef = useRef<SVGGElement>(null)
+  const pulseNodesRef = useRef<SVGGElement>(null)
+  const matrixRef = useRef<SVGGElement>(null)
 
-  // Generate pseudo-random coordinates for data fragments
-  const dataPoints = useMemo(() => {
+  // Neural network layer configuration
+  const layers = useMemo(() => [
+    { x: 100, nodes: 4, label: "INPUT" },
+    { x: 180, nodes: 6, label: "HIDDEN_1" },
+    { x: 260, nodes: 8, label: "HIDDEN_2" },
+    { x: 340, nodes: 6, label: "HIDDEN_3" },
+    { x: 420, nodes: 3, label: "OUTPUT" },
+  ], [])
+
+  // Generate node positions for each layer
+  const nodePositions = useMemo(() => {
+    const startY = 120
+    const spacing = 50
+    return layers.map((layer) => {
+      const totalHeight = (layer.nodes - 1) * spacing
+      const offsetY = startY + (4 * spacing - totalHeight) / 2
+      return Array.from({ length: layer.nodes }, (_, i) => ({
+        x: layer.x,
+        y: offsetY + i * spacing,
+      }))
+    })
+  }, [layers])
+
+  // Generate connections between layers
+  const connections = useMemo(() => {
+    const conns: { x1: number; y1: number; x2: number; y2: number; weight: number }[] = []
     const seed = 42
     const random = (i: number) => ((seed * (i + 1) * 9301 + 49297) % 233280) / 233280
-    return Array.from({ length: 12 }, (_, i) => ({
-      x: 50 + random(i) * 350,
-      y: 80 + random(i + 100) * 600,
-      label: `0x${Math.floor(random(i + 50) * 65535).toString(16).toUpperCase().padStart(4, "0")}`,
-      angle: random(i + 200) > 0.5 ? 0 : -90,
+
+    for (let l = 0; l < nodePositions.length - 1; l++) {
+      const currentLayer = nodePositions[l]
+      const nextLayer = nodePositions[l + 1]
+      currentLayer.forEach((node, i) => {
+        nextLayer.forEach((nextNode, j) => {
+          // Only draw some connections for visual clarity
+          if (random(l * 100 + i * 10 + j) > 0.4) {
+            conns.push({
+              x1: node.x,
+              y1: node.y,
+              x2: nextNode.x,
+              y2: nextNode.y,
+              weight: random(l * 50 + i * 5 + j),
+            })
+          }
+        })
+      })
+    }
+    return conns
+  }, [nodePositions])
+
+  // Tensor/matrix grid data
+  const tensorData = useMemo(() => {
+    const seed = 123
+    const random = (i: number) => ((seed * (i + 1) * 9301 + 49297) % 233280) / 233280
+    return Array.from({ length: 64 }, (_, i) => ({
+      value: random(i),
+      row: Math.floor(i / 8),
+      col: i % 8,
     }))
   }, [])
 
-  // Generate measurement ticks
-  const measurementTicks = useMemo(() => {
-    return Array.from({ length: 16 }, (_, i) => ({
-      y: 50 + i * 50,
-      major: i % 4 === 0,
-      value: i * 50,
-    }))
+  // Attention pattern data
+  const attentionData = useMemo(() => {
+    const seed = 77
+    const random = (i: number) => ((seed * (i + 1) * 9301 + 49297) % 233280) / 233280
+    return Array.from({ length: 36 }, (_, i) => random(i))
   }, [])
 
   useEffect(() => {
@@ -47,10 +96,10 @@ export function HeroBrutalistRight() {
         group: SVGGElement | null,
         duration: number,
         delay: number,
-        stagger = 0.03
+        stagger = 0.02
       ) => {
         if (!group) return
-        const paths = group.querySelectorAll("path, line, polyline, rect, circle")
+        const paths = group.querySelectorAll("path, line, polyline, circle, rect")
         paths.forEach((el) => {
           const geom = el as SVGGeometryElement
           if (typeof geom.getTotalLength === "function") {
@@ -74,104 +123,108 @@ export function HeroBrutalistRight() {
         })
       }
 
-      // Animate geometry group - complex patterns
-      drawPaths(geometryRef.current, 1.8, 0.3, 0.04)
+      // Animate neural network connections first (background)
+      drawPaths(connectionsRef.current, 2, 0.2, 0.008)
 
-      // Animate measurement lines
-      drawPaths(measurementsRef.current, 1.2, 0.6, 0.02)
-
-      // Animate data fragments with text reveal
-      if (dataFragmentsRef.current) {
-        const texts = dataFragmentsRef.current.querySelectorAll("text")
-        const rects = dataFragmentsRef.current.querySelectorAll("rect")
-        
-        gsap.set(texts, { opacity: 0 })
-        gsap.set(rects, { scaleX: 0, transformOrigin: "left center" })
-        
-        gsap.to(rects, {
-          scaleX: 1,
+      // Animate neural network nodes
+      if (neuralNetRef.current) {
+        const nodes = neuralNetRef.current.querySelectorAll("circle")
+        gsap.set(nodes, { scale: 0, opacity: 0, transformOrigin: "center" })
+        gsap.to(nodes, {
+          scale: 1,
+          opacity: 1,
           duration: 0.4,
+          delay: 0.8,
+          stagger: 0.03,
+          ease: "back.out(1.7)",
+        })
+      }
+
+      // Animate tensor grid
+      if (tensorGridRef.current) {
+        const cells = tensorGridRef.current.querySelectorAll("rect")
+        gsap.set(cells, { opacity: 0, scale: 0, transformOrigin: "center" })
+        gsap.to(cells, {
+          opacity: 1,
+          scale: 1,
+          duration: 0.3,
           delay: 1.2,
-          stagger: 0.08,
+          stagger: { each: 0.01, from: "random" },
           ease: "power2.out",
         })
-        
-        gsap.to(texts, {
+      }
+
+      // Animate data flow paths
+      drawPaths(dataFlowRef.current, 1.5, 1.6, 0.05)
+
+      // Animate matrix visualization
+      if (matrixRef.current) {
+        const elements = matrixRef.current.querySelectorAll("rect, text")
+        gsap.set(elements, { opacity: 0 })
+        gsap.to(elements, {
           opacity: 1,
-          duration: 0.3,
-          delay: 1.4,
-          stagger: 0.08,
+          duration: 0.4,
+          delay: 1.8,
+          stagger: 0.02,
           ease: "power2.out",
         })
       }
 
       // Animate text labels
-      if (textGroupRef.current) {
-        const textEls = textGroupRef.current.querySelectorAll("text")
-        gsap.set(textEls, { opacity: 0, y: 10 })
-        gsap.to(textEls, {
+      if (textLabelsRef.current) {
+        const texts = textLabelsRef.current.querySelectorAll("text")
+        gsap.set(texts, { opacity: 0, y: 5 })
+        gsap.to(texts, {
           opacity: 1,
           y: 0,
           duration: 0.5,
-          delay: 1.6,
-          stagger: 0.05,
+          delay: 2,
+          stagger: 0.04,
           ease: "power3.out",
         })
       }
 
-      // Glitch effect - periodic interference
-      if (glitchRef.current) {
-        const glitchLines = glitchRef.current.querySelectorAll("rect")
-        gsap.set(glitchLines, { scaleX: 0, transformOrigin: "left center" })
+      // Continuous pulse animation on active nodes
+      if (pulseNodesRef.current) {
+        const pulses = pulseNodesRef.current.querySelectorAll("circle")
+        gsap.set(pulses, { scale: 0, opacity: 0 })
         
         // Initial reveal
-        gsap.to(glitchLines, {
-          scaleX: 1,
-          duration: 0.1,
-          delay: 2,
-          stagger: 0.02,
-          ease: "power1.in",
+        gsap.to(pulses, {
+          scale: 1,
+          opacity: 0.6,
+          duration: 0.5,
+          delay: 2.2,
+          stagger: 0.1,
+          ease: "power2.out",
         })
-        
-        // Continuous glitch animation
-        const glitchTl = gsap.timeline({ repeat: -1, repeatDelay: 3, delay: 2.5 })
-        glitchTl
-          .to(glitchLines, {
-            scaleX: 0,
-            duration: 0.05,
-            stagger: { each: 0.01, from: "random" },
-            ease: "power1.in",
-          })
-          .to(glitchLines, {
-            scaleX: 1,
-            duration: 0.08,
-            stagger: { each: 0.015, from: "random" },
-            ease: "power1.out",
-          }, "+=0.1")
-          .to(glitchLines, {
-            x: "random(-3, 3)",
-            duration: 0.05,
-            stagger: 0.01,
-            ease: "none",
-          }, "-=0.05")
-          .to(glitchLines, {
-            x: 0,
-            duration: 0.1,
-            ease: "power2.out",
-          })
+
+        // Continuous pulse
+        gsap.to(pulses, {
+          scale: 1.5,
+          opacity: 0,
+          duration: 1.5,
+          delay: 2.7,
+          stagger: { each: 0.2, repeat: -1 },
+          ease: "power1.out",
+        })
       }
 
-      // Continuous subtle animation on geometric elements
-      const geometryPaths = geometryRef.current?.querySelectorAll(".animate-pulse-stroke")
-      if (geometryPaths && geometryPaths.length > 0) {
-        gsap.to(geometryPaths, {
-          strokeOpacity: 0.3,
-          duration: 2,
-          repeat: -1,
-          yoyo: true,
-          ease: "sine.inOut",
-          stagger: 0.3,
-          delay: 2.5,
+      // Data flow animation - continuous
+      const flowPaths = dataFlowRef.current?.querySelectorAll(".data-particle")
+      if (flowPaths && flowPaths.length > 0) {
+        flowPaths.forEach((particle, i) => {
+          gsap.to(particle, {
+            motionPath: {
+              path: `#flow-path-${i % 3}`,
+              align: `#flow-path-${i % 3}`,
+              alignOrigin: [0.5, 0.5],
+            },
+            duration: 3 + i * 0.5,
+            repeat: -1,
+            delay: 2.5 + i * 0.3,
+            ease: "none",
+          })
         })
       }
 
@@ -189,281 +242,325 @@ export function HeroBrutalistRight() {
       <svg
         ref={mainSvgRef}
         className="absolute inset-0 w-full h-full"
-        viewBox="0 0 450 800"
+        viewBox="0 0 500 800"
         preserveAspectRatio="xMaxYMid slice"
         fill="none"
       >
-        {/* Complex geometric patterns */}
-        <g ref={geometryRef} stroke="currentColor" className="text-foreground/20">
-          {/* Primary architectural frame */}
-          <path
-            d="M 350 100 L 350 700"
-            strokeWidth="0.5"
-          />
-          <path
-            d="M 100 150 L 400 150"
-            strokeWidth="0.5"
-          />
-          <path
-            d="M 100 650 L 400 650"
-            strokeWidth="0.5"
-          />
-          
-          {/* Isometric cube structure */}
-          <path
-            d="M 280 250 L 380 200 L 380 350 L 280 400 L 280 250"
-            strokeWidth="0.75"
-            className="text-foreground/30"
-          />
-          <path
-            d="M 280 250 L 180 200 L 180 350 L 280 400"
-            strokeWidth="0.75"
-            className="text-foreground/30"
-          />
-          <path
-            d="M 180 200 L 280 150 L 380 200"
-            strokeWidth="0.75"
-            className="text-foreground/30"
-          />
-          
-          {/* Inner structure lines */}
-          <path
-            d="M 230 225 L 330 175 M 230 325 L 330 275"
-            strokeWidth="0.4"
-            className="animate-pulse-stroke"
-          />
-          <path
-            d="M 230 225 L 230 375 M 330 175 L 330 325"
-            strokeWidth="0.4"
-            className="animate-pulse-stroke"
-          />
-          
-          {/* Technical circle arrays */}
-          <circle cx="280" cy="300" r="80" strokeWidth="0.4" strokeDasharray="4 4" />
-          <circle cx="280" cy="300" r="60" strokeWidth="0.3" strokeDasharray="2 6" />
-          <circle cx="280" cy="300" r="40" strokeWidth="0.5" />
-          <circle cx="280" cy="300" r="3" strokeWidth="1" className="text-foreground/50" />
-          
-          {/* Radial measurement lines */}
-          {[0, 45, 90, 135, 180, 225, 270, 315].map((angle) => (
+        {/* Neural network connections */}
+        <g ref={connectionsRef} stroke="currentColor" className="text-foreground/10">
+          {connections.map((conn, i) => (
             <line
-              key={angle}
-              x1={280 + Math.cos((angle * Math.PI) / 180) * 45}
-              y1={300 + Math.sin((angle * Math.PI) / 180) * 45}
-              x2={280 + Math.cos((angle * Math.PI) / 180) * 75}
-              y2={300 + Math.sin((angle * Math.PI) / 180) * 75}
-              strokeWidth="0.4"
+              key={i}
+              x1={conn.x1}
+              y1={conn.y1}
+              x2={conn.x2}
+              y2={conn.y2}
+              strokeWidth={0.3 + conn.weight * 0.5}
             />
           ))}
-          
-          {/* Complex polygon structures - bottom section */}
-          <path
-            d="M 150 500 L 250 480 L 350 500 L 350 600 L 250 620 L 150 600 Z"
-            strokeWidth="0.6"
-            className="text-foreground/25"
-          />
-          <path
-            d="M 175 510 L 250 495 L 325 510 L 325 590 L 250 605 L 175 590 Z"
-            strokeWidth="0.4"
-            strokeDasharray="8 4"
-          />
-          <path
-            d="M 200 520 L 250 510 L 300 520 L 300 580 L 250 590 L 200 580 Z"
+        </g>
+
+        {/* Neural network nodes */}
+        <g ref={neuralNetRef} className="text-foreground/40">
+          {nodePositions.map((layer, l) =>
+            layer.map((node, n) => (
+              <circle
+                key={`${l}-${n}`}
+                cx={node.x}
+                cy={node.y}
+                r={l === 0 || l === nodePositions.length - 1 ? 5 : 4}
+                fill="currentColor"
+                stroke="currentColor"
+                strokeWidth="0.5"
+                className={l === nodePositions.length - 1 ? "text-foreground/60" : ""}
+              />
+            ))
+          )}
+        </g>
+
+        {/* Pulse nodes for active signals */}
+        <g ref={pulseNodesRef} className="text-foreground/30">
+          {[
+            { x: 180, y: 170 },
+            { x: 260, y: 220 },
+            { x: 340, y: 195 },
+            { x: 420, y: 195 },
+          ].map((pos, i) => (
+            <circle
+              key={i}
+              cx={pos.x}
+              cy={pos.y}
+              r={8}
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1"
+            />
+          ))}
+        </g>
+
+        {/* Tensor/Feature Map Grid */}
+        <g ref={tensorGridRef} transform="translate(120, 420)">
+          {tensorData.map((cell, i) => (
+            <rect
+              key={i}
+              x={cell.col * 12}
+              y={cell.row * 12}
+              width="10"
+              height="10"
+              fill="currentColor"
+              className="text-foreground"
+              style={{ opacity: 0.05 + cell.value * 0.25 }}
+            />
+          ))}
+          {/* Grid border */}
+          <rect
+            x="-2"
+            y="-2"
+            width="100"
+            height="100"
+            fill="none"
+            stroke="currentColor"
             strokeWidth="0.5"
+            className="text-foreground/20"
           />
-          
-          {/* Connecting node lines */}
-          <path
-            d="M 250 495 L 250 400"
-            strokeWidth="0.3"
-            strokeDasharray="2 4"
-          />
-          <path
-            d="M 350 500 L 380 450 L 380 350"
-            strokeWidth="0.3"
-            strokeDasharray="2 4"
-          />
-          <path
-            d="M 150 500 L 120 450 L 120 200"
-            strokeWidth="0.3"
-            strokeDasharray="2 4"
-          />
-          
-          {/* Grid overlay fragments */}
-          {[0, 1, 2, 3].map((i) => (
-            <g key={`grid-${i}`}>
-              <line
-                x1={100 + i * 30}
-                y1={700}
-                x2={100 + i * 30}
-                y2={750}
-                strokeWidth="0.3"
-              />
-              <line
-                x1={300 + i * 30}
-                y1={700}
-                x2={300 + i * 30}
-                y2={750}
-                strokeWidth="0.3"
-              />
-            </g>
-          ))}
-          
-          {/* Angular measurement arcs */}
-          <path
-            d="M 280 300 L 340 280 A 60 60 0 0 0 280 240"
-            strokeWidth="0.4"
-            fill="none"
-          />
-          <path
-            d="M 280 300 L 220 320 A 60 60 0 0 1 280 360"
-            strokeWidth="0.4"
-            fill="none"
-          />
-          
-          {/* Crosshair markers */}
-          <g className="text-foreground/40">
-            <line x1="275" y1="300" x2="285" y2="300" strokeWidth="0.8" />
-            <line x1="280" y1="295" x2="280" y2="305" strokeWidth="0.8" />
-            <line x1="245" y1="550" x2="255" y2="550" strokeWidth="0.6" />
-            <line x1="250" y1="545" x2="250" y2="555" strokeWidth="0.6" />
-          </g>
-          
-          {/* Technical corner brackets */}
-          <path d="M 80 120 L 80 100 L 100 100" strokeWidth="0.8" className="text-foreground/30" />
-          <path d="M 400 120 L 400 100 L 380 100" strokeWidth="0.8" className="text-foreground/30" />
-          <path d="M 80 680 L 80 700 L 100 700" strokeWidth="0.8" className="text-foreground/30" />
-          <path d="M 400 680 L 400 700 L 380 700" strokeWidth="0.8" className="text-foreground/30" />
         </g>
 
-        {/* Measurement system - left ruler */}
-        <g ref={measurementsRef} stroke="currentColor" className="text-foreground/15">
-          {measurementTicks.map((tick, i) => (
+        {/* Attention Matrix Visualization */}
+        <g ref={matrixRef} transform="translate(280, 440)">
+          {/* 6x6 attention grid */}
+          {attentionData.map((value, i) => (
+            <rect
+              key={i}
+              x={(i % 6) * 14}
+              y={Math.floor(i / 6) * 14}
+              width="12"
+              height="12"
+              fill="currentColor"
+              className="text-foreground"
+              style={{ opacity: 0.03 + value * 0.35 }}
+            />
+          ))}
+          {/* Border */}
+          <rect
+            x="-2"
+            y="-2"
+            width="88"
+            height="88"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="0.5"
+            className="text-foreground/20"
+          />
+          {/* Diagonal attention pattern overlay */}
+          <path
+            d="M 0 0 L 84 84"
+            stroke="currentColor"
+            strokeWidth="0.3"
+            strokeDasharray="2 4"
+            className="text-foreground/30"
+          />
+        </g>
+
+        {/* Data flow paths */}
+        <g ref={dataFlowRef} stroke="currentColor" className="text-foreground/15">
+          {/* Gradient descent path */}
+          <path
+            id="flow-path-0"
+            d="M 80 600 Q 150 580 180 620 T 280 600 T 380 640 T 450 600"
+            strokeWidth="0.5"
+            fill="none"
+          />
+          {/* Loss curve */}
+          <path
+            id="flow-path-1"
+            d="M 100 700 C 150 650 200 720 250 680 S 350 700 400 660 S 480 680 480 680"
+            strokeWidth="0.6"
+            fill="none"
+          />
+          {/* Backpropagation flow */}
+          <path
+            id="flow-path-2"
+            d="M 420 350 L 340 350 L 340 380 L 260 380 L 260 350 L 180 350 L 180 380 L 100 380"
+            strokeWidth="0.4"
+            strokeDasharray="4 4"
+            fill="none"
+          />
+          
+          {/* Epoch markers on loss curve */}
+          {[100, 175, 250, 325, 400].map((x, i) => (
             <g key={i}>
-              <line
-                x1={tick.major ? 55 : 65}
-                y1={tick.y}
-                x2={75}
-                y2={tick.y}
-                strokeWidth={tick.major ? 0.6 : 0.3}
-              />
+              <line x1={x} y1={695} x2={x} y2={705} strokeWidth="0.4" />
             </g>
-          ))}
-          {/* Ruler spine */}
-          <line x1="75" y1="50" x2="75" y2="800" strokeWidth="0.4" />
-          
-          {/* Horizontal measurement at top */}
-          <line x1="100" y1="80" x2="400" y2="80" strokeWidth="0.3" />
-          {[100, 150, 200, 250, 300, 350, 400].map((x) => (
-            <line key={x} x1={x} y1={75} x2={x} y2={85} strokeWidth="0.3" />
           ))}
         </g>
 
-        {/* Data fragment labels */}
-        <g ref={dataFragmentsRef} className="text-foreground/60">
-          {dataPoints.slice(0, 6).map((point, i) => (
-            <g key={i} transform={`translate(${point.x}, ${point.y}) rotate(${point.angle})`}>
-              <rect
-                x={-2}
-                y={-8}
-                width={52}
-                height={12}
-                fill="currentColor"
-                className="text-background/80"
-                strokeWidth="0"
-              />
+        {/* Activation function visualization */}
+        <g transform="translate(320, 560)" stroke="currentColor" className="text-foreground/20">
+          {/* ReLU curve */}
+          <path d="M 0 40 L 40 40 L 80 0" strokeWidth="0.8" fill="none" />
+          {/* Axis */}
+          <line x1="0" y1="40" x2="80" y2="40" strokeWidth="0.3" />
+          <line x1="40" y1="0" x2="40" y2="50" strokeWidth="0.3" />
+          {/* Sigmoid overlay */}
+          <path
+            d="M 0 38 Q 20 38 40 20 Q 60 2 80 2"
+            strokeWidth="0.5"
+            strokeDasharray="2 2"
+            fill="none"
+            className="text-foreground/15"
+          />
+        </g>
+
+        {/* Layer dimension annotations */}
+        <g ref={textLabelsRef} fill="currentColor" className="text-foreground/40">
+          {layers.map((layer, i) => (
+            <g key={i}>
               <text
-                x={0}
-                y={0}
-                fontSize="8"
+                x={layer.x}
+                y={85}
+                fontSize="6"
                 fontFamily="ui-monospace, monospace"
-                fill="currentColor"
-                className="text-foreground/70"
+                textAnchor="middle"
               >
-                {point.label}
+                {layer.label}
+              </text>
+              <text
+                x={layer.x}
+                y={395}
+                fontSize="5"
+                fontFamily="ui-monospace, monospace"
+                textAnchor="middle"
+                className="text-foreground/30"
+              >
+                [{layer.nodes}]
               </text>
             </g>
           ))}
-        </g>
-
-        {/* Text labels and coordinates */}
-        <g ref={textGroupRef} fill="currentColor" className="text-foreground/50">
-          <text x="280" y="420" fontSize="7" fontFamily="ui-monospace, monospace" textAnchor="middle">
-            NODE_CENTRAL
+          
+          {/* Tensor labels */}
+          <text x="168" y="415" fontSize="6" fontFamily="ui-monospace, monospace">
+            FEATURE_MAP
           </text>
-          <text x="250" y="630" fontSize="6" fontFamily="ui-monospace, monospace" textAnchor="middle">
-            STRUCT_POLY_01
-          </text>
-          <text x="60" y="95" fontSize="6" fontFamily="ui-monospace, monospace">
-            Y_AXIS
-          </text>
-          <text x="395" y="95" fontSize="6" fontFamily="ui-monospace, monospace" textAnchor="end">
-            X:400
+          <text x="168" y="535" fontSize="5" fontFamily="ui-monospace, monospace" className="text-foreground/30">
+            8×8 TENSOR
           </text>
           
-          {/* Measurement values */}
-          {[0, 200, 400, 600].map((val, i) => (
-            <text
-              key={val}
-              x="50"
-              y={55 + i * 200}
-              fontSize="5"
-              fontFamily="ui-monospace, monospace"
-              textAnchor="end"
-            >
-              {val}
-            </text>
+          {/* Attention label */}
+          <text x="322" y="435" fontSize="6" fontFamily="ui-monospace, monospace">
+            ATTENTION
+          </text>
+          <text x="322" y="545" fontSize="5" fontFamily="ui-monospace, monospace" className="text-foreground/30">
+            6×6 MATRIX
+          </text>
+          
+          {/* Loss curve label */}
+          <text x="100" y="690" fontSize="5" fontFamily="ui-monospace, monospace">
+            LOSS
+          </text>
+          <text x="470" y="690" fontSize="5" fontFamily="ui-monospace, monospace" textAnchor="end">
+            EPOCHS
+          </text>
+          
+          {/* Activation label */}
+          <text x="360" y="555" fontSize="5" fontFamily="ui-monospace, monospace" textAnchor="middle">
+            ACTIVATION
+          </text>
+          <text x="360" y="625" fontSize="4" fontFamily="ui-monospace, monospace" textAnchor="middle" className="text-foreground/25">
+            ReLU / σ(x)
+          </text>
+          
+          {/* System status */}
+          <text x="450" y="760" fontSize="6" fontFamily="ui-monospace, monospace" textAnchor="end">
+            MODEL.INFERENCE
+          </text>
+          <text x="450" y="772" fontSize="5" fontFamily="ui-monospace, monospace" textAnchor="end" className="text-foreground/25">
+            PARAMS: 1.2M
+          </text>
+        </g>
+
+        {/* Corner brackets */}
+        <g stroke="currentColor" className="text-foreground/20" strokeWidth="0.8">
+          <path d="M 60 70 L 60 55 L 75 55" />
+          <path d="M 460 70 L 460 55 L 445 55" />
+          <path d="M 60 780 L 60 795 L 75 795" />
+          <path d="M 460 780 L 460 795 L 445 795" />
+        </g>
+
+        {/* Measurement ticks */}
+        <g stroke="currentColor" className="text-foreground/10" strokeWidth="0.3">
+          {[100, 200, 300, 400].map((y) => (
+            <line key={y} x1="55" y1={y} x2="65" y2={y} />
           ))}
-          
-          {/* System status text */}
-          <text x="350" y="720" fontSize="6" fontFamily="ui-monospace, monospace" textAnchor="end">
-            SYS.RENDER.OK
-          </text>
-          <text x="350" y="732" fontSize="5" fontFamily="ui-monospace, monospace" textAnchor="end" className="text-foreground/30">
-            FRAME: 60.0Hz
-          </text>
+          {[100, 200, 300, 400].map((x) => (
+            <line key={x} x1={x} y1="50" x2={x} y2="60" />
+          ))}
         </g>
 
-        {/* Glitch interference lines */}
-        <g ref={glitchRef} fill="currentColor" className="text-foreground/10">
-          {[180, 220, 380, 420, 520, 580].map((y, i) => (
+        {/* Animated signal dots on neural network */}
+        <g className="text-foreground/50">
+          {[
+            { cx: 180, cy: 145, delay: 0 },
+            { cx: 260, cy: 195, delay: 0.3 },
+            { cx: 340, cy: 170, delay: 0.6 },
+          ].map((dot, i) => (
+            <circle key={i} cx={dot.cx} cy={dot.cy} r="2" fill="currentColor">
+              <animate
+                attributeName="opacity"
+                values="0.2;1;0.2"
+                dur="1.5s"
+                repeatCount="indefinite"
+                begin={`${dot.delay}s`}
+              />
+            </circle>
+          ))}
+        </g>
+
+        {/* Weight visualization bars */}
+        <g transform="translate(80, 320)" className="text-foreground/15">
+          {[0.8, 0.4, 0.9, 0.3, 0.7, 0.5].map((w, i) => (
             <rect
               key={i}
-              x={100 + (i % 3) * 30}
-              y={y}
-              width={80 + (i % 2) * 40}
-              height="1"
+              x={0}
+              y={i * 8}
+              width={w * 30}
+              height="5"
+              fill="currentColor"
+              style={{ opacity: 0.1 + w * 0.3 }}
             />
           ))}
+          <text
+            x="0"
+            y="-5"
+            fontSize="5"
+            fontFamily="ui-monospace, monospace"
+            fill="currentColor"
+            className="text-foreground/30"
+          >
+            WEIGHTS
+          </text>
         </g>
 
-        {/* Animated pulse points */}
-        <g className="text-foreground/40">
-          <circle cx="280" cy="300" r="2" fill="currentColor">
-            <animate
-              attributeName="opacity"
-              values="1;0.3;1"
-              dur="2s"
-              repeatCount="indefinite"
-            />
-          </circle>
-          <circle cx="250" cy="550" r="1.5" fill="currentColor">
-            <animate
-              attributeName="opacity"
-              values="0.3;1;0.3"
-              dur="2.5s"
-              repeatCount="indefinite"
-            />
-          </circle>
-          <circle cx="380" cy="200" r="1.5" fill="currentColor">
-            <animate
-              attributeName="opacity"
-              values="0.5;1;0.5"
-              dur="1.8s"
-              repeatCount="indefinite"
-            />
-          </circle>
+        {/* Gradient flow indicators */}
+        <g stroke="currentColor" className="text-foreground/10" strokeWidth="0.4">
+          <path d="M 420 280 L 400 280 L 400 260" fill="none" markerEnd="url(#arrow)" />
+          <path d="M 340 280 L 320 280 L 320 260" fill="none" />
+          <path d="M 260 280 L 240 280 L 240 260" fill="none" />
         </g>
+
+        {/* Arrow marker definition */}
+        <defs>
+          <marker
+            id="arrow"
+            viewBox="0 0 10 10"
+            refX="5"
+            refY="5"
+            markerWidth="4"
+            markerHeight="4"
+            orient="auto-start-reverse"
+          >
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="currentColor" className="text-foreground/20" />
+          </marker>
+        </defs>
       </svg>
     </div>
   )
