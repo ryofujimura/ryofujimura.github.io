@@ -9,14 +9,30 @@ import { cn } from "@/lib/utils"
 gsap.registerPlugin(ScrollTrigger)
 
 // ─────────────────────────────────────────────────────────────
-// ASCII PATTERNS
+// ASCII MEDICAL PATTERNS
 // ─────────────────────────────────────────────────────────────
 
-const ASCII_BARCODE = `█▌▐█▌▐▌█▐█▌▐▌▐█▌▐█▌█▐▌▐█▌█▐█▌▐▌▐█▌█▐█`
-const ASCII_BARCODE_SHORT = `█▌▐█▌▐▌█▐█▌▐▌▐█`
-const ASCII_DOTS = `· · · · · · · · · · · · · · · · · · · ·`
-const ASCII_LINE = `────────────────────────────────────────`
-const ASCII_ARROW = `>>>`
+const ASCII_BRAIN_SCAN = `
+    ████████████████
+  ██░░░░░░░░░░░░░░░░██
+ █░░▒▒▒▒▒▒░░░░▒▒▒▒▒▒░░█
+█░░▒▓▓▓▓▒▒░░░░▒▒▓▓▓▓▒░░█
+█░▒▓████▓▒░░░░▒▓████▓▒░█
+█░▒▓████▓▒░░░░▒▓████▓▒░█
+█░░▒▓▓▓▓▒▒░░░░▒▒▓▓▓▓▒░░█
+ █░░▒▒▒▒▒▒░░░░▒▒▒▒▒▒░░█
+  ██░░░░░░░░░░░░░░░░██
+    ████████████████`.trim()
+
+const ASCII_ECG = `─────╱╲────────╱╲────────╱╲─────`
+
+const ASCII_DIAGNOSTIC = `
+┌─ DIAGNOSTIC ─────────────────┐
+│ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░░░░░░ │
+│ STATUS: ANALYZING            │
+└──────────────────────────────┘`.trim()
+
+const ASCII_NEURAL = `◉──●──◉──●──◉`
 
 // ─────────────────────────────────────────────────────────────
 // SKILL GROUPS
@@ -39,266 +55,291 @@ type SkillGroup = keyof typeof SKILL_GROUPS
 const allProjects = [
   {
     id: "01",
-    code: "RF.2024.01",
-    title: "Saboriendo Bakery",
-    category: "FULL-STACK",
+    code: "CASE-2024-01",
+    title: "Saboriendo Bakery Platform",
+    region: "CORTEX-A",
     primarySkill: "React + SwiftUI",
     year: "2024",
     image: "/images/default_image.png",
-    description: "Full-stack e-commerce with React 19, SwiftUI, Firebase. Real-time orders, barcode verification, 11+ formats.",
-    metrics: ["50%↑", "11+ formats", "3 lang"],
+    description:
+      "Full-stack e-commerce using React 19, SwiftUI, Firebase. Real-time order processing, FCM/APNs push. Barcode verification, 11+ formats, 50%+ faster lookup.",
+    vitals: ["50%↑", "11+ fmt", "3 lang"],
     skills: ["React 19", "SwiftUI", "Firebase", "Firestore", "AVFoundation"],
     links: { github: "https://github.com/ryofujimura", demo: "https://ryofujimura.github.io" },
+    status: "ACTIVE",
   },
   {
     id: "02",
-    code: "RF.2025.02",
+    code: "CASE-2025-02",
     title: "Zero Inbox",
-    category: "AI/ML",
-    primarySkill: "Swift + AI",
+    region: "CORTEX-B",
+    primarySkill: "Swift + AI Engine",
     year: "2025",
     image: "/images/default_image.png",
-    description: "AI email client with 95% classification accuracy, 200ms inference. Multi-stage decision system.",
-    metrics: ["95% acc", "200ms", "50-200/min"],
+    description:
+      "Swift/SwiftUI email client with AI reasoning engine. 90–95% classification accuracy, 100–300ms inference. Multi-stage decision system.",
+    vitals: ["95% acc", "200ms", "50-200/min"],
     skills: ["Swift", "SwiftUI", "Firebase", "AI/ML", "Google APIs"],
     links: { github: "https://github.com/ryofujimura", demo: "#" },
+    status: "ACTIVE",
   },
   {
     id: "03",
-    code: "RF.2025.03",
-    title: "Research Lab Mgmt",
-    category: "SERVERLESS",
+    code: "CASE-2025-03",
+    title: "Research Lab Management",
+    region: "CORTEX-C",
     primarySkill: "Cloud Functions",
     year: "2025",
     image: "/images/default_image.png",
-    description: "Serverless AI routing for 30+ researchers. Sub-200ms response, metadata-aware prompting.",
-    metrics: ["<200ms", "30+ users", "multi-lab"],
+    description:
+      "Serverless orchestration for dynamic AI routing across 30+ researchers. Sub-200ms Cloud Functions response.",
+    vitals: ["<200ms", "30+ users", "multi-lab"],
     skills: ["Cloud Functions", "Firebase", "AI routing", "Node.js"],
     links: { github: "https://github.com/ryofujimura", demo: "https://ryofujimura.github.io" },
+    status: "STABLE",
   },
   {
     id: "04",
-    code: "RF.2025.04",
+    code: "CASE-2025-04",
     title: "HTIC Shuttle",
-    category: "REAL-TIME",
+    region: "CORTEX-D",
     primarySkill: "Firebase RTDB",
     year: "2025",
     image: "/images/schedule.jpg",
-    description: "Live shuttle tracking for 25+ daily users. 70% reduction in conflicts, <100ms sync.",
-    metrics: ["25+ DAU", "70%↓", "<100ms"],
+    description:
+      "Live shuttle tracking for 25+ daily users. 70%+ reduction in duplicate pickups. Real-time sync under 100ms.",
+    vitals: ["25+ DAU", "70%↓", "<100ms"],
     skills: ["Swift", "Kotlin", "Firebase RTDB", "Real-time"],
     links: { github: "https://github.com/ryofujimura", demo: "https://ryofujimura.github.io", appStore: "#", playStore: "#" },
+    status: "ACTIVE",
   },
   {
     id: "05",
-    code: "RF.2025.05",
+    code: "CASE-2025-05",
     title: "CyberEdu",
-    category: "CROSS-PLATFORM",
+    region: "CORTEX-E",
     primarySkill: "Swift + Kotlin",
     year: "2025",
     image: "/images/CyberEdu.png",
-    description: "Synchronized iOS+Android apps for 50+ users. 99%+ cross-device sync reliability.",
-    metrics: ["50+ users", "99%↑ sync", "iOS+Android"],
+    description:
+      "Synchronized iOS+Android apps for live event updates. 99%+ cross-device sync reliability.",
+    vitals: ["50+ users", "99%↑", "iOS+Android"],
     skills: ["Swift", "Kotlin", "Firebase", "Real-time"],
     links: { github: "https://github.com/ryofujimura", demo: "https://ryofujimura.github.io", appStore: "#", playStore: "#" },
+    status: "STABLE",
   },
   {
     id: "06",
-    code: "RF.2025.06",
+    code: "CASE-2025-06",
     title: "Whiteboard AI",
-    category: "VISION",
-    primarySkill: "PyTorch",
+    region: "CORTEX-F",
+    primarySkill: "PyTorch + WebSocket",
     year: "2025",
     image: "/images/whiteboardai.png",
-    description: "Vision inference at 150ms latency with real-time CRDT collaboration. WebSocket pipeline.",
-    metrics: ["150ms", "5+ users", "CRDT"],
+    description:
+      "Transformer-based vision inference at 150–200ms latency. Real-time CRDT-like collaboration.",
+    vitals: ["150ms", "5+ users", "CRDT"],
     skills: ["PyTorch", "Vision", "WebSocket", "React"],
     links: { github: "https://github.com/ryofujimura", demo: "https://ryofujimura.github.io" },
+    status: "ACTIVE",
   },
   {
     id: "07",
-    code: "RF.2024.07",
+    code: "CASE-2024-07",
     title: "With",
-    category: "LOCAL AI",
-    primarySkill: "llama.cpp",
+    region: "CORTEX-G",
+    primarySkill: "llama.cpp + Swift",
     year: "2024–25",
     image: "/images/default_image.png",
-    description: "Offline LLM chat using GGUF + llama.cpp. <50ms/token, 2GB+ memory savings.",
-    metrics: ["<50ms/tok", "2GB↓", "offline"],
+    description:
+      "Offline-capable LLM chat using GGUF + llama.cpp. <50ms/token local inference. 2GB+ memory savings.",
+    vitals: ["<50ms/tok", "2GB↓", "offline"],
     skills: ["Swift", "llama.cpp", "GGUF", "SwiftUI"],
     links: { github: "https://github.com/ryofujimura" },
+    status: "STABLE",
   },
   {
     id: "08",
-    code: "RF.2024.08",
-    title: "Portfolio",
-    category: "WEB",
+    code: "CASE-2024-08",
+    title: "Portfolio Website",
+    region: "CORTEX-H",
     primarySkill: "Next.js + GSAP",
     year: "2024–25",
     image: "/images/homepage.png",
-    description: "40–60% faster load times. Brutalist design system with GSAP animations.",
-    metrics: ["40-60%↑", "modular", "Vercel"],
+    description:
+      "Client-side performance tuning: 40–60% faster load. Brutalist design with GSAP animations.",
+    vitals: ["40-60%↑", "modular", "Vercel"],
     skills: ["React", "Next.js", "Tailwind", "Vercel"],
     links: { github: "https://github.com/ryofujimura", demo: "https://ryofujimura.github.io" },
+    status: "ACTIVE",
   },
   {
     id: "09",
-    code: "RF.2024.09",
+    code: "CASE-2024-09",
     title: "Matcha Time",
-    category: "iOS",
-    primarySkill: "SwiftUI",
+    region: "CORTEX-I",
+    primarySkill: "SwiftUI Native",
     year: "2024",
     image: "/images/matchatime_1.jpg",
-    description: "Time zone coordination tool. 50 users at launch, 4-week idea-to-App Store.",
-    metrics: ["50 users", "4 weeks", "App Store"],
+    description:
+      "Swift/SwiftUI time zone coordination tool. 4-week idea-to-launch cycle with App Store deployment.",
+    vitals: ["50 users", "4 weeks", "App Store"],
     skills: ["Swift", "SwiftUI", "App Store"],
     links: { github: "https://github.com/ryofujimura", demo: "https://ryofujimura.github.io", appStore: "#" },
+    status: "STABLE",
   },
   {
     id: "10",
-    code: "RF.2023.10",
+    code: "CASE-2023-10",
     title: "Schedule Mastermind",
-    category: "BACKEND",
+    region: "CORTEX-J",
     primarySkill: "Python Flask",
     year: "2023–24",
     image: "/images/schedule.jpg",
-    description: "Flask scheduler for 500+ courses. 70% fewer scheduling errors.",
-    metrics: ["500+ courses", "70%↓ errors", "Flask"],
+    description:
+      "Python Flask scheduler for 500+ courses with real-time conflict detection. 70%+ fewer errors.",
+    vitals: ["500+ courses", "70%↓", "Flask"],
     skills: ["Python", "Flask", "scheduling"],
     links: { github: "https://github.com/ryofujimura", demo: "https://ryofujimura.github.io" },
+    status: "ARCHIVED",
   },
   {
     id: "11",
-    code: "RF.2023.11",
+    code: "CASE-2023-11",
     title: "Shohei Home Ground",
-    category: "AUTOMATION",
-    primarySkill: "Python",
+    region: "CORTEX-K",
+    primarySkill: "Python Scripts",
     year: "2023",
     image: "/images/shoheihomeground_1.jpg",
-    description: "Automated Instagram posting (685 posts). 11K followers in 8 months.",
-    metrics: ["11K followers", "685 posts", "2hr/day↓"],
+    description:
+      "Automated daily Instagram posting (685 posts), 11K followers in 8 months. 2+ hours/day saved.",
+    vitals: ["11K", "685 posts", "2hr↓"],
     skills: ["Python", "automation", "Instagram"],
     links: { instagram: "#", youtube: "#" },
+    status: "ARCHIVED",
   },
   {
     id: "12",
-    code: "RF.2022.12",
+    code: "CASE-2022-12",
     title: "Poker Percentage",
-    category: "WATCHOS",
-    primarySkill: "WatchKit",
+    region: "CORTEX-L",
+    primarySkill: "WatchKit + Swift",
     year: "2022–24",
     image: "/images/poker.png",
-    description: "WatchOS poker odds calculator. <10ms lookups via precomputed tables.",
-    metrics: ["<10ms", "WatchOS", "precomputed"],
+    description:
+      "WatchOS poker odds calculator. <10ms probability lookups via precomputed tables.",
+    vitals: ["<10ms", "WatchOS", "precomputed"],
     skills: ["Swift", "WatchOS", "probability"],
     links: { github: "https://github.com/ryofujimura", appStore: "#" },
+    status: "STABLE",
   },
 ]
 
 type Project = (typeof allProjects)[0]
 
 // ─────────────────────────────────────────────────────────────
-// TECHNICAL SVG OVERLAY
+// SCAN LINE SVG COMPONENT
 // ─────────────────────────────────────────────────────────────
 
-function TechOverlay({ className }: { className?: string }) {
-  const ref = useRef<SVGSVGElement>(null)
+function ScanLines({ className }: { className?: string }) {
+  const svgRef = useRef<SVGSVGElement>(null)
 
   useEffect(() => {
-    if (!ref.current) return
-    const els = ref.current.querySelectorAll("line, path, circle, rect")
+    if (!svgRef.current) return
+    const lines = svgRef.current.querySelectorAll("line")
     const ctx = gsap.context(() => {
       gsap.fromTo(
-        els,
-        { strokeDasharray: "0 300", opacity: 0 },
+        lines,
+        { strokeDasharray: "0 100", opacity: 0 },
         {
-          strokeDasharray: "300 0",
+          strokeDasharray: "100 0",
           opacity: 1,
-          duration: 1,
+          duration: 0.8,
           stagger: 0.02,
           ease: "power2.out",
           scrollTrigger: {
-            trigger: ref.current,
+            trigger: svgRef.current,
             start: "top 92%",
             toggleActions: "play none none none",
           },
         }
       )
-    }, ref.current)
+    }, svgRef.current)
     return () => ctx.revert()
   }, [])
 
   return (
     <svg
-      ref={ref}
+      ref={svgRef}
       className={cn("absolute inset-0 w-full h-full pointer-events-none", className)}
       viewBox="0 0 100 100"
       preserveAspectRatio="none"
     >
-      {/* Corner brackets */}
-      <path d="M0 8 L0 0 L8 0" fill="none" stroke="currentColor" strokeWidth="0.8" opacity="0.5" />
-      <path d="M92 0 L100 0 L100 8" fill="none" stroke="currentColor" strokeWidth="0.8" opacity="0.5" />
-      <path d="M0 92 L0 100 L8 100" fill="none" stroke="currentColor" strokeWidth="0.8" opacity="0.5" />
-      <path d="M92 100 L100 100 L100 92" fill="none" stroke="currentColor" strokeWidth="0.8" opacity="0.5" />
-      {/* Top measurement */}
-      <line x1="12" y1="3" x2="35" y2="3" stroke="currentColor" strokeWidth="0.3" opacity="0.2" />
-      {[15, 20, 25, 30].map((x) => (
-        <line key={x} x1={x} y1="1" x2={x} y2="5" stroke="currentColor" strokeWidth="0.3" opacity="0.25" />
-      ))}
-      {/* Registration mark */}
-      <circle cx="95" cy="50" r="2" fill="none" stroke="currentColor" strokeWidth="0.3" opacity="0.2" />
-      <line x1="93" y1="50" x2="97" y2="50" stroke="currentColor" strokeWidth="0.3" opacity="0.2" />
-      <line x1="95" y1="48" x2="95" y2="52" stroke="currentColor" strokeWidth="0.3" opacity="0.2" />
+      {/* Corner surgical marks */}
+      <line x1="0" y1="0" x2="8" y2="0" stroke="currentColor" strokeWidth="0.8" opacity="0.5" />
+      <line x1="0" y1="0" x2="0" y2="8" stroke="currentColor" strokeWidth="0.8" opacity="0.5" />
+      <line x1="100" y1="0" x2="92" y2="0" stroke="currentColor" strokeWidth="0.8" opacity="0.5" />
+      <line x1="100" y1="0" x2="100" y2="8" stroke="currentColor" strokeWidth="0.8" opacity="0.5" />
+      <line x1="0" y1="100" x2="8" y2="100" stroke="currentColor" strokeWidth="0.8" opacity="0.5" />
+      <line x1="0" y1="100" x2="0" y2="92" stroke="currentColor" strokeWidth="0.8" opacity="0.5" />
+      <line x1="100" y1="100" x2="92" y2="100" stroke="currentColor" strokeWidth="0.8" opacity="0.5" />
+      <line x1="100" y1="100" x2="100" y2="92" stroke="currentColor" strokeWidth="0.8" opacity="0.5" />
+      
+      {/* Cross-hair center marks */}
+      <line x1="48" y1="50" x2="52" y2="50" stroke="currentColor" strokeWidth="0.3" opacity="0.2" />
+      <line x1="50" y1="48" x2="50" y2="52" stroke="currentColor" strokeWidth="0.3" opacity="0.2" />
     </svg>
   )
 }
 
 // ─────────────────────────────────────────────────────────────
-// BARCODE COMPONENT
+// ECG LINE ANIMATION
 // ─────────────────────────────────────────────────────────────
 
-function Barcode({ code, short = false }: { code: string; short?: boolean }) {
-  const ref = useRef<HTMLDivElement>(null)
+function ECGLine({ className }: { className?: string }) {
+  const pathRef = useRef<SVGPathElement>(null)
 
   useEffect(() => {
-    if (!ref.current) return
+    if (!pathRef.current) return
+    const path = pathRef.current
+    const length = path.getTotalLength()
+    
+    gsap.set(path, { strokeDasharray: length, strokeDashoffset: length })
+    
     const ctx = gsap.context(() => {
-      gsap.fromTo(
-        ref.current,
-        { opacity: 0, scaleX: 0 },
-        {
-          opacity: 1,
-          scaleX: 1,
-          duration: 0.5,
-          ease: "power2.out",
-          scrollTrigger: {
-            trigger: ref.current,
-            start: "top 95%",
-            toggleActions: "play none none none",
-          },
-        }
-      )
-    }, ref.current)
+      gsap.to(path, {
+        strokeDashoffset: 0,
+        duration: 1.5,
+        ease: "power2.out",
+        scrollTrigger: {
+          trigger: path,
+          start: "top 90%",
+          toggleActions: "play none none none",
+        },
+      })
+    })
     return () => ctx.revert()
   }, [])
 
   return (
-    <div ref={ref} className="font-mono origin-left">
-      <div className="text-[4px] sm:text-[5px] tracking-[0.08em] text-foreground/30 select-none leading-none">
-        {short ? ASCII_BARCODE_SHORT : ASCII_BARCODE}
-      </div>
-      <div className="text-[6px] sm:text-[7px] tracking-[0.2em] text-foreground/50 mt-0.5">
-        {code}
-      </div>
-    </div>
+    <svg className={cn("w-full h-4", className)} viewBox="0 0 200 20" preserveAspectRatio="none">
+      <path
+        ref={pathRef}
+        d="M0,10 L30,10 L35,10 L40,2 L45,18 L50,10 L80,10 L85,10 L90,2 L95,18 L100,10 L130,10 L135,10 L140,2 L145,18 L150,10 L200,10"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1"
+        opacity="0.4"
+      />
+    </svg>
   )
 }
 
 // ─────────────────────────────────────────────────────────────
-// PROJECT TICKET CARD (Mobile-First)
+// PROJECT CARD - MEDICAL DIAGNOSTIC PANEL
 // ─────────────────────────────────────────────────────────────
 
-function ProjectTicket({ project, index }: { project: Project; index: number }) {
+function ProjectCard({ project }: { project: Project }) {
   const cardRef = useRef<HTMLDivElement>(null)
   const titleRef = useRef<HTMLSpanElement>(null)
   const imageRef = useRef<HTMLDivElement>(null)
@@ -328,7 +369,7 @@ function ProjectTicket({ project, index }: { project: Project; index: number }) 
 
       // Title scramble
       if (titleRef.current) {
-        const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789█▓▒"
+        const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+-"
         const originalText = project.primarySkill.toUpperCase()
         let iteration = 0
 
@@ -341,7 +382,7 @@ function ProjectTicket({ project, index }: { project: Project; index: number }) 
               titleRef.current.textContent = originalText
                 .split("")
                 .map((char, i) => {
-                  if (char === " " || char === "+" || char === ".") return char
+                  if (char === " " || char === "+") return char
                   if (i < iteration) return char
                   return chars[Math.floor(Math.random() * chars.length)]
                 })
@@ -353,18 +394,18 @@ function ProjectTicket({ project, index }: { project: Project; index: number }) 
         })
       }
 
-      // Image reveal
+      // Image scan effect
       if (imageRef.current) {
         gsap.fromTo(
-          imageRef.current,
-          { clipPath: "inset(100% 0 0 0)" },
+          imageRef.current.querySelector(".scan-overlay"),
+          { y: "-100%" },
           {
-            clipPath: "inset(0% 0 0 0)",
-            duration: 0.8,
-            ease: "power3.out",
+            y: "100%",
+            duration: 1.2,
+            ease: "power2.inOut",
             scrollTrigger: {
               trigger: imageRef.current,
-              start: "top 90%",
+              start: "top 85%",
               toggleActions: "play none none none",
             },
           }
@@ -372,15 +413,15 @@ function ProjectTicket({ project, index }: { project: Project; index: number }) 
       }
 
       // Stagger items
-      const items = el.querySelectorAll(".reveal")
+      const items = el.querySelectorAll(".reveal-item")
       gsap.fromTo(
         items,
-        { opacity: 0, y: 10 },
+        { opacity: 0, x: -10 },
         {
           opacity: 1,
-          y: 0,
+          x: 0,
           duration: 0.4,
-          stagger: 0.04,
+          stagger: 0.05,
           ease: "power2.out",
           scrollTrigger: {
             trigger: el,
@@ -399,231 +440,141 @@ function ProjectTicket({ project, index }: { project: Project; index: number }) 
   const hasAppStore = "appStore" in project.links
   const hasPlayStore = "playStore" in project.links
 
+  const statusColor = {
+    ACTIVE: "text-green-500 border-green-500/50",
+    STABLE: "text-blue-400 border-blue-400/50",
+    ARCHIVED: "text-foreground/40 border-foreground/20",
+  }[project.status] || "text-foreground/40 border-foreground/20"
+
   return (
     <article
       ref={cardRef}
-      className={cn(
-        "relative bg-background",
-        "border-2 border-foreground",
-        "shadow-[3px_3px_0_0_var(--foreground)]",
-        "sm:shadow-[4px_4px_0_0_var(--foreground)]",
-        "hover:shadow-[5px_5px_0_0_var(--foreground)]",
-        "transition-shadow duration-200"
-      )}
+      className="relative bg-background border border-foreground/30 overflow-hidden"
     >
-      <TechOverlay className="opacity-50" />
+      <ScanLines className="opacity-40" />
 
-      {/* MOBILE LAYOUT (default) */}
-      <div className="block lg:hidden">
-        {/* Header strip */}
-        <div className="flex items-center justify-between px-3 py-2 border-b border-dashed border-foreground/30 bg-foreground/[0.02]">
-          <div className="flex items-center gap-2">
-            <span className="font-mono text-lg sm:text-xl font-black text-foreground">{project.id}</span>
-            <span className="font-mono text-[8px] sm:text-[9px] text-accent tracking-[0.15em]">{project.category}</span>
-          </div>
-          <span className="font-mono text-[8px] sm:text-[9px] text-foreground/40">{project.year}</span>
-        </div>
-
-        {/* Image + Title section */}
-        <div className="grid grid-cols-[80px_1fr] sm:grid-cols-[100px_1fr] gap-0">
+      {/* Mobile-first layout */}
+      <div className="grid grid-cols-1 lg:grid-cols-[180px_1fr_160px]">
+        
+        {/* IMAGE PANEL */}
+        <div
+          ref={imageRef}
+          className="relative h-40 sm:h-48 lg:h-auto lg:min-h-[200px] border-b lg:border-b-0 lg:border-r border-foreground/20 overflow-hidden bg-foreground/5"
+        >
+          {/* Scan overlay */}
+          <div className="scan-overlay absolute inset-0 bg-gradient-to-b from-accent/20 via-transparent to-transparent pointer-events-none z-10" />
+          
           {/* Image */}
-          <div
-            ref={imageRef}
-            className="relative aspect-square border-r border-dashed border-foreground/30 overflow-hidden bg-foreground/5"
-          >
-            <img
-              src={project.image}
-              alt={project.title}
-              className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-500"
-            />
-            {/* Overlay pattern */}
-            <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent" />
-            <div className="absolute bottom-1 left-1 right-1">
-              <Barcode code={project.code} short />
+          <img
+            src={project.image}
+            alt={project.title}
+            className="w-full h-full object-cover opacity-80 grayscale hover:grayscale-0 transition-all duration-500"
+          />
+          
+          {/* Image overlay data */}
+          <div className="absolute bottom-0 left-0 right-0 p-2 sm:p-3 bg-gradient-to-t from-background/90 to-transparent">
+            <div className="flex items-center justify-between">
+              <span className="font-mono text-[8px] sm:text-[9px] text-foreground/60 tracking-wider">
+                {project.code}
+              </span>
+              <span className={cn("font-mono text-[8px] sm:text-[9px] px-1.5 py-0.5 border", statusColor)}>
+                {project.status}
+              </span>
             </div>
           </div>
+          
+          {/* Corner marks on image */}
+          <div className="absolute top-2 left-2 w-3 h-3 border-l border-t border-foreground/40" />
+          <div className="absolute top-2 right-2 w-3 h-3 border-r border-t border-foreground/40" />
+          <div className="absolute bottom-8 left-2 w-3 h-3 border-l border-b border-foreground/40" />
+          <div className="absolute bottom-8 right-2 w-3 h-3 border-r border-b border-foreground/40" />
+        </div>
 
-          {/* Main content */}
-          <div className="p-3 sm:p-4 flex flex-col justify-between min-h-[100px] sm:min-h-[120px]">
-            {/* Primary Skill Title */}
-            <div>
-              <h3 className="mb-1">
+        {/* MAIN DATA PANEL */}
+        <div className="p-3 sm:p-4 lg:p-5 border-b lg:border-b-0 lg:border-r border-foreground/20">
+          {/* Header row */}
+          <div className="flex items-start justify-between gap-2 mb-2 sm:mb-3">
+            <div className="flex-1 min-w-0">
+              <div className="reveal-item flex items-center gap-2 mb-1">
+                <span className="font-mono text-[9px] sm:text-[10px] text-accent tracking-[0.15em]">
+                  {project.region}
+                </span>
+                <span className="font-mono text-[8px] sm:text-[9px] text-foreground/30">
+                  {project.year}
+                </span>
+              </div>
+              
+              {/* Primary skill - MAIN TITLE */}
+              <h3 className="reveal-item">
                 <span
                   ref={titleRef}
-                  className="font-mono text-lg sm:text-xl md:text-2xl font-black text-foreground tracking-tight leading-none block"
+                  className="font-mono text-lg sm:text-xl lg:text-2xl font-black text-foreground tracking-tight leading-none block"
                 >
                   {project.primarySkill.toUpperCase()}
                 </span>
               </h3>
-              <p className="reveal font-mono text-[10px] sm:text-xs text-muted-foreground">{project.title}</p>
             </div>
-
-            {/* Metrics */}
-            <div className="reveal flex flex-wrap gap-1.5 mt-2">
-              {project.metrics.slice(0, 3).map((m, i) => (
-                <span
-                  key={i}
-                  className="font-mono text-[8px] sm:text-[9px] px-1.5 py-0.5 border border-foreground/30 text-foreground/80 bg-foreground/[0.02]"
-                >
-                  {m}
-                </span>
-              ))}
+            
+            {/* ID badge */}
+            <div className="reveal-item flex-shrink-0 font-mono text-2xl sm:text-3xl font-black text-foreground/15 tabular-nums leading-none">
+              {project.id}
             </div>
           </div>
-        </div>
 
-        {/* Description + Skills */}
-        <div className="px-3 py-3 sm:px-4 sm:py-4 border-t border-dashed border-foreground/30">
-          <p className="reveal text-[11px] sm:text-xs text-foreground/70 leading-relaxed mb-3">
+          {/* Project name */}
+          <p className="reveal-item font-mono text-[11px] sm:text-xs text-muted-foreground mb-2 sm:mb-3 truncate">
+            {project.title}
+          </p>
+
+          {/* Description */}
+          <p className="reveal-item text-[11px] sm:text-xs text-foreground/70 leading-relaxed mb-3 sm:mb-4 line-clamp-3 sm:line-clamp-none">
             {project.description}
           </p>
-          
-          {/* Skills row */}
-          <div className="reveal flex flex-wrap gap-1 mb-3">
-            {project.skills.map((skill) => (
-              <span
-                key={skill}
-                className="font-mono text-[7px] sm:text-[8px] text-foreground/50 border-b border-dotted border-foreground/20 pb-0.5"
-              >
-                {skill}
-              </span>
-            ))}
-          </div>
 
-          {/* Links */}
-          <div className="reveal flex flex-wrap gap-2">
-            {hasGithub && (
-              <a
-                href={project.links.github}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="touch-target inline-flex items-center gap-1.5 font-mono text-[9px] sm:text-[10px] text-foreground hover:text-accent transition-colors"
-              >
-                <Github className="w-3 h-3" />
-                <span>SRC</span>
-              </a>
-            )}
-            {hasDemo && (
-              <a
-                href={(project.links as { demo?: string }).demo}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="touch-target inline-flex items-center gap-1.5 font-mono text-[9px] sm:text-[10px] text-foreground hover:text-accent transition-colors"
-              >
-                <ExternalLink className="w-3 h-3" />
-                <span>DEMO</span>
-              </a>
-            )}
-            {hasAppStore && (
-              <a
-                href={(project.links as { appStore?: string }).appStore}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="touch-target font-mono text-[9px] sm:text-[10px] text-foreground/60 hover:text-foreground"
-              >
-                {ASCII_ARROW} iOS
-              </a>
-            )}
-            {hasPlayStore && (
-              <a
-                href={(project.links as { playStore?: string }).playStore}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="touch-target font-mono text-[9px] sm:text-[10px] text-foreground/60 hover:text-foreground"
-              >
-                {ASCII_ARROW} Android
-              </a>
-            )}
-          </div>
-        </div>
-
-        {/* Bottom barcode strip */}
-        <div className="px-3 py-1.5 border-t border-foreground/20 bg-foreground/[0.02] flex items-center justify-between">
-          <span className="font-mono text-[6px] sm:text-[7px] text-foreground/30 tracking-[0.15em]">{ASCII_DOTS.slice(0, 30)}</span>
-          <span className="font-mono text-[7px] sm:text-[8px] text-foreground/40">{project.code}</span>
-        </div>
-      </div>
-
-      {/* DESKTOP LAYOUT */}
-      <div className="hidden lg:grid lg:grid-cols-[140px_1fr_1fr_160px]">
-        {/* Image column */}
-        <div className="relative border-r border-dashed border-foreground/30 overflow-hidden bg-foreground/5">
-          <div ref={imageRef} className="absolute inset-0">
-            <img
-              src={project.image}
-              alt={project.title}
-              className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-500"
-            />
-          </div>
-          <div className="absolute inset-0 bg-gradient-to-r from-transparent to-background/30" />
-          {/* ID overlay */}
-          <div className="absolute top-3 left-3">
-            <span className="font-mono text-3xl font-black text-white/90 drop-shadow-lg">{project.id}</span>
-          </div>
-          {/* Category bottom */}
-          <div className="absolute bottom-2 left-2 right-2">
-            <span className="font-mono text-[8px] text-white/70 tracking-[0.2em] bg-foreground/60 px-1.5 py-0.5">
-              {project.category}
-            </span>
-          </div>
-        </div>
-
-        {/* Primary info */}
-        <div className="p-5 border-r border-dashed border-foreground/30 flex flex-col justify-between">
-          <div>
-            <div className="flex items-center gap-2 mb-2">
-              <span className="font-mono text-[9px] text-foreground/40 tracking-wider">{project.code}</span>
-              <span className="font-mono text-[9px] text-foreground/30">·</span>
-              <span className="font-mono text-[9px] text-foreground/40">{project.year}</span>
-            </div>
-            <h3 className="mb-2">
-              <span className="font-mono text-2xl xl:text-3xl font-black text-foreground tracking-tight leading-none block">
-                {project.primarySkill.toUpperCase()}
-              </span>
-            </h3>
-            <p className="reveal font-mono text-xs text-muted-foreground">{project.title}</p>
-          </div>
-
-          {/* Metrics */}
-          <div className="reveal flex flex-wrap gap-2 mt-4">
-            {project.metrics.map((m, i) => (
+          {/* Vitals row */}
+          <div className="reveal-item flex flex-wrap gap-1.5 sm:gap-2 mb-3 sm:mb-4">
+            {project.vitals.map((v, i) => (
               <span
                 key={i}
-                className="font-mono text-[10px] px-2 py-1 border border-foreground/40 text-foreground bg-foreground/[0.03]"
+                className="font-mono text-[9px] sm:text-[10px] px-1.5 sm:px-2 py-0.5 sm:py-1 border border-foreground/30 text-foreground bg-foreground/5"
               >
-                {m}
+                {v}
               </span>
             ))}
           </div>
-        </div>
 
-        {/* Description + Skills */}
-        <div className="p-5 border-r border-dashed border-foreground/30 flex flex-col justify-between">
-          <p className="reveal text-sm text-foreground/75 leading-relaxed">{project.description}</p>
-          <div className="reveal flex flex-wrap gap-1.5 mt-4">
+          {/* Skills */}
+          <div className="reveal-item flex flex-wrap gap-1 sm:gap-1.5">
             {project.skills.map((skill) => (
               <span
                 key={skill}
-                className="font-mono text-[9px] text-muted-foreground border-b border-dotted border-foreground/25 pb-0.5"
+                className="font-mono text-[8px] sm:text-[9px] text-muted-foreground/70"
               >
                 {skill}
+                <span className="text-foreground/20 ml-1">·</span>
               </span>
             ))}
           </div>
         </div>
 
-        {/* Links + Barcode */}
-        <div className="p-5 flex flex-col justify-between bg-foreground/[0.02]">
-          <div className="reveal flex flex-col gap-2">
+        {/* LINKS PANEL */}
+        <div className="p-3 sm:p-4 lg:p-5 flex flex-row lg:flex-col justify-between lg:justify-start gap-3 sm:gap-4">
+          {/* ECG line - desktop only */}
+          <div className="hidden lg:block mb-3">
+            <ECGLine className="text-foreground/30" />
+          </div>
+          
+          {/* Links */}
+          <div className="reveal-item flex flex-row lg:flex-col gap-2 sm:gap-3">
             {hasGithub && (
               <a
                 href={project.links.github}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="touch-target inline-flex items-center gap-2 font-mono text-[10px] text-foreground hover:text-accent transition-colors"
+                className="touch-target inline-flex items-center gap-1.5 font-mono text-[10px] sm:text-xs text-foreground hover:text-accent transition-colors"
               >
-                <Github className="w-3.5 h-3.5" />
-                <span className="border-b border-foreground/30">SOURCE</span>
+                <Github className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+                <span className="hidden sm:inline border-b border-foreground/20">SRC</span>
               </a>
             )}
             {hasDemo && (
@@ -631,10 +582,10 @@ function ProjectTicket({ project, index }: { project: Project; index: number }) 
                 href={(project.links as { demo?: string }).demo}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="touch-target inline-flex items-center gap-2 font-mono text-[10px] text-foreground hover:text-accent transition-colors"
+                className="touch-target inline-flex items-center gap-1.5 font-mono text-[10px] sm:text-xs text-foreground hover:text-accent transition-colors"
               >
-                <ExternalLink className="w-3.5 h-3.5" />
-                <span className="border-b border-foreground/30">DEMO</span>
+                <ExternalLink className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+                <span className="hidden sm:inline border-b border-foreground/20">DEMO</span>
               </a>
             )}
             {hasAppStore && (
@@ -642,9 +593,10 @@ function ProjectTicket({ project, index }: { project: Project; index: number }) 
                 href={(project.links as { appStore?: string }).appStore}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="touch-target font-mono text-[10px] text-foreground/60 hover:text-foreground transition-colors"
+                className="touch-target font-mono text-[10px] sm:text-xs text-muted-foreground hover:text-foreground transition-colors"
               >
-                → App Store
+                <span className="sm:hidden">iOS</span>
+                <span className="hidden sm:inline">→ iOS</span>
               </a>
             )}
             {hasPlayStore && (
@@ -652,15 +604,27 @@ function ProjectTicket({ project, index }: { project: Project; index: number }) 
                 href={(project.links as { playStore?: string }).playStore}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="touch-target font-mono text-[10px] text-foreground/60 hover:text-foreground transition-colors"
+                className="touch-target font-mono text-[10px] sm:text-xs text-muted-foreground hover:text-foreground transition-colors"
               >
-                → Play Store
+                <span className="sm:hidden">Android</span>
+                <span className="hidden sm:inline">→ Android</span>
               </a>
             )}
           </div>
 
-          {/* Barcode */}
-          <Barcode code={project.code} />
+          {/* Neural line - mobile indicator */}
+          <div className="lg:hidden font-mono text-[8px] text-foreground/20 self-center">
+            {ASCII_NEURAL}
+          </div>
+          
+          {/* ASCII readout - desktop */}
+          <div className="hidden lg:block mt-auto">
+            <pre className="font-mono text-[6px] text-foreground/20 leading-tight select-none">
+{`┌────────┐
+│ ${project.id.padEnd(6)} │
+└────────┘`}
+            </pre>
+          </div>
         </div>
       </div>
     </article>
@@ -675,14 +639,10 @@ function FilterPanel({
   selectedGroups,
   onToggleGroup,
   onClearFilters,
-  resultCount,
-  totalCount,
 }: {
   selectedGroups: SkillGroup[]
   onToggleGroup: (group: SkillGroup) => void
   onClearFilters: () => void
-  resultCount: number
-  totalCount: number
 }) {
   const ref = useRef<HTMLDivElement>(null)
 
@@ -711,9 +671,9 @@ function FilterPanel({
   const groups = Object.keys(SKILL_GROUPS) as SkillGroup[]
 
   return (
-    <div ref={ref} className="mb-6">
-      {/* Filter buttons */}
-      <div className="flex flex-wrap gap-1.5 sm:gap-2">
+    <div ref={ref} className="mb-4 sm:mb-6">
+      {/* Filter chips - horizontal scroll on mobile */}
+      <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide -mx-4 px-4 sm:mx-0 sm:px-0 sm:flex-wrap sm:overflow-visible">
         {groups.map((group) => {
           const isSelected = selectedGroups.includes(group)
           return (
@@ -721,10 +681,10 @@ function FilterPanel({
               key={group}
               onClick={() => onToggleGroup(group)}
               className={cn(
-                "touch-target font-mono text-[9px] sm:text-[10px] px-2 sm:px-3 py-1.5 border-2 transition-all duration-150",
+                "touch-target flex-shrink-0 font-mono text-[10px] sm:text-xs px-3 py-1.5 border transition-all duration-200",
                 isSelected
                   ? "border-foreground bg-foreground text-background"
-                  : "border-foreground/30 text-foreground/60 hover:border-foreground hover:text-foreground active:bg-foreground active:text-background"
+                  : "border-foreground/30 text-foreground/60 hover:border-foreground hover:text-foreground"
               )}
             >
               {group}
@@ -735,19 +695,11 @@ function FilterPanel({
         {selectedGroups.length > 0 && (
           <button
             onClick={onClearFilters}
-            className="touch-target flex items-center gap-1 font-mono text-[9px] sm:text-[10px] text-muted-foreground hover:text-foreground px-2 py-1 transition-colors"
+            className="touch-target flex-shrink-0 flex items-center gap-1 font-mono text-[10px] sm:text-xs text-muted-foreground hover:text-foreground px-2 py-1 transition-colors"
           >
             <X className="w-3 h-3" />
           </button>
         )}
-      </div>
-
-      {/* Count */}
-      <div className="flex items-center gap-2 mt-3 font-mono text-[8px] sm:text-[9px] text-foreground/40">
-        <span className="text-foreground/60">{resultCount}</span>
-        <span>/</span>
-        <span>{totalCount}</span>
-        {selectedGroups.length > 0 && <span className="text-accent">•</span>}
       </div>
     </div>
   )
@@ -757,17 +709,15 @@ function FilterPanel({
 // SECTION HEADER
 // ─────────────────────────────────────────────────────────────
 
-function SectionHeader({ count }: { count: number }) {
-  const ref = useRef<HTMLDivElement>(null)
+function SectionHeader({ count, filtered }: { count: number; filtered: number }) {
+  const headerRef = useRef<HTMLDivElement>(null)
   const titleRef = useRef<HTMLHeadingElement>(null)
-  const lineRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    if (!ref.current) return
+    if (!headerRef.current) return
     const ctx = gsap.context(() => {
-      // Title scramble
       if (titleRef.current) {
-        const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ█▓▒░"
+        const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ░▒▓█"
         const originalText = "PROJECTS"
         let iteration = 0
 
@@ -790,35 +740,22 @@ function SectionHeader({ count }: { count: number }) {
           },
         })
       }
-
-      // Line draw
-      if (lineRef.current) {
-        gsap.fromTo(
-          lineRef.current,
-          { scaleX: 0 },
-          {
-            scaleX: 1,
-            duration: 0.8,
-            ease: "power2.out",
-            scrollTrigger: {
-              trigger: lineRef.current,
-              start: "top 92%",
-              toggleActions: "play none none none",
-            },
-          }
-        )
-      }
-    }, ref.current)
+    }, headerRef.current)
     return () => ctx.revert()
   }, [])
 
   return (
-    <div ref={ref} className="mb-6 sm:mb-8">
-      {/* Section number + Title */}
+    <div ref={headerRef} className="mb-4 sm:mb-6 relative">
+      {/* ASCII brain - mobile condensed */}
+      <pre className="font-mono text-[4px] sm:text-[5px] text-foreground/15 leading-tight select-none mb-3 sm:mb-4 overflow-hidden">
+        {ASCII_BRAIN_SCAN}
+      </pre>
+
+      {/* Header row */}
       <div className="flex items-end justify-between gap-3">
-        <div>
-          <p className="font-mono text-[8px] sm:text-[9px] text-foreground/40 tracking-[0.2em] mb-1">
-            — 04
+        <div className="min-w-0">
+          <p className="font-mono text-[8px] sm:text-[9px] text-muted-foreground tracking-[0.2em] mb-1">
+            — NEURAL MAP / 04
           </p>
           <h2
             ref={titleRef}
@@ -827,25 +764,19 @@ function SectionHeader({ count }: { count: number }) {
             PROJECTS
           </h2>
         </div>
-        <span className="font-mono text-xl sm:text-2xl md:text-3xl font-black text-foreground/15 tabular-nums pb-0.5">
-          {String(count).padStart(2, "0")}
-        </span>
-      </div>
-
-      {/* Animated line */}
-      <div className="mt-3 flex items-center gap-2">
-        <div ref={lineRef} className="h-0.5 sm:h-1 w-10 sm:w-14 bg-foreground origin-left" />
-        <div className="h-px flex-1 bg-foreground/15" />
-        <div className="flex gap-0.5">
-          {[...Array(3)].map((_, i) => (
-            <div key={i} className="w-1 h-1 bg-foreground/20" />
-          ))}
+        
+        {/* Count display */}
+        <div className="flex-shrink-0 text-right">
+          <div className="font-mono text-xl sm:text-2xl lg:text-3xl font-black text-foreground/20 tabular-nums leading-none">
+            {String(filtered).padStart(2, "0")}
+            <span className="text-foreground/10">/{String(count).padStart(2, "0")}</span>
+          </div>
         </div>
       </div>
 
-      {/* ASCII decoration */}
-      <div className="font-mono text-[6px] sm:text-[7px] text-foreground/15 mt-2 overflow-hidden select-none">
-        {ASCII_LINE}
+      {/* ECG underline */}
+      <div className="mt-2 sm:mt-3">
+        <ECGLine className="text-foreground/25" />
       </div>
     </div>
   )
@@ -890,50 +821,56 @@ export function ProjectsSection() {
     <section
       id="projects"
       ref={sectionRef}
-      className="relative py-10 sm:py-14 md:py-18 lg:py-24 px-3 sm:px-5 md:px-6 bg-background"
+      className={cn(
+        "relative py-8 sm:py-12 md:py-16 lg:py-20 px-3 sm:px-4 md:px-6",
+        "bg-background"
+      )}
     >
       {/* Background pattern */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <svg className="w-full h-full opacity-[0.015]" preserveAspectRatio="none">
-          {[...Array(20)].map((_, i) => (
-            <line key={`v-${i}`} x1={`${i * 5}%`} y1="0" x2={`${i * 5}%`} y2="100%" stroke="currentColor" strokeWidth="1" />
-          ))}
-          {[...Array(80)].map((_, i) => (
-            <line key={`h-${i}`} x1="0" y1={`${i * 1.25}%`} x2="100%" y2={`${i * 1.25}%`} stroke="currentColor" strokeWidth="0.5" />
-          ))}
-        </svg>
+        <div className="absolute inset-0 opacity-[0.015]">
+          <svg className="w-full h-full" preserveAspectRatio="none">
+            {[...Array(30)].map((_, i) => (
+              <line
+                key={`v-${i}`}
+                x1={`${i * 3.33}%`}
+                y1="0"
+                x2={`${i * 3.33}%`}
+                y2="100%"
+                stroke="currentColor"
+                strokeWidth="1"
+              />
+            ))}
+          </svg>
+        </div>
       </div>
 
-      <div className="max-w-6xl mx-auto relative">
-        <SectionHeader count={allProjects.length} />
+      <div className="max-w-5xl mx-auto relative">
+        <SectionHeader count={allProjects.length} filtered={filteredProjects.length} />
 
         <FilterPanel
           selectedGroups={selectedGroups}
           onToggleGroup={toggleGroup}
           onClearFilters={clearFilters}
-          resultCount={filteredProjects.length}
-          totalCount={allProjects.length}
         />
 
-        {/* Projects */}
+        {/* No results */}
         {filteredProjects.length === 0 ? (
-          <div className="text-center py-10 border border-dashed border-foreground/20">
-            <pre className="font-mono text-[9px] text-foreground/30 mb-3">
-              {`┌─────────────┐
-│  NO MATCH   │
-└─────────────┘`}
+          <div className="text-center py-8 sm:py-12 border border-dashed border-foreground/20">
+            <pre className="font-mono text-[8px] sm:text-[10px] text-foreground/30 mb-3">
+{ASCII_DIAGNOSTIC}
             </pre>
             <button
               onClick={clearFilters}
-              className="font-mono text-[9px] sm:text-[10px] border border-foreground/40 px-3 py-1.5 hover:bg-foreground hover:text-background transition-colors"
+              className="font-mono text-[10px] sm:text-xs border border-foreground/40 px-3 py-1.5 hover:bg-foreground hover:text-background transition-colors"
             >
-              RESET
+              RESET SCAN
             </button>
           </div>
         ) : (
-          <div className="space-y-3 sm:space-y-4 lg:space-y-5">
-            {displayedProjects.map((project, index) => (
-              <ProjectTicket key={project.id} project={project} index={index} />
+          <div className="space-y-3 sm:space-y-4">
+            {displayedProjects.map((project) => (
+              <ProjectCard key={project.id} project={project} />
             ))}
           </div>
         )}
@@ -945,32 +882,34 @@ export function ProjectsSection() {
               onClick={() => setShowAll(true)}
               className={cn(
                 "touch-target group flex items-center gap-2",
-                "px-5 sm:px-6 py-2.5 sm:py-3",
-                "font-mono text-[9px] sm:text-[10px] tracking-[0.12em]",
-                "border-2 border-foreground bg-foreground text-background",
-                "hover:bg-background hover:text-foreground active:scale-[0.98] transition-all",
-                "shadow-[2px_2px_0_0_var(--foreground)]",
-                "sm:shadow-[3px_3px_0_0_var(--foreground)]"
+                "px-4 sm:px-6 py-2.5 sm:py-3",
+                "font-mono text-[10px] sm:text-xs tracking-[0.1em]",
+                "border border-foreground/50 text-foreground",
+                "hover:bg-foreground hover:text-background transition-colors"
               )}
             >
-              <span>+{remaining}</span>
-              <ChevronDown className="w-3.5 h-3.5" />
+              <span>SCAN +{remaining}</span>
+              <ChevronDown className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </button>
           </div>
         )}
 
-        {/* End */}
-        {showAll && (
+        {/* End marker */}
+        {showAll && filteredProjects.length > 0 && (
           <div className="mt-8 sm:mt-10 text-center">
-            <div className="font-mono text-[6px] sm:text-[7px] text-foreground/15 select-none mb-3">
-              {ASCII_DOTS}
-            </div>
+            <pre className="font-mono text-[7px] sm:text-[8px] text-foreground/20 select-none">
+{`
+    ╭───────────────────────╮
+    │   SCAN COMPLETE ✓    │
+    ╰───────────────────────╯
+`}
+            </pre>
             <a
               href="#contact"
-              className="touch-target inline-flex items-center gap-1.5 font-mono text-[9px] sm:text-[10px] text-foreground/40 hover:text-foreground transition-colors"
+              className="touch-target inline-flex items-center gap-1.5 font-mono text-[10px] sm:text-xs text-muted-foreground hover:text-foreground transition-colors mt-2"
             >
               <span>↓</span>
-              <span>NEXT</span>
+              <span>PROCEED</span>
             </a>
           </div>
         )}
