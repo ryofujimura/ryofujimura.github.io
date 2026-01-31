@@ -284,12 +284,17 @@ export function AboutSection() {
             {/* Top-right: Technical SVG panel */}
             <div className="hidden sm:block">
               <div className="border-2 border-foreground bg-background p-3 sm:p-4 md:p-5 relative overflow-hidden">
-                <div className="absolute inset-0 pointer-events-none opacity-20">
+                <div className="absolute inset-0 pointer-events-none opacity-10">
                   <GSAPSVG className="w-full h-full" duration={1.8} delay={0.4}>
                     <svg ref={gridRef} viewBox="0 0 200 200" className="w-full h-full" stroke="currentColor">
-                      {/* Concentric circles */}
-                      <circle cx="100" cy="100" r="80" strokeWidth="0.6" />
-                      <circle cx="100" cy="100" r="52" strokeWidth="0.5" />
+                      {/* Concentric circles with pulse animation */}
+                      <circle cx="100" cy="100" r="95" strokeWidth="0.3" className="animate-pulse" style={{ animationDuration: '4s' }} />
+                      <circle cx="100" cy="100" r="80" strokeWidth="0.6" className="animate-pulse" style={{ animationDuration: '3s' }} />
+                      <circle cx="100" cy="100" r="65" strokeWidth="0.4" className="animate-pulse" style={{ animationDuration: '3.5s' }} />
+                      <circle cx="100" cy="100" r="52" strokeWidth="0.5" className="animate-pulse" style={{ animationDuration: '2.5s' }} />
+                      <circle cx="100" cy="100" r="38" strokeWidth="0.4" className="animate-pulse" style={{ animationDuration: '3s' }} />
+                      <circle cx="100" cy="100" r="24" strokeWidth="0.3" className="animate-pulse" style={{ animationDuration: '2s' }} />
+                      <circle cx="100" cy="100" r="12" strokeWidth="0.5" className="animate-pulse" style={{ animationDuration: '2.5s' }} />
                       {/* Crosshair */}
                       <line x1="100" y1="10" x2="100" y2="190" strokeWidth="0.4" />
                       <line x1="10" y1="100" x2="190" y2="100" strokeWidth="0.4" />
