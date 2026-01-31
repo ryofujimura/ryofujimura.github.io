@@ -810,7 +810,7 @@ export function ExperienceSection() {
                     className={cn(
                       "relative transition-[opacity,transform] duration-200 border border-dashed p-1 sm:p-1.5 md:p-2",
                       isActive
-                        ? "opacity-100 translate-y-0 border-foreground"
+                        ? "opacity-100 translate-y-0 border-foreground mb-2 sm:mb-3 md:mb-4"
                         : "opacity-0 pointer-events-none absolute inset-2 sm:inset-3 md:inset-3.5 border-transparent"
                     )}
                     aria-hidden={!isActive}
@@ -868,7 +868,7 @@ export function ExperienceSection() {
                         {exp.description}
                       </p>
 
-                      <div data-detail-block className="grid gap-3 sm:gap-4 md:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] items-start md:items-stretch pb-3 sm:pb-4 md:pb-5">
+                      <div data-detail-block className="grid gap-3 sm:gap-4 md:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] items-start md:items-stretch">
                         <ul className="space-y-5 sm:space-y-6">
                           {exp.highlights.map((highlight, i) => (
                             <li
