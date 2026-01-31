@@ -21,6 +21,17 @@ export function HeroBrutalistRight() {
     if (!containerRef.current) return
 
     const ctx = gsap.context(() => {
+      // Reveal the SVG container first
+      const svg = containerRef.current?.querySelector("svg")
+      if (svg) {
+        gsap.to(svg, {
+          opacity: 1,
+          duration: 0.3,
+          delay: 0.1,
+          ease: "power2.out",
+        })
+      }
+
       // Helper: animate stroke-dashoffset for path drawing
       const drawPaths = (
         group: SVGGElement | null,
@@ -246,7 +257,7 @@ export function HeroBrutalistRight() {
       aria-hidden="true"
     >
       <svg
-        className="absolute inset-0 w-full h-full"
+        className="absolute inset-0 w-full h-full opacity-0"
         viewBox="0 0 450 700"
         preserveAspectRatio="xMaxYMid slice"
         fill="none"
