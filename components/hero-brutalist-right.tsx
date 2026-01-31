@@ -1,67 +1,21 @@
 "use client"
 
-import { useEffect, useRef, useMemo } from "react"
+import { useEffect, useRef } from "react"
 import { gsap } from "gsap"
 
 /**
- * Award-winning brutalist technical animation representing AI, RAG, and Edge Models.
- * Features neural network nodes, vector embeddings, retrieval flows, and edge deployment.
+ * AI/RAG/Edge Model visualization for hero section.
+ * Features neural network, document retrieval flows, edge nodes,
+ * and continuous data processing animations.
  */
 export function HeroBrutalistRight() {
   const containerRef = useRef<HTMLDivElement>(null)
-  const neuralRef = useRef<SVGGElement>(null)
+  const neuralCoreRef = useRef<SVGGElement>(null)
   const ragFlowRef = useRef<SVGGElement>(null)
-  const embeddingsRef = useRef<SVGGElement>(null)
   const edgeNodesRef = useRef<SVGGElement>(null)
-  const dataFlowRef = useRef<SVGGElement>(null)
+  const dataParticlesRef = useRef<SVGGElement>(null)
+  const connectionsRef = useRef<SVGGElement>(null)
   const labelsRef = useRef<SVGGElement>(null)
-
-  // Neural network layer positions
-  const neuralLayers = useMemo(() => [
-    { x: 120, nodes: [180, 240, 300, 360] },      // Input layer
-    { x: 200, nodes: [195, 255, 315, 345] },      // Hidden 1
-    { x: 280, nodes: [210, 270, 330] },            // Hidden 2  
-    { x: 360, nodes: [240, 300] },                 // Output
-  ], [])
-
-  // RAG document nodes
-  const ragDocs = useMemo(() => [
-    { x: 100, y: 480, label: "DOC_01" },
-    { x: 160, y: 520, label: "DOC_02" },
-    { x: 120, y: 560, label: "DOC_03" },
-    { x: 180, y: 500, label: "DOC_04" },
-    { x: 140, y: 540, label: "DOC_05" },
-  ], [])
-
-  // Edge device positions
-  const edgeDevices = useMemo(() => [
-    { x: 320, y: 520, type: "mobile", label: "EDGE_01" },
-    { x: 380, y: 480, type: "server", label: "EDGE_02" },
-    { x: 400, y: 550, type: "iot", label: "EDGE_03" },
-    { x: 340, y: 580, type: "mobile", label: "EDGE_04" },
-  ], [])
-
-  // Vector embedding dots (clustering visualization)
-  const embeddingDots = useMemo(() => {
-    const seed = 42
-    const random = (i: number) => ((seed * (i + 1) * 9301 + 49297) % 233280) / 233280
-    
-    // Cluster 1 - Query vectors
-    const cluster1 = Array.from({ length: 12 }, (_, i) => ({
-      x: 260 + random(i) * 40 - 20,
-      y: 450 + random(i + 50) * 30 - 15,
-      cluster: 1,
-    }))
-    
-    // Cluster 2 - Retrieved vectors
-    const cluster2 = Array.from({ length: 10 }, (_, i) => ({
-      x: 180 + random(i + 100) * 35 - 17,
-      y: 490 + random(i + 150) * 25 - 12,
-      cluster: 2,
-    }))
-    
-    return [...cluster1, ...cluster2]
-  }, [])
 
   useEffect(() => {
     if (!containerRef.current) return
@@ -75,7 +29,7 @@ export function HeroBrutalistRight() {
         stagger = 0.03
       ) => {
         if (!group) return
-        const paths = group.querySelectorAll("path, line, polyline, rect, circle")
+        const paths = group.querySelectorAll("path, line, polyline, circle, rect, ellipse")
         paths.forEach((el) => {
           const geom = el as SVGGeometryElement
           if (typeof geom.getTotalLength === "function") {
@@ -99,33 +53,21 @@ export function HeroBrutalistRight() {
         })
       }
 
-      // Neural network animation
-      drawPaths(neuralRef.current, 1.5, 0.2, 0.02)
+      // === LOADING ANIMATIONS ===
+      
+      // 1. Draw neural core first
+      drawPaths(neuralCoreRef.current, 1.5, 0.2, 0.05)
 
-      // RAG flow animation
-      drawPaths(ragFlowRef.current, 1.2, 0.8, 0.04)
+      // 2. Draw connections from core
+      drawPaths(connectionsRef.current, 1.2, 0.8, 0.04)
 
-      // Edge nodes animation
-      drawPaths(edgeNodesRef.current, 1.0, 1.2, 0.05)
+      // 3. Draw edge nodes
+      drawPaths(edgeNodesRef.current, 1.0, 1.2, 0.06)
 
-      // Data flow arrows
-      drawPaths(dataFlowRef.current, 1.8, 1.5, 0.03)
+      // 4. Draw RAG flow elements
+      drawPaths(ragFlowRef.current, 1.4, 1.0, 0.03)
 
-      // Embedding dots scatter animation
-      if (embeddingsRef.current) {
-        const dots = embeddingsRef.current.querySelectorAll("circle")
-        gsap.set(dots, { scale: 0, opacity: 0, transformOrigin: "center center" })
-        gsap.to(dots, {
-          scale: 1,
-          opacity: 1,
-          duration: 0.4,
-          delay: 1.0,
-          stagger: { each: 0.03, from: "random" },
-          ease: "back.out(1.7)",
-        })
-      }
-
-      // Labels fade in
+      // 5. Reveal labels
       if (labelsRef.current) {
         const texts = labelsRef.current.querySelectorAll("text")
         gsap.set(texts, { opacity: 0, y: 5 })
@@ -133,52 +75,162 @@ export function HeroBrutalistRight() {
           opacity: 1,
           y: 0,
           duration: 0.5,
-          delay: 1.8,
-          stagger: 0.06,
+          delay: 2.0,
+          stagger: 0.08,
           ease: "power3.out",
         })
       }
 
-      // Continuous neural pulse animation
-      const pulseNodes = neuralRef.current?.querySelectorAll(".neural-node")
-      if (pulseNodes && pulseNodes.length > 0) {
-        gsap.to(pulseNodes, {
-          strokeOpacity: 0.8,
-          duration: 0.8,
-          repeat: -1,
-          yoyo: true,
-          ease: "sine.inOut",
-          stagger: { each: 0.1, from: "start", repeat: -1 },
-          delay: 2,
+      // 6. Animate data particles entrance
+      if (dataParticlesRef.current) {
+        const particles = dataParticlesRef.current.querySelectorAll("circle")
+        gsap.set(particles, { scale: 0, transformOrigin: "center center" })
+        gsap.to(particles, {
+          scale: 1,
+          duration: 0.4,
+          delay: 1.8,
+          stagger: 0.05,
+          ease: "back.out(2)",
         })
       }
 
-      // Data flow pulse animation
-      const flowLines = dataFlowRef.current?.querySelectorAll(".flow-pulse")
-      if (flowLines && flowLines.length > 0) {
-        gsap.to(flowLines, {
-          strokeDashoffset: -20,
+      // === CONTINUOUS ANIMATIONS ===
+
+      // Neural core pulse - constant "thinking" animation
+      const corePulse = neuralCoreRef.current?.querySelector(".core-pulse")
+      if (corePulse) {
+        gsap.to(corePulse, {
+          scale: 1.15,
+          opacity: 0.3,
           duration: 1.5,
           repeat: -1,
-          ease: "none",
-          stagger: 0.2,
+          yoyo: true,
+          ease: "sine.inOut",
           delay: 2.5,
         })
       }
 
-      // Embedding cluster subtle motion
-      if (embeddingsRef.current) {
-        const dots = embeddingsRef.current.querySelectorAll("circle")
-        dots.forEach((dot, i) => {
-          gsap.to(dot, {
-            x: `+=${Math.sin(i) * 3}`,
-            y: `+=${Math.cos(i) * 3}`,
-            duration: 2 + (i % 3),
+      // Neural rings rotation
+      const neuralRings = neuralCoreRef.current?.querySelectorAll(".neural-ring")
+      if (neuralRings) {
+        neuralRings.forEach((ring, i) => {
+          gsap.to(ring, {
+            rotation: i % 2 === 0 ? 360 : -360,
+            duration: 20 + i * 5,
+            repeat: -1,
+            ease: "none",
+            transformOrigin: "225px 350px",
+            delay: 2,
+          })
+        })
+      }
+
+      // Data particles flowing through system
+      const particles = dataParticlesRef.current?.querySelectorAll(".data-particle")
+      if (particles) {
+        particles.forEach((particle, i) => {
+          const paths = [
+            // Flow to core
+            { x: [0, -50, -80], y: [0, -30, -60], duration: 3 },
+            { x: [0, 40, 60], y: [0, -40, -80], duration: 3.5 },
+            { x: [0, -30, -50], y: [0, 40, 70], duration: 2.8 },
+            // Flow from documents
+            { x: [0, 30, 50, 30, 0], y: [0, -20, -40, -60, -80], duration: 4 },
+            { x: [0, -20, -40, -30, -10], y: [0, 30, 50, 70, 90], duration: 3.8 },
+          ]
+          const path = paths[i % paths.length]
+          
+          gsap.to(particle, {
+            motionPath: {
+              path: `M0,0 Q${path.x[1]},${path.y[1]} ${path.x[2]},${path.y[2]}`,
+              autoRotate: false,
+            },
+            duration: path.duration,
+            repeat: -1,
+            ease: "none",
+            delay: 2.5 + i * 0.3,
+          })
+
+          // Particle pulse
+          gsap.to(particle, {
+            opacity: 0.3,
+            duration: 0.8,
             repeat: -1,
             yoyo: true,
             ease: "sine.inOut",
-            delay: 2.5 + i * 0.05,
+            delay: 2.5 + i * 0.15,
           })
+        })
+      }
+
+      // Edge nodes pulse - showing active inference
+      const edgeNodeCircles = edgeNodesRef.current?.querySelectorAll(".edge-pulse")
+      if (edgeNodeCircles) {
+        edgeNodeCircles.forEach((node, i) => {
+          gsap.to(node, {
+            scale: 1.3,
+            opacity: 0,
+            duration: 1.2,
+            repeat: -1,
+            ease: "power1.out",
+            delay: 2.5 + i * 0.4,
+          })
+        })
+      }
+
+      // Connection lines pulse - data transfer
+      const connectionLines = connectionsRef.current?.querySelectorAll(".connection-pulse")
+      if (connectionLines) {
+        connectionLines.forEach((line, i) => {
+          gsap.to(line, {
+            strokeDashoffset: -40,
+            duration: 1.5,
+            repeat: -1,
+            ease: "none",
+            delay: 2.5 + i * 0.2,
+          })
+        })
+      }
+
+      // RAG document stack - retrieval animation
+      const ragDocs = ragFlowRef.current?.querySelectorAll(".rag-doc")
+      if (ragDocs) {
+        ragDocs.forEach((doc, i) => {
+          gsap.to(doc, {
+            y: -3,
+            duration: 1.5,
+            repeat: -1,
+            yoyo: true,
+            ease: "sine.inOut",
+            delay: 2.5 + i * 0.2,
+          })
+        })
+      }
+
+      // Vector embedding visualization
+      const embeddings = ragFlowRef.current?.querySelectorAll(".embedding-dot")
+      if (embeddings) {
+        gsap.to(embeddings, {
+          opacity: 0.3,
+          duration: 0.6,
+          repeat: -1,
+          yoyo: true,
+          stagger: { each: 0.1, from: "random" },
+          ease: "sine.inOut",
+          delay: 2.5,
+        })
+      }
+
+      // Processing indicator rotation
+      const processingRing = neuralCoreRef.current?.querySelector(".processing-ring")
+      if (processingRing) {
+        gsap.to(processingRing, {
+          rotation: 360,
+          duration: 8,
+          repeat: -1,
+          ease: "none",
+          transformOrigin: "225px 350px",
+          delay: 2,
         })
       }
 
@@ -195,312 +247,396 @@ export function HeroBrutalistRight() {
     >
       <svg
         className="absolute inset-0 w-full h-full"
-        viewBox="0 0 450 800"
+        viewBox="0 0 450 700"
         preserveAspectRatio="xMaxYMid slice"
         fill="none"
       >
-        {/* Neural Network Structure */}
-        <g ref={neuralRef} stroke="currentColor" className="text-foreground/25">
-          {/* Layer connections */}
-          {neuralLayers.slice(0, -1).map((layer, li) => {
-            const nextLayer = neuralLayers[li + 1]
-            return layer.nodes.map((y1, ni) =>
-              nextLayer.nodes.map((y2, nj) => (
-                <line
-                  key={`conn-${li}-${ni}-${nj}`}
-                  x1={layer.x}
-                  y1={y1}
-                  x2={nextLayer.x}
-                  y2={y2}
-                  strokeWidth="0.3"
-                  className="text-foreground/15"
-                />
-              ))
-            )
-          })}
+        {/* Connection lines from core to edge nodes */}
+        <g ref={connectionsRef} stroke="currentColor" className="text-foreground/15">
+          {/* Main data highways */}
+          <path
+            d="M 225 350 Q 150 300 80 200"
+            strokeWidth="0.5"
+            className="connection-pulse"
+            strokeDasharray="4 4"
+          />
+          <path
+            d="M 225 350 Q 280 280 350 180"
+            strokeWidth="0.5"
+            className="connection-pulse"
+            strokeDasharray="4 4"
+          />
+          <path
+            d="M 225 350 Q 160 400 70 450"
+            strokeWidth="0.5"
+            className="connection-pulse"
+            strokeDasharray="4 4"
+          />
+          <path
+            d="M 225 350 Q 300 420 380 500"
+            strokeWidth="0.5"
+            className="connection-pulse"
+            strokeDasharray="4 4"
+          />
+          <path
+            d="M 225 350 L 225 550"
+            strokeWidth="0.5"
+            className="connection-pulse"
+            strokeDasharray="4 4"
+          />
           
-          {/* Neural nodes */}
-          {neuralLayers.map((layer, li) =>
-            layer.nodes.map((y, ni) => (
-              <g key={`node-${li}-${ni}`}>
-                <circle
-                  cx={layer.x}
-                  cy={y}
-                  r={li === 0 ? 6 : li === neuralLayers.length - 1 ? 8 : 5}
-                  strokeWidth={li === neuralLayers.length - 1 ? 1 : 0.6}
-                  className={`neural-node ${li === neuralLayers.length - 1 ? "text-foreground/40" : "text-foreground/30"}`}
-                />
-                {/* Activation indicator */}
-                <circle
-                  cx={layer.x}
-                  cy={y}
-                  r="2"
-                  fill="currentColor"
-                  className="text-foreground/20"
-                />
-              </g>
-            ))
-          )}
-
-          {/* Layer labels */}
-          <text x="120" y="145" fontSize="6" fill="currentColor" className="text-foreground/40" fontFamily="ui-monospace, monospace" textAnchor="middle">INPUT</text>
-          <text x="240" y="165" fontSize="5" fill="currentColor" className="text-foreground/30" fontFamily="ui-monospace, monospace" textAnchor="middle">HIDDEN</text>
-          <text x="360" y="210" fontSize="6" fill="currentColor" className="text-foreground/40" fontFamily="ui-monospace, monospace" textAnchor="middle">OUTPUT</text>
-          
-          {/* Neural frame */}
-          <rect x="90" y="160" width="300" height="220" strokeWidth="0.4" strokeDasharray="4 8" className="text-foreground/15" />
-          
-          {/* Model header */}
-          <path d="M 90 150 L 90 140 L 110 140" strokeWidth="0.6" className="text-foreground/30" />
-          <path d="M 390 150 L 390 140 L 370 140" strokeWidth="0.6" className="text-foreground/30" />
+          {/* Secondary connections */}
+          <line x1="80" y1="200" x2="120" y2="140" strokeWidth="0.3" />
+          <line x1="350" y1="180" x2="400" y2="120" strokeWidth="0.3" />
+          <line x1="70" y1="450" x2="50" y2="520" strokeWidth="0.3" />
+          <line x1="380" y1="500" x2="410" y2="560" strokeWidth="0.3" />
         </g>
 
-        {/* RAG Document Retrieval Flow */}
-        <g ref={ragFlowRef} stroke="currentColor" className="text-foreground/25">
-          {/* Knowledge base container */}
-          <rect x="80" y="450" width="140" height="140" strokeWidth="0.5" className="text-foreground/20" />
-          <path d="M 80 470 L 220 470" strokeWidth="0.3" />
-          
-          {/* Document icons */}
-          {ragDocs.map((doc, i) => (
-            <g key={`doc-${i}`}>
-              <rect
-                x={doc.x - 12}
-                y={doc.y - 10}
-                width="24"
-                height="20"
-                strokeWidth="0.5"
-                className="text-foreground/30"
-              />
-              {/* Document lines */}
-              <line x1={doc.x - 8} y1={doc.y - 4} x2={doc.x + 8} y2={doc.y - 4} strokeWidth="0.3" />
-              <line x1={doc.x - 8} y1={doc.y} x2={doc.x + 6} y2={doc.y} strokeWidth="0.3" />
-              <line x1={doc.x - 8} y1={doc.y + 4} x2={doc.x + 4} y2={doc.y + 4} strokeWidth="0.3" />
-            </g>
-          ))}
-
-          {/* Query arrow */}
-          <path
-            d="M 250 420 L 250 440 L 200 460"
-            strokeWidth="0.6"
-            className="text-foreground/35"
-            markerEnd="url(#arrowhead)"
+        {/* Neural Core - Central AI Model */}
+        <g ref={neuralCoreRef} className="text-foreground/30">
+          {/* Outer processing ring */}
+          <circle
+            cx="225"
+            cy="350"
+            r="85"
+            stroke="currentColor"
+            strokeWidth="0.4"
+            strokeDasharray="8 4 2 4"
+            className="processing-ring"
           />
+          
+          {/* Neural network rings */}
+          <circle
+            cx="225"
+            cy="350"
+            r="70"
+            stroke="currentColor"
+            strokeWidth="0.5"
+            strokeDasharray="3 6"
+            className="neural-ring"
+          />
+          <circle
+            cx="225"
+            cy="350"
+            r="55"
+            stroke="currentColor"
+            strokeWidth="0.6"
+            strokeDasharray="12 4"
+            className="neural-ring"
+          />
+          <circle
+            cx="225"
+            cy="350"
+            r="40"
+            stroke="currentColor"
+            strokeWidth="0.5"
+            className="neural-ring"
+          />
+          
+          {/* Core pulse effect */}
+          <circle
+            cx="225"
+            cy="350"
+            r="25"
+            stroke="currentColor"
+            strokeWidth="1"
+            className="core-pulse text-foreground/40"
+          />
+          
+          {/* Inner core - the "brain" */}
+          <circle
+            cx="225"
+            cy="350"
+            r="15"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            className="text-foreground/50"
+          />
+          <circle
+            cx="225"
+            cy="350"
+            r="5"
+            fill="currentColor"
+            className="text-foreground/60"
+          />
+          
+          {/* Neural pathway lines inside core */}
+          <path
+            d="M 210 340 Q 225 350 240 340"
+            stroke="currentColor"
+            strokeWidth="0.5"
+            className="text-foreground/40"
+          />
+          <path
+            d="M 210 360 Q 225 350 240 360"
+            stroke="currentColor"
+            strokeWidth="0.5"
+            className="text-foreground/40"
+          />
+          <path
+            d="M 215 335 L 215 365"
+            stroke="currentColor"
+            strokeWidth="0.3"
+            className="text-foreground/30"
+          />
+          <path
+            d="M 235 335 L 235 365"
+            stroke="currentColor"
+            strokeWidth="0.3"
+            className="text-foreground/30"
+          />
+        </g>
+
+        {/* Edge Nodes - Distributed Computing */}
+        <g ref={edgeNodesRef} stroke="currentColor" className="text-foreground/25">
+          {/* Edge node 1 - Top left */}
+          <g transform="translate(80, 200)">
+            <rect x="-12" y="-12" width="24" height="24" strokeWidth="0.6" rx="2" />
+            <circle cx="0" cy="0" r="18" strokeWidth="0.3" className="edge-pulse" />
+            <line x1="-6" y1="0" x2="6" y2="0" strokeWidth="0.5" />
+            <line x1="0" y1="-6" x2="0" y2="6" strokeWidth="0.5" />
+          </g>
+          
+          {/* Edge node 2 - Top right */}
+          <g transform="translate(350, 180)">
+            <rect x="-12" y="-12" width="24" height="24" strokeWidth="0.6" rx="2" />
+            <circle cx="0" cy="0" r="18" strokeWidth="0.3" className="edge-pulse" />
+            <line x1="-6" y1="0" x2="6" y2="0" strokeWidth="0.5" />
+            <line x1="0" y1="-6" x2="0" y2="6" strokeWidth="0.5" />
+          </g>
+          
+          {/* Edge node 3 - Bottom left */}
+          <g transform="translate(70, 450)">
+            <rect x="-12" y="-12" width="24" height="24" strokeWidth="0.6" rx="2" />
+            <circle cx="0" cy="0" r="18" strokeWidth="0.3" className="edge-pulse" />
+            <line x1="-6" y1="0" x2="6" y2="0" strokeWidth="0.5" />
+            <line x1="0" y1="-6" x2="0" y2="6" strokeWidth="0.5" />
+          </g>
+          
+          {/* Edge node 4 - Bottom right */}
+          <g transform="translate(380, 500)">
+            <rect x="-12" y="-12" width="24" height="24" strokeWidth="0.6" rx="2" />
+            <circle cx="0" cy="0" r="18" strokeWidth="0.3" className="edge-pulse" />
+            <line x1="-6" y1="0" x2="6" y2="0" strokeWidth="0.5" />
+            <line x1="0" y1="-6" x2="0" y2="6" strokeWidth="0.5" />
+          </g>
+          
+          {/* Smaller edge processors */}
+          <g transform="translate(120, 140)">
+            <rect x="-8" y="-8" width="16" height="16" strokeWidth="0.4" rx="1" />
+          </g>
+          <g transform="translate(400, 120)">
+            <rect x="-8" y="-8" width="16" height="16" strokeWidth="0.4" rx="1" />
+          </g>
+          <g transform="translate(50, 520)">
+            <rect x="-8" y="-8" width="16" height="16" strokeWidth="0.4" rx="1" />
+          </g>
+          <g transform="translate(410, 560)">
+            <rect x="-8" y="-8" width="16" height="16" strokeWidth="0.4" rx="1" />
+          </g>
+        </g>
+
+        {/* RAG Flow - Document Retrieval */}
+        <g ref={ragFlowRef} stroke="currentColor" className="text-foreground/20">
+          {/* Document stack */}
+          <g transform="translate(225, 580)">
+            {/* Documents */}
+            <rect x="-30" y="0" width="60" height="40" strokeWidth="0.5" rx="2" className="rag-doc" />
+            <rect x="-25" y="-5" width="50" height="35" strokeWidth="0.4" rx="2" className="rag-doc" />
+            <rect x="-20" y="-10" width="40" height="30" strokeWidth="0.4" rx="2" className="rag-doc" />
+            
+            {/* Document lines (text representation) */}
+            <line x1="-20" y1="10" x2="10" y2="10" strokeWidth="0.3" />
+            <line x1="-20" y1="16" x2="15" y2="16" strokeWidth="0.3" />
+            <line x1="-20" y1="22" x2="5" y2="22" strokeWidth="0.3" />
+            <line x1="-20" y1="28" x2="20" y2="28" strokeWidth="0.3" />
+          </g>
+          
+          {/* Vector embeddings visualization */}
+          <g transform="translate(225, 510)">
+            {/* Embedding space */}
+            <ellipse cx="0" cy="0" rx="45" ry="20" strokeWidth="0.4" strokeDasharray="2 3" />
+            
+            {/* Embedding dots */}
+            {[-30, -15, 0, 15, 30].map((x, i) => (
+              <circle
+                key={i}
+                cx={x}
+                cy={Math.sin(i * 1.2) * 8}
+                r="2"
+                fill="currentColor"
+                className="embedding-dot text-foreground/40"
+              />
+            ))}
+            {[-22, -7, 7, 22].map((x, i) => (
+              <circle
+                key={`b-${i}`}
+                cx={x}
+                cy={Math.cos(i * 0.8) * 6}
+                r="1.5"
+                fill="currentColor"
+                className="embedding-dot text-foreground/30"
+              />
+            ))}
+          </g>
           
           {/* Retrieval arrow */}
           <path
-            d="M 220 520 L 270 500 L 270 420"
+            d="M 225 485 L 225 430"
             strokeWidth="0.6"
-            strokeDasharray="3 3"
-            className="text-foreground/35"
-          />
-          
-          {/* Similarity search indicator */}
-          <circle cx="240" cy="480" r="25" strokeWidth="0.4" strokeDasharray="2 4" className="text-foreground/20" />
-          <text x="240" y="483" fontSize="5" fill="currentColor" className="text-foreground/30" fontFamily="ui-monospace, monospace" textAnchor="middle">SEARCH</text>
-        </g>
-
-        {/* Vector Embeddings Visualization */}
-        <g ref={embeddingsRef} className="text-foreground/40">
-          {embeddingDots.map((dot, i) => (
-            <circle
-              key={`emb-${i}`}
-              cx={dot.x}
-              cy={dot.y}
-              r={dot.cluster === 1 ? 2 : 1.5}
-              fill="currentColor"
-              className={dot.cluster === 1 ? "text-foreground/50" : "text-foreground/30"}
-            />
-          ))}
-          
-          {/* Cluster boundary hints */}
-          <ellipse cx="260" cy="455" rx="30" ry="20" stroke="currentColor" strokeWidth="0.3" strokeDasharray="2 4" className="text-foreground/15" fill="none" />
-          <ellipse cx="185" cy="495" rx="25" ry="18" stroke="currentColor" strokeWidth="0.3" strokeDasharray="2 4" className="text-foreground/15" fill="none" />
-        </g>
-
-        {/* Edge Model Deployment Network */}
-        <g ref={edgeNodesRef} stroke="currentColor" className="text-foreground/25">
-          {/* Central inference node */}
-          <circle cx="360" cy="520" r="35" strokeWidth="0.5" className="text-foreground/20" />
-          <circle cx="360" cy="520" r="25" strokeWidth="0.6" className="text-foreground/30" />
-          <circle cx="360" cy="520" r="8" strokeWidth="0.8" fill="currentColor" className="text-foreground/15" />
-          
-          {/* Edge devices */}
-          {edgeDevices.map((device, i) => (
-            <g key={`edge-${i}`}>
-              {/* Connection to central */}
-              <line
-                x1="360"
-                y1="520"
-                x2={device.x}
-                y2={device.y}
-                strokeWidth="0.4"
-                strokeDasharray="2 3"
-                className="text-foreground/20"
-              />
-              
-              {/* Device node */}
-              {device.type === "mobile" ? (
-                <rect
-                  x={device.x - 8}
-                  y={device.y - 12}
-                  width="16"
-                  height="24"
-                  rx="2"
-                  strokeWidth="0.6"
-                  className="text-foreground/35"
-                />
-              ) : device.type === "server" ? (
-                <g>
-                  <rect x={device.x - 10} y={device.y - 8} width="20" height="6" strokeWidth="0.5" className="text-foreground/35" />
-                  <rect x={device.x - 10} y={device.y} width="20" height="6" strokeWidth="0.5" className="text-foreground/35" />
-                  <rect x={device.x - 10} y={device.y + 8} width="20" height="6" strokeWidth="0.5" className="text-foreground/35" />
-                </g>
-              ) : (
-                <circle cx={device.x} cy={device.y} r="10" strokeWidth="0.5" className="text-foreground/35" />
-              )}
-              
-              {/* Status indicator */}
-              <circle cx={device.x + 10} cy={device.y - 10} r="2" fill="currentColor" className="text-foreground/40">
-                <animate attributeName="opacity" values="1;0.3;1" dur={`${1.5 + i * 0.3}s`} repeatCount="indefinite" />
-              </circle>
-            </g>
-          ))}
-          
-          {/* Latency indicators */}
-          <text x="330" y="490" fontSize="4" fill="currentColor" className="text-foreground/25" fontFamily="ui-monospace, monospace">12ms</text>
-          <text x="395" y="505" fontSize="4" fill="currentColor" className="text-foreground/25" fontFamily="ui-monospace, monospace">8ms</text>
-          <text x="405" y="570" fontSize="4" fill="currentColor" className="text-foreground/25" fontFamily="ui-monospace, monospace">15ms</text>
-        </g>
-
-        {/* Data Flow Visualization */}
-        <g ref={dataFlowRef} stroke="currentColor" className="text-foreground/20">
-          {/* Main pipeline */}
-          <path
-            d="M 100 400 L 180 400 L 180 420 L 280 420"
-            strokeWidth="0.6"
-            className="flow-pulse"
-            strokeDasharray="4 4"
+            markerEnd="url(#arrowhead)"
           />
           <path
-            d="M 280 420 L 340 420 L 340 480"
-            strokeWidth="0.6"
-            className="flow-pulse"
-            strokeDasharray="4 4"
-          />
-          
-          {/* Inference output flow */}
-          <path
-            d="M 360 555 L 360 620 L 280 620 L 280 680"
+            d="M 215 440 L 225 425 L 235 440"
             strokeWidth="0.5"
-            strokeDasharray="3 5"
-            className="text-foreground/15"
           />
           
-          {/* Context injection line */}
+          {/* Query input */}
+          <g transform="translate(320, 580)">
+            <rect x="-25" y="-10" width="50" height="20" strokeWidth="0.4" rx="3" />
+            <text
+              x="0"
+              y="3"
+              fontSize="6"
+              fontFamily="ui-monospace, monospace"
+              fill="currentColor"
+              textAnchor="middle"
+              className="text-foreground/40"
+            >
+              QUERY
+            </text>
+          </g>
           <path
-            d="M 220 480 L 260 450 L 300 450"
+            d="M 295 580 Q 270 560 250 530"
             strokeWidth="0.4"
-            className="text-foreground/25"
+            strokeDasharray="3 3"
           />
-          
-          {/* Flow direction arrows */}
-          <polygon points="280,420 275,415 275,425" fill="currentColor" className="text-foreground/30" />
-          <polygon points="340,480 335,475 345,475" fill="currentColor" className="text-foreground/30" />
-          <polygon points="280,680 275,675 285,675" fill="currentColor" className="text-foreground/30" />
         </g>
 
-        {/* Technical Labels */}
+        {/* Data Particles - Flowing through system */}
+        <g ref={dataParticlesRef} fill="currentColor" className="text-foreground/50">
+          <circle cx="180" cy="300" r="2.5" className="data-particle" />
+          <circle cx="270" cy="310" r="2" className="data-particle" />
+          <circle cx="200" cy="380" r="2.5" className="data-particle" />
+          <circle cx="250" cy="290" r="2" className="data-particle" />
+          <circle cx="190" cy="400" r="2" className="data-particle" />
+          <circle cx="260" cy="400" r="2.5" className="data-particle" />
+          <circle cx="225" cy="450" r="2" className="data-particle" />
+          <circle cx="150" cy="350" r="2" className="data-particle" />
+          <circle cx="300" cy="350" r="2" className="data-particle" />
+        </g>
+
+        {/* Labels */}
         <g ref={labelsRef} fill="currentColor" className="text-foreground/50">
-          {/* Section headers */}
-          <text x="240" y="130" fontSize="7" fontFamily="ui-monospace, monospace" textAnchor="middle" className="text-foreground/60">
-            LLM_INFERENCE_LAYER
+          <text
+            x="225"
+            y="265"
+            fontSize="7"
+            fontFamily="ui-monospace, monospace"
+            textAnchor="middle"
+          >
+            LLM_CORE
+          </text>
+          <text
+            x="225"
+            y="275"
+            fontSize="5"
+            fontFamily="ui-monospace, monospace"
+            textAnchor="middle"
+            className="text-foreground/30"
+          >
+            inference.active
           </text>
           
-          <text x="150" y="440" fontSize="6" fontFamily="ui-monospace, monospace" textAnchor="middle">
-            KNOWLEDGE_BASE
+          <text
+            x="80"
+            y="170"
+            fontSize="5"
+            fontFamily="ui-monospace, monospace"
+            textAnchor="middle"
+            className="text-foreground/35"
+          >
+            EDGE_01
+          </text>
+          <text
+            x="350"
+            y="150"
+            fontSize="5"
+            fontFamily="ui-monospace, monospace"
+            textAnchor="middle"
+            className="text-foreground/35"
+          >
+            EDGE_02
+          </text>
+          <text
+            x="70"
+            y="485"
+            fontSize="5"
+            fontFamily="ui-monospace, monospace"
+            textAnchor="middle"
+            className="text-foreground/35"
+          >
+            EDGE_03
+          </text>
+          <text
+            x="380"
+            y="535"
+            fontSize="5"
+            fontFamily="ui-monospace, monospace"
+            textAnchor="middle"
+            className="text-foreground/35"
+          >
+            EDGE_04
           </text>
           
-          <text x="360" y="580" fontSize="6" fontFamily="ui-monospace, monospace" textAnchor="middle">
-            EDGE_CLUSTER
-          </text>
-          
-          {/* RAG label */}
-          <text x="100" y="600" fontSize="5" fontFamily="ui-monospace, monospace" className="text-foreground/35">
+          <text
+            x="225"
+            y="640"
+            fontSize="6"
+            fontFamily="ui-monospace, monospace"
+            textAnchor="middle"
+          >
             RAG_RETRIEVAL
           </text>
-          
-          {/* Vector space label */}
-          <text x="220" y="525" fontSize="5" fontFamily="ui-monospace, monospace" className="text-foreground/35">
-            VECTOR_SPACE
+          <text
+            x="225"
+            y="650"
+            fontSize="5"
+            fontFamily="ui-monospace, monospace"
+            textAnchor="middle"
+            className="text-foreground/30"
+          >
+            vector.search
           </text>
           
           {/* System status */}
-          <text x="380" y="700" fontSize="5" fontFamily="ui-monospace, monospace" textAnchor="end" className="text-foreground/40">
-            MODEL: DEPLOYED
+          <text
+            x="400"
+            y="660"
+            fontSize="5"
+            fontFamily="ui-monospace, monospace"
+            textAnchor="end"
+            className="text-foreground/25"
+          >
+            SYS.AI.READY
           </text>
-          <text x="380" y="712" fontSize="4" fontFamily="ui-monospace, monospace" textAnchor="end" className="text-foreground/25">
-            CONTEXT_LEN: 128K
-          </text>
-          <text x="380" y="722" fontSize="4" fontFamily="ui-monospace, monospace" textAnchor="end" className="text-foreground/25">
-            EDGE_NODES: 4
-          </text>
-          
-          {/* Technical coordinates */}
-          <text x="85" y="165" fontSize="4" fontFamily="ui-monospace, monospace" className="text-foreground/25">
-            [0,0]
-          </text>
-          <text x="85" y="595" fontSize="4" fontFamily="ui-monospace, monospace" className="text-foreground/25">
-            [0,1]
-          </text>
-          <text x="400" y="595" fontSize="4" fontFamily="ui-monospace, monospace" textAnchor="end" className="text-foreground/25">
-            [1,1]
-          </text>
-        </g>
-
-        {/* Animated Signal Pulses */}
-        <g className="text-foreground/30">
-          {/* Neural activity pulse */}
-          <circle cx="360" cy="270" r="3" fill="currentColor">
-            <animate attributeName="r" values="3;6;3" dur="2s" repeatCount="indefinite" />
-            <animate attributeName="opacity" values="0.5;0.2;0.5" dur="2s" repeatCount="indefinite" />
-          </circle>
-          
-          {/* Edge sync pulse */}
-          <circle cx="360" cy="520" r="4" fill="none" stroke="currentColor" strokeWidth="0.5">
-            <animate attributeName="r" values="25;40;25" dur="3s" repeatCount="indefinite" />
-            <animate attributeName="opacity" values="0.3;0;0.3" dur="3s" repeatCount="indefinite" />
-          </circle>
-          
-          {/* Retrieval indicator */}
-          <circle cx="240" cy="480" r="2" fill="currentColor">
-            <animate attributeName="opacity" values="0.8;0.2;0.8" dur="1.5s" repeatCount="indefinite" />
-          </circle>
-        </g>
-
-        {/* Technical Grid Overlay */}
-        <g stroke="currentColor" className="text-foreground/8">
-          {/* Subtle grid lines */}
-          {[150, 250, 350, 450, 550, 650].map((y) => (
-            <line key={`grid-h-${y}`} x1="80" y1={y} x2="420" y2={y} strokeWidth="0.2" />
-          ))}
-          {[150, 250, 350].map((x) => (
-            <line key={`grid-v-${x}`} x1={x} y1="130" x2={x} y2="700" strokeWidth="0.2" />
-          ))}
-        </g>
-
-        {/* Corner Frame */}
-        <g stroke="currentColor" className="text-foreground/30">
-          <path d="M 70 120 L 70 100 L 90 100" strokeWidth="0.8" />
-          <path d="M 420 120 L 420 100 L 400 100" strokeWidth="0.8" />
-          <path d="M 70 730 L 70 750 L 90 750" strokeWidth="0.8" />
-          <path d="M 420 730 L 420 750 L 400 750" strokeWidth="0.8" />
         </g>
 
         {/* Arrow marker definition */}
         <defs>
-          <marker id="arrowhead" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
-            <polygon points="0,0 6,3 0,6" fill="currentColor" className="text-foreground/30" />
+          <marker
+            id="arrowhead"
+            markerWidth="6"
+            markerHeight="6"
+            refX="3"
+            refY="3"
+            orient="auto"
+          >
+            <path
+              d="M 0 0 L 6 3 L 0 6 Z"
+              fill="currentColor"
+              className="text-foreground/30"
+            />
           </marker>
         </defs>
       </svg>
