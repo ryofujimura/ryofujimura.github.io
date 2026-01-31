@@ -21,11 +21,11 @@ const ASCII_GRID = `┼───┼───┼───┼───┼───
 // ─────────────────────────────────────────────────────────────
 
 const SKILL_GROUPS = {
-  "Mobile": ["Swift", "SwiftUI", "Kotlin", "WatchOS", "AVFoundation", "App Store"],
+  "Mobile": ["Swift", "SwiftUI", "Kotlin", "WatchOS", "AVFoundation", "App Store", "probability"],
   "Web": ["React", "React 19", "Next.js", "Tailwind", "WebSocket", "Vercel"],
-  "Backend": ["Firebase", "Firestore", "Firebase RTDB", "Cloud Functions", "Node.js", "Flask", "Python"],
+  "Cloud": ["Firebase", "Firestore", "Firebase RTDB", "Cloud Functions", "Node.js", "Real-time", "Google APIs"],
   "AI/ML": ["AI/ML", "AI routing", "PyTorch", "Vision", "llama.cpp", "GGUF"],
-  "Other": ["Real-time", "Google APIs", "scheduling", "automation", "Instagram", "probability"],
+  "Python": ["Python", "Flask", "scheduling", "automation", "Instagram"],
 }
 
 type SkillGroup = keyof typeof SKILL_GROUPS
