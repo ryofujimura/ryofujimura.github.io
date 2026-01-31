@@ -801,7 +801,7 @@ export function ExperienceSection() {
               </div>
             </div>
 
-            <div className="relative p-3 sm:p-4 md:p-5">
+            <div className="relative p-3 sm:p-4 md:p-5 ">
               {experiences.map((exp, index) => {
                 const isActive = index === activeIndex
                 return (
@@ -868,7 +868,7 @@ export function ExperienceSection() {
                         {exp.description}
                       </p>
 
-                      <div data-detail-block className="grid gap-3 sm:gap-4 md:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] items-start md:items-stretch">
+                      <div data-detail-block className="grid gap-3 sm:gap-4 md:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] items-start md:items-stretch pb-3 sm:pb-4 md:pb-5">
                         <ul className="space-y-5 sm:space-y-6">
                           {exp.highlights.map((highlight, i) => (
                             <li
