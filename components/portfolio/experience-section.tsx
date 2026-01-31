@@ -388,12 +388,11 @@ export function ExperienceSection() {
     })
 
     const tl = gsap.timeline({ overwrite: true })
-    // Expand container to auto height
+    // Expand container to auto height (keep overflow hidden to prevent scrollbar)
     tl.to(container, {
       height: "auto",
       duration: 0.5,
       ease: "power3.inOut",
-      overflow: "visible",
     })
     // Stagger each row: row slide + opacity, then inner content (icon, text, line draw)
     rows.forEach((row, i) => {
@@ -633,13 +632,13 @@ export function ExperienceSection() {
             <div
               ref={indexListRef}
               className={cn(
-                "flex flex-col min-h-0 space-y-3",
+                "flex flex-col min-h-0 space-y-3 scrollbar-hide",
                 listExpanded && hasIndexOverflow && "border-t border-b",
-                isLg && detailPanelHeight > 0 && "lg:flex-1 lg:min-h-0 lg:overflow-y-auto lg:scrollbar-hide"
+                isLg && detailPanelHeight > 0 && "lg:flex-1 lg:min-h-0 lg:overflow-y-auto"
               )}
             >
               <div className={cn(
-                "border divide-y divide-foreground bg-secondary",
+                "border divide-y divide-foreground bg-secondary scrollbar-hide",
               )}>
               {/* First N items always visible */}
               {experiences.slice(0, INITIAL_INDEX_VISIBLE).map((exp, index) => (
