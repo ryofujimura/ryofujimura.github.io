@@ -94,7 +94,7 @@ export function Navigation() {
             : "bg-transparent"
         )}
       >
-        <div className="max-w-5xl lg:max-w-6xl mx-auto px-4 sm:px-6 py-3 sm:py-4">
+        <div className="max-w-6xl mx-auto py-3 sm:py-4">
           <div className="flex items-center justify-between">
             <MagneticButton
               onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
