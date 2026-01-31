@@ -873,8 +873,9 @@ export function ExperienceSection() {
                           {exp.highlights.map((highlight, i) => (
                             <li
                               key={i}
-                              className="text-xs sm:text-sm text-foreground/90 py-2"
+                              className="flex gap-3 text-xs sm:text-sm text-foreground/90 py-2"
                             >
+                              <span className="mt-1 h-3 w-3 shrink-0 border border-foreground bg-accent/20" />
                               <span className="leading-relaxed"><BoldNumbers text={highlight} /></span>
                             </li>
                           ))}
