@@ -10,10 +10,10 @@ import { cn } from "@/lib/utils"
 
 const INITIAL_INDEX_VISIBLE = 3
 
-// Helper to bold numbers in highlight text
+// Helper to bold numbers in highlight text (includes adjacent letters like "8B", "Q4", "3GB", "3D")
 function BoldNumbers({ text }: { text: string }) {
-  // Match numbers including decimals, percentages, ranges (–), and special chars like #, ×, +
-  const parts = text.split(/(\d+(?:[–-]\d+)?%?×?|\d+\+?|#\d+|\d+\/\d+)/g)
+  // Match numbers with adjacent letters, percentages, ranges (–), and special chars like #, ×, +
+  const parts = text.split(/([A-Za-z]*\d+(?:[–-]\d+)?[A-Za-z]*%?×?\+?|#\d+[A-Za-z]*|\d+\/\d+[A-Za-z]*)/g)
   return (
     <>
       {parts.map((part, i) =>
