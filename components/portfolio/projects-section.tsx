@@ -3,36 +3,34 @@
 import { useState, useRef, useEffect, useMemo, useCallback } from "react"
 import { gsap } from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
-import { ExternalLink, Github, X, ChevronDown } from "lucide-react"
+import { ExternalLink, Github, X, ChevronDown, ChevronRight } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 gsap.registerPlugin(ScrollTrigger)
 
 // ─────────────────────────────────────────────────────────────
-// ASCII MEDICAL PATTERNS
+// ASCII NEURAL PATTERNS
 // ─────────────────────────────────────────────────────────────
 
-const ASCII_BRAIN_SCAN = `
-    ████████████████
-  ██░░░░░░░░░░░░░░░░██
- █░░▒▒▒▒▒▒░░░░▒▒▒▒▒▒░░█
-█░░▒▓▓▓▓▒▒░░░░▒▒▓▓▓▓▒░░█
-█░▒▓████▓▒░░░░▒▓████▓▒░█
-█░▒▓████▓▒░░░░▒▓████▓▒░█
-█░░▒▓▓▓▓▒▒░░░░▒▒▓▓▓▓▒░░█
- █░░▒▒▒▒▒▒░░░░▒▒▒▒▒▒░░█
-  ██░░░░░░░░░░░░░░░░██
-    ████████████████`.trim()
+const ASCII_NEURON = `
+    ●━━━●
+   ╱│╲ ╱│╲
+  ● ● ● ● ●
+   ╲│╱ ╲│╱
+    ●━━━●
+`.trim()
 
-const ASCII_ECG = `─────╱╲────────╱╲────────╱╲─────`
+const ASCII_SYNAPSE = `○──●──○──●──○──●──○──●──○──●──○──●──○`
 
-const ASCII_DIAGNOSTIC = `
-┌─ DIAGNOSTIC ─────────────────┐
-│ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░░░░░░ │
-│ STATUS: ANALYZING            │
-└──────────────────────────────┘`.trim()
+const ASCII_NETWORK = `
+┌─●─┬─●─┬─●─┐
+│ ╲ │ ╱ │ ╲ │
+●───●───●───●
+│ ╱ │ ╲ │ ╱ │
+└─●─┴─●─┴─●─┘
+`.trim()
 
-const ASCII_NEURAL = `◉──●──◉──●──◉`
+const ASCII_NODE = `[●]`
 
 // ─────────────────────────────────────────────────────────────
 // SKILL GROUPS
@@ -55,301 +53,301 @@ type SkillGroup = keyof typeof SKILL_GROUPS
 const allProjects = [
   {
     id: "01",
-    code: "CASE-2024-01",
+    code: "RF.2024.01",
     title: "Saboriendo Bakery Platform",
-    region: "CORTEX-A",
+    category: "FULL-STACK",
     primarySkill: "React + SwiftUI",
     year: "2024",
-    image: "/images/default_image.png",
-    description:
-      "Full-stack e-commerce using React 19, SwiftUI, Firebase. Real-time order processing, FCM/APNs push. Barcode verification, 11+ formats, 50%+ faster lookup.",
-    vitals: ["50%↑", "11+ fmt", "3 lang"],
+    image: "/images/saboriendo.jpg",
+    description: "Full-stack e-commerce using React 19, SwiftUI, Firebase. Real-time order processing, barcode verification, 11+ formats.",
+    metrics: ["50%↑", "11+ formats", "3 lang"],
     skills: ["React 19", "SwiftUI", "Firebase", "Firestore", "AVFoundation"],
     links: { github: "https://github.com/ryofujimura", demo: "https://ryofujimura.github.io" },
-    status: "ACTIVE",
   },
   {
     id: "02",
-    code: "CASE-2025-02",
+    code: "RF.2025.02",
     title: "Zero Inbox",
-    region: "CORTEX-B",
+    category: "AI/ML",
     primarySkill: "Swift + AI Engine",
     year: "2025",
-    image: "/images/default_image.png",
-    description:
-      "Swift/SwiftUI email client with AI reasoning engine. 90–95% classification accuracy, 100–300ms inference. Multi-stage decision system.",
-    vitals: ["95% acc", "200ms", "50-200/min"],
+    image: "/images/zeroinbox.jpg",
+    description: "Swift/SwiftUI email client with AI reasoning engine. 90–95% classification accuracy, 100–300ms inference.",
+    metrics: ["95% acc", "200ms", "50-200/min"],
     skills: ["Swift", "SwiftUI", "Firebase", "AI/ML", "Google APIs"],
     links: { github: "https://github.com/ryofujimura", demo: "#" },
-    status: "ACTIVE",
   },
   {
     id: "03",
-    code: "CASE-2025-03",
+    code: "RF.2025.03",
     title: "Research Lab Management",
-    region: "CORTEX-C",
+    category: "SERVERLESS",
     primarySkill: "Cloud Functions",
     year: "2025",
-    image: "/images/default_image.png",
-    description:
-      "Serverless orchestration for dynamic AI routing across 30+ researchers. Sub-200ms Cloud Functions response.",
-    vitals: ["<200ms", "30+ users", "multi-lab"],
+    image: "/images/researchlab.jpg",
+    description: "Serverless orchestration for dynamic AI routing across 30+ researchers. Sub-200ms response.",
+    metrics: ["<200ms", "30+ users", "multi-lab"],
     skills: ["Cloud Functions", "Firebase", "AI routing", "Node.js"],
     links: { github: "https://github.com/ryofujimura", demo: "https://ryofujimura.github.io" },
-    status: "STABLE",
   },
   {
     id: "04",
-    code: "CASE-2025-04",
+    code: "RF.2025.04",
     title: "HTIC Shuttle",
-    region: "CORTEX-D",
+    category: "REAL-TIME",
     primarySkill: "Firebase RTDB",
     year: "2025",
     image: "/images/schedule.jpg",
-    description:
-      "Live shuttle tracking for 25+ daily users. 70%+ reduction in duplicate pickups. Real-time sync under 100ms.",
-    vitals: ["25+ DAU", "70%↓", "<100ms"],
+    description: "Live shuttle tracking for 25+ daily users. 70%+ reduction in duplicate pickups via event serialization.",
+    metrics: ["25+ DAU", "70%↓", "<100ms"],
     skills: ["Swift", "Kotlin", "Firebase RTDB", "Real-time"],
     links: { github: "https://github.com/ryofujimura", demo: "https://ryofujimura.github.io", appStore: "#", playStore: "#" },
-    status: "ACTIVE",
   },
   {
     id: "05",
-    code: "CASE-2025-05",
+    code: "RF.2025.05",
     title: "CyberEdu",
-    region: "CORTEX-E",
+    category: "CROSS-PLATFORM",
     primarySkill: "Swift + Kotlin",
     year: "2025",
     image: "/images/CyberEdu.png",
-    description:
-      "Synchronized iOS+Android apps for live event updates. 99%+ cross-device sync reliability.",
-    vitals: ["50+ users", "99%↑", "iOS+Android"],
+    description: "Synchronized iOS+Android apps for live event updates. 99%+ cross-device sync reliability.",
+    metrics: ["50+ users", "99%↑", "iOS+Android"],
     skills: ["Swift", "Kotlin", "Firebase", "Real-time"],
     links: { github: "https://github.com/ryofujimura", demo: "https://ryofujimura.github.io", appStore: "#", playStore: "#" },
-    status: "STABLE",
   },
   {
     id: "06",
-    code: "CASE-2025-06",
+    code: "RF.2025.06",
     title: "Whiteboard AI",
-    region: "CORTEX-F",
+    category: "VISION",
     primarySkill: "PyTorch + WebSocket",
     year: "2025",
     image: "/images/whiteboardai.png",
-    description:
-      "Transformer-based vision inference at 150–200ms latency. Real-time CRDT-like collaboration.",
-    vitals: ["150ms", "5+ users", "CRDT"],
+    description: "Transformer-based vision inference at 150–200ms latency; real-time CRDT-like collaboration.",
+    metrics: ["150ms", "5+ users", "CRDT"],
     skills: ["PyTorch", "Vision", "WebSocket", "React"],
     links: { github: "https://github.com/ryofujimura", demo: "https://ryofujimura.github.io" },
-    status: "ACTIVE",
   },
   {
     id: "07",
-    code: "CASE-2024-07",
+    code: "RF.2024.07",
     title: "With",
-    region: "CORTEX-G",
+    category: "LOCAL AI",
     primarySkill: "llama.cpp + Swift",
     year: "2024–25",
-    image: "/images/default_image.png",
-    description:
-      "Offline-capable LLM chat using GGUF + llama.cpp. <50ms/token local inference. 2GB+ memory savings.",
-    vitals: ["<50ms/tok", "2GB↓", "offline"],
+    image: "/images/with.jpg",
+    description: "Offline-capable LLM chat using GGUF + llama.cpp, <50ms/token local inference. 2GB+ memory savings.",
+    metrics: ["<50ms/tok", "2GB↓", "offline"],
     skills: ["Swift", "llama.cpp", "GGUF", "SwiftUI"],
     links: { github: "https://github.com/ryofujimura" },
-    status: "STABLE",
   },
   {
     id: "08",
-    code: "CASE-2024-08",
+    code: "RF.2024.08",
     title: "Portfolio Website",
-    region: "CORTEX-H",
+    category: "WEB",
     primarySkill: "Next.js + GSAP",
     year: "2024–25",
     image: "/images/homepage.png",
-    description:
-      "Client-side performance tuning: 40–60% faster load. Brutalist design with GSAP animations.",
-    vitals: ["40-60%↑", "modular", "Vercel"],
+    description: "Client-side performance tuning: 40–60% faster load. Brutalist design system with GSAP animations.",
+    metrics: ["40-60%↑", "modular", "Vercel"],
     skills: ["React", "Next.js", "Tailwind", "Vercel"],
     links: { github: "https://github.com/ryofujimura", demo: "https://ryofujimura.github.io" },
-    status: "ACTIVE",
   },
   {
     id: "09",
-    code: "CASE-2024-09",
+    code: "RF.2024.09",
     title: "Matcha Time",
-    region: "CORTEX-I",
+    category: "iOS",
     primarySkill: "SwiftUI Native",
     year: "2024",
     image: "/images/matchatime_1.jpg",
-    description:
-      "Swift/SwiftUI time zone coordination tool. 4-week idea-to-launch cycle with App Store deployment.",
-    vitals: ["50 users", "4 weeks", "App Store"],
+    description: "Swift/SwiftUI time zone coordination tool; 50 users at launch. 4-week idea-to-launch cycle.",
+    metrics: ["50 users", "4 weeks", "App Store"],
     skills: ["Swift", "SwiftUI", "App Store"],
     links: { github: "https://github.com/ryofujimura", demo: "https://ryofujimura.github.io", appStore: "#" },
-    status: "STABLE",
   },
   {
     id: "10",
-    code: "CASE-2023-10",
+    code: "RF.2023.10",
     title: "Schedule Mastermind",
-    region: "CORTEX-J",
+    category: "BACKEND",
     primarySkill: "Python Flask",
     year: "2023–24",
     image: "/images/schedule.jpg",
-    description:
-      "Python Flask scheduler for 500+ courses with real-time conflict detection. 70%+ fewer errors.",
-    vitals: ["500+ courses", "70%↓", "Flask"],
+    description: "Python Flask scheduler for 500+ courses with real-time conflict detection. 70%+ fewer errors.",
+    metrics: ["500+ courses", "70%↓", "Flask"],
     skills: ["Python", "Flask", "scheduling"],
     links: { github: "https://github.com/ryofujimura", demo: "https://ryofujimura.github.io" },
-    status: "ARCHIVED",
   },
   {
     id: "11",
-    code: "CASE-2023-11",
+    code: "RF.2023.11",
     title: "Shohei Home Ground",
-    region: "CORTEX-K",
+    category: "AUTOMATION",
     primarySkill: "Python Scripts",
     year: "2023",
     image: "/images/shoheihomeground_1.jpg",
-    description:
-      "Automated daily Instagram posting (685 posts), 11K followers in 8 months. 2+ hours/day saved.",
-    vitals: ["11K", "685 posts", "2hr↓"],
+    description: "Automated daily Instagram posting (685 posts), 11K followers in 8 months. 2+ hours/day saved.",
+    metrics: ["11K followers", "685 posts", "2hr/day↓"],
     skills: ["Python", "automation", "Instagram"],
     links: { instagram: "#", youtube: "#" },
-    status: "ARCHIVED",
   },
   {
     id: "12",
-    code: "CASE-2022-12",
+    code: "RF.2022.12",
     title: "Poker Percentage",
-    region: "CORTEX-L",
+    category: "WATCHOS",
     primarySkill: "WatchKit + Swift",
     year: "2022–24",
     image: "/images/poker.png",
-    description:
-      "WatchOS poker odds calculator. <10ms probability lookups via precomputed tables.",
-    vitals: ["<10ms", "WatchOS", "precomputed"],
+    description: "WatchOS poker odds calculator, <10ms probability lookups via precomputed tables.",
+    metrics: ["<10ms", "WatchOS", "precomputed"],
     skills: ["Swift", "WatchOS", "probability"],
     links: { github: "https://github.com/ryofujimura", appStore: "#" },
-    status: "STABLE",
   },
 ]
 
 type Project = (typeof allProjects)[0]
 
 // ─────────────────────────────────────────────────────────────
-// SCAN LINE SVG COMPONENT
+// NEURAL SVG BACKGROUND
 // ─────────────────────────────────────────────────────────────
 
-function ScanLines({ className }: { className?: string }) {
+function NeuralBackground() {
   const svgRef = useRef<SVGSVGElement>(null)
 
   useEffect(() => {
     if (!svgRef.current) return
-    const lines = svgRef.current.querySelectorAll("line")
+    const nodes = svgRef.current.querySelectorAll(".neural-node")
+    const lines = svgRef.current.querySelectorAll(".neural-line")
+
     const ctx = gsap.context(() => {
+      // Animate lines
       gsap.fromTo(
         lines,
-        { strokeDasharray: "0 100", opacity: 0 },
+        { strokeDasharray: "0 1000", opacity: 0 },
         {
-          strokeDasharray: "100 0",
-          opacity: 1,
-          duration: 0.8,
-          stagger: 0.02,
-          ease: "power2.out",
-          scrollTrigger: {
-            trigger: svgRef.current,
-            start: "top 92%",
-            toggleActions: "play none none none",
-          },
+          strokeDasharray: "1000 0",
+          opacity: 0.15,
+          duration: 2,
+          stagger: 0.1,
+          ease: "power1.out",
         }
       )
+
+      // Pulse nodes
+      gsap.to(nodes, {
+        scale: 1.2,
+        opacity: 0.4,
+        duration: 1.5,
+        stagger: { each: 0.2, repeat: -1, yoyo: true },
+        ease: "sine.inOut",
+      })
     }, svgRef.current)
+
     return () => ctx.revert()
   }, [])
 
   return (
     <svg
       ref={svgRef}
-      className={cn("absolute inset-0 w-full h-full pointer-events-none", className)}
+      className="absolute inset-0 w-full h-full pointer-events-none"
       viewBox="0 0 100 100"
-      preserveAspectRatio="none"
+      preserveAspectRatio="xMidYMid slice"
     >
-      {/* Corner surgical marks */}
-      <line x1="0" y1="0" x2="8" y2="0" stroke="currentColor" strokeWidth="0.8" opacity="0.5" />
-      <line x1="0" y1="0" x2="0" y2="8" stroke="currentColor" strokeWidth="0.8" opacity="0.5" />
-      <line x1="100" y1="0" x2="92" y2="0" stroke="currentColor" strokeWidth="0.8" opacity="0.5" />
-      <line x1="100" y1="0" x2="100" y2="8" stroke="currentColor" strokeWidth="0.8" opacity="0.5" />
-      <line x1="0" y1="100" x2="8" y2="100" stroke="currentColor" strokeWidth="0.8" opacity="0.5" />
-      <line x1="0" y1="100" x2="0" y2="92" stroke="currentColor" strokeWidth="0.8" opacity="0.5" />
-      <line x1="100" y1="100" x2="92" y2="100" stroke="currentColor" strokeWidth="0.8" opacity="0.5" />
-      <line x1="100" y1="100" x2="100" y2="92" stroke="currentColor" strokeWidth="0.8" opacity="0.5" />
-      
-      {/* Cross-hair center marks */}
-      <line x1="48" y1="50" x2="52" y2="50" stroke="currentColor" strokeWidth="0.3" opacity="0.2" />
-      <line x1="50" y1="48" x2="50" y2="52" stroke="currentColor" strokeWidth="0.3" opacity="0.2" />
+      {/* Neural network lines */}
+      <line className="neural-line" x1="10" y1="20" x2="30" y2="40" stroke="currentColor" strokeWidth="0.2" />
+      <line className="neural-line" x1="30" y1="40" x2="50" y2="30" stroke="currentColor" strokeWidth="0.2" />
+      <line className="neural-line" x1="50" y1="30" x2="70" y2="50" stroke="currentColor" strokeWidth="0.2" />
+      <line className="neural-line" x1="70" y1="50" x2="90" y2="35" stroke="currentColor" strokeWidth="0.2" />
+      <line className="neural-line" x1="20" y1="60" x2="40" y2="70" stroke="currentColor" strokeWidth="0.2" />
+      <line className="neural-line" x1="40" y1="70" x2="60" y2="60" stroke="currentColor" strokeWidth="0.2" />
+      <line className="neural-line" x1="60" y1="60" x2="80" y2="80" stroke="currentColor" strokeWidth="0.2" />
+      <line className="neural-line" x1="30" y1="40" x2="40" y2="70" stroke="currentColor" strokeWidth="0.15" />
+      <line className="neural-line" x1="50" y1="30" x2="60" y2="60" stroke="currentColor" strokeWidth="0.15" />
+      <line className="neural-line" x1="70" y1="50" x2="80" y2="80" stroke="currentColor" strokeWidth="0.15" />
+
+      {/* Neural nodes */}
+      <circle className="neural-node" cx="10" cy="20" r="1" fill="currentColor" opacity="0.2" />
+      <circle className="neural-node" cx="30" cy="40" r="1.5" fill="currentColor" opacity="0.3" />
+      <circle className="neural-node" cx="50" cy="30" r="1" fill="currentColor" opacity="0.2" />
+      <circle className="neural-node" cx="70" cy="50" r="1.5" fill="currentColor" opacity="0.3" />
+      <circle className="neural-node" cx="90" cy="35" r="1" fill="currentColor" opacity="0.2" />
+      <circle className="neural-node" cx="20" cy="60" r="1" fill="currentColor" opacity="0.2" />
+      <circle className="neural-node" cx="40" cy="70" r="1.5" fill="currentColor" opacity="0.3" />
+      <circle className="neural-node" cx="60" cy="60" r="1" fill="currentColor" opacity="0.2" />
+      <circle className="neural-node" cx="80" cy="80" r="1.5" fill="currentColor" opacity="0.3" />
     </svg>
   )
 }
 
 // ─────────────────────────────────────────────────────────────
-// ECG LINE ANIMATION
+// NODE CONNECTOR SVG
 // ─────────────────────────────────────────────────────────────
 
-function ECGLine({ className }: { className?: string }) {
-  const pathRef = useRef<SVGPathElement>(null)
+function NodeConnector({ className }: { className?: string }) {
+  const ref = useRef<SVGSVGElement>(null)
 
   useEffect(() => {
-    if (!pathRef.current) return
-    const path = pathRef.current
-    const length = path.getTotalLength()
-    
-    gsap.set(path, { strokeDasharray: length, strokeDashoffset: length })
-    
+    if (!ref.current) return
+    const paths = ref.current.querySelectorAll("path, line, circle")
     const ctx = gsap.context(() => {
-      gsap.to(path, {
-        strokeDashoffset: 0,
-        duration: 1.5,
-        ease: "power2.out",
-        scrollTrigger: {
-          trigger: path,
-          start: "top 90%",
-          toggleActions: "play none none none",
-        },
-      })
-    })
+      gsap.fromTo(
+        paths,
+        { strokeDasharray: "0 200", opacity: 0 },
+        {
+          strokeDasharray: "200 0",
+          opacity: 1,
+          duration: 0.8,
+          stagger: 0.05,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: ref.current,
+            start: "top 95%",
+            toggleActions: "play none none none",
+          },
+        }
+      )
+    }, ref.current)
     return () => ctx.revert()
   }, [])
 
   return (
-    <svg className={cn("w-full h-4", className)} viewBox="0 0 200 20" preserveAspectRatio="none">
-      <path
-        ref={pathRef}
-        d="M0,10 L30,10 L35,10 L40,2 L45,18 L50,10 L80,10 L85,10 L90,2 L95,18 L100,10 L130,10 L135,10 L140,2 L145,18 L150,10 L200,10"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1"
-        opacity="0.4"
-      />
+    <svg
+      ref={ref}
+      className={cn("w-full h-4 sm:h-6", className)}
+      viewBox="0 0 400 24"
+      preserveAspectRatio="none"
+    >
+      {/* Connection line with nodes */}
+      <line x1="0" y1="12" x2="400" y2="12" stroke="currentColor" strokeWidth="1" opacity="0.15" strokeDasharray="4 4" />
+      <circle cx="50" cy="12" r="3" fill="none" stroke="currentColor" strokeWidth="1" opacity="0.3" />
+      <circle cx="50" cy="12" r="1" fill="currentColor" opacity="0.4" />
+      <circle cx="200" cy="12" r="4" fill="none" stroke="currentColor" strokeWidth="1" opacity="0.3" />
+      <circle cx="200" cy="12" r="1.5" fill="currentColor" opacity="0.5" />
+      <circle cx="350" cy="12" r="3" fill="none" stroke="currentColor" strokeWidth="1" opacity="0.3" />
+      <circle cx="350" cy="12" r="1" fill="currentColor" opacity="0.4" />
     </svg>
   )
 }
 
 // ─────────────────────────────────────────────────────────────
-// PROJECT CARD - MEDICAL DIAGNOSTIC PANEL
+// PROJECT NODE CARD
 // ─────────────────────────────────────────────────────────────
 
-function ProjectCard({ project }: { project: Project }) {
-  const cardRef = useRef<HTMLDivElement>(null)
-  const titleRef = useRef<HTMLSpanElement>(null)
-  const imageRef = useRef<HTMLDivElement>(null)
+function ProjectNode({ project, index }: { project: Project; index: number }) {
+  const nodeRef = useRef<HTMLDivElement>(null)
+  const titleRef = useRef<HTMLHeadingElement>(null)
+  const [imgError, setImgError] = useState(false)
 
   useEffect(() => {
-    if (!cardRef.current) return
-    const el = cardRef.current
+    if (!nodeRef.current) return
+    const el = nodeRef.current
 
     const ctx = gsap.context(() => {
-      // Card entrance
+      // Node entrance
       gsap.fromTo(
         el,
         { opacity: 0, y: 30, scale: 0.98 },
@@ -369,7 +367,7 @@ function ProjectCard({ project }: { project: Project }) {
 
       // Title scramble
       if (titleRef.current) {
-        const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+-"
+        const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789●○◐◑"
         const originalText = project.primarySkill.toUpperCase()
         let iteration = 0
 
@@ -394,26 +392,8 @@ function ProjectCard({ project }: { project: Project }) {
         })
       }
 
-      // Image scan effect
-      if (imageRef.current) {
-        gsap.fromTo(
-          imageRef.current.querySelector(".scan-overlay"),
-          { y: "-100%" },
-          {
-            y: "100%",
-            duration: 1.2,
-            ease: "power2.inOut",
-            scrollTrigger: {
-              trigger: imageRef.current,
-              start: "top 85%",
-              toggleActions: "play none none none",
-            },
-          }
-        )
-      }
-
-      // Stagger items
-      const items = el.querySelectorAll(".reveal-item")
+      // Stagger reveals
+      const items = el.querySelectorAll(".node-reveal")
       gsap.fromTo(
         items,
         { opacity: 0, x: -10 },
@@ -440,190 +420,164 @@ function ProjectCard({ project }: { project: Project }) {
   const hasAppStore = "appStore" in project.links
   const hasPlayStore = "playStore" in project.links
 
-  const statusColor = {
-    ACTIVE: "text-green-500 border-green-500/50",
-    STABLE: "text-blue-400 border-blue-400/50",
-    ARCHIVED: "text-foreground/40 border-foreground/20",
-  }[project.status] || "text-foreground/40 border-foreground/20"
-
   return (
     <article
-      ref={cardRef}
-      className="relative bg-background border border-foreground/30 overflow-hidden"
+      ref={nodeRef}
+      className="relative group"
     >
-      <ScanLines className="opacity-40" />
-
-      {/* Mobile-first layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-[180px_1fr_160px]">
-        
-        {/* IMAGE PANEL */}
-        <div
-          ref={imageRef}
-          className="relative h-40 sm:h-48 lg:h-auto lg:min-h-[200px] border-b lg:border-b-0 lg:border-r border-foreground/20 overflow-hidden bg-foreground/5"
-        >
-          {/* Scan overlay */}
-          <div className="scan-overlay absolute inset-0 bg-gradient-to-b from-accent/20 via-transparent to-transparent pointer-events-none z-10" />
+      {/* Mobile: Stacked layout / Desktop: Side-by-side */}
+      <div className={cn(
+        "border-2 border-foreground bg-background",
+        "shadow-[3px_3px_0_0_var(--foreground)]",
+        "sm:shadow-[4px_4px_0_0_var(--foreground)]",
+        "hover:shadow-[5px_5px_0_0_var(--foreground)]",
+        "transition-shadow duration-200"
+      )}>
+        {/* Main grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr]">
           
-          {/* Image */}
-          <img
-            src={project.image}
-            alt={project.title}
-            className="w-full h-full object-cover opacity-80 grayscale hover:grayscale-0 transition-all duration-500"
-          />
-          
-          {/* Image overlay data */}
-          <div className="absolute bottom-0 left-0 right-0 p-2 sm:p-3 bg-gradient-to-t from-background/90 to-transparent">
-            <div className="flex items-center justify-between">
-              <span className="font-mono text-[8px] sm:text-[9px] text-foreground/60 tracking-wider">
-                {project.code}
+          {/* IMAGE SECTION */}
+          <div className="relative aspect-[4/3] lg:aspect-auto lg:h-full border-b lg:border-b-0 lg:border-r border-foreground/30 overflow-hidden bg-muted/30">
+            {/* Node decoration */}
+            <div className="absolute top-2 left-2 sm:top-3 sm:left-3 z-10">
+              <span className="font-mono text-[10px] sm:text-xs text-foreground/60 bg-background/90 px-1.5 py-0.5 border border-foreground/30">
+                {ASCII_NODE} {project.id}
               </span>
-              <span className={cn("font-mono text-[8px] sm:text-[9px] px-1.5 py-0.5 border", statusColor)}>
-                {project.status}
+            </div>
+
+            {/* Image or placeholder */}
+            {!imgError ? (
+              <img
+                src={project.image}
+                alt={project.title}
+                className="w-full h-full object-cover"
+                onError={() => setImgError(true)}
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center bg-muted/50">
+                <pre className="font-mono text-[8px] sm:text-[10px] text-foreground/30 select-none text-center leading-tight">
+                  {ASCII_NEURON}
+                </pre>
+              </div>
+            )}
+
+            {/* Overlay gradient */}
+            <div className="absolute inset-0 bg-gradient-to-t from-background/60 via-transparent to-transparent lg:bg-gradient-to-r" />
+
+            {/* Category badge - mobile bottom, desktop top-right */}
+            <div className="absolute bottom-2 left-2 sm:bottom-3 sm:left-3 lg:bottom-auto lg:top-3 lg:left-auto lg:right-3">
+              <span className="font-mono text-[9px] sm:text-[10px] text-background bg-foreground px-2 py-1">
+                {project.category}
               </span>
             </div>
           </div>
-          
-          {/* Corner marks on image */}
-          <div className="absolute top-2 left-2 w-3 h-3 border-l border-t border-foreground/40" />
-          <div className="absolute top-2 right-2 w-3 h-3 border-r border-t border-foreground/40" />
-          <div className="absolute bottom-8 left-2 w-3 h-3 border-l border-b border-foreground/40" />
-          <div className="absolute bottom-8 right-2 w-3 h-3 border-r border-b border-foreground/40" />
-        </div>
 
-        {/* MAIN DATA PANEL */}
-        <div className="p-3 sm:p-4 lg:p-5 border-b lg:border-b-0 lg:border-r border-foreground/20">
-          {/* Header row */}
-          <div className="flex items-start justify-between gap-2 mb-2 sm:mb-3">
-            <div className="flex-1 min-w-0">
-              <div className="reveal-item flex items-center gap-2 mb-1">
-                <span className="font-mono text-[9px] sm:text-[10px] text-accent tracking-[0.15em]">
-                  {project.region}
-                </span>
-                <span className="font-mono text-[8px] sm:text-[9px] text-foreground/30">
-                  {project.year}
-                </span>
-              </div>
-              
-              {/* Primary skill - MAIN TITLE */}
-              <h3 className="reveal-item">
-                <span
+          {/* CONTENT SECTION */}
+          <div className="p-3 sm:p-4 lg:p-5">
+            {/* Header row */}
+            <div className="flex items-start justify-between gap-2 mb-2 sm:mb-3">
+              <div className="flex-1 min-w-0">
+                {/* Primary skill - MAIN TITLE */}
+                <h3
                   ref={titleRef}
-                  className="font-mono text-lg sm:text-xl lg:text-2xl font-black text-foreground tracking-tight leading-none block"
+                  className="font-mono text-lg sm:text-xl lg:text-2xl font-black text-foreground tracking-tight leading-tight truncate"
                 >
                   {project.primarySkill.toUpperCase()}
+                </h3>
+                {/* Project name */}
+                <p className="node-reveal font-mono text-[11px] sm:text-xs text-muted-foreground mt-0.5 truncate">
+                  {project.title}
+                </p>
+              </div>
+              <div className="flex-shrink-0 text-right">
+                <span className="font-mono text-lg sm:text-xl font-black text-foreground/20 tabular-nums">
+                  {project.id}
                 </span>
-              </h3>
+              </div>
             </div>
-            
-            {/* ID badge */}
-            <div className="reveal-item flex-shrink-0 font-mono text-2xl sm:text-3xl font-black text-foreground/15 tabular-nums leading-none">
-              {project.id}
+
+            {/* Metrics - horizontal scroll on mobile */}
+            <div className="node-reveal flex gap-1.5 sm:gap-2 mb-2 sm:mb-3 overflow-x-auto scrollbar-hide pb-1">
+              {project.metrics.map((m, i) => (
+                <span
+                  key={i}
+                  className="flex-shrink-0 font-mono text-[9px] sm:text-[10px] px-1.5 sm:px-2 py-0.5 sm:py-1 border border-foreground/40 text-foreground bg-foreground/5"
+                >
+                  {m}
+                </span>
+              ))}
+              <span className="flex-shrink-0 font-mono text-[9px] sm:text-[10px] px-1.5 sm:px-2 py-0.5 sm:py-1 text-muted-foreground">
+                {project.year}
+              </span>
             </div>
-          </div>
 
-          {/* Project name */}
-          <p className="reveal-item font-mono text-[11px] sm:text-xs text-muted-foreground mb-2 sm:mb-3 truncate">
-            {project.title}
-          </p>
+            {/* Description - clamped on mobile */}
+            <p className="node-reveal text-[11px] sm:text-xs lg:text-sm text-foreground/75 leading-relaxed mb-2 sm:mb-3 line-clamp-2 sm:line-clamp-3 lg:line-clamp-none">
+              {project.description}
+            </p>
 
-          {/* Description */}
-          <p className="reveal-item text-[11px] sm:text-xs text-foreground/70 leading-relaxed mb-3 sm:mb-4 line-clamp-3 sm:line-clamp-none">
-            {project.description}
-          </p>
+            {/* Skills - wrap */}
+            <div className="node-reveal flex flex-wrap gap-1 sm:gap-1.5 mb-3 sm:mb-4">
+              {project.skills.map((skill) => (
+                <span
+                  key={skill}
+                  className="font-mono text-[8px] sm:text-[9px] text-muted-foreground/80 border-b border-dotted border-foreground/20 pb-px"
+                >
+                  {skill}
+                </span>
+              ))}
+            </div>
 
-          {/* Vitals row */}
-          <div className="reveal-item flex flex-wrap gap-1.5 sm:gap-2 mb-3 sm:mb-4">
-            {project.vitals.map((v, i) => (
-              <span
-                key={i}
-                className="font-mono text-[9px] sm:text-[10px] px-1.5 sm:px-2 py-0.5 sm:py-1 border border-foreground/30 text-foreground bg-foreground/5"
-              >
-                {v}
+            {/* Links row */}
+            <div className="node-reveal flex flex-wrap items-center gap-2 sm:gap-3">
+              {hasGithub && (
+                <a
+                  href={project.links.github}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="touch-target inline-flex items-center gap-1 sm:gap-1.5 font-mono text-[10px] sm:text-xs text-foreground hover:text-accent transition-colors"
+                >
+                  <Github className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+                  <span className="border-b border-foreground/30">SRC</span>
+                </a>
+              )}
+              {hasDemo && (
+                <a
+                  href={(project.links as { demo?: string }).demo}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="touch-target inline-flex items-center gap-1 sm:gap-1.5 font-mono text-[10px] sm:text-xs text-foreground hover:text-accent transition-colors"
+                >
+                  <ExternalLink className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+                  <span className="border-b border-foreground/30">DEMO</span>
+                </a>
+              )}
+              {hasAppStore && (
+                <a
+                  href={(project.links as { appStore?: string }).appStore}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="touch-target font-mono text-[9px] sm:text-[10px] text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  App Store →
+                </a>
+              )}
+              {hasPlayStore && (
+                <a
+                  href={(project.links as { playStore?: string }).playStore}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="touch-target font-mono text-[9px] sm:text-[10px] text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  Play Store →
+                </a>
+              )}
+
+              {/* Code identifier */}
+              <span className="ml-auto font-mono text-[8px] sm:text-[9px] text-foreground/30 hidden sm:block">
+                {project.code}
               </span>
-            ))}
-          </div>
-
-          {/* Skills */}
-          <div className="reveal-item flex flex-wrap gap-1 sm:gap-1.5">
-            {project.skills.map((skill) => (
-              <span
-                key={skill}
-                className="font-mono text-[8px] sm:text-[9px] text-muted-foreground/70"
-              >
-                {skill}
-                <span className="text-foreground/20 ml-1">·</span>
-              </span>
-            ))}
-          </div>
-        </div>
-
-        {/* LINKS PANEL */}
-        <div className="p-3 sm:p-4 lg:p-5 flex flex-row lg:flex-col justify-between lg:justify-start gap-3 sm:gap-4">
-          {/* ECG line - desktop only */}
-          <div className="hidden lg:block mb-3">
-            <ECGLine className="text-foreground/30" />
-          </div>
-          
-          {/* Links */}
-          <div className="reveal-item flex flex-row lg:flex-col gap-2 sm:gap-3">
-            {hasGithub && (
-              <a
-                href={project.links.github}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="touch-target inline-flex items-center gap-1.5 font-mono text-[10px] sm:text-xs text-foreground hover:text-accent transition-colors"
-              >
-                <Github className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
-                <span className="hidden sm:inline border-b border-foreground/20">SRC</span>
-              </a>
-            )}
-            {hasDemo && (
-              <a
-                href={(project.links as { demo?: string }).demo}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="touch-target inline-flex items-center gap-1.5 font-mono text-[10px] sm:text-xs text-foreground hover:text-accent transition-colors"
-              >
-                <ExternalLink className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
-                <span className="hidden sm:inline border-b border-foreground/20">DEMO</span>
-              </a>
-            )}
-            {hasAppStore && (
-              <a
-                href={(project.links as { appStore?: string }).appStore}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="touch-target font-mono text-[10px] sm:text-xs text-muted-foreground hover:text-foreground transition-colors"
-              >
-                <span className="sm:hidden">iOS</span>
-                <span className="hidden sm:inline">→ iOS</span>
-              </a>
-            )}
-            {hasPlayStore && (
-              <a
-                href={(project.links as { playStore?: string }).playStore}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="touch-target font-mono text-[10px] sm:text-xs text-muted-foreground hover:text-foreground transition-colors"
-              >
-                <span className="sm:hidden">Android</span>
-                <span className="hidden sm:inline">→ Android</span>
-              </a>
-            )}
-          </div>
-
-          {/* Neural line - mobile indicator */}
-          <div className="lg:hidden font-mono text-[8px] text-foreground/20 self-center">
-            {ASCII_NEURAL}
-          </div>
-          
-          {/* ASCII readout - desktop */}
-          <div className="hidden lg:block mt-auto">
-            <pre className="font-mono text-[6px] text-foreground/20 leading-tight select-none">
-{`┌────────┐
-│ ${project.id.padEnd(6)} │
-└────────┘`}
-            </pre>
+            </div>
           </div>
         </div>
       </div>
@@ -632,17 +586,21 @@ function ProjectCard({ project }: { project: Project }) {
 }
 
 // ─────────────────────────────────────────────────────────────
-// FILTER PANEL
+// FILTER NODES
 // ─────────────────────────────────────────────────────────────
 
-function FilterPanel({
+function FilterNodes({
   selectedGroups,
   onToggleGroup,
-  onClearFilters,
+  onClear,
+  resultCount,
+  totalCount,
 }: {
   selectedGroups: SkillGroup[]
   onToggleGroup: (group: SkillGroup) => void
-  onClearFilters: () => void
+  onClear: () => void
+  resultCount: number
+  totalCount: number
 }) {
   const ref = useRef<HTMLDivElement>(null)
 
@@ -651,11 +609,10 @@ function FilterPanel({
     const ctx = gsap.context(() => {
       gsap.fromTo(
         ref.current,
-        { opacity: 0, y: -15 },
+        { opacity: 0 },
         {
           opacity: 1,
-          y: 0,
-          duration: 0.5,
+          duration: 0.4,
           ease: "power2.out",
           scrollTrigger: {
             trigger: ref.current,
@@ -672,8 +629,8 @@ function FilterPanel({
 
   return (
     <div ref={ref} className="mb-4 sm:mb-6">
-      {/* Filter chips - horizontal scroll on mobile */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide -mx-4 px-4 sm:mx-0 sm:px-0 sm:flex-wrap sm:overflow-visible">
+      {/* Filter row - horizontal scroll on mobile */}
+      <div className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto scrollbar-hide pb-2 -mx-1 px-1">
         {groups.map((group) => {
           const isSelected = selectedGroups.includes(group)
           return (
@@ -681,12 +638,16 @@ function FilterPanel({
               key={group}
               onClick={() => onToggleGroup(group)}
               className={cn(
-                "touch-target flex-shrink-0 font-mono text-[10px] sm:text-xs px-3 py-1.5 border transition-all duration-200",
+                "touch-target flex-shrink-0",
+                "font-mono text-[10px] sm:text-xs",
+                "px-2.5 sm:px-3 py-1.5 sm:py-2",
+                "border-2 transition-all duration-150",
                 isSelected
                   ? "border-foreground bg-foreground text-background"
                   : "border-foreground/30 text-foreground/60 hover:border-foreground hover:text-foreground"
               )}
             >
+              <span className="mr-1 opacity-60">●</span>
               {group}
             </button>
           )
@@ -694,12 +655,23 @@ function FilterPanel({
 
         {selectedGroups.length > 0 && (
           <button
-            onClick={onClearFilters}
-            className="touch-target flex-shrink-0 flex items-center gap-1 font-mono text-[10px] sm:text-xs text-muted-foreground hover:text-foreground px-2 py-1 transition-colors"
+            onClick={onClear}
+            className="touch-target flex-shrink-0 flex items-center gap-1 font-mono text-[10px] sm:text-xs text-muted-foreground hover:text-foreground px-2 py-1.5 transition-colors"
           >
             <X className="w-3 h-3" />
           </button>
         )}
+      </div>
+
+      {/* Count */}
+      <div className="flex items-center gap-2 mt-2 font-mono text-[9px] sm:text-[10px] text-muted-foreground">
+        <span className="inline-flex items-center gap-1">
+          <span className="w-1.5 h-1.5 bg-accent rounded-full" />
+          {resultCount}
+        </span>
+        <span className="text-foreground/20">/</span>
+        <span>{totalCount}</span>
+        <span className="text-foreground/30">nodes</span>
       </div>
     </div>
   )
@@ -709,21 +681,42 @@ function FilterPanel({
 // SECTION HEADER
 // ─────────────────────────────────────────────────────────────
 
-function SectionHeader({ count, filtered }: { count: number; filtered: number }) {
+function SectionHeader({ count }: { count: number }) {
   const headerRef = useRef<HTMLDivElement>(null)
   const titleRef = useRef<HTMLHeadingElement>(null)
+  const networkRef = useRef<HTMLPreElement>(null)
 
   useEffect(() => {
     if (!headerRef.current) return
     const ctx = gsap.context(() => {
+      // Network ASCII animation
+      if (networkRef.current) {
+        gsap.fromTo(
+          networkRef.current,
+          { opacity: 0, scale: 0.9 },
+          {
+            opacity: 1,
+            scale: 1,
+            duration: 0.6,
+            ease: "power2.out",
+            scrollTrigger: {
+              trigger: networkRef.current,
+              start: "top 95%",
+              toggleActions: "play none none none",
+            },
+          }
+        )
+      }
+
+      // Title scramble
       if (titleRef.current) {
-        const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ░▒▓█"
+        const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ●○◐◑"
         const originalText = "PROJECTS"
         let iteration = 0
 
         ScrollTrigger.create({
           trigger: titleRef.current,
-          start: "top 92%",
+          start: "top 95%",
           onEnter: () => {
             const interval = setInterval(() => {
               if (!titleRef.current) return clearInterval(interval)
@@ -745,18 +738,26 @@ function SectionHeader({ count, filtered }: { count: number; filtered: number })
   }, [])
 
   return (
-    <div ref={headerRef} className="mb-4 sm:mb-6 relative">
-      {/* ASCII brain - mobile condensed */}
-      <pre className="font-mono text-[4px] sm:text-[5px] text-foreground/15 leading-tight select-none mb-3 sm:mb-4 overflow-hidden">
-        {ASCII_BRAIN_SCAN}
+    <div ref={headerRef} className="mb-5 sm:mb-8">
+      {/* ASCII Network - Desktop only */}
+      <pre
+        ref={networkRef}
+        className="font-mono text-[7px] sm:text-[8px] text-foreground/20 select-none mb-3 hidden sm:block leading-tight"
+      >
+        {ASCII_NETWORK}
       </pre>
 
-      {/* Header row */}
+      {/* Title row */}
       <div className="flex items-end justify-between gap-3">
-        <div className="min-w-0">
-          <p className="font-mono text-[8px] sm:text-[9px] text-muted-foreground tracking-[0.2em] mb-1">
-            — NEURAL MAP / 04
-          </p>
+        <div>
+          <div className="flex items-center gap-2 mb-1">
+            <span className="font-mono text-[9px] sm:text-[10px] text-muted-foreground tracking-wider">
+              04
+            </span>
+            <span className="font-mono text-[8px] sm:text-[9px] text-foreground/30">
+              {ASCII_SYNAPSE.slice(0, 15)}
+            </span>
+          </div>
           <h2
             ref={titleRef}
             className="font-mono text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-foreground tracking-tighter leading-none"
@@ -764,19 +765,22 @@ function SectionHeader({ count, filtered }: { count: number; filtered: number })
             PROJECTS
           </h2>
         </div>
-        
-        {/* Count display */}
-        <div className="flex-shrink-0 text-right">
-          <div className="font-mono text-xl sm:text-2xl lg:text-3xl font-black text-foreground/20 tabular-nums leading-none">
-            {String(filtered).padStart(2, "0")}
-            <span className="text-foreground/10">/{String(count).padStart(2, "0")}</span>
-          </div>
+        <div className="text-right hidden sm:block">
+          <span className="font-mono text-2xl sm:text-3xl lg:text-4xl font-black text-foreground/15 tabular-nums">
+            {String(count).padStart(2, "0")}
+          </span>
         </div>
       </div>
 
-      {/* ECG underline */}
-      <div className="mt-2 sm:mt-3">
-        <ECGLine className="text-foreground/25" />
+      {/* Underline */}
+      <div className="mt-2 sm:mt-3 flex items-center gap-2">
+        <div className="h-0.5 sm:h-1 w-8 sm:w-12 bg-foreground" />
+        <div className="h-px flex-1 bg-foreground/15" />
+        <div className="flex gap-1">
+          <span className="w-1.5 h-1.5 bg-foreground/30 rounded-full" />
+          <span className="w-1.5 h-1.5 bg-foreground/20 rounded-full" />
+          <span className="w-1.5 h-1.5 bg-foreground/10 rounded-full" />
+        </div>
       </div>
     </div>
   )
@@ -823,54 +827,49 @@ export function ProjectsSection() {
       ref={sectionRef}
       className={cn(
         "relative py-8 sm:py-12 md:py-16 lg:py-20 px-3 sm:px-4 md:px-6",
-        "bg-background"
+        "bg-background overflow-hidden"
       )}
     >
-      {/* Background pattern */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute inset-0 opacity-[0.015]">
-          <svg className="w-full h-full" preserveAspectRatio="none">
-            {[...Array(30)].map((_, i) => (
-              <line
-                key={`v-${i}`}
-                x1={`${i * 3.33}%`}
-                y1="0"
-                x2={`${i * 3.33}%`}
-                y2="100%"
-                stroke="currentColor"
-                strokeWidth="1"
-              />
-            ))}
-          </svg>
-        </div>
-      </div>
+      {/* Neural background */}
+      <NeuralBackground />
 
       <div className="max-w-5xl mx-auto relative">
-        <SectionHeader count={allProjects.length} filtered={filteredProjects.length} />
+        <SectionHeader count={allProjects.length} />
 
-        <FilterPanel
+        <FilterNodes
           selectedGroups={selectedGroups}
           onToggleGroup={toggleGroup}
-          onClearFilters={clearFilters}
+          onClear={clearFilters}
+          resultCount={filteredProjects.length}
+          totalCount={allProjects.length}
         />
 
-        {/* No results */}
+        {/* Projects */}
         {filteredProjects.length === 0 ? (
           <div className="text-center py-8 sm:py-12 border border-dashed border-foreground/20">
-            <pre className="font-mono text-[8px] sm:text-[10px] text-foreground/30 mb-3">
-{ASCII_DIAGNOSTIC}
+            <pre className="font-mono text-[9px] sm:text-[10px] text-foreground/30 mb-3 select-none">
+              {ASCII_NEURON}
             </pre>
+            <p className="font-mono text-[10px] sm:text-xs text-muted-foreground mb-3">
+              No matching nodes
+            </p>
             <button
               onClick={clearFilters}
-              className="font-mono text-[10px] sm:text-xs border border-foreground/40 px-3 py-1.5 hover:bg-foreground hover:text-background transition-colors"
+              className="font-mono text-[10px] sm:text-xs border border-foreground/50 px-3 py-1.5 hover:bg-foreground hover:text-background transition-colors"
             >
-              RESET SCAN
+              RESET
             </button>
           </div>
         ) : (
           <div className="space-y-3 sm:space-y-4">
-            {displayedProjects.map((project) => (
-              <ProjectCard key={project.id} project={project} />
+            {displayedProjects.map((project, index) => (
+              <div key={project.id}>
+                <ProjectNode project={project} index={index} />
+                {/* Connector between nodes */}
+                {index < displayedProjects.length - 1 && (
+                  <NodeConnector className="my-2 sm:my-3 opacity-30" />
+                )}
+              </div>
             ))}
           </div>
         )}
@@ -883,33 +882,32 @@ export function ProjectsSection() {
               className={cn(
                 "touch-target group flex items-center gap-2",
                 "px-4 sm:px-6 py-2.5 sm:py-3",
-                "font-mono text-[10px] sm:text-xs tracking-[0.1em]",
-                "border border-foreground/50 text-foreground",
-                "hover:bg-foreground hover:text-background transition-colors"
+                "font-mono text-[10px] sm:text-xs tracking-wider",
+                "border-2 border-foreground bg-foreground text-background",
+                "hover:bg-background hover:text-foreground transition-colors",
+                "shadow-[2px_2px_0_0_var(--foreground)]",
+                "sm:shadow-[3px_3px_0_0_var(--foreground)]"
               )}
             >
-              <span>SCAN +{remaining}</span>
+              <span className="opacity-60">●</span>
+              <span>+{remaining} NODES</span>
               <ChevronDown className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </button>
           </div>
         )}
 
         {/* End marker */}
-        {showAll && filteredProjects.length > 0 && (
+        {showAll && (
           <div className="mt-8 sm:mt-10 text-center">
-            <pre className="font-mono text-[7px] sm:text-[8px] text-foreground/20 select-none">
-{`
-    ╭───────────────────────╮
-    │   SCAN COMPLETE ✓    │
-    ╰───────────────────────╯
-`}
+            <pre className="font-mono text-[7px] sm:text-[8px] text-foreground/15 select-none mb-3">
+              {`○──●──○──●──○──●──○`}
             </pre>
             <a
               href="#contact"
-              className="touch-target inline-flex items-center gap-1.5 font-mono text-[10px] sm:text-xs text-muted-foreground hover:text-foreground transition-colors mt-2"
+              className="touch-target inline-flex items-center gap-1.5 font-mono text-[10px] sm:text-xs text-muted-foreground hover:text-foreground transition-colors"
             >
-              <span>↓</span>
-              <span>PROCEED</span>
+              <ChevronRight className="w-3 h-3" />
+              <span>NEXT</span>
             </a>
           </div>
         )}
