@@ -3,36 +3,32 @@
 import { useState, useRef, useEffect, useMemo, useCallback } from "react"
 import { gsap } from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
-import { ExternalLink, Github, X } from "lucide-react"
+import { ExternalLink, Github, X, ChevronDown } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 gsap.registerPlugin(ScrollTrigger)
 
 // ─────────────────────────────────────────────────────────────
-// ASCII PATTERNS & DECORATIVE ELEMENTS
+// ASCII PATTERNS
 // ─────────────────────────────────────────────────────────────
 
 const ASCII_BARCODE = `█▌▐█▌▐▌█▐█▌▐▌▐█▌▐█▌█▐▌▐█▌█▐█▌▐▌▐█▌█▐█`
 
-const ASCII_HEADER = `
-╔══════════════════════════════════════════════════════════════════════════════════════════════════════╗
-║  ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  ║
-║  ██████╗ ██████╗  ██████╗      ██╗███████╗ ██████╗████████╗███████╗                                   ║
-║  ██╔══██╗██╔══██╗██╔═══██╗     ██║██╔════╝██╔════╝╚══██╔══╝██╔════╝                                   ║
-║  ██████╔╝██████╔╝██║   ██║     ██║█████╗  ██║        ██║   ███████╗                                   ║
-║  ██╔═══╝ ██╔══██╗██║   ██║██   ██║██╔══╝  ██║        ██║   ╚════██║                                   ║
-║  ██║     ██║  ██║╚██████╔╝╚█████╔╝███████╗╚██████╗   ██║   ███████║                                   ║
-║  ╚═╝     ╚═╝  ╚═╝ ╚═════╝  ╚════╝ ╚══════╝ ╚═════╝   ╚═╝   ╚══════╝                                   ║
-╚══════════════════════════════════════════════════════════════════════════════════════════════════════╝`.trim()
+const ASCII_GRID = `┼───┼───┼───┼───┼───┼───┼───┼───┼───┼───┼───┼───┼───┼───┼───┼───┼───┼───┼───┼───┼`
 
-const ASCII_MINI = `
-┌──────────────────────────────────────────────────────────────────────────────┐
-│  ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓  │
-└──────────────────────────────────────────────────────────────────────────────┘`.trim()
+// ─────────────────────────────────────────────────────────────
+// SKILL GROUPS FOR FILTERING
+// ─────────────────────────────────────────────────────────────
 
-const ASCII_GRID = `
-┼───┼───┼───┼───┼───┼───┼───┼───┼───┼───┼───┼───┼───┼───┼───┼───┼───┼───┼───┼───┼
-`.trim()
+const SKILL_GROUPS = {
+  "Mobile": ["Swift", "SwiftUI", "Kotlin", "WatchOS", "AVFoundation", "App Store"],
+  "Web": ["React", "React 19", "Next.js", "Tailwind", "WebSocket", "Vercel"],
+  "Backend": ["Firebase", "Firestore", "Firebase RTDB", "Cloud Functions", "Node.js", "Flask", "Python"],
+  "AI/ML": ["AI/ML", "AI routing", "PyTorch", "Vision", "llama.cpp", "GGUF"],
+  "Other": ["Real-time", "Google APIs", "scheduling", "automation", "Instagram", "probability"],
+}
+
+type SkillGroup = keyof typeof SKILL_GROUPS
 
 // ─────────────────────────────────────────────────────────────
 // PROJECT DATA
@@ -199,8 +195,6 @@ const allProjects = [
 
 type Project = (typeof allProjects)[0]
 
-const allSkills = [...new Set(allProjects.flatMap((p) => p.skills))].sort()
-
 // ─────────────────────────────────────────────────────────────
 // TECHNICAL SVG PATTERNS
 // ─────────────────────────────────────────────────────────────
@@ -239,22 +233,15 @@ function TechnicalOverlay({ className }: { className?: string }) {
       viewBox="0 0 400 100"
       preserveAspectRatio="none"
     >
-      {/* Corner brackets */}
       <path d="M0 15 L0 0 L15 0" fill="none" stroke="currentColor" strokeWidth="1.5" opacity="0.4" />
       <path d="M385 0 L400 0 L400 15" fill="none" stroke="currentColor" strokeWidth="1.5" opacity="0.4" />
       <path d="M0 85 L0 100 L15 100" fill="none" stroke="currentColor" strokeWidth="1.5" opacity="0.4" />
       <path d="M385 100 L400 100 L400 85" fill="none" stroke="currentColor" strokeWidth="1.5" opacity="0.4" />
-      
-      {/* Horizontal measurement lines */}
       <line x1="20" y1="8" x2="80" y2="8" stroke="currentColor" strokeWidth="0.5" opacity="0.15" />
       <line x1="320" y1="8" x2="380" y2="8" stroke="currentColor" strokeWidth="0.5" opacity="0.15" />
-      
-      {/* Vertical tick marks */}
       {[25, 35, 45, 55, 65, 75].map((x) => (
         <line key={x} x1={x} y1="5" x2={x} y2="11" stroke="currentColor" strokeWidth="0.5" opacity="0.2" />
       ))}
-      
-      {/* Registration marks */}
       <circle cx="390" cy="50" r="3" fill="none" stroke="currentColor" strokeWidth="0.5" opacity="0.2" />
       <line x1="387" y1="50" x2="393" y2="50" stroke="currentColor" strokeWidth="0.5" opacity="0.2" />
       <line x1="390" y1="47" x2="390" y2="53" stroke="currentColor" strokeWidth="0.5" opacity="0.2" />
@@ -307,9 +294,8 @@ function Barcode({ code, className }: { code: string; className?: string }) {
 // PROJECT CARD
 // ─────────────────────────────────────────────────────────────
 
-function ProjectCard({ project, index }: { project: Project; index: number }) {
+function ProjectCard({ project }: { project: Project }) {
   const cardRef = useRef<HTMLDivElement>(null)
-  const titleRef = useRef<HTMLHeadingElement>(null)
   const skillRef = useRef<HTMLSpanElement>(null)
 
   useEffect(() => {
@@ -317,7 +303,6 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
     const el = cardRef.current
 
     const ctx = gsap.context(() => {
-      // Card entrance
       gsap.fromTo(
         el,
         { opacity: 0, y: 40 },
@@ -334,7 +319,6 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
         }
       )
 
-      // Primary skill scramble
       if (skillRef.current) {
         const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+#@"
         const originalText = project.primarySkill.toUpperCase()
@@ -361,7 +345,6 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
         })
       }
 
-      // Stagger inner elements
       const items = el.querySelectorAll(".reveal-item")
       gsap.fromTo(
         items,
@@ -403,9 +386,8 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
       <TechnicalOverlay className="opacity-60" />
 
       <div className="grid grid-cols-1 md:grid-cols-[1fr_1fr] lg:grid-cols-[1.2fr_1fr_auto]">
-        {/* LEFT: Primary info */}
+        {/* LEFT */}
         <div className="p-4 sm:p-5 lg:p-6 border-b md:border-b-0 md:border-r border-dashed border-foreground/30">
-          {/* Category + Code */}
           <div className="flex items-center justify-between gap-2 mb-3">
             <span className="font-mono text-[10px] sm:text-xs text-accent tracking-[0.2em] font-medium">
               {project.category}
@@ -415,7 +397,6 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
             </span>
           </div>
 
-          {/* Primary Skill - MAIN TITLE */}
           <h3 className="mb-2">
             <span
               ref={skillRef}
@@ -425,12 +406,10 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
             </span>
           </h3>
 
-          {/* Project name - secondary */}
           <p className="reveal-item font-mono text-xs sm:text-sm text-muted-foreground mb-4">
             {project.title}
           </p>
 
-          {/* Metrics row */}
           <div className="reveal-item flex flex-wrap gap-2">
             {project.metrics.map((m, i) => (
               <span
@@ -443,13 +422,12 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
           </div>
         </div>
 
-        {/* CENTER: Description + Skills */}
+        {/* CENTER */}
         <div className="p-4 sm:p-5 lg:p-6 flex flex-col justify-between border-b lg:border-b-0 lg:border-r border-dashed border-foreground/30">
           <p className="reveal-item text-xs sm:text-sm text-foreground/80 leading-relaxed mb-4">
             {project.description}
           </p>
 
-          {/* Skills */}
           <div className="reveal-item flex flex-wrap gap-1.5">
             {project.skills.map((skill) => (
               <span
@@ -462,9 +440,8 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
           </div>
         </div>
 
-        {/* RIGHT: Links + Barcode */}
+        {/* RIGHT */}
         <div className="p-4 sm:p-5 lg:p-6 flex flex-col justify-between min-w-[140px] lg:min-w-[160px]">
-          {/* Year + ID */}
           <div className="reveal-item flex items-baseline justify-between mb-4">
             <span className="font-mono text-2xl sm:text-3xl font-black text-foreground tabular-nums">
               {project.id}
@@ -474,7 +451,6 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
             </span>
           </div>
 
-          {/* Links */}
           <div className="reveal-item flex flex-col gap-2 mb-4">
             {hasGithub && (
               <a
@@ -520,7 +496,6 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
             )}
           </div>
 
-          {/* Barcode */}
           <Barcode code={project.code} className="mt-auto" />
         </div>
       </div>
@@ -529,22 +504,23 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
 }
 
 // ─────────────────────────────────────────────────────────────
-// FILTER COMPONENT
+// GROUPED FILTER COMPONENT
 // ─────────────────────────────────────────────────────────────
 
 function FilterPanel({
-  skills,
-  selectedSkills,
-  onToggleSkill,
+  selectedGroups,
+  onToggleGroup,
   onClearFilters,
+  resultCount,
+  totalCount,
 }: {
-  skills: string[]
-  selectedSkills: string[]
-  onToggleSkill: (skill: string) => void
+  selectedGroups: SkillGroup[]
+  onToggleGroup: (group: SkillGroup) => void
   onClearFilters: () => void
+  resultCount: number
+  totalCount: number
 }) {
   const ref = useRef<HTMLDivElement>(null)
-  const [expanded, setExpanded] = useState(false)
 
   useEffect(() => {
     if (!ref.current) return
@@ -568,81 +544,53 @@ function FilterPanel({
     return () => ctx.revert()
   }, [])
 
+  const groups = Object.keys(SKILL_GROUPS) as SkillGroup[]
+
   return (
-    <div ref={ref} className="mb-8 sm:mb-10">
-      {/* Header */}
-      <div className="flex items-center justify-between gap-4 mb-3 pb-2 border-b border-foreground/30">
-        <div className="flex items-center gap-3">
-          <span className="font-mono text-[10px] sm:text-xs text-muted-foreground tracking-[0.15em]">
-            FILTER
-          </span>
-          {selectedSkills.length > 0 && (
-            <span className="font-mono text-[10px] sm:text-xs text-accent">
-              [{selectedSkills.length}]
-            </span>
-          )}
-        </div>
-        <div className="flex items-center gap-2">
-          {selectedSkills.length > 0 && (
+    <div ref={ref} className="mb-6 sm:mb-8">
+      {/* Filter row */}
+      <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+        {/* Groups */}
+        {groups.map((group) => {
+          const isSelected = selectedGroups.includes(group)
+          const skillCount = SKILL_GROUPS[group].length
+          return (
             <button
-              onClick={onClearFilters}
-              className="touch-target flex items-center gap-1 font-mono text-[10px] sm:text-xs text-muted-foreground hover:text-foreground px-2 py-1 transition-colors"
+              key={group}
+              onClick={() => onToggleGroup(group)}
+              className={cn(
+                "touch-target font-mono text-[10px] sm:text-xs px-3 py-1.5 border-2 transition-all duration-200",
+                isSelected
+                  ? "border-foreground bg-foreground text-background"
+                  : "border-foreground/40 text-foreground/70 hover:border-foreground hover:text-foreground"
+              )}
             >
-              <X className="w-3 h-3" />
-              CLEAR
+              {group}
+              <span className="ml-1.5 opacity-50">({skillCount})</span>
             </button>
-          )}
+          )
+        })}
+
+        {/* Clear button */}
+        {selectedGroups.length > 0 && (
           <button
-            onClick={() => setExpanded(!expanded)}
-            className="touch-target font-mono text-[10px] sm:text-xs border border-foreground/40 px-2 py-1 hover:bg-foreground hover:text-background transition-colors"
+            onClick={onClearFilters}
+            className="touch-target flex items-center gap-1 font-mono text-[10px] sm:text-xs text-muted-foreground hover:text-foreground px-2 py-1 transition-colors"
           >
-            {expanded ? "−" : "+"}
+            <X className="w-3 h-3" />
+            CLEAR
           </button>
-        </div>
+        )}
       </div>
 
-      {/* Active filters */}
-      {selectedSkills.length > 0 && (
-        <div className="flex flex-wrap gap-1.5 mb-3">
-          {selectedSkills.map((skill) => (
-            <button
-              key={skill}
-              onClick={() => onToggleSkill(skill)}
-              className="inline-flex items-center gap-1 font-mono text-[10px] sm:text-xs px-2 py-1 border border-foreground bg-foreground text-background hover:bg-accent transition-colors"
-            >
-              {skill}
-              <X className="w-2.5 h-2.5" />
-            </button>
-          ))}
-        </div>
-      )}
-
-      {/* Skills grid */}
-      <div
-        className={cn(
-          "overflow-hidden transition-all duration-300",
-          expanded ? "max-h-[400px]" : "max-h-[60px] sm:max-h-[70px]"
+      {/* Result count */}
+      <div className="flex items-center gap-2 mt-4 font-mono text-[9px] sm:text-[10px] text-muted-foreground">
+        <span>{resultCount}</span>
+        <span className="text-foreground/30">/</span>
+        <span>{totalCount}</span>
+        {selectedGroups.length > 0 && (
+          <span className="text-accent ml-1">•</span>
         )}
-      >
-        <div className="flex flex-wrap gap-1.5">
-          {skills.map((skill) => {
-            const isSelected = selectedSkills.includes(skill)
-            return (
-              <button
-                key={skill}
-                onClick={() => onToggleSkill(skill)}
-                className={cn(
-                  "font-mono text-[9px] sm:text-[10px] px-2 py-1 border transition-all",
-                  isSelected
-                    ? "border-foreground bg-foreground text-background"
-                    : "border-foreground/30 text-foreground/60 hover:border-foreground hover:text-foreground"
-                )}
-              >
-                {skill}
-              </button>
-            )
-          })}
-        </div>
       </div>
     </div>
   )
@@ -654,56 +602,53 @@ function FilterPanel({
 
 function SectionHeader({ count }: { count: number }) {
   const headerRef = useRef<HTMLDivElement>(null)
-  const asciiRef = useRef<HTMLPreElement>(null)
+  const titleRef = useRef<HTMLHeadingElement>(null)
 
   useEffect(() => {
     if (!headerRef.current) return
     const ctx = gsap.context(() => {
-      // ASCII reveal
-      if (asciiRef.current) {
-        gsap.fromTo(
-          asciiRef.current,
-          { opacity: 0, y: 20 },
-          {
-            opacity: 1,
-            y: 0,
-            duration: 0.8,
-            ease: "power2.out",
-            scrollTrigger: {
-              trigger: asciiRef.current,
-              start: "top 90%",
-              toggleActions: "play none none none",
-            },
-          }
-        )
+      // Title scramble
+      if (titleRef.current) {
+        const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ█▓▒░"
+        const originalText = "PROJECTS"
+        let iteration = 0
+
+        ScrollTrigger.create({
+          trigger: titleRef.current,
+          start: "top 90%",
+          onEnter: () => {
+            const interval = setInterval(() => {
+              if (!titleRef.current) return clearInterval(interval)
+              titleRef.current.textContent = originalText
+                .split("")
+                .map((char, i) => {
+                  if (i < iteration) return char
+                  return chars[Math.floor(Math.random() * chars.length)]
+                })
+                .join("")
+              if (iteration >= originalText.length) clearInterval(interval)
+              iteration += 0.3
+            }, 40)
+          },
+        })
       }
     }, headerRef.current)
     return () => ctx.revert()
   }, [])
 
   return (
-    <div ref={headerRef} className="mb-8 sm:mb-12 relative">
-      {/* ASCII Header - Desktop */}
-      <pre
-        ref={asciiRef}
-        className="font-mono text-[4px] sm:text-[5px] md:text-[6px] lg:text-[7px] text-foreground/25 overflow-x-auto whitespace-pre select-none mb-4 hidden md:block leading-tight"
-      >
-        {ASCII_HEADER}
-      </pre>
-
-      {/* ASCII Header - Mobile */}
-      <pre className="font-mono text-[5px] sm:text-[6px] text-foreground/25 overflow-x-auto whitespace-pre select-none mb-4 md:hidden leading-tight">
-        {ASCII_MINI}
-      </pre>
-
+    <div ref={headerRef} className="mb-6 sm:mb-8 relative">
       {/* Title row */}
       <div className="flex items-end justify-between gap-4">
         <div>
           <p className="font-mono text-[9px] sm:text-[10px] text-muted-foreground tracking-[0.25em] mb-1">
             — 04
           </p>
-          <h2 className="font-mono text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-foreground tracking-tighter leading-none">
-            WORK
+          <h2
+            ref={titleRef}
+            className="font-mono text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-foreground tracking-tighter leading-none"
+          >
+            PROJECTS
           </h2>
         </div>
         <div className="text-right">
@@ -725,7 +670,7 @@ function SectionHeader({ count }: { count: number }) {
       </div>
 
       {/* Grid reference */}
-      <pre className="font-mono text-[8px] sm:text-[9px] text-foreground/20 mt-2 select-none hidden sm:block">
+      <pre className="font-mono text-[8px] sm:text-[9px] text-foreground/15 mt-2 select-none hidden sm:block overflow-hidden">
         {ASCII_GRID}
       </pre>
     </div>
@@ -737,28 +682,35 @@ function SectionHeader({ count }: { count: number }) {
 // ─────────────────────────────────────────────────────────────
 
 export function ProjectsSection() {
-  const [selectedSkills, setSelectedSkills] = useState<string[]>([])
+  const [selectedGroups, setSelectedGroups] = useState<SkillGroup[]>([])
   const [showAll, setShowAll] = useState(false)
   const sectionRef = useRef<HTMLElement>(null)
 
-  const toggleSkill = useCallback((skill: string) => {
-    setSelectedSkills((prev) =>
-      prev.includes(skill) ? prev.filter((s) => s !== skill) : [...prev, skill]
+  const toggleGroup = useCallback((group: SkillGroup) => {
+    setSelectedGroups((prev) =>
+      prev.includes(group) ? prev.filter((g) => g !== group) : [...prev, group]
     )
   }, [])
 
   const clearFilters = useCallback(() => {
-    setSelectedSkills([])
+    setSelectedGroups([])
   }, [])
 
+  // Get all skills from selected groups
+  const selectedSkills = useMemo(() => {
+    if (selectedGroups.length === 0) return []
+    return selectedGroups.flatMap((group) => SKILL_GROUPS[group])
+  }, [selectedGroups])
+
+  // Filter projects: show if ANY skill from selected groups matches
   const filteredProjects = useMemo(() => {
     if (selectedSkills.length === 0) return allProjects
     return allProjects.filter((project) =>
-      selectedSkills.every((skill) => project.skills.includes(skill))
+      project.skills.some((skill) => selectedSkills.includes(skill))
     )
   }, [selectedSkills])
 
-  const INITIAL_VISIBLE = 4
+  const INITIAL_VISIBLE = 3
   const displayedProjects = showAll ? filteredProjects : filteredProjects.slice(0, INITIAL_VISIBLE)
   const remaining = filteredProjects.length - INITIAL_VISIBLE
 
@@ -803,21 +755,12 @@ export function ProjectsSection() {
         <SectionHeader count={allProjects.length} />
 
         <FilterPanel
-          skills={allSkills}
-          selectedSkills={selectedSkills}
-          onToggleSkill={toggleSkill}
+          selectedGroups={selectedGroups}
+          onToggleGroup={toggleGroup}
           onClearFilters={clearFilters}
+          resultCount={filteredProjects.length}
+          totalCount={allProjects.length}
         />
-
-        {/* Count display */}
-        <div className="flex items-center gap-2 mb-6 font-mono text-[9px] sm:text-[10px] text-muted-foreground">
-          <span>{displayedProjects.length}</span>
-          <span className="text-foreground/30">/</span>
-          <span>{filteredProjects.length}</span>
-          {selectedSkills.length > 0 && (
-            <span className="text-accent ml-1">•</span>
-          )}
-        </div>
 
         {/* Projects */}
         {filteredProjects.length === 0 ? (
@@ -838,8 +781,8 @@ export function ProjectsSection() {
           </div>
         ) : (
           <div className="space-y-4 sm:space-y-6">
-            {displayedProjects.map((project, index) => (
-              <ProjectCard key={project.id} project={project} index={index} />
+            {displayedProjects.map((project) => (
+              <ProjectCard key={project.id} project={project} />
             ))}
           </div>
         )}
@@ -850,7 +793,7 @@ export function ProjectsSection() {
             <button
               onClick={() => setShowAll(true)}
               className={cn(
-                "touch-target group",
+                "touch-target group flex items-center gap-2",
                 "px-6 sm:px-8 py-3 sm:py-4",
                 "font-mono text-[10px] sm:text-xs tracking-[0.15em]",
                 "border-2 border-foreground bg-foreground text-background",
@@ -860,6 +803,7 @@ export function ProjectsSection() {
               )}
             >
               <span>+{remaining} MORE</span>
+              <ChevronDown className="w-4 h-4" />
             </button>
           </div>
         )}
@@ -870,7 +814,7 @@ export function ProjectsSection() {
             <pre className="font-mono text-[8px] sm:text-[9px] text-foreground/20 select-none">
               {`
 ┌────────────────────────────────────────┐
-│            END OF MANIFEST             │
+│                  ···                   │
 └────────────────────────────────────────┘
               `}
             </pre>
