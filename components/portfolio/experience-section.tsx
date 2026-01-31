@@ -655,7 +655,7 @@ export function ExperienceSection() {
               {experiences.length > INITIAL_INDEX_VISIBLE && (
                 <div
                   ref={moreItemsContainerRef}
-                  className="overflow-hidden"
+                  className="overflow-hidden scrollbar-hide"
                   style={
                     !listExpanded
                       ? { maxHeight: 0, overflow: "hidden", borderTopWidth: 0 }
