@@ -284,8 +284,8 @@ export function AboutSection() {
             {/* Top-right: Technical SVG panel */}
             <div className="hidden sm:block">
               <div className="border-2 border-foreground bg-background p-3 sm:p-4 md:p-5 relative overflow-hidden">
-                <div className="absolute inset-0 pointer-events-none opacity-10">
-                  <GSAPSVG className="w-full h-full" duration={1.8} delay={0.4}>
+                <div className="absolute inset-0 pointer-events-none opacity-[0.05] overflow-hidden">
+                  <GSAPSVG className="w-[150%] h-[150%] -translate-x-[16%] -translate-y-[16%]" duration={1.8} delay={0.4}>
                     <svg ref={gridRef} viewBox="0 0 200 200" className="w-full h-full" stroke="currentColor">
                       {/* Concentric circles with pulse animation */}
                       <circle cx="100" cy="100" r="95" strokeWidth="0.3" className="animate-pulse" style={{ animationDuration: '4s' }} />
