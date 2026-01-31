@@ -188,6 +188,142 @@
   box-shadow: 4px 4px 0 0 var(--foreground);
 }
 
+/* Flight Ticket Theme — Award-level aesthetic */
+.flight-ticket-shadow {
+  box-shadow: 
+    6px 6px 0 0 var(--foreground),
+    inset 0 0 0 1px rgba(0, 0, 0, 0.05);
+}
+
+.flight-ticket-shadow:hover {
+  box-shadow: 
+    8px 8px 0 0 var(--foreground),
+    inset 0 0 0 1px rgba(0, 0, 0, 0.08);
+}
+
+/* Perforated edge effect */
+.perforated-edge {
+  background-image: radial-gradient(
+    circle at 0 50%,
+    transparent 6px,
+    var(--background) 6px,
+    var(--background) 8px,
+    transparent 8px
+  );
+  background-size: 16px 16px;
+  background-repeat: repeat-y;
+}
+
+.perforated-edge-horizontal {
+  background-image: radial-gradient(
+    circle at 50% 0,
+    transparent 4px,
+    var(--foreground) 4px,
+    var(--foreground) 5px,
+    transparent 5px
+  );
+  background-size: 12px 8px;
+  background-repeat: repeat-x;
+}
+
+/* Technical blueprint pattern */
+.bg-blueprint {
+  background-image:
+    linear-gradient(to right, oklch(0.5 0.15 220 / 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, oklch(0.5 0.15 220 / 0.03) 1px, transparent 1px),
+    linear-gradient(to right, oklch(0.5 0.15 220 / 0.06) 2px, transparent 2px),
+    linear-gradient(to bottom, oklch(0.5 0.15 220 / 0.06) 2px, transparent 2px);
+  background-size: 10px 10px, 10px 10px, 50px 50px, 50px 50px;
+}
+
+/* Scan lines overlay effect */
+.scanlines::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.02) 2px,
+    rgba(0, 0, 0, 0.02) 4px
+  );
+  pointer-events: none;
+}
+
+/* ASCII text glow effect for terminals */
+.ascii-glow {
+  text-shadow: 
+    0 0 1px currentColor,
+    0 0 2px currentColor;
+}
+
+/* Technical corner markers */
+.corner-marks {
+  position: relative;
+}
+
+.corner-marks::before,
+.corner-marks::after {
+  content: '';
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--foreground);
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+.corner-marks::before {
+  top: -4px;
+  left: -4px;
+  border-right: none;
+  border-bottom: none;
+}
+
+.corner-marks::after {
+  bottom: -4px;
+  right: -4px;
+  border-left: none;
+  border-top: none;
+}
+
+/* Departure board flicker animation */
+@keyframes board-flicker {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.95; }
+  75% { opacity: 0.98; }
+}
+
+.departure-board-text {
+  animation: board-flicker 3s infinite;
+}
+
+/* Technical noise texture */
+.noise-texture {
+  position: relative;
+}
+
+.noise-texture::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  opacity: 0.015;
+  pointer-events: none;
+}
+
+/* Flight path dotted line */
+.flight-path {
+  background-image: linear-gradient(
+    to right,
+    var(--foreground) 33%,
+    transparent 33%
+  );
+  background-size: 8px 2px;
+  background-repeat: repeat-x;
+}
+
 @layer utilities {
   .preserve-3d {
     transform-style: preserve-3d;
