@@ -8,6 +8,19 @@ import { SkillSurfaceGlobe } from "@/components/skill-surface-globe"
 import { useIsMobile } from "@/hooks/use-mobile"
 import { cn } from "@/lib/utils"
 
+// Helper to bold numbers in highlight strings
+function highlightWithBoldNumbers(text: string) {
+  // Match numbers including ranges (40–60%), percentages, units (3GB+), decimals, etc.
+  const parts = text.split(/(\d[\d,\.]*[+%]?[-–]\d[\d,\.]*[+%]?|~?\d[\d,\.]*[+%A-Za-z]*)/g)
+  return parts.map((part, i) => {
+    // Check if this part is a number/range pattern
+    if (/^\d|^~?\d/.test(part)) {
+      return <strong key={i} className="font-bold">{part}</strong>
+    }
+    return part
+  })
+}
+
 const INITIAL_INDEX_VISIBLE = 3
 
 // Reusable index list row: optional ref + data attrs for GSAP "load more" animation
@@ -859,7 +872,7 @@ export function ExperienceSection() {
                               className="flex gap-3 text-xs sm:text-sm text-foreground/90 min-h-[2.5rem] sm:min-h-[3rem] py-2 sm:py-3 items-center"
                             >
                               <span className="h-3 w-3 shrink-0 border border-foreground bg-accent/20" />
-                              <span className="leading-relaxed">{highlight}</span>
+                              <span className="leading-relaxed">{highlightWithBoldNumbers(highlight)}</span>
                             </li>
                           ))}
                         </ul>

@@ -231,7 +231,7 @@ export function AboutSection() {
       <div className="pointer-events-none absolute inset-0 bg-brutalist-grid opacity-[0.04]" aria-hidden />
 
       {/* Collision Background - AI / Mobile / Backend systems converging */}
-      <div className="pointer-events-none absolute inset-0 overflow-hidden opacity-50" aria-hidden>
+      <div className="pointer-events-none absolute inset-0 overflow-hidden opacity-30" aria-hidden>
         <svg
           ref={bgRef}
           viewBox="0 0 1200 800"
