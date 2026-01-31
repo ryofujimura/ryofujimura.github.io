@@ -17,7 +17,7 @@ export function LeonardoNotebook({
   return (
     <div
       className={cn(
-        "relative p-4 sm:p-6 md:p-8 bg-[oklch(0.95_0.02_45)] dark:bg-[oklch(0.15_0.02_45)]",
+        "relative p-4 sm:p-6 md:p-8 bg-[oklch(0.95_0.02_45/0.7)] dark:bg-[oklch(0.15_0.02_45/0.7)]",
         "border border-foreground/20 shadow-lg",
         "before:absolute before:inset-0 before:opacity-30",
         "before:bg-[radial-gradient(circle_at_30%_40%,rgba(139,90,43,0.1)_0%,transparent_50%)]",
