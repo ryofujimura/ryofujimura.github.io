@@ -140,6 +140,13 @@ export function AboutSection() {
           },
         })
 
+        // Reveal SVG container first
+        tl.to(svg, {
+          opacity: 1,
+          duration: 0.3,
+          ease: "power2.out",
+        })
+
         // Grid lines draw in first
         tl.to(gridLines, {
           strokeDasharray: "500 0",
@@ -224,11 +231,11 @@ export function AboutSection() {
       <div className="pointer-events-none absolute inset-0 bg-brutalist-grid opacity-[0.04]" aria-hidden />
 
       {/* Collision Background - AI / Mobile / Backend systems converging */}
-      <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
+      <div className="pointer-events-none absolute inset-0 overflow-hidden opacity-50" aria-hidden>
         <svg
           ref={bgRef}
           viewBox="0 0 1200 800"
-          className="absolute w-[140%] h-[140%] -left-[20%] -top-[20%]"
+          className="absolute w-[140%] h-[140%] -left-[20%] -top-[20%] opacity-0"
           fill="none"
           stroke="currentColor"
         >
