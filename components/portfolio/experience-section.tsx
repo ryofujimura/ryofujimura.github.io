@@ -182,9 +182,9 @@ const experiences = [
     "endDate": "Nov 2025",
     "description": "Built a real-time shuttle tracking and stop-request system with a web dashboard, driver iOS app, and student iOS/Android apps, powered by Firebase for live updates.",
     "highlights": [
-      "MVP launched in 43 days (6-mo stall)",
-      "30 min wait cut via real-time",
-      "80% adoption, 8/10 ease-of-use",
+      "Built real-time request sync, cutting waits 30min",
+      "Implemented driver-safe state machine, 80% adoption",
+      "Shipped multi-platform MVP in 43 days",
     ],
     
     "skills": [
@@ -856,7 +856,7 @@ export function ExperienceSection() {
                           {exp.highlights.map((highlight, i) => (
                             <li
                               key={i}
-                              className="flex gap-3 text-xs sm:text-sm text-foreground/90 min-h-[2.5rem] sm:min-h-[3rem] py-2 sm:py-3 items-center border-b border-foreground/10 last:border-b-0"
+                              className="flex gap-3 text-xs sm:text-sm text-foreground/90 min-h-[2.5rem] sm:min-h-[3rem] py-2 sm:py-3 items-center"
                             >
                               <span className="h-3 w-3 shrink-0 border border-foreground bg-accent/20" />
                               <span className="leading-relaxed">{highlight}</span>
