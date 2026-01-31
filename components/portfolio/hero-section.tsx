@@ -4,7 +4,7 @@ import { useRef, useState, useEffect, useMemo } from "react"
 import { gsap } from "gsap"
 import { GSAPText } from "@/components/gsap-text"
 import { HeroTechnicalCanvas } from "@/components/hero-technical-canvas"
-import { HeroBrutalistAscii } from "@/components/hero-brutalist-ascii"
+import { HeroBrutalistRight } from "@/components/hero-brutalist-right"
 import { MagneticButton } from "@/components/magnetic-button"
 import { useToast } from "@/hooks/use-toast"
 import { ArrowDown, ArrowRight, Check, Github, Globe, Linkedin, Mail, Mouse } from "lucide-react"
@@ -295,10 +295,8 @@ export function HeroSection() {
         <HeroTechnicalCanvas />
       </div>
 
-      {/* Brutalist ASCII animation - laptop/desktop only (lg+) */}
-      <div className="hidden lg:block absolute inset-0">
-        <HeroBrutalistAscii />
-      </div>
+      {/* Brutalist technical animation - right side on desktop */}
+      <HeroBrutalistRight />
 
       <div className="relative z-10 w-full max-w-5xl mx-auto px-0">
         <div className="flex flex-col items-start gap-4 sm:gap-6 md:gap-8">
