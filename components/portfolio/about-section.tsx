@@ -258,17 +258,21 @@ export function AboutSection() {
                   <p className="font-mono text-[10px] sm:text-xs uppercase tracking-[0.16em] text-muted-foreground">
                     CURRENTLY
                   </p>
-                  <p className="text-sm sm:text-base text-foreground/90 leading-relaxed">
-                  Computer Science student specializing in mobile systems, on-device AI/ML, and full-stack engineering, with experience building production iOS/Android apps, optimized LLM inference, and real-time data pipelines across research and industry.
-                  </p>
+                  <ul className="text-sm sm:text-base text-foreground/90 leading-relaxed space-y-1 list-disc list-inside">
+                    <li>CS student at CSULB</li>
+                    <li>Focus: mobile systems, on-device AI/ML, full-stack</li>
+                    <li>Building iOS/Android apps, LLM inference, data pipelines</li>
+                  </ul>
                 </div>
                 <div className="space-y-2">
                   <p className="font-mono text-[10px] sm:text-xs uppercase tracking-[0.16em] text-muted-foreground">
                     LOOKING FOR
                   </p>
-                  <p className="text-sm sm:text-base text-foreground/90 leading-relaxed">
-                  A team where I can learn from strong engineers while contributing careful, performance-driven work on applications, applied ML, or infrastructure that values correctness, efficiency, and real-world impact.
-                  </p>
+                  <ul className="text-sm sm:text-base text-foreground/90 leading-relaxed space-y-1 list-disc list-inside">
+                    <li>Team with strong engineers to learn from</li>
+                    <li>Hands-on work in apps, applied ML, or infrastructure</li>
+                    <li>Environment valuing correctness and real-world impact</li>
+                  </ul>
                 </div>
               </div>
             </AnimatedSection>
