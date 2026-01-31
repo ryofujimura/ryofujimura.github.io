@@ -143,7 +143,7 @@ export function AboutSection() {
         // Grid lines draw in first
         tl.to(gridLines, {
           strokeDasharray: "500 0",
-          opacity: 0.15,
+          opacity: 0.075,
           duration: 1.2,
           stagger: 0.03,
           ease: "power2.inOut",
@@ -152,7 +152,7 @@ export function AboutSection() {
         // Circuit paths trace
         tl.to(circuitPaths, {
           strokeDasharray: "800 0",
-          opacity: 0.25,
+          opacity: 0.125,
           duration: 1.8,
           stagger: 0.08,
           ease: "power1.inOut",
@@ -169,7 +169,7 @@ export function AboutSection() {
         // Connections draw between nodes
         tl.to(connections, {
           strokeDasharray: "1000 0",
-          opacity: 0.3,
+          opacity: 0.15,
           duration: 1.4,
           stagger: 0.06,
           ease: "power2.out",
@@ -177,14 +177,14 @@ export function AboutSection() {
 
         // Data flow animation (continuous)
         tl.to(dataFlows, {
-          opacity: 0.4,
+          opacity: 0.2,
           duration: 0.5,
           stagger: 0.1,
         }, "-=0.8")
 
         // Tech labels fade in
         tl.to(techLabels, {
-          opacity: 0.6,
+          opacity: 0.3,
           y: 0,
           duration: 0.5,
           stagger: 0.08,
