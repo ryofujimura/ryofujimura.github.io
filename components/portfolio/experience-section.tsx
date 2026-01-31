@@ -123,10 +123,11 @@ const experiences = [
     mediaLabels: ["Proof 1", "Proof 2"],
     startDate: "Jun 2025",
     endDate: "Aug 2025",
-    description: "Engineered internal Bluetooth debugging tools adopted by 1,000+ engineers, accelerating cross-platform testing.",
+    description: "Engineered internal Bluetooth debugging tools adopted by 1,000+ engineers, to debug, improve, and reduce QA friction.",
     highlights: [
-      "Reduced QA mismatch-version detection time by 40–60%, shortening release cycles",
-      "Eliminated 10+ hours/week of debugging overhead through automation",
+      "40–60% faster QA mismatch detection",
+      "~70% faster onboarding w/ codename UI",
+      "10+ hrs/week saved via automation",
     ],
     skills: [ "iOS (SwiftUI)", "Kotlin (Android)", "App Architecture", "BLE", "WebSocket", "APIs", "Debugging", "Environment Validation", "Configuration Management"] 
     },
@@ -141,12 +142,11 @@ const experiences = [
     mediaLabels: ["Proof 1", "Proof 2"],
     startDate: "Jun 2024",
     endDate: "Aug 2024",
-    description: "Prototyped next-generation on-device AI using Jetson Orin Nano, evaluating automotive-grade compute constraints.",
+    description: "Prototyped open-source on-device AI using Jetson Orin Nano, evaluating automotive-grade compute constraints.",
     highlights: [
-      "Reduced Llama3 8B inference latency by 20–40% via mixed-precision quantization",
-      "Achieved over 3GB RAM savings enabling deployment under OEM safety requirements",
-      "Delivered demos to 10+ cross-functional teams including executive leadership",
-      "Profiled thermal, latency, and bandwidth tradeoffs for hybrid inference",
+      "20–40% faster Llama3 8B via quant",
+      "3GB+ RAM saved for OEM deployment",
+      "Demoed to 10+ teams incl. execs",
     ],
     skills: ["On-Device AI","NVIDIA Jetson","Embedded GPU","LLM Deployment","Optimization","Quantization","Latency","Memory Management","Benchmarking" ] 
   },
@@ -157,16 +157,15 @@ const experiences = [
     companyFull: "California State University, Long Beach",
     icon: "/images/CSU-Longbeach.svg",
     panelImage: "/images/lb.csulb.png",
-    mediaImages: ["/images/ACMIEEEICCPS2025.pdf", "/images/ICRA2026.pdf"],
+    mediaImages: ["/images/ACMIEEEICCPS2025.pdf", "/images/IEEEICRA2026.pdf"],
     mediaLabels: ["Proof 1", "Proof 2"],
     startDate: "Aug 2024",
     endDate: new Date().toLocaleDateString("en-US", { month: "short", year: "numeric" }),
     description: "Contributing to a 30+ person robotics/AI research group, supporting two peer-reviewed publications (ICCPS 2025, ICRA 2026).",
     highlights: [
-      "Developed transformer-based classifiers improving task accuracy by 25% and supporting real-time robotic actuation",
-      "Built 3D-printed prototypes (10 iterations) and sensor-integrated hardware systems",
-      "Led data collection/annotation pipelines generating 1,000+ labeled samples",
-      "Created reproducible ML pipelines adopted by multiple lab members",
+      "25% accuracy boost via transformers",
+      "Built 10+ 3D-printed prototypes",
+      "ML pipelines adopted lab-wide",
     ],
     skills: [ "Human-Computer Interaction", "Human-Robot Interaction", "Robotic Actuation", "Safety-Critical Systems", "Embedded Systems", "3D Printing", "CAD Design", "Servo Motor", "Raspberry Pi", "Signal Temporal Logic", "Machine Learning Classification" ]
   },
@@ -181,14 +180,13 @@ const experiences = [
     "mediaLabels": ["iOS", "Android", "Website"],
     "startDate": "Mar 2025",
     "endDate": "Nov 2025",
-    "description": "Built a real-time shuttle tracking and stop-request system with a web dashboard, driver iOS app, and student iOS/Android apps, powered by Firebase Firestore for live location and requests.",
+    "description": "Built a real-time shuttle tracking and stop-request system with a web dashboard, driver iOS app, and student iOS/Android apps, powered by Firebase for live updates.",
     "highlights": [
-      "Implemented real-time bus location and ETA updates with 10s refresh and stale detection",
-      "Designed a reliable driver workflow with slide-to-complete stops and session persistence",
-      "Enabled authenticated student pickup/drop-off requests with one active request per user",
-      "Shipped web, driver iOS, and student iOS/Android apps using a shared Firestore schema",
-      "Deployed via Firebase Hosting with CI; built App Store assets and automation tooling"
+      "MVP launched in 43 days (6-mo stall)",
+      "30 min wait cut via real-time",
+      "80% adoption, 8/10 ease-of-use",
     ],
+    
     "skills": [
       "SwiftUI",
       "Kotlin",
@@ -217,9 +215,9 @@ const experiences = [
     endDate: "May 2024",
     description: "Built Python-based extraction pipelines processing 11,500+ legacy files spanning PDFs, images, and mixed formats.",
     highlights: [
-      "Delivered 5–10× faster processing vs. manual workflows with 1–3% error rate",
-      "Designed normalization/indexing layers exposing cleaned data through internal API",
-      "Enabled 30% revenue increase by converting archival content into searchable intelligence",
+      "5–10× faster processing, 1–3% error",
+      "Built normalization + API layers",
+      "30% revenue lift via searchable data",
     ],
     skills: [ "Data Engineering", "Python", "Data Extraction", "Data Normalization", "API Development", "Automation", "Batch Processing", "Information Retrieval", "Workflow Optimization"]
   },
@@ -230,14 +228,15 @@ const experiences = [
     companyFull: "Apple Inc.",
     icon: "/images/apple.svg",
     panelImage: "/images/apple.svg",
-    mediaImages: ["/images/cusco_1.jpg"],
+    mediaImages: ["/images/apple_1.jpeg"],
     mediaLabels: ["Proof 1"],
     startDate: "Sep 2025",
     endDate: "Jan 2026",
-    description: "Drove top-tier Apple Retail performance by converting high-volume customer interactions into measurable growth across attach rates, customer satisfaction, and connected ecosystem adoption.",
+    description: "Drove top-tier Apple Retail performance by converting high-volume customer interactions into measurable sales, attach-rate, and CX outcomes.",
     highlights: [
-      "Achieved 47% AppleCare attach and 54% accessory attach, consistently outperforming store benchmarks across iPhone, iPad, Mac, and Watch",
-      "Maintained elite customer experience metrics with 41-customer promoter streak achieving 100 TMS customer feedback score",
+      "47% AppleCare, 54% accessory attach",
+      "Exceeded benchmarks on all devices",
+      "100 TMS, 41-customer promoter streak",
     ],
     skills: [
       "Customer Service",
@@ -256,15 +255,15 @@ const experiences = [
     companyFull: "Nespresso",
     icon: "/images/nespresso-icon.svg",
     panelImage: "/images/nespresso-logo.svg",
-    mediaImages: [],
-    mediaLabels: [],
+    mediaImages: ["/images/nespresso_1.jpeg"],
+    mediaLabels: ["Proof 1"],
     startDate: "Sep 2024",
     endDate: "May 2025",
-    description: "Drove top-ranked sales performance in a premium retail environment by translating customer preferences into high-value, subscription-based coffee and equipment solutions while upholding brand standards and sustainability initiatives.",
+    description: "Drove top-ranked sales in a premium retail setting by matching customer preferences with high-value coffee, equipment, and subscription solutions.",
     highlights: [
-      "Ranked #1 in Q4 2024 sales performance across the U.S. Southwest region by exceeding regional benchmarks through consultative selling",
-      "Generated the boutique’s highest subscription enrollment over a 30-week period, accelerating recurring revenue and long-term customer retention",
-      "Delivered the highest average basket value by pairing customer taste profiles with tailored machine, coffee, and accessory recommendations",
+      "Ranked #1 Q4 2024 in U.S. Southwest",
+      "Led subscription enrollment 30 weeks",
+      "Highest avg basket via pairing",
     ],
     skills: [
       "Consultative Sales",
@@ -857,9 +856,9 @@ export function ExperienceSection() {
                           {exp.highlights.map((highlight, i) => (
                             <li
                               key={i}
-                              className="flex gap-3 text-xs sm:text-sm text-foreground/90"
+                              className="flex gap-3 text-xs sm:text-sm text-foreground/90 min-h-[2.5rem] sm:min-h-[3rem] py-2 sm:py-3 items-center border-b border-foreground/10 last:border-b-0"
                             >
-                              <span className="mt-1 h-3 w-3 shrink-0 border border-foreground bg-accent/20" />
+                              <span className="h-3 w-3 shrink-0 border border-foreground bg-accent/20" />
                               <span className="leading-relaxed">{highlight}</span>
                             </li>
                           ))}
