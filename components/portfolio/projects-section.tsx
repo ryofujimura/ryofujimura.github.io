@@ -687,6 +687,37 @@ function AsciiLine({ char = "─", className }: { char?: string; className?: str
   )
 }
 
+// Adaptive ASCII border line (╔═══╗ or ╚═══╝)
+function AsciiBorderLine({ position, className }: { position: "top" | "bottom"; className?: string }) {
+  const lineRef = useRef<HTMLDivElement>(null)
+  const [line, setLine] = useState("")
+
+  useEffect(() => {
+    const updateWidth = () => {
+      if (!lineRef.current) return
+      const width = lineRef.current.offsetWidth
+      const charWidth = 6 // approximate width per character at this font size
+      const charCount = Math.max(4, Math.floor(width / charWidth) - 2) // -2 for corners
+      const middle = "═".repeat(charCount)
+      
+      if (position === "top") {
+        setLine(`╔${middle}╗`)
+      } else {
+        setLine(`╚${middle}╝`)
+      }
+    }
+    updateWidth()
+    window.addEventListener("resize", updateWidth)
+    return () => window.removeEventListener("resize", updateWidth)
+  }, [position])
+
+  return (
+    <div ref={lineRef} className={cn("font-mono text-[8px] sm:text-[10px] text-foreground/30 overflow-hidden", className)}>
+      {line}
+    </div>
+  )
+}
+
 // ─────────────────────────────────────────────────────────────
 // MAIN SECTION
 // ─────────────────────────────────────────────────────────────
@@ -792,9 +823,7 @@ export function ProjectsSection() {
         <div ref={containerRef} className="relative z-10 px-4 sm:px-6 md:px-8">
           {/* Section header */}
           <div className="max-w-6xl mx-auto mb-8 sm:mb-12">
-            <div className="ascii-decoration font-mono text-[8px] sm:text-[10px] text-foreground/30 mb-4">
-              ╔══════════════════════════════════════════════════════════╗
-            </div>
+            <AsciiBorderLine position="top" className="ascii-decoration mb-4" />
             
             <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
               <div>
@@ -812,9 +841,7 @@ export function ProjectsSection() {
               </div>
             </div>
 
-            <div className="ascii-decoration font-mono text-[8px] sm:text-[10px] text-foreground/30 mt-4">
-              ╚══════════════════════════════════════════════════════════╝
-            </div>
+            <AsciiBorderLine position="bottom" className="ascii-decoration mt-4" />
           </div>
 
           {/* Project titles */}
