@@ -48,138 +48,22 @@ type SkillGroup = keyof typeof SKILL_GROUPS
 // ─────────────────────────────────────────────────────────────
 
 const allProjects = [
+  // 2025 - Most Recent
   {
     id: "01",
-    year: "2022",
-    title: "Poker Percentage",
-    image: "/images/poker.png",
-    growth: "First WatchOS App",
-    learned: ["WatchKit basics", "Precomputed tables", "Real-time probability"],
-    techStack: ["Swift", "WatchOS"],
-    achievement: "<10ms lookup speed",
-    description: "Built first watchOS app with precomputed probability tables for instant equity calculations.",
-    skills: ["Swift", "WatchOS", "probability"],
-    links: { github: "https://github.com/ryofujimura", appStore: "#" },
+    year: "2025",
+    title: "Zero Inbox",
+    image: "/images/default_image.png",
+    growth: "Production AI Engine",
+    learned: ["Multi-stage AI", "95% accuracy tuning", "High-throughput systems"],
+    techStack: ["Swift", "AI/ML", "Firebase"],
+    achievement: "95% accuracy, 200ms",
+    description: "Most advanced AI project: multi-stage reasoning with production-grade performance.",
+    skills: ["Swift", "SwiftUI", "Firebase", "AI/ML", "Google APIs"],
+    links: { github: "https://github.com/ryofujimura", demo: "#" },
   },
   {
     id: "02",
-    year: "2023",
-    title: "Shohei Home Ground",
-    image: "/images/shoheihomeground_1.jpg",
-    growth: "Python Automation",
-    learned: ["API automation", "Content scheduling", "Growth hacking"],
-    techStack: ["Python", "Instagram API"],
-    achievement: "11K followers, 685 posts",
-    description: "Automated content pipeline saving 2+ hours daily. First major automation project.",
-    skills: ["Python", "automation", "Instagram"],
-    links: { instagram: "#", youtube: "#" },
-  },
-  {
-    id: "03",
-    year: "2023",
-    title: "Schedule Mastermind",
-    image: "/images/schedule.jpg",
-    growth: "Backend Architecture",
-    learned: ["Flask routing", "Conflict algorithms", "Database design"],
-    techStack: ["Python", "Flask"],
-    achievement: "500+ courses, 70% fewer errors",
-    description: "First production backend handling complex scheduling logic for university courses.",
-    skills: ["Python", "Flask", "scheduling"],
-    links: { github: "https://github.com/ryofujimura", demo: "https://ryofujimura.github.io" },
-  },
-  {
-    id: "04",
-    year: "2024",
-    title: "Matcha Time",
-    image: "/images/matchatime_1.jpg",
-    growth: "App Store Launch",
-    learned: ["SwiftUI patterns", "App Store submission", "4-week sprint"],
-    techStack: ["Swift", "SwiftUI"],
-    achievement: "50 users at launch",
-    description: "First iOS app published to App Store. Learned complete app lifecycle.",
-    skills: ["Swift", "SwiftUI", "App Store"],
-    links: { github: "https://github.com/ryofujimura", appStore: "#" },
-  },
-  {
-    id: "05",
-    year: "2024",
-    title: "Portfolio Website",
-    image: "/images/homepage.png",
-    growth: "Modern Web Stack",
-    learned: ["Next.js App Router", "GSAP animations", "Performance tuning"],
-    techStack: ["React", "Next.js", "GSAP"],
-    achievement: "40-60% faster load",
-    description: "Deep dive into React ecosystem with advanced animations and optimization.",
-    skills: ["React", "Next.js", "Tailwind", "Vercel"],
-    links: { github: "https://github.com/ryofujimura", demo: "https://ryofujimura.github.io" },
-  },
-  {
-    id: "06",
-    year: "2024",
-    title: "Saboriendo Platform",
-    image: "/images/default_image.png",
-    growth: "Full-Stack + Mobile",
-    learned: ["React 19 features", "Cross-platform sync", "Barcode systems"],
-    techStack: ["React 19", "SwiftUI", "Firebase"],
-    achievement: "50% faster lookup",
-    description: "First full-stack project combining web and mobile with real-time sync.",
-    skills: ["React 19", "SwiftUI", "Firebase", "Firestore", "AVFoundation"],
-    links: { github: "https://github.com/ryofujimura", demo: "https://ryofujimura.github.io" },
-  },
-  {
-    id: "07",
-    year: "2024",
-    title: "With (Local LLM)",
-    image: "/images/default_image.png",
-    growth: "On-Device AI",
-    learned: ["llama.cpp integration", "Model quantization", "Memory optimization"],
-    techStack: ["Swift", "llama.cpp", "GGUF"],
-    achievement: "<50ms/token, 2GB saved",
-    description: "First local AI project. Learned model optimization and efficient inference.",
-    skills: ["Swift", "llama.cpp", "GGUF", "SwiftUI"],
-    links: { github: "https://github.com/ryofujimura" },
-  },
-  {
-    id: "08",
-    year: "2025",
-    title: "HTIC Shuttle",
-    image: "/images/schedule.jpg",
-    growth: "Real-Time Systems",
-    learned: ["Firebase RTDB", "Event serialization", "Cross-platform native"],
-    techStack: ["Swift", "Kotlin", "Firebase"],
-    achievement: "70% fewer conflicts",
-    description: "First cross-platform native app with real-time synchronization.",
-    skills: ["Swift", "Kotlin", "Firebase RTDB", "Real-time"],
-    links: { github: "https://github.com/ryofujimura", appStore: "#", playStore: "#" },
-  },
-  {
-    id: "09",
-    year: "2025",
-    title: "CyberEdu",
-    image: "/images/CyberEdu.png",
-    growth: "Network Resilience",
-    learned: ["Offline-first patterns", "Sync strategies", "Error recovery"],
-    techStack: ["Swift", "Kotlin", "Firebase"],
-    achievement: "99%+ sync reliability",
-    description: "Mastered cross-device sync across unstable networks.",
-    skills: ["Swift", "Kotlin", "Firebase", "Real-time"],
-    links: { github: "https://github.com/ryofujimura", appStore: "#", playStore: "#" },
-  },
-  {
-    id: "10",
-    year: "2025",
-    title: "Research Lab PM",
-    image: "/images/default_image.png",
-    growth: "Serverless + AI Routing",
-    learned: ["Cloud Functions", "Dynamic AI routing", "Multi-tenant systems"],
-    techStack: ["Cloud Functions", "Firebase"],
-    achievement: "<200ms response",
-    description: "Built serverless orchestration for 30+ researchers with AI-powered workflows.",
-    skills: ["Cloud Functions", "Firebase", "AI routing", "Node.js"],
-    links: { github: "https://github.com/ryofujimura", demo: "https://ryofujimura.github.io" },
-  },
-  {
-    id: "11",
     year: "2025",
     title: "Whiteboard AI",
     image: "/images/whiteboardai.png",
@@ -192,17 +76,137 @@ const allProjects = [
     links: { github: "https://github.com/ryofujimura", demo: "https://ryofujimura.github.io" },
   },
   {
-    id: "12",
+    id: "03",
     year: "2025",
-    title: "Zero Inbox",
+    title: "Research Lab PM",
     image: "/images/default_image.png",
-    growth: "Production AI Engine",
-    learned: ["Multi-stage AI", "95% accuracy tuning", "High-throughput systems"],
-    techStack: ["Swift", "AI/ML", "Firebase"],
-    achievement: "95% accuracy, 200ms",
-    description: "Most advanced AI project: multi-stage reasoning with production-grade performance.",
-    skills: ["Swift", "SwiftUI", "Firebase", "AI/ML", "Google APIs"],
-    links: { github: "https://github.com/ryofujimura", demo: "#" },
+    growth: "Serverless + AI Routing",
+    learned: ["Cloud Functions", "Dynamic AI routing", "Multi-tenant systems"],
+    techStack: ["Cloud Functions", "Firebase"],
+    achievement: "<200ms response",
+    description: "Built serverless orchestration for 30+ researchers with AI-powered workflows.",
+    skills: ["Cloud Functions", "Firebase", "AI routing", "Node.js"],
+    links: { github: "https://github.com/ryofujimura", demo: "https://ryofujimura.github.io" },
+  },
+  {
+    id: "04",
+    year: "2025",
+    title: "CyberEdu",
+    image: "/images/CyberEdu.png",
+    growth: "Network Resilience",
+    learned: ["Offline-first patterns", "Sync strategies", "Error recovery"],
+    techStack: ["Swift", "Kotlin", "Firebase"],
+    achievement: "99%+ sync reliability",
+    description: "Mastered cross-device sync across unstable networks.",
+    skills: ["Swift", "Kotlin", "Firebase", "Real-time"],
+    links: { github: "https://github.com/ryofujimura", appStore: "#", playStore: "#" },
+  },
+  {
+    id: "05",
+    year: "2025",
+    title: "HTIC Shuttle",
+    image: "/images/schedule.jpg",
+    growth: "Real-Time Systems",
+    learned: ["Firebase RTDB", "Event serialization", "Cross-platform native"],
+    techStack: ["Swift", "Kotlin", "Firebase"],
+    achievement: "70% fewer conflicts",
+    description: "First cross-platform native app with real-time synchronization.",
+    skills: ["Swift", "Kotlin", "Firebase RTDB", "Real-time"],
+    links: { github: "https://github.com/ryofujimura", appStore: "#", playStore: "#" },
+  },
+  // 2024
+  {
+    id: "06",
+    year: "2024",
+    title: "With (Local LLM)",
+    image: "/images/default_image.png",
+    growth: "On-Device AI",
+    learned: ["llama.cpp integration", "Model quantization", "Memory optimization"],
+    techStack: ["Swift", "llama.cpp", "GGUF"],
+    achievement: "<50ms/token, 2GB saved",
+    description: "First local AI project. Learned model optimization and efficient inference.",
+    skills: ["Swift", "llama.cpp", "GGUF", "SwiftUI"],
+    links: { github: "https://github.com/ryofujimura" },
+  },
+  {
+    id: "07",
+    year: "2024",
+    title: "Saboriendo Platform",
+    image: "/images/default_image.png",
+    growth: "Full-Stack + Mobile",
+    learned: ["React 19 features", "Cross-platform sync", "Barcode systems"],
+    techStack: ["React 19", "SwiftUI", "Firebase"],
+    achievement: "50% faster lookup",
+    description: "First full-stack project combining web and mobile with real-time sync.",
+    skills: ["React 19", "SwiftUI", "Firebase", "Firestore", "AVFoundation"],
+    links: { github: "https://github.com/ryofujimura", demo: "https://ryofujimura.github.io" },
+  },
+  {
+    id: "08",
+    year: "2024",
+    title: "Portfolio Website",
+    image: "/images/homepage.png",
+    growth: "Modern Web Stack",
+    learned: ["Next.js App Router", "GSAP animations", "Performance tuning"],
+    techStack: ["React", "Next.js", "GSAP"],
+    achievement: "40-60% faster load",
+    description: "Deep dive into React ecosystem with advanced animations and optimization.",
+    skills: ["React", "Next.js", "Tailwind", "Vercel"],
+    links: { github: "https://github.com/ryofujimura", demo: "https://ryofujimura.github.io" },
+  },
+  {
+    id: "09",
+    year: "2024",
+    title: "Matcha Time",
+    image: "/images/matchatime_1.jpg",
+    growth: "App Store Launch",
+    learned: ["SwiftUI patterns", "App Store submission", "4-week sprint"],
+    techStack: ["Swift", "SwiftUI"],
+    achievement: "50 users at launch",
+    description: "First iOS app published to App Store. Learned complete app lifecycle.",
+    skills: ["Swift", "SwiftUI", "App Store"],
+    links: { github: "https://github.com/ryofujimura", appStore: "#" },
+  },
+  // 2023
+  {
+    id: "10",
+    year: "2023",
+    title: "Schedule Mastermind",
+    image: "/images/schedule.jpg",
+    growth: "Backend Architecture",
+    learned: ["Flask routing", "Conflict algorithms", "Database design"],
+    techStack: ["Python", "Flask"],
+    achievement: "500+ courses, 70% fewer errors",
+    description: "First production backend handling complex scheduling logic for university courses.",
+    skills: ["Python", "Flask", "scheduling"],
+    links: { github: "https://github.com/ryofujimura", demo: "https://ryofujimura.github.io" },
+  },
+  {
+    id: "11",
+    year: "2023",
+    title: "Shohei Home Ground",
+    image: "/images/shoheihomeground_1.jpg",
+    growth: "Python Automation",
+    learned: ["API automation", "Content scheduling", "Growth hacking"],
+    techStack: ["Python", "Instagram API"],
+    achievement: "11K followers, 685 posts",
+    description: "Automated content pipeline saving 2+ hours daily. First major automation project.",
+    skills: ["Python", "automation", "Instagram"],
+    links: { instagram: "#", youtube: "#" },
+  },
+  // 2022 - Oldest
+  {
+    id: "12",
+    year: "2022",
+    title: "Poker Percentage",
+    image: "/images/poker.png",
+    growth: "First WatchOS App",
+    learned: ["WatchKit basics", "Precomputed tables", "Real-time probability"],
+    techStack: ["Swift", "WatchOS"],
+    achievement: "<10ms lookup speed",
+    description: "Built first watchOS app with precomputed probability tables for instant equity calculations.",
+    skills: ["Swift", "WatchOS", "probability"],
+    links: { github: "https://github.com/ryofujimura", appStore: "#" },
   },
 ]
 
@@ -596,11 +600,11 @@ function SectionHeader({ count }: { count: number }) {
 
       {/* Timeline legend - mobile */}
       <div className="flex items-center gap-2 font-mono text-[8px] sm:text-[9px] text-muted-foreground">
-        <span>2022</span>
-        <span className="flex-1 h-px bg-foreground/20" />
-        <span className="text-accent">GROWTH TIMELINE</span>
-        <span className="flex-1 h-px bg-foreground/20" />
         <span>2025</span>
+        <span className="flex-1 h-px bg-foreground/20" />
+        <span className="text-accent">TIMELINE</span>
+        <span className="flex-1 h-px bg-foreground/20" />
+        <span>2022</span>
       </div>
     </div>
   )
@@ -669,10 +673,10 @@ function HorizontalTimeline({ projects }: { projects: Project[] }) {
 
       {/* Scrolling content */}
       <div ref={scrollRef} className="flex items-center gap-8 py-8 px-4">
-        {/* Start marker */}
+        {/* Now marker */}
         <div className="flex-shrink-0 flex flex-col items-center">
           <pre className="font-mono text-[8px] text-foreground/30 select-none whitespace-pre">{ASCII_GROWTH}</pre>
-          <span className="font-mono text-[10px] text-foreground/50 mt-2">START</span>
+          <span className="font-mono text-[10px] text-accent mt-2">NOW</span>
         </div>
 
         {projects.map((project, index) => (
@@ -696,9 +700,9 @@ function HorizontalTimeline({ projects }: { projects: Project[] }) {
           </div>
         ))}
 
-        {/* End marker */}
+        {/* Start marker */}
         <div className="flex-shrink-0 flex flex-col items-center ml-4">
-          <span className="font-mono text-[10px] text-accent">NOW</span>
+          <span className="font-mono text-[10px] text-foreground/50">2022</span>
           <pre className="font-mono text-[8px] text-foreground/30 select-none mt-1">{ASCII_ARROW}</pre>
         </div>
       </div>
@@ -765,10 +769,10 @@ function VerticalTimeline({ projects }: { projects: Project[] }) {
         ))}
       </div>
 
-      {/* End marker */}
+      {/* Start marker (oldest) */}
       <div className="relative mt-6 pl-10 sm:pl-14">
-        <div className="absolute -left-10 sm:-left-14 top-0 w-4 h-4 border-2 border-accent bg-background rotate-45" />
-        <span className="font-mono text-xs text-accent">NOW →</span>
+        <div className="absolute -left-10 sm:-left-14 top-0 w-4 h-4 border-2 border-foreground/40 bg-background rotate-45" />
+        <span className="font-mono text-xs text-muted-foreground">← 2022</span>
       </div>
     </div>
   )
