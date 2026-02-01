@@ -580,68 +580,94 @@ function MobileQuickNav({
 
 export function ProjectsSection() {
   const [activeIndex, setActiveIndex] = useState(0)
-  const [isMobile, setIsMobile] = useState(false)
   const sectionRef = useRef<HTMLElement>(null)
   const pinContainerRef = useRef<HTMLDivElement>(null)
   const scrollTriggerRef = useRef<ScrollTrigger | null>(null)
+  const isMobileRef = useRef<boolean | null>(null)
+  const isInitializedRef = useRef(false)
 
   const currentProject = allProjects[activeIndex]
 
-  // Detect mobile with matchMedia and resize listener
-  useEffect(() => {
-    if (typeof window === "undefined") return
-
-    const mediaQuery = window.matchMedia("(max-width: 768px)")
-    
-    const handleChange = (e: MediaQueryListEvent | MediaQueryList) => {
-      setIsMobile(e.matches)
-    }
-
-    // Set initial value
-    handleChange(mediaQuery)
-
-    // Add listener for changes
-    mediaQuery.addEventListener("change", handleChange)
-
-    return () => {
-      mediaQuery.removeEventListener("change", handleChange)
-    }
+  // Get mobile state helper
+  const getIsMobile = useCallback(() => {
+    if (typeof window === "undefined") return false
+    return window.matchMedia("(max-width: 768px)").matches
   }, [])
 
-  // GSAP ScrollTrigger pin setup - recreate on mobile/desktop change
-  useEffect(() => {
+  // Create or update ScrollTrigger
+  const setupScrollTrigger = useCallback(() => {
     if (!sectionRef.current || !pinContainerRef.current) return
+
+    const isMobile = getIsMobile()
+    
+    // Skip if mobile state hasn't changed (except on first init)
+    if (isInitializedRef.current && isMobileRef.current === isMobile) return
+    
+    isMobileRef.current = isMobile
+
+    // Kill existing ScrollTrigger before creating new one
+    if (scrollTriggerRef.current) {
+      scrollTriggerRef.current.kill()
+      scrollTriggerRef.current = null
+    }
 
     // Mobile: pin later, shorter scroll distance per project
     // Desktop: pin at top, longer scroll distance
     const startValue = isMobile ? "top 15%" : "top top"
-    const scrollPerProject = isMobile ? 40 : 50
+    const scrollPerProject = isMobile ? 80 : 100
     const scrubValue = isMobile ? 0.3 : 0.5
 
-    const ctx = gsap.context(() => {
-      scrollTriggerRef.current = ScrollTrigger.create({
-        trigger: sectionRef.current,
-        start: startValue,
-        end: `+=${TOTAL_PROJECTS * scrollPerProject}%`,
-        pin: pinContainerRef.current,
-        pinSpacing: true,
-        scrub: scrubValue,
-        onUpdate: (self) => {
-          const progress = self.progress
-          const newIndex = Math.min(
-            Math.floor(progress * TOTAL_PROJECTS),
-            TOTAL_PROJECTS - 1
-          )
-          setActiveIndex(newIndex)
-        },
-      })
-    }, sectionRef.current)
+    scrollTriggerRef.current = ScrollTrigger.create({
+      trigger: sectionRef.current,
+      start: startValue,
+      end: `+=${TOTAL_PROJECTS * scrollPerProject}%`,
+      pin: pinContainerRef.current,
+      pinSpacing: true,
+      scrub: scrubValue,
+      onUpdate: (self) => {
+        const progress = self.progress
+        const newIndex = Math.min(
+          Math.floor(progress * TOTAL_PROJECTS),
+          TOTAL_PROJECTS - 1
+        )
+        setActiveIndex(newIndex)
+      },
+    })
+
+    isInitializedRef.current = true
+  }, [getIsMobile])
+
+  // Initial setup and resize handling
+  useEffect(() => {
+    if (typeof window === "undefined") return
+
+    // Initial setup
+    setupScrollTrigger()
+
+    // Handle resize with debounce to prevent flickering
+    let resizeTimeout: NodeJS.Timeout
+    const handleResize = () => {
+      clearTimeout(resizeTimeout)
+      resizeTimeout = setTimeout(() => {
+        const newIsMobile = getIsMobile()
+        // Only recreate if breakpoint actually crossed
+        if (isMobileRef.current !== newIsMobile) {
+          setupScrollTrigger()
+        }
+      }, 150)
+    }
+
+    window.addEventListener("resize", handleResize)
 
     return () => {
-      ctx.revert()
-      scrollTriggerRef.current = null
+      window.removeEventListener("resize", handleResize)
+      clearTimeout(resizeTimeout)
+      if (scrollTriggerRef.current) {
+        scrollTriggerRef.current.kill()
+        scrollTriggerRef.current = null
+      }
     }
-  }, [isMobile])
+  }, [setupScrollTrigger, getIsMobile])
 
   return (
     <section
