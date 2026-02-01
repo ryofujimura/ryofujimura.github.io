@@ -389,10 +389,26 @@ function TerminalOutput({
       <div className="border border-foreground/20 bg-black/40 backdrop-blur-sm">
         {/* Terminal header */}
         <div className="flex items-center justify-between px-3 py-2 border-b border-foreground/10 bg-foreground/5">
-          <div className="flex items-center gap-2">
-            <div className="w-2.5 h-2.5 rounded-full bg-red-500/60" />
-            <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/60" />
-            <div className="w-2.5 h-2.5 rounded-full bg-green-500/60" />
+          <div className="flex items-center gap-2 group/buttons">
+            <button 
+              onClick={onClose}
+              className="w-2.5 h-2.5 rounded-full bg-red-500/60 hover:bg-red-500 transition-colors relative"
+              title="Close"
+            >
+              <span className="absolute inset-0 flex items-center justify-center text-[6px] text-red-900 opacity-0 group-hover/buttons:opacity-100 transition-opacity">×</span>
+            </button>
+            <button 
+              className="w-2.5 h-2.5 rounded-full bg-yellow-500/60 hover:bg-yellow-500 transition-colors relative cursor-default"
+              title="Minimize"
+            >
+              <span className="absolute inset-0 flex items-center justify-center text-[6px] text-yellow-900 opacity-0 group-hover/buttons:opacity-100 transition-opacity">−</span>
+            </button>
+            <button 
+              className="w-2.5 h-2.5 rounded-full bg-green-500/60 hover:bg-green-500 transition-colors relative cursor-default"
+              title="Maximize"
+            >
+              <span className="absolute inset-0 flex items-center justify-center text-[6px] text-green-900 opacity-0 group-hover/buttons:opacity-100 transition-opacity">+</span>
+            </button>
             <span className="hidden md:inline font-mono text-[9px] text-foreground/40 ml-2">
               ryofujimura@MacBookPro
             </span>
