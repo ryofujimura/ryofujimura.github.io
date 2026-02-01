@@ -287,18 +287,20 @@ export function ContactSection() {
         </div>
 
         <AnimatedSection delay={200}>
-          <div className="text-base sm:text-lg md:text-xl text-muted-foreground leading-relaxed max-w-2xl mx-auto mb-8 sm:mb-12 px-1 font-mono">
-            <p className="text-center">
-              Open to{" "}
-              <VerticalWordRotator
-                words={ROTATING_WORDS}
-                slotWidthCh={WORD_SLOT_CH}
-                className="text-foreground font-medium"
-              />
-            </p>
-            <p className="text-right mt-1">
-              — let&apos;s connect.
-            </p>
+          <div className="flex justify-center mb-8 sm:mb-12 px-1">
+            <div className="text-base sm:text-lg md:text-xl text-muted-foreground leading-relaxed font-mono inline-block">
+              <p>
+                Open to{" "}
+                <VerticalWordRotator
+                  words={ROTATING_WORDS}
+                  slotWidthCh={WORD_SLOT_CH}
+                  className="text-foreground font-medium"
+                />
+              </p>
+              <p className="text-right mt-1">
+                — let&apos;s connect.
+              </p>
+            </div>
           </div>
         </AnimatedSection>
 
