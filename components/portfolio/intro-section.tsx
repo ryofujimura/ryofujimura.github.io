@@ -599,8 +599,6 @@ export function IntroSection() {
                 data-intro-animate
                 className="flex items-center gap-2 sm:gap-4 mb-6 sm:mb-8 font-mono text-[9px] sm:text-[10px] uppercase tracking-[0.2em] text-muted-foreground"
               >
-                <span className="text-green-500">● ONLINE</span>
-                <span className="text-foreground/20">│</span>
                 <span>REV: {rev}</span>
                 <span className="text-foreground/20">│</span>
                 <span className="hidden sm:inline">SYS: OPERATIONAL</span>
