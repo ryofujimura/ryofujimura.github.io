@@ -2,18 +2,12 @@
 
 import { useRef, useState, useEffect } from "react"
 import { gsap } from "gsap"
-import { ScrollTrigger } from "gsap/ScrollTrigger"
 import { useReducedMotion } from "@/hooks/use-reduced-motion"
 import { GSAPText } from "@/components/gsap-text"
 import { BrutalistBackground } from "@/components/brutalist-background"
 import { MagneticButton } from "@/components/magnetic-button"
 import { useToast } from "@/hooks/use-toast"
-import { ArrowDown, ArrowRight, Check, Github, Globe, Linkedin, Mail } from "lucide-react"
-
-// Register GSAP plugins
-if (typeof window !== "undefined") {
-  gsap.registerPlugin(ScrollTrigger)
-}
+import { Check, Github, Globe, Linkedin, Mail } from "lucide-react"
 
 const SITE_URL = "https://ryofujimura.github.io/"
 const MOBILE_BREAKPOINT = 768
@@ -371,17 +365,10 @@ function TechnicalFrame({ className = "" }: { className?: string }) {
 }
 
 /**
- * IntroSection - Brutalist intro combining hero + about content
- * Smooth single scroll with GSAP scroll-triggered animations
+ * HeroSection - Brutalist hero with name, role, and social links
  */
-export function IntroSection() {
-  const sectionRef = useRef<HTMLDivElement>(null)
+export function HeroSection() {
   const heroRef = useRef<HTMLDivElement>(null)
-  const statsRef = useRef<HTMLDivElement>(null)
-  const statsGridRef = useRef<HTMLDivElement>(null)
-  const stackTickerRef = useRef<HTMLDivElement>(null)
-  const ctaRef = useRef<HTMLDivElement>(null)
-  
   const isMobile = useResponsiveMobile()
   const prefersReducedMotion = useReducedMotion()
 
@@ -404,87 +391,13 @@ export function IntroSection() {
           delay: 0.2,
         }
       )
-
     }, heroRef)
 
     return () => ctx.revert()
   }, [prefersReducedMotion])
 
-  // Stats section scroll-triggered animations
-  useEffect(() => {
-    if (!statsRef.current || prefersReducedMotion) return
-
-    const ctx = gsap.context(() => {
-      // Stats grid stagger
-      if (statsGridRef.current) {
-        const statItems = statsGridRef.current.querySelectorAll("[data-stat]")
-        gsap.fromTo(
-          statItems,
-          { opacity: 0, y: 30, scale: 0.95 },
-          {
-            opacity: 1,
-            y: 0,
-            scale: 1,
-            duration: 0.6,
-            stagger: 0.1,
-            ease: "power3.out",
-            scrollTrigger: {
-              trigger: statsGridRef.current,
-              start: "top 85%",
-              toggleActions: "play none none none",
-            },
-          }
-        )
-      }
-
-      // Stack ticker
-      if (stackTickerRef.current) {
-        gsap.fromTo(
-          stackTickerRef.current,
-          { opacity: 0, x: -20 },
-          {
-            opacity: 1,
-            x: 0,
-            duration: 0.8,
-            ease: "power3.out",
-            scrollTrigger: {
-              trigger: stackTickerRef.current,
-              start: "top 90%",
-              toggleActions: "play none none none",
-            },
-          }
-        )
-      }
-
-      // CTA buttons
-      if (ctaRef.current) {
-        gsap.fromTo(
-          ctaRef.current.querySelectorAll("a"),
-          { opacity: 0, y: 15 },
-          {
-            opacity: 1,
-            y: 0,
-            duration: 0.6,
-            stagger: 0.1,
-            ease: "power3.out",
-            scrollTrigger: {
-              trigger: ctaRef.current,
-              start: "top 90%",
-              toggleActions: "play none none none",
-            },
-          }
-        )
-      }
-    }, statsRef)
-
-    return () => ctx.revert()
-  }, [prefersReducedMotion])
-
   return (
-    <section id="intro" ref={sectionRef} className="relative">
-      {/* ═══════════════════════════════════════════════════════════════════
-          HERO: Identity
-      ═══════════════════════════════════════════════════════════════════ */}
+    <section id="hero" className="relative">
       <div
         ref={heroRef}
         className="relative w-full pt-40 sm:pt-48 pb-24 sm:pb-32"
@@ -560,179 +473,6 @@ export function IntroSection() {
           </div>
         </div>
       </div>
-
-      {/* ═══════════════════════════════════════════════════════════════════
-          STATS: Skills & Info
-      ═══════════════════════════════════════════════════════════════════ */}
-      <div
-        ref={statsRef}
-        className="relative w-full pt-8 sm:pt-12 pb-16 sm:pb-24"
-      >
-        {/* Subtle background variant */}
-        <div className="absolute inset-0 opacity-40">
-          <BrutalistBackground variant="circuit" />
-        </div>
-
-        <div className="relative z-10 w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Section label */}
-          <div className="flex items-center gap-3 mb-8 sm:mb-10">
-            <div className="relative">
-              <div className="w-2.5 h-2.5 bg-green-500 rounded-full animate-pulse" />
-              <div className="absolute inset-0 w-2.5 h-2.5 bg-green-500 rounded-full animate-ping opacity-75" />
-            </div>
-            <span className="font-mono text-[10px] sm:text-xs uppercase tracking-[0.2em] text-green-500">
-              Available for Opportunities
-            </span>
-          </div>
-
-          {/* Stats Grid */}
-          <div 
-            ref={statsGridRef} 
-            className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-8 sm:mb-10"
-          >
-            {[
-              { label: "Years Coding", value: "8+", link: null, hash: null },
-              { label: "Internships", value: "2", link: "experience", hash: null },
-              { label: "Projects Shipped", value: "10+", link: "projects", hash: null },
-              { label: "Publications", value: "2", link: null, hash: "#experience-cpx-lab" },
-            ].map((stat) => {
-              const isLink = !!stat.link || !!stat.hash
-              const handleClick = () => {
-                if (stat.hash) {
-                  // Use hash navigation for specific experience
-                  window.location.hash = stat.hash
-                } else if (stat.link) {
-                  document.getElementById(stat.link)?.scrollIntoView({ behavior: "smooth" })
-                }
-              }
-              return (
-                <button
-                  key={stat.label}
-                  data-stat
-                  type="button"
-                  onClick={isLink ? handleClick : undefined}
-                  disabled={!isLink}
-                  className={`
-                    relative border bg-background/80 backdrop-blur-sm px-3 py-4 sm:px-4 sm:py-5 
-                    flex flex-col justify-between min-h-[5rem] sm:min-h-[5.5rem] text-left
-                    transition-all duration-300 group
-                    ${isLink 
-                      ? "border-foreground/25 cursor-pointer hover:border-foreground hover:shadow-[4px_4px_0_0_var(--foreground)]" 
-                      : "border-foreground/15 cursor-default"
-                    }
-                  `}
-                >
-                  {/* Technical pattern overlay on hover */}
-                  {isLink && (
-                    <svg
-                      className="absolute inset-0 w-full h-full pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                      viewBox="0 0 48 48"
-                      fill="none"
-                      aria-hidden
-                    >
-                      <line x1="0" y1="0" x2="48" y2="48" stroke="currentColor" strokeWidth="0.3" className="text-foreground/10" />
-                      <line x1="48" y1="0" x2="0" y2="48" stroke="currentColor" strokeWidth="0.3" className="text-foreground/10" />
-                    </svg>
-                  )}
-                  <span className="font-mono text-[9px] sm:text-[10px] uppercase tracking-[0.15em] text-muted-foreground">
-                    {stat.label}
-                  </span>
-                  <span className="font-mono text-2xl sm:text-3xl md:text-4xl font-black text-foreground">
-                    {stat.value}
-                  </span>
-                </button>
-              )
-            })}
-          </div>
-
-          {/* Stack Ticker */}
-          <div 
-            ref={stackTickerRef} 
-            className="border border-foreground/20 bg-background/50 backdrop-blur-sm overflow-hidden mb-6 sm:mb-8"
-          >
-            <div className="px-3 py-2 border-b border-foreground/10">
-              <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-muted-foreground">
-                Tech Stack
-              </span>
-            </div>
-            <div className="relative overflow-hidden py-3">
-              <div className={`stack-ticker flex gap-8 whitespace-nowrap ${prefersReducedMotion ? "" : "animate-ticker"}`}>
-                {[
-                  "Python", "Swift", "Kotlin", "TypeScript", "React", 
-                  "Firebase", "PyTorch", "CoreML", "On-device LLMs", 
-                  "CUDA", "Docker", "Node.js", "REST APIs"
-                ].map((tech, i) => (
-                  <span 
-                    key={i} 
-                    className="font-mono text-sm sm:text-base text-foreground/80"
-                  >
-                    {tech}
-                  </span>
-                ))}
-                {/* Duplicate for seamless loop */}
-                {[
-                  "Python", "Swift", "Kotlin", "TypeScript", "React", 
-                  "Firebase", "PyTorch", "CoreML", "On-device LLMs", 
-                  "CUDA", "Docker", "Node.js", "REST APIs"
-                ].map((tech, i) => (
-                  <span 
-                    key={`dup-${i}`} 
-                    className="font-mono text-sm sm:text-base text-foreground/80"
-                  >
-                    {tech}
-                  </span>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* Focus Areas */}
-          <div className="flex flex-wrap gap-2 mb-8 sm:mb-10">
-            {["AI / ML", "Mobile", "Backend", "Full-Stack"].map((area) => (
-              <span 
-                key={area}
-                className="font-mono text-[10px] sm:text-xs uppercase tracking-wider px-3 py-1.5 border border-foreground/30 text-foreground/70 bg-background/50"
-              >
-                {area}
-              </span>
-            ))}
-          </div>
-
-          {/* CTA Buttons */}
-          <div ref={ctaRef} className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4">
-            <MagneticButton
-              as="a"
-              href="#experience"
-              className="touch-target group relative inline-flex items-center justify-center gap-2 sm:gap-3 px-6 sm:px-8 py-3 sm:py-4 min-h-[48px] text-xs sm:text-sm font-mono uppercase tracking-wider text-primary-foreground bg-primary border-2 border-primary hover:bg-transparent hover:text-primary transition-all duration-300"
-            >
-              View Work
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform shrink-0" />
-            </MagneticButton>
-            <MagneticButton
-              as="a"
-              href="#contact"
-              className="touch-target group inline-flex items-center justify-center gap-2 sm:gap-3 px-6 sm:px-8 py-3 sm:py-4 min-h-[48px] text-xs sm:text-sm font-mono uppercase tracking-wider text-foreground bg-transparent border-2 border-foreground hover:bg-foreground hover:text-background transition-all duration-300"
-            >
-              Contact
-              <ArrowDown className="w-4 h-4 group-hover:translate-y-1 transition-transform shrink-0" />
-            </MagneticButton>
-          </div>
-        </div>
-      </div>
-
-      {/* CSS for ticker animation */}
-      <style jsx>{`
-        @keyframes ticker {
-          0% { transform: translateX(0); }
-          100% { transform: translateX(-50%); }
-        }
-        .animate-ticker {
-          animation: ticker 30s linear infinite;
-        }
-        .animate-ticker:hover {
-          animation-play-state: paused;
-        }
-      `}</style>
     </section>
   )
 }

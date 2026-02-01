@@ -1,5 +1,6 @@
 import { Navigation } from "@/components/portfolio/navigation"
-import { IntroSection } from "@/components/portfolio/intro-section"
+import { HeroSection } from "@/components/portfolio/hero-section"
+import { AboutSection } from "@/components/portfolio/about-section"
 import { ExperienceSection } from "@/components/portfolio/experience-section"
 import { ProjectsSection } from "@/components/portfolio/projects-section"
 import { HobbiesSection } from "@/components/portfolio/hobbies-section"
@@ -12,7 +13,8 @@ export default function Portfolio() {
     <main className="min-h-screen bg-background text-foreground selection:bg-accent selection:text-accent-foreground">
       <CustomCursor />
       <Navigation />
-      <IntroSection />
+      <HeroSection />
+      <AboutSection />
       <ExperienceSection />
       <ProjectsSection />
       <HobbiesSection />
