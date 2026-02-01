@@ -609,141 +609,217 @@ function TechnicalGridSVG({ isActive }: { isActive: boolean }) {
 }
 
 // ─────────────────────────────────────────────────────────────
-// IMAGE GALLERY WITH BRUTALIST STYLING
+// FILMSTRIP IMAGE GALLERY - BRUTALIST HORIZONTAL SCROLL
 // ─────────────────────────────────────────────────────────────
 
-function ImageGallery({ 
+function FilmstripGallery({ 
   images, 
   isActive, 
-  projectTitle 
+  projectTitle,
+  projectId
 }: { 
   images: string[]
   isActive: boolean
   projectTitle: string
+  projectId: string
 }) {
   const galleryRef = useRef<HTMLDivElement>(null)
-  const [activeImage, setActiveImage] = useState(0)
   const [imageErrors, setImageErrors] = useState<Set<number>>(new Set())
-
-  // Auto-rotate images
-  useEffect(() => {
-    if (!isActive || images.length <= 1) return
-
-    const interval = setInterval(() => {
-      setActiveImage(prev => (prev + 1) % images.length)
-    }, 3000)
-
-    return () => clearInterval(interval)
-  }, [isActive, images.length])
-
-  // GSAP animation for gallery
-  useEffect(() => {
-    if (!isActive || !galleryRef.current) return
-
-    gsap.fromTo(
-      galleryRef.current,
-      { opacity: 0, scale: 0.95, y: 10 },
-      { opacity: 1, scale: 1, y: 0, duration: 0.5, ease: "power2.out", delay: 0.2 }
-    )
-  }, [isActive])
+  const [glitchFrame, setGlitchFrame] = useState(0)
 
   const handleImageError = (index: number) => {
     setImageErrors(prev => new Set(prev).add(index))
   }
 
-  // If no valid images, show ASCII placeholder
   const validImages = images.filter((_, i) => !imageErrors.has(i))
 
+  // Glitch effect on frame markers
+  useEffect(() => {
+    if (!isActive) return
+
+    const glitchChars = ["░", "▒", "▓", "█", "│", "─"]
+    const interval = setInterval(() => {
+      setGlitchFrame(Math.floor(Math.random() * glitchChars.length))
+    }, 200)
+
+    return () => clearInterval(interval)
+  }, [isActive])
+
+  // GSAP staggered reveal animation
+  useEffect(() => {
+    if (!isActive || !galleryRef.current) return
+
+    const ctx = gsap.context(() => {
+      // Container slide up
+      gsap.fromTo(
+        galleryRef.current,
+        { opacity: 0, y: 20 },
+        { opacity: 1, y: 0, duration: 0.4, ease: "power3.out", delay: 0.15 }
+      )
+
+      // Individual frames staggered reveal with unique animations
+      gsap.fromTo(
+        ".filmstrip-frame",
+        { 
+          opacity: 0, 
+          scale: 0.8, 
+          rotateY: -15,
+          x: -30 
+        },
+        { 
+          opacity: 1, 
+          scale: 1, 
+          rotateY: 0,
+          x: 0,
+          duration: 0.5, 
+          stagger: 0.1, 
+          ease: "back.out(1.4)",
+          delay: 0.2
+        }
+      )
+
+      // Sprocket holes animation
+      gsap.fromTo(
+        ".sprocket-hole",
+        { scale: 0, opacity: 0 },
+        { scale: 1, opacity: 1, duration: 0.2, stagger: 0.02, delay: 0.4 }
+      )
+
+      // Frame numbers glitch in
+      gsap.fromTo(
+        ".frame-number",
+        { opacity: 0, x: 10 },
+        { opacity: 1, x: 0, duration: 0.3, stagger: 0.05, delay: 0.5, ease: "power2.out" }
+      )
+    }, galleryRef.current)
+
+    return () => ctx.revert()
+  }, [isActive])
+
+  // No images - show ASCII filmstrip placeholder
   if (validImages.length === 0) {
     return (
       <div 
         ref={galleryRef}
-        className="relative h-full border border-foreground/20 bg-foreground/[0.02] flex items-center justify-center"
+        className="w-full h-full flex items-center justify-center bg-foreground/[0.01] border-t border-foreground/10"
       >
-        {/* ASCII art placeholder */}
-        <div className="text-center">
-          <pre className="font-mono text-[6px] md:text-[7px] text-foreground/20 leading-tight">
-{`┌─────────────────┐
-│  ╔═══════════╗  │
-│  ║           ║  │
-│  ║   IMAGE   ║  │
-│  ║  PENDING  ║  │
-│  ║           ║  │
-│  ╚═══════════╝  │
-└─────────────────┘`}
+        <div className="flex items-center gap-2 sm:gap-3">
+          {/* Filmstrip perforations */}
+          <div className="hidden sm:flex flex-col gap-1">
+            {[...Array(3)].map((_, i) => (
+              <div key={i} className="w-1.5 h-2 bg-foreground/10" />
+            ))}
+          </div>
+          
+          {/* ASCII placeholder */}
+          <pre className="font-mono text-[5px] sm:text-[6px] text-foreground/15 leading-tight">
+{`┌───────────────────────────────┐
+│  ▓▓▓   ░░░   ▒▒▒   ░░░   ▓▓▓  │
+│  ▓▓▓   ░░░   ▒▒▒   ░░░   ▓▓▓  │
+│  MEDIA LOADING // ${projectId.padStart(2, '0')}   │
+└───────────────────────────────┘`}
           </pre>
-          <span className="font-mono text-[6px] text-foreground/30 mt-2 block">
-            [ {projectTitle.toUpperCase()} ]
-          </span>
+          
+          {/* Filmstrip perforations */}
+          <div className="hidden sm:flex flex-col gap-1">
+            {[...Array(3)].map((_, i) => (
+              <div key={i} className="w-1.5 h-2 bg-foreground/10" />
+            ))}
+          </div>
         </div>
-
-        {/* Technical corner marks */}
-        <span className="absolute top-1 left-1 font-mono text-[5px] text-foreground/20">◢</span>
-        <span className="absolute top-1 right-1 font-mono text-[5px] text-foreground/20">◣</span>
-        <span className="absolute bottom-1 left-1 font-mono text-[5px] text-foreground/20">◥</span>
-        <span className="absolute bottom-1 right-1 font-mono text-[5px] text-foreground/20">◤</span>
       </div>
     )
   }
 
+  const glitchChars = ["░", "▒", "▓", "█", "│", "─"]
+
   return (
     <div 
       ref={galleryRef}
-      className="relative h-full border border-foreground/30 bg-foreground/[0.02] overflow-hidden"
+      className="w-full h-full relative overflow-hidden"
     >
-      {/* Main image display */}
-      <div className="absolute inset-0">
-        {images.map((src, i) => (
-          <div
-            key={i}
-            className={cn(
-              "absolute inset-0 transition-opacity duration-500",
-              i === activeImage && !imageErrors.has(i) ? "opacity-100" : "opacity-0"
-            )}
-          >
-            <Image
-              src={src}
-              alt={`${projectTitle} screenshot ${i + 1}`}
-              fill
-              className="object-cover grayscale hover:grayscale-0 transition-all duration-500"
-              onError={() => handleImageError(i)}
-            />
-            {/* Scanline overlay */}
-            <div className="absolute inset-0 pointer-events-none opacity-30" 
-              style={{
-                backgroundImage: "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px)"
-              }}
-            />
-          </div>
-        ))}
+      {/* Top filmstrip edge with sprocket holes */}
+      <div className="absolute top-0 left-0 right-0 h-2 sm:h-3 bg-foreground/[0.03] border-b border-foreground/10 flex items-center justify-between px-1 sm:px-2 overflow-hidden">
+        <div className="flex gap-2 sm:gap-4">
+          {[...Array(12)].map((_, i) => (
+            <div key={i} className="sprocket-hole w-1 h-1 sm:w-1.5 sm:h-1.5 bg-foreground/10" />
+          ))}
+        </div>
+        <span className="font-mono text-[4px] sm:text-[5px] text-foreground/20">
+          {glitchChars[glitchFrame]} ROLL_{projectId} {glitchChars[(glitchFrame + 1) % 6]}
+        </span>
+        <div className="flex gap-2 sm:gap-4">
+          {[...Array(12)].map((_, i) => (
+            <div key={i} className="sprocket-hole w-1 h-1 sm:w-1.5 sm:h-1.5 bg-foreground/10" />
+          ))}
+        </div>
       </div>
 
-      {/* Image counter and navigation dots */}
-      {validImages.length > 1 && (
-        <div className="absolute bottom-2 left-2 right-2 flex items-center justify-between">
-          <div className="font-mono text-[6px] text-foreground/60 bg-background/80 px-1">
-            {String(activeImage + 1).padStart(2, "0")}/{String(validImages.length).padStart(2, "0")}
-          </div>
-          <div className="flex gap-1">
-            {validImages.map((_, i) => (
-              <button
-                key={i}
-                onClick={() => setActiveImage(i)}
-                className={cn(
-                  "w-1.5 h-1.5 transition-all",
-                  i === activeImage ? "bg-foreground" : "bg-foreground/20"
-                )}
-              />
-            ))}
+      {/* Main filmstrip content */}
+      <div className="absolute top-2 sm:top-3 bottom-2 sm:bottom-3 left-0 right-0 flex items-center overflow-x-auto scrollbar-hide">
+        <div className="flex gap-1 sm:gap-2 px-2 sm:px-3 py-1">
+          {validImages.map((src, i) => (
+            <div
+              key={i}
+              className="filmstrip-frame relative flex-shrink-0 group"
+              style={{ perspective: "1000px" }}
+            >
+              {/* Frame container */}
+              <div className="relative w-16 h-12 sm:w-24 sm:h-16 md:w-32 md:h-20 lg:w-40 lg:h-24 border border-foreground/20 bg-foreground/[0.02] overflow-hidden">
+                <Image
+                  src={src}
+                  alt={`${projectTitle} ${i + 1}`}
+                  fill
+                  className="object-cover grayscale group-hover:grayscale-0 transition-all duration-500 group-hover:scale-105"
+                  onError={() => handleImageError(i)}
+                />
+                
+                {/* Scanline overlay */}
+                <div className="absolute inset-0 pointer-events-none opacity-20 group-hover:opacity-10 transition-opacity" 
+                  style={{
+                    backgroundImage: "repeating-linear-gradient(0deg, transparent, transparent 1px, rgba(0,0,0,0.1) 1px, rgba(0,0,0,0.1) 2px)"
+                  }}
+                />
+
+                {/* Corner technical marks */}
+                <div className="absolute top-0.5 left-0.5 font-mono text-[4px] sm:text-[5px] text-foreground/30 opacity-0 group-hover:opacity-100 transition-opacity">┌</div>
+                <div className="absolute top-0.5 right-0.5 font-mono text-[4px] sm:text-[5px] text-foreground/30 opacity-0 group-hover:opacity-100 transition-opacity">┐</div>
+                <div className="absolute bottom-0.5 left-0.5 font-mono text-[4px] sm:text-[5px] text-foreground/30 opacity-0 group-hover:opacity-100 transition-opacity">└</div>
+                <div className="absolute bottom-0.5 right-0.5 font-mono text-[4px] sm:text-[5px] text-foreground/30 opacity-0 group-hover:opacity-100 transition-opacity">┘</div>
+              </div>
+
+              {/* Frame number below */}
+              <div className="frame-number absolute -bottom-2.5 sm:-bottom-3 left-0 right-0 flex justify-center">
+                <span className="font-mono text-[5px] sm:text-[6px] text-foreground/30 bg-background px-1">
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+              </div>
+            </div>
+          ))}
+
+          {/* End frame marker */}
+          <div className="filmstrip-frame flex-shrink-0 w-8 sm:w-12 h-12 sm:h-16 md:h-20 lg:h-24 border border-dashed border-foreground/10 flex items-center justify-center">
+            <span className="font-mono text-[6px] sm:text-[8px] text-foreground/15 rotate-90 whitespace-nowrap">
+              END
+            </span>
           </div>
         </div>
-      )}
+      </div>
 
-      {/* Technical frame markers */}
-      <div className="absolute top-1 left-1 font-mono text-[5px] text-foreground/30">┌</div>
-      <div className="absolute top-1 right-1 font-mono text-[5px] text-foreground/30">┐</div>
-      <div className="absolute bottom-1 left-1 font-mono text-[5px] text-foreground/30">└</div>
-      <div className="absolute bottom-1 right-1 font-mono text-[5px] text-foreground/30">┘</div>
+      {/* Bottom filmstrip edge */}
+      <div className="absolute bottom-0 left-0 right-0 h-2 sm:h-3 bg-foreground/[0.03] border-t border-foreground/10 flex items-center justify-between px-1 sm:px-2 overflow-hidden">
+        <span className="font-mono text-[4px] sm:text-[5px] text-foreground/20">
+          {projectTitle.toUpperCase().slice(0, 12)}
+        </span>
+        <div className="flex gap-2 sm:gap-4">
+          {[...Array(8)].map((_, i) => (
+            <div key={i} className="sprocket-hole w-1 h-1 sm:w-1.5 sm:h-1.5 bg-foreground/10" />
+          ))}
+        </div>
+        <span className="font-mono text-[4px] sm:text-[5px] text-foreground/20">
+          {validImages.length} FRAMES
+        </span>
+      </div>
     </div>
   )
 }
@@ -939,150 +1015,131 @@ function ProjectSlide({
           {"═══"}┘
         </span>
 
-        {/* Content grid layout - responsive */}
-        <div className="flex-1 grid grid-cols-1 lg:grid-cols-5 gap-2 sm:gap-3 md:gap-4 p-3 sm:p-4 md:p-5 pb-6 sm:pb-7 overflow-y-auto lg:overflow-hidden">
+        {/* Content layout - vertical stack with filmstrip at bottom */}
+        <div className="flex-1 flex flex-col p-2 sm:p-3 md:p-4 pb-5 sm:pb-6 overflow-hidden">
           
-          {/* LEFT: Project details - takes 3 cols on lg */}
-          <div className="lg:col-span-3 flex flex-col min-h-0 space-y-2 sm:space-y-2.5 md:space-y-3">
-            {/* Header with icon and ID */}
-            <div className="detail-animate flex items-start gap-2 sm:gap-3">
-              <ProjectIcon 
-                icon={project.icon} 
-                category={project.category} 
-                isActive={isActive} 
-              />
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-1.5 sm:gap-2 mb-0.5 sm:mb-1">
-                  <span className="font-mono text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black text-foreground/10">
-                    {project.id}
-                  </span>
-                  <span className="font-mono text-[6px] sm:text-[7px] md:text-[8px] px-1 sm:px-1.5 py-0.5 border border-foreground/20 text-foreground/50">
-                    {project.category}
-                  </span>
+          {/* TOP: Project details - horizontal layout on larger screens */}
+          <div className="flex-1 flex flex-col md:flex-row gap-2 sm:gap-3 md:gap-4 min-h-0 overflow-y-auto md:overflow-hidden">
+            
+            {/* Left column: Title + Growth */}
+            <div className="flex-1 flex flex-col gap-1.5 sm:gap-2 min-w-0">
+              {/* Header row with icon */}
+              <div className="detail-animate flex items-start gap-2 sm:gap-3">
+                <ProjectIcon 
+                  icon={project.icon} 
+                  category={project.category} 
+                  isActive={isActive} 
+                />
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-1 sm:gap-2 flex-wrap">
+                    <span className="font-mono text-2xl sm:text-3xl md:text-4xl font-black text-foreground/10">
+                      {project.id}
+                    </span>
+                    <span className="font-mono text-[5px] sm:text-[6px] md:text-[7px] px-1 py-0.5 border border-foreground/20 text-foreground/50">
+                      {project.category}
+                    </span>
+                    <span className="font-mono text-[5px] sm:text-[6px] text-foreground/30">
+                      {project.year}
+                    </span>
+                  </div>
+                  <h3 className="font-mono text-sm sm:text-base md:text-lg lg:text-xl font-black text-foreground tracking-tight truncate mt-0.5">
+                    {project.title.toUpperCase()}
+                  </h3>
                 </div>
-                <div className="font-mono text-[6px] sm:text-[7px] text-foreground/40">
-                  ├─ {project.year}
+              </div>
+
+              {/* Growth section - compact */}
+              <div className="detail-animate bg-foreground/[0.02] border border-foreground/10 p-1.5 sm:p-2">
+                <div className="flex items-center gap-1 sm:gap-2 mb-1">
+                  <span className="font-mono text-[5px] sm:text-[6px] text-foreground/30">GROWTH:</span>
+                  <h4 className="font-mono text-[9px] sm:text-[10px] md:text-xs font-black text-foreground">
+                    {project.growth.toUpperCase()}
+                  </h4>
+                </div>
+                <div className="flex items-center gap-1 sm:gap-2 text-[5px] sm:text-[6px] md:text-[7px]">
+                  <span className="text-foreground/40 truncate flex-1">{project.before}</span>
+                  <span className="font-mono text-foreground/30 text-[7px] sm:text-[8px] flex-shrink-0">►</span>
+                  <span className="text-foreground font-medium truncate flex-1">{project.after}</span>
                 </div>
               </div>
-            </div>
 
-            {/* Project title */}
-            <div className="detail-animate">
-              <div className="font-mono text-[5px] sm:text-[6px] text-foreground/30 mb-0.5">
-                └─ PROJECT_NAME
-              </div>
-              <h3 className="font-mono text-base sm:text-lg md:text-xl lg:text-2xl font-black text-foreground tracking-tight truncate">
-                {project.title.toUpperCase()}
-              </h3>
-            </div>
-
-            {/* Description - hidden on very small screens */}
-            <div className="detail-animate hidden sm:block flex-shrink-0">
-              <div className="font-mono text-[5px] sm:text-[6px] text-foreground/30 mb-0.5 sm:mb-1">
-                ├─ DESCRIPTION
-              </div>
-              <p className="font-mono text-[8px] sm:text-[9px] md:text-[10px] text-foreground/60 leading-relaxed line-clamp-2 lg:line-clamp-3">
+              {/* Description - mobile visible but compact */}
+              <p className="detail-animate font-mono text-[6px] sm:text-[7px] md:text-[8px] text-foreground/50 leading-relaxed line-clamp-2">
                 {project.description}
               </p>
             </div>
 
-            {/* Growth section */}
-            <div className="detail-animate flex-shrink-0">
-              <div className="font-mono text-[5px] sm:text-[6px] text-foreground/30 mb-0.5 sm:mb-1">
-                ├─ GROWTH_VECTOR
-              </div>
-              <div className="bg-foreground/[0.03] border border-foreground/10 p-1.5 sm:p-2">
-                <h4 className="font-mono text-[10px] sm:text-xs md:text-sm font-black text-foreground mb-1 sm:mb-2">
-                  {project.growth.toUpperCase()}
-                </h4>
-                <div className="flex items-center gap-1.5 sm:gap-2 text-[6px] sm:text-[7px] md:text-[8px]">
-                  <div className="flex-1 min-w-0">
-                    <span className="text-foreground/30 block">BEFORE:</span>
-                    <span className="text-foreground/50 truncate block">{project.before}</span>
+            {/* Right column: Metrics + Tech + Links */}
+            <div className="md:w-48 lg:w-56 flex flex-col gap-1.5 sm:gap-2 flex-shrink-0">
+              {/* Metrics row */}
+              <div className="detail-animate flex items-stretch gap-1.5 sm:gap-2">
+                <div className="metric-highlight flex-1 border-2 border-foreground/30 px-2 py-1 sm:py-1.5 text-center">
+                  <div className="font-mono text-[4px] sm:text-[5px] text-foreground/40">METRIC</div>
+                  <div className="font-mono text-sm sm:text-base md:text-lg font-black text-foreground">
+                    {project.metric}
                   </div>
-                  <span className="font-mono text-foreground/30 text-[8px] sm:text-[10px] flex-shrink-0">──►</span>
-                  <div className="flex-1 min-w-0">
-                    <span className="text-foreground block">AFTER:</span>
-                    <span className="text-foreground font-medium truncate block">{project.after}</span>
+                </div>
+                <div className="flex-1 border border-foreground/15 px-2 py-1 sm:py-1.5 text-center">
+                  <div className="font-mono text-[4px] sm:text-[5px] text-foreground/30">RESULT</div>
+                  <div className="font-mono text-[7px] sm:text-[8px] md:text-[9px] text-foreground/60">
+                    {project.achievement}
                   </div>
                 </div>
               </div>
-            </div>
 
-            {/* Metrics */}
-            <div className="detail-animate flex items-center gap-2 sm:gap-3 flex-shrink-0">
-              <div className="metric-highlight border-2 border-foreground/30 px-2 sm:px-3 py-1 sm:py-1.5">
-                <div className="font-mono text-[4px] sm:text-[5px] text-foreground/40">METRIC</div>
-                <div className="font-mono text-xs sm:text-sm md:text-base font-black text-foreground">
-                  {project.metric}
+              {/* Tech stack */}
+              <div className="detail-animate">
+                <div className="flex flex-wrap gap-0.5 sm:gap-1">
+                  {project.techStack.map((tech) => (
+                    <span
+                      key={tech}
+                      className="tech-tag font-mono text-[5px] sm:text-[6px] md:text-[7px] px-1 py-0.5 border border-foreground/20 text-foreground/50 bg-foreground/[0.02]"
+                    >
+                      {tech}
+                    </span>
+                  ))}
                 </div>
               </div>
-              <div className="border border-foreground/15 px-1.5 sm:px-2 py-1 sm:py-1.5">
-                <div className="font-mono text-[4px] sm:text-[5px] text-foreground/30">RESULT</div>
-                <div className="font-mono text-[8px] sm:text-[9px] md:text-[10px] text-foreground/60">
-                  {project.achievement}
-                </div>
-              </div>
-            </div>
 
-            {/* Tech stack */}
-            <div className="detail-animate flex-shrink-0">
-              <div className="font-mono text-[5px] sm:text-[6px] text-foreground/30 mb-0.5 sm:mb-1">
-                └─ TECH_STACK
-              </div>
-              <div className="flex flex-wrap gap-0.5 sm:gap-1">
-                {project.techStack.map((tech) => (
-                  <span
-                    key={tech}
-                    className="tech-tag font-mono text-[6px] sm:text-[7px] md:text-[8px] px-1 sm:px-1.5 py-0.5 border border-foreground/20 text-foreground/50 bg-foreground/[0.02] hover:bg-foreground/5 hover:text-foreground/70 transition-colors"
+              {/* Links */}
+              <div className="detail-animate flex items-center gap-2 sm:gap-3 pt-1 sm:pt-1.5 border-t border-foreground/10 mt-auto">
+                {hasGithub && (
+                  <a 
+                    href={project.links.github} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="font-mono text-[6px] sm:text-[7px] text-foreground/40 hover:text-foreground transition-colors flex items-center gap-1"
                   >
-                    {tech}
-                  </span>
-                ))}
+                    <Github className="w-2.5 h-2.5" />
+                    <span>CODE</span>
+                  </a>
+                )}
+                {hasDemo && (
+                  <a 
+                    href={(project.links as { demo?: string }).demo} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="font-mono text-[6px] sm:text-[7px] text-foreground/40 hover:text-foreground transition-colors flex items-center gap-1"
+                  >
+                    <ExternalLink className="w-2.5 h-2.5" />
+                    <span>DEMO</span>
+                  </a>
+                )}
+                {hasAppStore && (
+                  <span className="font-mono text-[6px] sm:text-[7px] text-foreground/30">● iOS</span>
+                )}
               </div>
-            </div>
-
-            {/* Links - pushed to bottom on larger screens */}
-            <div className="detail-animate flex items-center gap-2 sm:gap-3 pt-1.5 sm:pt-2 mt-auto border-t border-foreground/10">
-              {hasGithub && (
-                <a 
-                  href={project.links.github} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="font-mono text-[7px] sm:text-[8px] text-foreground/40 hover:text-foreground transition-colors flex items-center gap-1 group"
-                >
-                  <Github className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
-                  <span className="group-hover:underline">SOURCE</span>
-                </a>
-              )}
-              {hasDemo && (
-                <a 
-                  href={(project.links as { demo?: string }).demo} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="font-mono text-[7px] sm:text-[8px] text-foreground/40 hover:text-foreground transition-colors flex items-center gap-1 group"
-                >
-                  <ExternalLink className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
-                  <span className="group-hover:underline">DEMO</span>
-                </a>
-              )}
-              {hasAppStore && (
-                <span className="font-mono text-[7px] sm:text-[8px] text-foreground/30 flex items-center gap-1">
-                  <span>●</span> iOS
-                </span>
-              )}
             </div>
           </div>
 
-          {/* RIGHT: Image gallery - takes 2 cols on lg, hidden below lg */}
-          <div className="hidden lg:flex lg:col-span-2 h-full min-h-[180px]">
-            <div className="w-full h-full">
-              <ImageGallery 
-                images={project.images} 
-                isActive={isActive} 
-                projectTitle={project.title}
-              />
-            </div>
+          {/* BOTTOM: Filmstrip image gallery - visible on all screens */}
+          <div className="h-16 sm:h-20 md:h-24 lg:h-28 flex-shrink-0 mt-2 sm:mt-3">
+            <FilmstripGallery 
+              images={project.images} 
+              isActive={isActive} 
+              projectTitle={project.title}
+              projectId={project.id}
+            />
           </div>
         </div>
 
@@ -1401,7 +1458,7 @@ export function ProjectsSection() {
               <div 
                 className="relative"
                 style={{ 
-                  height: "clamp(320px, 55vh, 600px)",
+                  height: "clamp(340px, 58vh, 560px)",
                 }}
               >
                 {allProjects.map((project, index) => (
