@@ -825,8 +825,8 @@ export function ProjectsSection() {
             {/* Decorative lines */}
             <AsciiLine char="═" className="absolute top-0 left-0 right-0" />
             
-            {/* Main title flow */}
-            <div className="flex flex-wrap justify-center items-baseline gap-x-[0.15em] gap-y-2 px-2">
+            {/* Main title flow - stacked on mobile, wrapped on desktop */}
+            <div className="flex flex-col sm:flex-row sm:flex-wrap justify-center items-center sm:items-baseline gap-y-1 sm:gap-x-[0.15em] sm:gap-y-2 px-2">
               {projects.map((project, index) => (
                 <span key={project.id} className="inline-flex items-baseline">
                   <ProjectTitle
@@ -838,7 +838,7 @@ export function ProjectsSection() {
                     onLeave={() => setHoveredIndex(null)}
                   />
                   {index < projects.length - 1 && (
-                    <span className="font-mono text-[3vw] sm:text-[2vw] text-foreground/10 mx-[0.1em] select-none">
+                    <span className="hidden sm:inline font-mono text-[2vw] text-foreground/10 mx-[0.1em] select-none">
                       ·
                     </span>
                   )}
