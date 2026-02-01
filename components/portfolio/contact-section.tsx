@@ -108,6 +108,8 @@ function VerticalWordRotator({
 
 // Cloud-themed expandable message form
 function CloudMessageForm({ onClose }: { onClose: () => void }) {
+  const containerRef = useRef<HTMLDivElement>(null)
+  const backdropRef = useRef<HTMLDivElement>(null)
   const formRef = useRef<HTMLDivElement>(null)
   const contentRef = useRef<HTMLDivElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
@@ -115,10 +117,14 @@ function CloudMessageForm({ onClose }: { onClose: () => void }) {
   const [isSending, setIsSending] = useState(false)
 
   useEffect(() => {
-    if (!formRef.current || !contentRef.current) return
+    if (!formRef.current || !contentRef.current || !backdropRef.current) return
 
     const ctx = gsap.context(() => {
       // Initial state
+      gsap.set(backdropRef.current, { 
+        opacity: 0,
+        backdropFilter: "blur(0px)",
+      })
       gsap.set(formRef.current, { 
         scale: 0, 
         opacity: 0,
@@ -129,16 +135,24 @@ function CloudMessageForm({ onClose }: { onClose: () => void }) {
       // Main timeline
       const tl = gsap.timeline()
 
-      // Phase 1: Main form expands
-      tl.to(formRef.current, {
+      // Phase 1: Backdrop fades in with blur
+      tl.to(backdropRef.current, {
+        opacity: 1,
+        backdropFilter: "blur(8px)",
+        duration: 0.5,
+        ease: "power2.out",
+      })
+
+      // Phase 2: Main form expands
+      .to(formRef.current, {
         scale: 1,
         opacity: 1,
         borderRadius: "2rem",
         duration: 0.6,
         ease: "power4.out",
-      })
+      }, "-=0.3")
 
-      // Phase 2: Content fades in
+      // Phase 3: Content fades in
       .to(contentRef.current, {
         opacity: 1,
         duration: 0.4,
@@ -150,13 +164,13 @@ function CloudMessageForm({ onClose }: { onClose: () => void }) {
         textareaRef.current?.focus()
       }, 600)
 
-    }, formRef)
+    }, containerRef)
 
     return () => ctx.revert()
   }, [])
 
   const handleClose = useCallback(() => {
-    if (!formRef.current || !contentRef.current) return
+    if (!formRef.current || !contentRef.current || !backdropRef.current) return
 
     const tl = gsap.timeline({
       onComplete: onClose,
@@ -175,6 +189,12 @@ function CloudMessageForm({ onClose }: { onClose: () => void }) {
       duration: 0.4,
       ease: "power3.in",
     }, "-=0.1")
+    .to(backdropRef.current, {
+      opacity: 0,
+      backdropFilter: "blur(0px)",
+      duration: 0.3,
+      ease: "power2.in",
+    }, "-=0.2")
   }, [onClose])
 
   const handleSend = useCallback(() => {
@@ -218,10 +238,11 @@ function CloudMessageForm({ onClose }: { onClose: () => void }) {
   }, [message, isSending])
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
+    <div ref={containerRef} className="fixed inset-0 z-50 flex items-center justify-center px-4">
       {/* Backdrop */}
       <div 
-        className="absolute inset-0 bg-background/80 backdrop-blur-sm"
+        ref={backdropRef}
+        className="absolute inset-0 bg-background/80"
         onClick={handleClose}
       />
 
