@@ -416,8 +416,8 @@ function CloudMessageForm({ onClose }: { onClose: () => void }) {
         <div ref={contentRef} className="relative z-10 p-5 sm:p-8">
           {/* Textarea with glass effect */}
           <div className="relative">
-            {/* Animated placeholder overlay - responsive positioning */}
-            {!message && (
+            {/* Animated placeholder overlay - hidden during send animation */}
+            {!message && sendStatus !== "success" && (
               <div 
                 className="absolute left-4 sm:left-5 top-3 sm:top-4 pointer-events-none font-mono text-xs sm:text-sm"
                 style={{ zIndex: 1 }}
@@ -425,7 +425,7 @@ function CloudMessageForm({ onClose }: { onClose: () => void }) {
                 <AnimatedPlaceholder
                   prompts={PLACEHOLDER_PROMPTS}
                   slotWidthCh={isMobile ? 14 : PLACEHOLDER_SLOT_CH}
-                  isVisible={!message}
+                  isVisible={!message && sendStatus !== "success"}
                 />
               </div>
             )}
@@ -442,13 +442,7 @@ function CloudMessageForm({ onClose }: { onClose: () => void }) {
             />
           </div>
           
-          {/* Status message */}
-          {sendStatus === "success" && (
-            <div className="mt-3 sm:mt-4 flex items-center gap-2 text-green-500 font-mono text-xs sm:text-sm">
-              <Check className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-              <span>Message sent!</span>
-            </div>
-          )}
+          {/* Error message only - success shown via green button */}
           {sendStatus === "error" && (
             <div className="mt-3 sm:mt-4 flex items-center gap-2 text-red-500 font-mono text-xs sm:text-sm">
               <AlertCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
