@@ -121,14 +121,21 @@ export async function storeContactMessage(
   if (!db) return null
 
   try {
-    const docRef = await addDoc(collection(db, COLLECTIONS.CONTACT_MESSAGES), {
+    // Build message doc, only include contactId if it exists
+    const messageDoc: Record<string, unknown> = {
       message,
       visitorId,
       visitorUUID,
-      contactId,
       sentAt: serverTimestamp(),
       status: "new",
-    })
+    }
+    
+    // Only add contactId if it's defined (Firestore doesn't accept undefined)
+    if (contactId) {
+      messageDoc.contactId = contactId
+    }
+    
+    const docRef = await addDoc(collection(db, COLLECTIONS.CONTACT_MESSAGES), messageDoc)
     return docRef
   } catch (error) {
     console.error("Error storing contact message:", error)
