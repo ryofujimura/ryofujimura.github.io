@@ -53,7 +53,7 @@ const allProjects = [
     id: "01",
     year: "2025",
     title: "Zero Inbox",
-    images: ["/images/profile.jpg"],
+    images: ["/images/profile.jpg","/images/profile.jpg", "/images/profile.jpg"],
     growth: "Production AI Engine",
     learned: ["Multi-stage AI", "95% accuracy tuning", "High-throughput systems"],
     techStack: ["Swift", "AI/ML", "Firebase"],
@@ -271,11 +271,11 @@ function ImageGallery({ images, projectId, projectTitle }: { images: string[]; p
   // If only one image, show it full width
   if (images.length === 1) {
     return (
-      <div className="relative w-full h-full">
+      <div className="relative w-full h-full group">
         <img
           src={images[0]}
           alt={projectTitle}
-          className="w-full h-full object-cover opacity-90 grayscale hover:grayscale-0 transition-all duration-500"
+          className="w-full h-full object-cover opacity-90 grayscale group-hover:grayscale-0 transition-all duration-500"
           loading="lazy"
         />
       </div>
@@ -311,8 +311,7 @@ function ImageGallery({ images, projectId, projectTitle }: { images: string[]; p
             key={`${projectId}-img-${index}`}
             className={cn(
               "relative h-full overflow-hidden transition-all duration-300 ease-out",
-              "border-r border-foreground/20 last:border-r-0",
-              !isHovered && hasHover && "grayscale"
+              "border-r border-foreground/20 last:border-r-0"
             )}
             style={{ width: `${widthPercent}%` }}
             onMouseEnter={() => setHoveredIndex(index)}
@@ -321,8 +320,8 @@ function ImageGallery({ images, projectId, projectTitle }: { images: string[]; p
               src={image}
               alt={`${projectTitle} - ${index + 1}`}
               className={cn(
-                "w-full h-full object-cover transition-all duration-300",
-                isHovered ? "opacity-100 scale-105" : "opacity-80"
+                "w-full h-full object-cover transition-all duration-500",
+                isHovered ? "opacity-100 scale-105 grayscale-0" : "opacity-80 grayscale"
               )}
               loading="lazy"
             />
