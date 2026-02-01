@@ -363,8 +363,8 @@ function ProjectCard({ project, index, isActive }: { project: Project; index: nu
         <span className="font-mono text-[10px] sm:text-xs font-bold tracking-wider">{project.year}</span>
       </div>
 
-      {/* Image placeholder */}
-      <div className="relative h-32 sm:h-40 lg:h-36 border-b-2 border-foreground overflow-hidden bg-muted">
+      {/* Image placeholder - smaller to emphasize content */}
+      <div className="relative h-20 sm:h-24 lg:h-28 border-b-2 border-foreground overflow-hidden bg-muted">
         <img
           src={project.image}
           alt={project.title}
