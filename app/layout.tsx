@@ -20,8 +20,8 @@ export const metadata: Metadata = {
     type: 'website',
   },
   icons: {
-    icon: '/images/rflogoblack.png',
-    apple: '/images/rflogoblack.png',
+    icon: '/images/branding/rflogoblack.png',
+    apple: '/images/branding/rflogoblack.png',
   },
 }
 

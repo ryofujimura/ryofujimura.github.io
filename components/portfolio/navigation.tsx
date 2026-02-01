@@ -108,7 +108,7 @@ export function Navigation() {
               className="touch-target min-h-[44px] min-w-[88px] flex items-center justify-center gap-1.5 text-lg sm:text-xl font-bold font-mono text-foreground hover:text-accent transition-colors"
               aria-label="Home"
             >
-              <img src="/images/ryologo.png" alt="" className="h-6 w-6 sm:h-7 sm:w-7 object-contain" width={28} height={28} />
+              <img src="/images/branding/ryologo.png" alt="" className="h-6 w-6 sm:h-7 sm:w-7 object-contain" width={28} height={28} />
               {/* <span>&gt; RF</span> */}
             </MagneticButton>
 
