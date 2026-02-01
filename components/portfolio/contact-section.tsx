@@ -117,6 +117,106 @@ function VerticalWordRotator({
   )
 }
 
+// Animated placeholder prompts
+const PLACEHOLDER_PROMPTS = [
+  "favorite coffee",
+  "favorite language",
+  "dream project",
+  "go-to IDE",
+  "unpopular opinion",
+  "superpower",
+  "hidden talent",
+]
+const PLACEHOLDER_ROTATE_MS = 2200
+const PLACEHOLDER_SLOT_CH = 18
+
+// Animated placeholder component for textarea
+function AnimatedPlaceholder({
+  prompts,
+  slotWidthCh,
+  isVisible,
+  className = "",
+}: {
+  prompts: string[]
+  slotWidthCh: number
+  isVisible: boolean
+  className?: string
+}) {
+  const [currentIndex, setCurrentIndex] = useState(0)
+  const wordRef = useRef<HTMLSpanElement>(null)
+
+  useEffect(() => {
+    if (prompts.length <= 1 || !wordRef.current || !isVisible) return
+
+    const animateToNext = () => {
+      const wordEl = wordRef.current
+      if (!wordEl) return
+
+      const chars = wordEl.querySelectorAll(".placeholder-char")
+
+      // Animate out current word
+      gsap.to(chars, {
+        y: -16,
+        opacity: 0,
+        duration: 0.2,
+        stagger: 0.012,
+        ease: "power2.in",
+        onComplete: () => {
+          setCurrentIndex((prev) => (prev + 1) % prompts.length)
+        },
+      })
+    }
+
+    const interval = setInterval(animateToNext, PLACEHOLDER_ROTATE_MS)
+    return () => clearInterval(interval)
+  }, [prompts.length, isVisible])
+
+  // Animate in when word changes
+  useEffect(() => {
+    if (!wordRef.current || !isVisible) return
+    
+    const chars = wordRef.current.querySelectorAll(".placeholder-char")
+    gsap.fromTo(
+      chars,
+      { y: 16, opacity: 0 },
+      {
+        y: 0,
+        opacity: 1,
+        duration: 0.2,
+        stagger: 0.012,
+        ease: "power2.out",
+      }
+    )
+  }, [currentIndex, isVisible])
+
+  if (!isVisible) return null
+
+  const currentPrompt = prompts[currentIndex]
+
+  return (
+    <span className={`inline-flex items-baseline ${className}`}>
+      <span className="text-muted-foreground/60">What is your </span>
+      <span
+        className="inline-flex overflow-hidden"
+        style={{ minWidth: `${slotWidthCh}ch` }}
+      >
+        <span ref={wordRef} className="inline-flex">
+          {currentPrompt.split("").map((char, i) => (
+            <span
+              key={`${currentIndex}-${i}`}
+              className="placeholder-char inline-block text-muted-foreground/60"
+              style={{ whiteSpace: char === " " ? "pre" : "normal" }}
+            >
+              {char === " " ? "\u00A0" : char}
+            </span>
+          ))}
+        </span>
+      </span>
+      <span className="text-muted-foreground/60">?</span>
+    </span>
+  )
+}
+
 // Send status types
 type SendStatus = "idle" | "sending" | "success" | "error"
 
@@ -348,14 +448,26 @@ function CloudMessageForm({ onClose }: { onClose: () => void }) {
         <div ref={contentRef} className="relative z-10 p-8">
           {/* Textarea with glass effect */}
           <div className="relative">
+            {/* Animated placeholder overlay */}
+            {!message && (
+              <div 
+                className="absolute left-5 top-4 pointer-events-none font-mono text-sm sm:text-base"
+                style={{ zIndex: 1 }}
+              >
+                <AnimatedPlaceholder
+                  prompts={PLACEHOLDER_PROMPTS}
+                  slotWidthCh={PLACEHOLDER_SLOT_CH}
+                  isVisible={!message}
+                />
+              </div>
+            )}
             <textarea
               ref={textareaRef}
               value={message}
               onChange={handleMessageChange}
               onFocus={handleFieldFocus}
-              placeholder="Hi, I'm [Name]. Reach me at [email/phone]. [Your message here...]"
               rows={4}
-              className="relative w-full px-5 py-4 rounded-2xl border border-white/20 dark:border-white/10 resize-none font-mono text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:border-white/40 transition-all duration-300"
+              className="relative w-full px-5 py-4 rounded-2xl border border-white/20 dark:border-white/10 resize-none font-mono text-foreground focus:outline-none focus:border-white/40 transition-all duration-300"
               style={{
                 background: "rgba(255, 255, 255, 0.08)",
                 backdropFilter: "blur(4px)",
