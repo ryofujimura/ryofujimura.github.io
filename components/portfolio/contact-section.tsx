@@ -110,13 +110,13 @@ function VerticalWordRotator({
 
 // Animated placeholder prompts
 const PLACEHOLDER_PROMPTS = [
-  "favorite coffee",
-  "favorite language",
-  "dream project",
-  "go-to IDE",
-  "unpopular opinion",
-  "superpower",
-  "hidden talent",
+  "favorite coffee?",
+  "favorite language?",
+  "dream project?",
+  "go-to IDE?",
+  "unpopular opinion?",
+  "superpower?",
+  "hidden talent?",
 ]
 const PLACEHOLDER_ROTATE_MS = 2200
 const PLACEHOLDER_SLOT_CH = 18
@@ -384,7 +384,7 @@ function CloudMessageForm({ onClose }: { onClose: () => void }) {
   }, [message, username, isSending, handleClose])
 
   return (
-    <div ref={containerRef} className="fixed inset-0 z-50 flex items-center justify-center px-4">
+    <div ref={containerRef} className="fixed inset-0 z-50 flex items-center justify-center px-3 sm:px-4">
       {/* Backdrop */}
       <div 
         ref={backdropRef}
@@ -412,19 +412,19 @@ function CloudMessageForm({ onClose }: { onClose: () => void }) {
             borderRadius: "inherit",
           }}
         />
-        {/* Content */}
-        <div ref={contentRef} className="relative z-10 p-8">
+        {/* Content - responsive padding */}
+        <div ref={contentRef} className="relative z-10 p-5 sm:p-8">
           {/* Textarea with glass effect */}
           <div className="relative">
-            {/* Animated placeholder overlay */}
+            {/* Animated placeholder overlay - responsive positioning */}
             {!message && (
               <div 
-                className="absolute left-5 top-4 pointer-events-none font-mono text-sm sm:text-base"
+                className="absolute left-4 sm:left-5 top-3 sm:top-4 pointer-events-none font-mono text-xs sm:text-sm"
                 style={{ zIndex: 1 }}
               >
                 <AnimatedPlaceholder
                   prompts={PLACEHOLDER_PROMPTS}
-                  slotWidthCh={PLACEHOLDER_SLOT_CH}
+                  slotWidthCh={isMobile ? 14 : PLACEHOLDER_SLOT_CH}
                   isVisible={!message}
                 />
               </div>
@@ -433,8 +433,8 @@ function CloudMessageForm({ onClose }: { onClose: () => void }) {
               ref={textareaRef}
               value={message}
               onChange={(e) => setMessage(e.target.value)}
-              rows={4}
-              className="relative w-full px-5 py-4 rounded-2xl border border-white/20 dark:border-white/10 resize-none font-mono text-foreground focus:outline-none focus:border-white/40 transition-all duration-300"
+              rows={isMobile ? 3 : 4}
+              className="relative w-full px-4 sm:px-5 py-3 sm:py-4 rounded-xl sm:rounded-2xl border border-white/20 dark:border-white/10 resize-none font-mono text-sm sm:text-base text-foreground focus:outline-none focus:border-white/40 transition-all duration-300"
               style={{
                 background: "rgba(255, 255, 255, 0.08)",
                 backdropFilter: "blur(4px)",
@@ -444,20 +444,20 @@ function CloudMessageForm({ onClose }: { onClose: () => void }) {
           
           {/* Status message */}
           {sendStatus === "success" && (
-            <div className="mt-4 flex items-center gap-2 text-green-500 font-mono text-sm">
-              <Check className="w-4 h-4" />
-              <span>Message sent successfully!</span>
+            <div className="mt-3 sm:mt-4 flex items-center gap-2 text-green-500 font-mono text-xs sm:text-sm">
+              <Check className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+              <span>Message sent!</span>
             </div>
           )}
           {sendStatus === "error" && (
-            <div className="mt-4 flex items-center gap-2 text-red-500 font-mono text-sm">
-              <AlertCircle className="w-4 h-4" />
-              <span>Failed to send. Please try again.</span>
+            <div className="mt-3 sm:mt-4 flex items-center gap-2 text-red-500 font-mono text-xs sm:text-sm">
+              <AlertCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+              <span>Failed to send. Try again.</span>
             </div>
           )}
 
-          {/* Username input and Send button - same row */}
-          <div className="mt-6 flex items-center justify-between gap-4">
+          {/* Username input and Send button - responsive layout */}
+          <div className="mt-4 sm:mt-6 flex items-center justify-between gap-2 sm:gap-4">
             {/* Username input */}
             <input
               ref={usernameRef}
@@ -465,18 +465,18 @@ function CloudMessageForm({ onClose }: { onClose: () => void }) {
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               placeholder="Username"
-              className="flex-1 max-w-[180px] px-4 py-2 rounded-full border border-white/20 dark:border-white/10 font-mono text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:border-white/40 transition-all duration-300"
+              className="flex-1 min-w-0 max-w-[140px] sm:max-w-[180px] px-3 sm:px-4 py-2 sm:py-2.5 rounded-full border border-white/20 dark:border-white/10 font-mono text-xs sm:text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:border-white/40 transition-all duration-300"
               style={{
                 background: "rgba(255, 255, 255, 0.08)",
                 backdropFilter: "blur(4px)",
               }}
             />
             
-            {/* Send button */}
+            {/* Send button - touch-friendly sizing */}
             <button
               onClick={handleSend}
               disabled={!message.trim() || !username.trim() || isSending || sendStatus === "success"}
-              className="send-btn group flex items-center gap-2 px-6 py-2.5 rounded-full font-mono text-sm font-medium disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-300 border border-white/20 shrink-0"
+              className="send-btn group flex items-center gap-1.5 sm:gap-2 px-4 sm:px-6 py-2 sm:py-2.5 rounded-full font-mono text-xs sm:text-sm font-medium disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-300 border border-white/20 shrink-0 min-h-[40px] sm:min-h-[44px]"
               style={{
                 background: sendStatus === "success"
                   ? "rgba(34, 197, 94, 0.9)"
@@ -491,18 +491,24 @@ function CloudMessageForm({ onClose }: { onClose: () => void }) {
                 boxShadow: (message.trim() && username.trim()) ? "0 4px 20px rgba(0, 0, 0, 0.15)" : "none",
               }}
             >
-              <span>
+              <span className="hidden sm:inline">
                 {sendStatus === "sending" ? "Sending..." : 
                  sendStatus === "success" ? "Sent!" :
                  sendStatus === "error" ? "Try Again" :
                  "Send Message"}
               </span>
+              <span className="sm:hidden">
+                {sendStatus === "sending" ? "..." : 
+                 sendStatus === "success" ? "Sent!" :
+                 sendStatus === "error" ? "Retry" :
+                 "Send"}
+              </span>
               {sendStatus === "success" ? (
-                <Check className="w-4 h-4" />
+                <Check className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               ) : sendStatus === "error" ? (
-                <AlertCircle className="w-4 h-4" />
+                <AlertCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               ) : (
-                <Send className="w-4 h-4 group-hover:translate-x-1 group-hover:-translate-y-0.5 transition-transform" />
+                <Send className="w-3.5 h-3.5 sm:w-4 sm:h-4 group-hover:translate-x-1 group-hover:-translate-y-0.5 transition-transform" />
               )}
             </button>
           </div>
