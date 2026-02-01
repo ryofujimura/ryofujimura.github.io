@@ -850,8 +850,12 @@ function AsciiBorderLine({ position, className }: { position: "top" | "bottom"; 
     const updateWidth = () => {
       if (!lineRef.current) return
       const width = lineRef.current.offsetWidth
-      const charWidth = 6
-      const charCount = Math.max(4, Math.floor(width / charWidth) - 2)
+      // Get computed font size to calculate character width accurately
+      const fontSize = parseFloat(getComputedStyle(lineRef.current).fontSize) || 10
+      // Monospace character width is approximately 0.6 of font size
+      const charWidth = fontSize * 0.6
+      // Subtract 2 for the corner characters (╔/╚ and ╗/╝), and add small buffer
+      const charCount = Math.max(4, Math.floor((width - charWidth * 2) / charWidth))
       const middle = "═".repeat(charCount)
       setLine(position === "top" ? `╔${middle}╗` : `╚${middle}╝`)
     }
@@ -861,7 +865,7 @@ function AsciiBorderLine({ position, className }: { position: "top" | "bottom"; 
   }, [position])
 
   return (
-    <div ref={lineRef} className={cn("font-mono text-[8px] sm:text-[10px] text-foreground/30 overflow-hidden", className)}>
+    <div ref={lineRef} className={cn("font-mono text-[8px] sm:text-[10px] text-foreground/30", className)}>
       {line}
     </div>
   )
