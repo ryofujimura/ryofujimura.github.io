@@ -733,18 +733,6 @@ function ImageGallery({ images, title, isActive }: { images: string[]; title: st
     })
   }, [])
 
-  // Hover ripple effect
-  const handleHover = (idx: number, isEntering: boolean) => {
-    const item = itemsRef.current[idx]
-    if (!item) return
-
-    gsap.to(item, {
-      y: isEntering ? -3 : 0,
-      duration: isEntering ? 0.3 : 0.4,
-      ease: isEntering ? "sine.out" : "sine.inOut",
-    })
-  }
-
   if (images.length === 0) {
     return (
       <div className="h-full flex items-center justify-center border border-dashed border-foreground/10 bg-foreground/[0.02]">
@@ -785,8 +773,6 @@ function ImageGallery({ images, title, isActive }: { images: string[]; title: st
             <div
               key={`${title}-${idx}`}
               ref={el => { itemsRef.current[idx] = el }}
-              onMouseEnter={() => handleHover(idx, true)}
-              onMouseLeave={() => handleHover(idx, false)}
               className={cn(
                 "flex-shrink-0 w-[85%] h-full snap-center",
                 "relative border bg-background overflow-hidden",
@@ -1122,12 +1108,12 @@ function MobileToggleButton({
   onToggle: () => void 
 }) {
   const buttonRef = useRef<HTMLButtonElement>(null)
-  const [displayText, setDisplayText] = useState(showDetails ? "[ LESS ]" : "[ MORE ]")
+  const [displayText, setDisplayText] = useState(showDetails ? "PREVIEW" : "DETAIL")
   const scrambleChars = "░▒▓█╳╱╲─│┼"
 
   // ASCII scramble animation on toggle
   useEffect(() => {
-    const targetText = showDetails ? "[ LESS ]" : "[ MORE ]"
+    const targetText = showDetails ? "PREVIEW" : "DETAIL"
     let iteration = 0
     const maxIterations = targetText.length * 2
 
@@ -1136,7 +1122,7 @@ function MobileToggleButton({
         targetText
           .split("")
           .map((char, i) => {
-            if (char === " " || char === "[" || char === "]") return char
+            if (char === " ") return char
             if (i < iteration / 2) return char
             return scrambleChars[Math.floor(Math.random() * scrambleChars.length)]
           })
@@ -1172,19 +1158,19 @@ function MobileToggleButton({
       ref={buttonRef}
       onClick={handleClick}
       className={cn(
-        "md:hidden w-full py-2 mt-2",
-        "font-mono text-[9px] text-foreground/60",
-        "border border-foreground/20 bg-foreground/[0.02]",
-        "transition-colors duration-200",
-        "hover:bg-foreground/10 hover:text-foreground hover:border-foreground/40",
-        "active:bg-foreground/20"
+        "md:hidden w-full py-3 mt-3",
+        "font-mono text-[10px] text-foreground/70",
+        "border border-foreground/30 bg-foreground/[0.03]",
+        "transition-all duration-200",
+        "hover:bg-foreground/10 hover:text-foreground hover:border-foreground/50",
+        "active:bg-foreground/15"
       )}
     >
-      <span className="inline-flex items-center gap-2">
-        <span className="text-foreground/30">{showDetails ? "▲" : "▼"}</span>
-        <span>{displayText}</span>
-        <span className="text-foreground/30">{showDetails ? "▲" : "▼"}</span>
-      </span>
+      <div className="flex items-center justify-center gap-3">
+        <span className="text-foreground/40 text-[8px]">{showDetails ? "◄◄" : "►►"}</span>
+        <span className="tracking-wider">{displayText}</span>
+        <span className="text-foreground/40 text-[8px]">{showDetails ? "◄◄" : "►►"}</span>
+      </div>
     </button>
   )
 }
@@ -1322,10 +1308,10 @@ function ProjectSlide({
           {/* Mobile Content - Toggle between views */}
           <div ref={contentRef} className="flex-1 min-h-0 md:hidden">
             {!showDetails ? (
-              /* Default View: Tech Stack, ASCII, Image */
+              /* Default View (Preview): Image, Tech Stack */
               <div className="flex flex-col gap-3 h-full">
                 {/* Image Gallery - Taller on mobile */}
-                <div className="mobile-content flex-1 min-h-[180px]">
+                <div className="mobile-content flex-1 min-h-[200px]">
                   <div className="font-mono text-[7px] text-foreground/30 mb-2">
                     ├── PREVIEW
                   </div>
@@ -1337,7 +1323,7 @@ function ProjectSlide({
                 {/* Tech Stack */}
                 <div className="mobile-content">
                   <div className="font-mono text-[7px] text-foreground/30 mb-2">
-                    ├── TECH_STACK
+                    └── TECH_STACK
                   </div>
                   <div className="flex flex-wrap gap-1.5">
                     {project.techStack.map((tech) => (
@@ -1350,17 +1336,9 @@ function ProjectSlide({
                     ))}
                   </div>
                 </div>
-
-                {/* ASCII Art - Mobile */}
-                <div className="mobile-content border border-foreground/10 bg-foreground/[0.02] p-2">
-                  <div className="font-mono text-[7px] text-foreground/30 mb-1">
-                    └── ASCII_ART
-                  </div>
-                  <AsciiArt ascii={project.ascii} isActive={isActive && !showDetails} />
-                </div>
               </div>
             ) : (
-              /* Detail View: Description, Features, Growth */
+              /* Detail View: Description, Features, Growth, ASCII */
               <div className="flex flex-col gap-3 h-full">
                 {/* Description */}
                 <div className="mobile-content">
@@ -1387,7 +1365,7 @@ function ProjectSlide({
                 {/* Growth Journey */}
                 <div className="mobile-content border border-foreground/10 bg-foreground/[0.02] p-3">
                   <div className="font-mono text-[7px] text-foreground/30 mb-2">
-                    └── GROWTH_JOURNEY
+                    ├── GROWTH_JOURNEY
                   </div>
                   <div className="flex items-center gap-3">
                     <div className="flex-1">
@@ -1404,6 +1382,14 @@ function ProjectSlide({
                       </div>
                     </div>
                   </div>
+                </div>
+
+                {/* ASCII Art - Detail view */}
+                <div className="mobile-content border border-foreground/10 bg-foreground/[0.02] p-2">
+                  <div className="font-mono text-[7px] text-foreground/30 mb-1">
+                    └── ASCII_ART
+                  </div>
+                  <AsciiArt ascii={project.ascii} isActive={isActive && showDetails} />
                 </div>
               </div>
             )}
