@@ -9,19 +9,6 @@ import { cn } from "@/lib/utils"
 gsap.registerPlugin(ScrollTrigger)
 
 // ─────────────────────────────────────────────────────────────
-// ASCII GRAPHICS
-// ─────────────────────────────────────────────────────────────
-
-const ASCII_ARROW = `──────►`
-
-const ASCII_GROWTH = `
-    ▲
-   ▲▲
-  ▲▲▲
- ▲▲▲▲
-`.trim()
-
-// ─────────────────────────────────────────────────────────────
 // SKILL FILTER GROUPS
 // ─────────────────────────────────────────────────────────────
 
@@ -613,24 +600,9 @@ function MobileProjectList({ projects }: { projects: Project[] }) {
 function DesktopTimeline({ projects }: { projects: Project[] }) {
   const containerRef = useRef<HTMLDivElement>(null)
   const scrollRef = useRef<HTMLDivElement>(null)
-  const [scrollProgress, setScrollProgress] = useState(0)
   const [isDragging, setIsDragging] = useState(false)
   const [startX, setStartX] = useState(0)
   const [scrollLeft, setScrollLeft] = useState(0)
-
-  useEffect(() => {
-    if (!scrollRef.current) return
-    const scroll = scrollRef.current
-
-    const handleScroll = () => {
-      const maxScroll = scroll.scrollWidth - scroll.clientWidth
-      const progress = maxScroll > 0 ? scroll.scrollLeft / maxScroll : 0
-      setScrollProgress(progress)
-    }
-
-    scroll.addEventListener("scroll", handleScroll)
-    return () => scroll.removeEventListener("scroll", handleScroll)
-  }, [])
 
   const handleMouseDown = (e: React.MouseEvent) => {
     if (!scrollRef.current) return
@@ -686,18 +658,6 @@ function DesktopTimeline({ projects }: { projects: Project[] }) {
 
   return (
     <div ref={containerRef} className="relative">
-      {/* Progress bar */}
-      <div className="mb-4 flex items-center gap-3">
-        <span className="font-mono text-[10px] text-accent">NOW</span>
-        <div className="flex-1 h-1 bg-foreground/10 relative">
-          <div
-            className="absolute inset-y-0 left-0 bg-accent/60 transition-all duration-150"
-            style={{ width: `${scrollProgress * 100}%` }}
-          />
-        </div>
-        <span className="font-mono text-[10px] text-foreground/50">2022</span>
-      </div>
-
       {/* Horizontal scroll */}
       <div
         ref={scrollRef}
@@ -711,12 +671,6 @@ function DesktopTimeline({ projects }: { projects: Project[] }) {
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
       >
-        {/* Start marker */}
-        <div className="flex-shrink-0 flex flex-col items-center justify-center w-12">
-          <pre className="font-mono text-[7px] text-foreground/30 select-none whitespace-pre leading-tight">{ASCII_GROWTH}</pre>
-          <span className="font-mono text-[9px] text-accent mt-1">▼</span>
-        </div>
-
         {projects.map((project, index) => (
           <div
             key={project.id}
@@ -726,12 +680,6 @@ function DesktopTimeline({ projects }: { projects: Project[] }) {
             <ProjectCard project={project} index={index} />
           </div>
         ))}
-
-        {/* End marker */}
-        <div className="flex-shrink-0 flex flex-col items-center justify-center w-16">
-          <span className="font-mono text-[9px] text-foreground/40">2022</span>
-          <pre className="font-mono text-[8px] text-foreground/30 select-none mt-1">{ASCII_ARROW}</pre>
-        </div>
       </div>
 
       {/* Scroll hint */}
