@@ -2,9 +2,6 @@
 
 import { useState, useRef, useEffect } from "react"
 import { gsap } from "gsap"
-import { ScrollTrigger } from "gsap/ScrollTrigger"
-
-gsap.registerPlugin(ScrollTrigger)
 import { GSAPText, GSAPSVG } from "@/components/gsap-text"
 import { TechnicalGrid, TechnicalPattern } from "@/components/technical-grid"
 import { SkillSurfaceGlobe } from "@/components/skill-surface-globe"
@@ -12,71 +9,6 @@ import { useIsMobile } from "@/hooks/use-mobile"
 import { cn } from "@/lib/utils"
 
 const INITIAL_INDEX_VISIBLE = 3
-
-// Apple logo with GSAP draw-in animation (Steve Jobs tribute)
-function AppleLogoAnimation() {
-  const svgRef = useRef<SVGSVGElement>(null)
-  const hasAnimated = useRef(false)
-
-  useEffect(() => {
-    if (!svgRef.current || hasAnimated.current) return
-    const svg = svgRef.current
-    const applePath = svg.querySelector("[data-apple-body]") as SVGPathElement
-    const leafPath = svg.querySelector("[data-apple-leaf]") as SVGPathElement
-    if (!applePath || !leafPath) return
-
-    // Setup: hide paths, prepare stroke-draw
-    const bodyLen = applePath.getTotalLength()
-    const leafLen = leafPath.getTotalLength()
-    gsap.set(applePath, { strokeDasharray: bodyLen, strokeDashoffset: bodyLen, fillOpacity: 0 })
-    gsap.set(leafPath, { strokeDasharray: leafLen, strokeDashoffset: leafLen, fillOpacity: 0 })
-
-    const tl = gsap.timeline({
-      scrollTrigger: {
-        trigger: svg,
-        start: "top 85%",
-        toggleActions: "play none none none",
-      },
-    })
-
-    // Draw leaf first, then body, then fill both
-    tl.to(leafPath, { strokeDashoffset: 0, duration: 0.6, ease: "power2.inOut" })
-      .to(applePath, { strokeDashoffset: 0, duration: 1.0, ease: "power2.inOut" }, "-=0.3")
-      .to([leafPath, applePath], { fillOpacity: 0.7, duration: 0.4, ease: "power2.out" }, "-=0.2")
-
-    hasAnimated.current = true
-
-    return () => {
-      tl.kill()
-    }
-  }, [])
-
-  return (
-    <svg
-      ref={svgRef}
-      className="w-5 h-6 sm:w-6 sm:h-7 text-foreground/70 mr-2"
-      viewBox="0 0 24 30"
-      fill="currentColor"
-      stroke="currentColor"
-      strokeWidth="0.5"
-    >
-      {/* Apple body */}
-      <path
-        data-apple-body
-        d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83z"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      {/* Apple leaf */}
-      <path
-        data-apple-leaf
-        d="M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  )
-}
 
 // Helper to bold numbers in highlight text (includes adjacent letters and symbols)
 function BoldNumbers({ text }: { text: string }) {
@@ -574,21 +506,16 @@ export function ExperienceSection() {
             >
               Experience // Operational Log
             </GSAPText>
-            <GSAPText
-              variant="words"
-              className="text-2xl xs:text-3xl sm:text-4xl md:text-5xl font-black tracking-tight leading-[0.94]"
-            >
-              Great things in business are never done by one person. They're done by a team of people.
-            </GSAPText>
-            {/* Steve Jobs attribution with Apple logo SVG animation */}
-            <div className="flex items-center mt-1">
-              <AppleLogoAnimation />
+            <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
               <GSAPText
-                variant="lines"
-                className="font-mono text-[10px] sm:text-[11px] italic text-muted-foreground/80 tracking-wide"
+                variant="words"
+                className="text-xl xs:text-2xl sm:text-3xl md:text-4xl font-black tracking-tight leading-[0.94]"
               >
-                — Steve Jobs
+                Great things in business are never done by one person. They're done by a team of people.
               </GSAPText>
+              <span className="ml-auto font-mono text-[10px] sm:text-[11px] italic text-muted-foreground/80 tracking-wide whitespace-nowrap">
+                — Steve Jobs
+              </span>
             </div>
             <GSAPText
               variant="scramble"
