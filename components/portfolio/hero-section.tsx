@@ -27,14 +27,14 @@ const MODE_VERBS = [
   "LEARN",
 ]
 const MODE_ROTATE_MS = 2600
-const VERB_SLOT_CH_DESKTOP = 11
-const VERB_SLOT_CH_MOBILE = 8
+const VERB_SLOT_CH_DESKTOP = 14
+const VERB_SLOT_CH_MOBILE = 11
 
 // Location config
-const LOC_DEFAULT = "IRVINE_CA"
-const LOC_HOVER = "OPEN_TO_RELOCATE"
-const LOC_SLOT_CH_DESKTOP = 16
-const LOC_SLOT_CH_MOBILE = 16
+const LOC_DEFAULT = "IRVINE CA"
+const LOC_HOVER = "OPEN TO RELOCATE"
+const LOC_SLOT_CH_DESKTOP = 20
+const LOC_SLOT_CH_MOBILE = 20
 
 /**
  * Custom hook for responsive mobile detection
