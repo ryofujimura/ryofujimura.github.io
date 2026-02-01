@@ -117,30 +117,30 @@ function ProjectRow({
       {/* Project name - clickable */}
       <button
         onClick={onToggle}
-        className="w-full text-left group flex items-center gap-2 hover:bg-foreground/5 -mx-2 px-2 py-0.5 transition-colors"
+        className="w-full text-left group flex items-center gap-2 hover:bg-white/5 -mx-2 px-2 py-0.5 transition-colors"
       >
-        <span className="text-foreground/30">{String(index + 1).padStart(2, "0")}.</span>
+        <span className="text-white/50">{String(index + 1).padStart(2, "0")}.</span>
         <span className={cn(
           "font-medium transition-colors",
-          isExpanded ? "text-sky-400" : "text-sky-400/80 group-hover:text-sky-400"
+          isExpanded ? "text-sky-300" : "text-sky-300/80 group-hover:text-sky-300"
         )}>
           {project.title}
         </span>
         <span className={cn(
           "text-[0.8em] transition-transform duration-200",
-          isExpanded ? "text-emerald-400/60 rotate-90" : "text-foreground/20"
+          isExpanded ? "text-emerald-300 rotate-90" : "text-white/30"
         )}>
           ▶
         </span>
         {!isExpanded && (
-          <span className="text-foreground/20 text-[0.85em]">
+          <span className="text-white/30 text-[0.85em]">
             // {project.year}
           </span>
         )}
       </button>
 
       {/* Tech stack - clickable skills */}
-      <div className="text-foreground/30 ml-6">
+      <div className="text-white/50 ml-6">
         {"["}
         {project.skills.map((tech, i) => (
           <span key={tech}>
@@ -149,11 +149,11 @@ function ProjectRow({
                 e.stopPropagation()
                 onSkillClick?.(tech)
               }}
-              className="text-amber-400/60 hover:text-amber-400 hover:underline transition-colors"
+              className="text-amber-200/80 hover:text-amber-200 hover:underline transition-colors"
             >
               {tech}
             </button>
-            {i < project.skills.length - 1 && <span className="text-foreground/20">, </span>}
+            {i < project.skills.length - 1 && <span className="text-white/30">, </span>}
           </span>
         ))}
         {"]"}
@@ -165,21 +165,21 @@ function ProjectRow({
         className="overflow-hidden"
         style={{ height: 0, opacity: 0 }}
       >
-        <div className="ml-6 mt-2 mb-3 pl-3 border-l border-foreground/10">
+        <div className="ml-6 mt-2 mb-3 pl-3 border-l border-white/10">
           {/* Description */}
           <div className="mb-2">
-            <span className="text-foreground/30">desc: </span>
-            <span className="text-foreground/50">{project.description}</span>
+            <span className="text-white/50">desc: </span>
+            <span className="text-white/70">{project.description}</span>
           </div>
           {/* Year */}
           <div className="mb-2">
-            <span className="text-foreground/30">year: </span>
-            <span className="text-lime-400/70">{project.year}</span>
+            <span className="text-white/50">year: </span>
+            <span className="text-lime-300">{project.year}</span>
           </div>
           {/* ID */}
           <div>
-            <span className="text-foreground/30">id: </span>
-            <span className="text-violet-400/60">PRJ-{project.id}</span>
+            <span className="text-white/50">id: </span>
+            <span className="text-violet-300">PRJ-{project.id}</span>
           </div>
         </div>
       </div>
@@ -337,44 +337,44 @@ function TerminalOutput({
 
   if (!isActive || !skill) return null
 
-  // Darker pastel syntax highlighting for header lines
+  // Light pastel syntax highlighting for header lines
   const highlightLine = (line: string) => {
     if (line.startsWith("$")) {
       const parts = line.split(" ")
       return (
         <>
-          <span className="text-emerald-400/80">$</span>
-          <span className="text-sky-400/80"> {parts[1]}</span>
-          <span className="text-amber-400/70"> {parts.slice(2).join(" ")}</span>
+          <span className="text-emerald-300">$</span>
+          <span className="text-sky-300"> {parts[1]}</span>
+          <span className="text-amber-200"> {parts.slice(2).join(" ")}</span>
         </>
       )
     }
     if (line.includes("████")) {
-      return <span className="text-emerald-400/60">{line}</span>
+      return <span className="text-emerald-300/80">{line}</span>
     }
     if (line.startsWith("[EXEC]") || line.startsWith("[OK]")) {
       const bracket = line.match(/^\[([^\]]+)\]/)
       const rest = line.replace(/^\[[^\]]+\]\s*/, "")
       return (
         <>
-          <span className="text-violet-400/70">[{bracket?.[1]}]</span>
-          <span className="text-foreground/50"> {rest}</span>
+          <span className="text-violet-300">[{bracket?.[1]}]</span>
+          <span className="text-white/70"> {rest}</span>
         </>
       )
     }
     if (line.startsWith("SKILL:")) {
       return (
         <>
-          <span className="text-foreground/40">SKILL: </span>
-          <span className="text-rose-400/80 font-medium">{skill}</span>
+          <span className="text-white/60">SKILL: </span>
+          <span className="text-rose-300 font-medium">{skill}</span>
         </>
       )
     }
     if (line.startsWith("PROJECTS:")) {
       return (
         <>
-          <span className="text-foreground/40">PROJECTS: </span>
-          <span className="text-amber-400/80 font-medium">{relatedProjects.length}</span>
+          <span className="text-white/60">PROJECTS: </span>
+          <span className="text-amber-200 font-medium">{relatedProjects.length}</span>
         </>
       )
     }
@@ -382,15 +382,15 @@ function TerminalOutput({
       const years = [...new Set(relatedProjects.map(p => p.year))].sort()
       return (
         <>
-          <span className="text-foreground/40">YEARS: </span>
-          <span className="text-lime-400/70">{years.join(", ")}</span>
+          <span className="text-white/60">YEARS: </span>
+          <span className="text-lime-300">{years.join(", ")}</span>
         </>
       )
     }
     if (line.startsWith("//")) {
-      return <span className="text-foreground/25 italic">{line}</span>
+      return <span className="text-white/40 italic">{line}</span>
     }
-    return <span className="text-foreground/35">{line}</span>
+    return <span className="text-white/50">{line}</span>
   }
 
   return (
@@ -457,9 +457,9 @@ function TerminalOutput({
           {/* Loading state */}
           {isLoading ? (
             <div className="py-4">
-              <div className="flex items-center gap-2 text-foreground/40">
-                <span className="text-emerald-400/80">{loadingFrames[loadingFrame]}</span>
-                <span><span className="text-emerald-400/60">$</span> Initializing query...</span>
+              <div className="flex items-center gap-2 text-white/60">
+                <span className="text-emerald-300">{loadingFrames[loadingFrame]}</span>
+                <span><span className="text-emerald-300">$</span> Initializing query...</span>
               </div>
               <div className="mt-2 flex gap-0.5">
                 {Array.from({ length: 16 }).map((_, i) => (
@@ -467,7 +467,7 @@ function TerminalOutput({
                     key={i}
                     className={cn(
                       "w-1 h-1 transition-all duration-100",
-                      i <= loadingFrame ? "bg-emerald-500/60" : "bg-foreground/10"
+                      i <= loadingFrame ? "bg-emerald-300" : "bg-white/10"
                     )}
                   />
                 ))}
@@ -484,7 +484,7 @@ function TerminalOutput({
                     <>
                       {highlightLine(line.slice(0, currentChar))}
                       {showCursor && !isHeaderComplete && (
-                        <span className="inline-block w-2 h-4 bg-emerald-500 ml-0.5 animate-pulse" />
+                        <span className="inline-block w-2 h-4 bg-emerald-300 ml-0.5 animate-pulse" />
                       )}
                     </>
                   ) : null}
@@ -517,14 +517,14 @@ function TerminalOutput({
                   
                   {/* Footer line */}
                   <div className="mt-3 min-h-[1.4em]">
-                    <span className="text-violet-400/70">[OK]</span>
-                    <span className="text-foreground/50"> Query complete. {relatedProjects.length} result(s) found.</span>
+                    <span className="text-violet-300">[OK]</span>
+                    <span className="text-white/70"> Query complete. {relatedProjects.length} result(s) found.</span>
                   </div>
                   <div className="min-h-[1.4em]">
-                    <span className="text-emerald-400/80">$</span>
-                    <span className="text-foreground/30"> _</span>
+                    <span className="text-emerald-300">$</span>
+                    <span className="text-white/50"> _</span>
                     {showCursor && (
-                      <span className="inline-block w-2 h-4 bg-emerald-500 ml-0.5 animate-pulse" />
+                      <span className="inline-block w-2 h-4 bg-emerald-300 ml-0.5 animate-pulse" />
                     )}
                   </div>
                 </div>
