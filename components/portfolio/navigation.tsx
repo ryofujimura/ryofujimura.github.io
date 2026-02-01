@@ -7,109 +7,30 @@ import { Menu, X, MessageCircle, Mail } from "lucide-react"
 import { OPEN_CONTACT_FORM_EVENT, CLOSE_CONTACT_FORM_EVENT } from "@/components/portfolio/contact-section"
 import { gsap } from "gsap"
 
-// SVG path generator for blob shapes
-function generateBlobPath(
-  cx: number,
-  cy: number,
-  rx: number,
-  ry: number,
-  pinch: number = 0,
-  split: number = 0
-): string {
-  // pinch: 0 = no pinch, 1 = fully pinched in middle
-  // split: 0 = no split, 1 = fully split into two
-  
-  const pinchAmount = pinch * ry * 0.9
-  const splitGap = split * 20
-  
-  if (split > 0.5) {
-    // Two separate blobs
-    const blobRx = rx * 0.45
-    const leftCx = cx - blobRx - splitGap / 2
-    const rightCx = cx + blobRx + splitGap / 2
-    const wobble = (1 - split) * 5
-    
-    // Left blob
-    const leftPath = `
-      M ${leftCx - blobRx} ${cy}
-      C ${leftCx - blobRx} ${cy - ry + wobble}, ${leftCx + blobRx} ${cy - ry - wobble}, ${leftCx + blobRx} ${cy}
-      C ${leftCx + blobRx} ${cy + ry - wobble}, ${leftCx - blobRx} ${cy + ry + wobble}, ${leftCx - blobRx} ${cy}
-      Z
-    `
-    // Right blob
-    const rightPath = `
-      M ${rightCx - blobRx} ${cy}
-      C ${rightCx - blobRx} ${cy - ry - wobble}, ${rightCx + blobRx} ${cy - ry + wobble}, ${rightCx + blobRx} ${cy}
-      C ${rightCx + blobRx} ${cy + ry + wobble}, ${rightCx - blobRx} ${cy + ry - wobble}, ${rightCx - blobRx} ${cy}
-      Z
-    `
-    return leftPath + " " + rightPath
-  }
-  
-  // Single blob with optional pinch
-  const topPinch = pinchAmount
-  const bottomPinch = pinchAmount
-  
-  return `
-    M ${cx - rx} ${cy}
-    C ${cx - rx} ${cy - ry}, ${cx - rx/3} ${cy - ry}, ${cx} ${cy - ry + topPinch}
-    C ${cx + rx/3} ${cy - ry}, ${cx + rx} ${cy - ry}, ${cx + rx} ${cy}
-    C ${cx + rx} ${cy + ry}, ${cx + rx/3} ${cy + ry}, ${cx} ${cy + ry - bottomPinch}
-    C ${cx - rx/3} ${cy + ry}, ${cx - rx} ${cy + ry}, ${cx - rx} ${cy}
-    Z
-  `
-}
-
-// Animated slime-split pill button for desktop
+// Gooey slime-split pill button using blur + contrast metaball effect
 function SplitContactButton() {
   const containerRef = useRef<HTMLDivElement>(null)
-  const svgRef = useRef<SVGSVGElement>(null)
-  const blobPathRef = useRef<SVGPathElement>(null)
+  const leftPillRef = useRef<HTMLDivElement>(null)
+  const rightPillRef = useRef<HTMLDivElement>(null)
   const mainTextRef = useRef<HTMLSpanElement>(null)
-  const leftButtonRef = useRef<HTMLButtonElement>(null)
-  const rightButtonRef = useRef<HTMLAnchorElement>(null)
   const leftContentRef = useRef<HTMLSpanElement>(null)
   const rightContentRef = useRef<HTMLSpanElement>(null)
   const timelineRef = useRef<gsap.core.Timeline | null>(null)
-  const animationRef = useRef<{ pinch: number; split: number }>({ pinch: 0, split: 0 })
   const [isHovered, setIsHovered] = useState(false)
 
-  // SVG dimensions
-  const svgWidth = 260
-  const svgHeight = 44
-  const cx = svgWidth / 2
-  const cy = svgHeight / 2
-  const initialRx = 58
-  const ry = 18
-
-  // Update blob path based on animation state
-  const updateBlobPath = useCallback(() => {
-    if (!blobPathRef.current) return
-    const { pinch, split } = animationRef.current
-    const expandedRx = initialRx + split * 40
-    blobPathRef.current.setAttribute("d", generateBlobPath(cx, cy, expandedRx, ry, pinch, split))
-  }, [cx, cy, initialRx, ry])
-
-  // Initialize
+  // Initialize positions
   useEffect(() => {
     if (!containerRef.current) return
 
     const ctx = gsap.context(() => {
-      // Set initial path
-      updateBlobPath()
-      
-      // Hide split buttons initially
-      gsap.set([leftButtonRef.current, rightButtonRef.current], {
-        opacity: 0,
-        scale: 0.8,
-      })
-      gsap.set([leftContentRef.current, rightContentRef.current], {
-        opacity: 0,
-      })
+      // Both pills start at center, overlapping to form single pill
+      gsap.set(leftPillRef.current, { x: 0, scaleX: 1, scaleY: 1 })
+      gsap.set(rightPillRef.current, { x: 0, scaleX: 1, scaleY: 1 })
+      gsap.set([leftContentRef.current, rightContentRef.current], { opacity: 0 })
     }, containerRef)
 
     return () => ctx.revert()
-  }, [updateBlobPath])
+  }, [])
 
   const handleMouseEnter = useCallback(() => {
     if (!containerRef.current) return
@@ -122,45 +43,41 @@ function SplitContactButton() {
     // Phase 1: Fade out main text
     tl.to(mainTextRef.current, {
       opacity: 0,
-      scale: 0.9,
-      duration: 0.2,
+      duration: 0.15,
       ease: "power2.in",
     })
 
-    // Phase 2: Blob stretches and pinches (slime effect)
-    .to(animationRef.current, {
-      pinch: 1,
-      duration: 0.3,
-      ease: "power2.inOut",
-      onUpdate: updateBlobPath,
-    }, "-=0.1")
+    // Phase 2: Squash before split (slime tension)
+    .to([leftPillRef.current, rightPillRef.current], {
+      scaleX: 1.15,
+      scaleY: 0.85,
+      duration: 0.15,
+      ease: "power2.out",
+    }, "-=0.05")
 
-    // Phase 3: Blob splits into two with elastic bounce
-    .to(animationRef.current, {
-      split: 1,
-      pinch: 0,
+    // Phase 3: Split apart with elastic bounce
+    .to(leftPillRef.current, {
+      x: -52,
+      scaleX: 1,
+      scaleY: 1,
       duration: 0.5,
-      ease: "elastic.out(1, 0.5)",
-      onUpdate: updateBlobPath,
-    }, "-=0.1")
+      ease: "elastic.out(1, 0.6)",
+    }, "-=0.05")
+    .to(rightPillRef.current, {
+      x: 52,
+      scaleX: 1,
+      scaleY: 1,
+      duration: 0.5,
+      ease: "elastic.out(1, 0.6)",
+    }, "<")
 
-    // Phase 4: Buttons appear
-    .to([leftButtonRef.current, rightButtonRef.current], {
-      opacity: 1,
-      scale: 1,
-      duration: 0.3,
-      ease: "back.out(2)",
-      stagger: 0.05,
-    }, "-=0.4")
-
-    // Phase 5: Content fades in
+    // Phase 4: Content fades in
     .to([leftContentRef.current, rightContentRef.current], {
       opacity: 1,
       duration: 0.2,
       ease: "power2.out",
-      stagger: 0.03,
-    }, "-=0.2")
-  }, [updateBlobPath])
+    }, "-=0.35")
+  }, [])
 
   const handleMouseLeave = useCallback(() => {
     if (!containerRef.current) return
@@ -170,46 +87,44 @@ function SplitContactButton() {
     const tl = gsap.timeline()
     timelineRef.current = tl
 
-    // Reverse: Hide content
+    // Phase 1: Fade out content
     tl.to([leftContentRef.current, rightContentRef.current], {
       opacity: 0,
-      duration: 0.15,
+      duration: 0.12,
       ease: "power2.in",
     })
 
-    // Hide buttons
-    .to([leftButtonRef.current, rightButtonRef.current], {
-      opacity: 0,
-      scale: 0.8,
-      duration: 0.2,
-      ease: "power2.in",
-    }, "-=0.1")
-
-    // Merge blobs back (slime rejoining)
-    .to(animationRef.current, {
-      split: 0,
-      pinch: 0.5,
-      duration: 0.35,
-      ease: "power3.inOut",
-      onUpdate: updateBlobPath,
-    }, "-=0.15")
-
-    // Settle back to pill shape
-    .to(animationRef.current, {
-      pinch: 0,
+    // Phase 2: Merge back together (slime rejoining)
+    .to(leftPillRef.current, {
+      x: 0,
+      scaleX: 1.1,
+      scaleY: 0.9,
       duration: 0.25,
-      ease: "elastic.out(1, 0.7)",
-      onUpdate: updateBlobPath,
+      ease: "power3.inOut",
+    }, "-=0.05")
+    .to(rightPillRef.current, {
+      x: 0,
+      scaleX: 1.1,
+      scaleY: 0.9,
+      duration: 0.25,
+      ease: "power3.inOut",
+    }, "<")
+
+    // Phase 3: Settle back to normal shape
+    .to([leftPillRef.current, rightPillRef.current], {
+      scaleX: 1,
+      scaleY: 1,
+      duration: 0.2,
+      ease: "elastic.out(1, 0.8)",
     })
 
-    // Fade in main text
+    // Phase 4: Fade in main text
     .to(mainTextRef.current, {
       opacity: 1,
-      scale: 1,
-      duration: 0.25,
+      duration: 0.2,
       ease: "power2.out",
-    }, "-=0.2")
-  }, [updateBlobPath])
+    }, "-=0.15")
+  }, [])
 
   const handleMessageClick = useCallback(() => {
     const contactSection = document.getElementById("contact")
@@ -229,69 +144,102 @@ function SplitContactButton() {
   return (
     <div
       ref={containerRef}
-      className="relative flex items-center justify-center"
-      style={{ width: svgWidth, height: svgHeight }}
+      className="relative flex items-center justify-center h-10"
+      style={{ width: 240 }}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
-      {/* SVG blob background */}
-      <svg
-        ref={svgRef}
-        className="absolute inset-0 pointer-events-none"
-        width={svgWidth}
-        height={svgHeight}
-        viewBox={`0 0 ${svgWidth} ${svgHeight}`}
+      {/* Gooey filter container - blur + contrast creates metaball effect */}
+      <div 
+        className="absolute inset-0 flex items-center justify-center"
+        style={{ 
+          filter: "blur(8px) contrast(20)",
+          background: "transparent",
+        }}
       >
-        <path
-          ref={blobPathRef}
-          className="fill-primary"
-          d={generateBlobPath(cx, cy, initialRx, ry, 0, 0)}
+        {/* Left pill blob */}
+        <div
+          ref={leftPillRef}
+          className="absolute bg-primary rounded-full"
+          style={{ 
+            width: 100,
+            height: 36,
+            willChange: "transform",
+          }}
         />
-      </svg>
+        {/* Right pill blob */}
+        <div
+          ref={rightPillRef}
+          className="absolute bg-primary rounded-full"
+          style={{ 
+            width: 100,
+            height: 36,
+            willChange: "transform",
+          }}
+        />
+      </div>
 
-      {/* Main text - visible when not hovered */}
-      <span
-        ref={mainTextRef}
-        className="absolute inset-0 flex items-center justify-center text-sm font-medium text-primary-foreground whitespace-nowrap pointer-events-none z-10"
-      >
-        Get in Touch
-      </span>
-
-      {/* Split buttons - positioned over the split blobs */}
-      <div className="absolute inset-0 flex items-center justify-center gap-6 z-10">
+      {/* Sharp overlay pills for crisp edges and interaction */}
+      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+        {/* Left clickable area */}
         <button
-          ref={leftButtonRef}
           type="button"
           onClick={handleMessageClick}
           className={cn(
-            "flex items-center justify-center px-4 py-2 text-primary-foreground text-sm font-medium rounded-full",
-            "hover:brightness-110 transition-all duration-150",
+            "absolute flex items-center justify-center rounded-full transition-opacity duration-150",
             isHovered ? "pointer-events-auto" : "pointer-events-none"
           )}
-          style={{ opacity: 0 }}
+          style={{ 
+            width: 100,
+            height: 36,
+            left: "50%",
+            transform: isHovered ? "translateX(calc(-50% - 52px))" : "translateX(-50%)",
+            transition: isHovered ? "none" : "transform 0.25s ease-out",
+          }}
         >
-          <span ref={leftContentRef} className="flex items-center gap-2" style={{ opacity: 0 }}>
+          <span 
+            ref={leftContentRef} 
+            className="flex items-center gap-2 text-primary-foreground text-sm font-medium"
+            style={{ opacity: 0 }}
+          >
             <MessageCircle className="w-4 h-4" />
             <span>Message</span>
           </span>
         </button>
 
+        {/* Right clickable area */}
         <a
-          ref={rightButtonRef}
           href="mailto:ryo.fujimura1@gmail.com"
           className={cn(
-            "flex items-center justify-center px-4 py-2 text-primary-foreground text-sm font-medium rounded-full",
-            "hover:brightness-110 transition-all duration-150",
+            "absolute flex items-center justify-center rounded-full transition-opacity duration-150",
             isHovered ? "pointer-events-auto" : "pointer-events-none"
           )}
-          style={{ opacity: 0 }}
+          style={{ 
+            width: 100,
+            height: 36,
+            left: "50%",
+            transform: isHovered ? "translateX(calc(-50% + 52px))" : "translateX(-50%)",
+            transition: isHovered ? "none" : "transform 0.25s ease-out",
+          }}
         >
-          <span ref={rightContentRef} className="flex items-center gap-2" style={{ opacity: 0 }}>
+          <span 
+            ref={rightContentRef} 
+            className="flex items-center gap-2 text-primary-foreground text-sm font-medium"
+            style={{ opacity: 0 }}
+          >
             <Mail className="w-4 h-4" />
             <span>Email</span>
           </span>
         </a>
       </div>
+
+      {/* Main text overlay - visible when not split */}
+      <span
+        ref={mainTextRef}
+        className="relative z-10 text-sm font-medium text-primary-foreground whitespace-nowrap pointer-events-none"
+      >
+        Get in Touch
+      </span>
     </div>
   )
 }
