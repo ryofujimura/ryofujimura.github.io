@@ -191,6 +191,8 @@ function TerminalOutput({
   onClose: () => void
 }) {
   const outputRef = useRef<HTMLDivElement>(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const [loadingFrame, setLoadingFrame] = useState(0)
   const [headerLines, setHeaderLines] = useState<string[]>([])
   const [currentLine, setCurrentLine] = useState(0)
   const [currentChar, setCurrentChar] = useState(0)
@@ -199,6 +201,10 @@ function TerminalOutput({
   const [expandedProject, setExpandedProject] = useState<string | null>(null)
 
   const relatedProjects = skill ? skillsMap.get(skill) || [] : []
+
+  const loadingFrames = [
+    "⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"
+  ]
 
   // Generate header lines (before projects)
   const generateHeaderLines = useCallback(() => {
@@ -222,9 +228,37 @@ function TerminalOutput({
     ]
   }, [skill, relatedProjects])
 
-  // Reset and start typewriter effect
+  // Loading animation
   useEffect(() => {
     if (!isActive || !skill) {
+      setIsLoading(true)
+      setLoadingFrame(0)
+      return
+    }
+
+    setIsLoading(true)
+    setLoadingFrame(0)
+
+    // Spinner animation
+    const spinnerInterval = setInterval(() => {
+      setLoadingFrame(prev => (prev + 1) % loadingFrames.length)
+    }, 80)
+
+    // End loading after delay
+    const loadingTimer = setTimeout(() => {
+      clearInterval(spinnerInterval)
+      setIsLoading(false)
+    }, 600)
+
+    return () => {
+      clearInterval(spinnerInterval)
+      clearTimeout(loadingTimer)
+    }
+  }, [isActive, skill, loadingFrames.length])
+
+  // Reset and start typewriter effect after loading
+  useEffect(() => {
+    if (!isActive || !skill || isLoading) {
       setHeaderLines([])
       setCurrentLine(0)
       setCurrentChar(0)
@@ -246,7 +280,7 @@ function TerminalOutput({
     }, 530)
 
     return () => clearInterval(cursorInterval)
-  }, [isActive, skill, generateHeaderLines])
+  }, [isActive, skill, isLoading, generateHeaderLines])
 
   // Typewriter animation for header
   useEffect(() => {
@@ -375,7 +409,7 @@ function TerminalOutput({
         </div>
 
         {/* Terminal body */}
-        <div className="p-4 sm:p-6 font-mono text-[10px] sm:text-xs leading-relaxed min-h-[200px] relative">
+        <div className="p-4 sm:p-6 font-mono text-[10px] sm:text-xs leading-relaxed min-h-[120px] relative">
           {/* Scanline effect */}
           <div 
             className="absolute inset-0 pointer-events-none opacity-[0.02]"
@@ -384,57 +418,82 @@ function TerminalOutput({
             }}
           />
 
-          {/* Header lines with typewriter */}
-          {headerLines.slice(0, currentLine + 1).map((line, i) => (
-            <div key={i} className="min-h-[1.4em]">
-              {i < currentLine ? (
-                highlightLine(line)
-              ) : i === currentLine ? (
-                <>
-                  {highlightLine(line.slice(0, currentChar))}
-                  {showCursor && !isHeaderComplete && (
-                    <span className="inline-block w-2 h-4 bg-emerald-400 ml-0.5 animate-pulse" />
-                  )}
-                </>
-              ) : null}
+          {/* Loading state */}
+          {isLoading ? (
+            <div className="flex flex-col items-center justify-center py-8">
+              <div className="text-2xl text-emerald-300/80 mb-3">
+                {loadingFrames[loadingFrame]}
+              </div>
+              <div className="text-foreground/40">
+                <span className="text-emerald-300/60">$</span> Initializing query...
+              </div>
+              <div className="mt-3 flex gap-1">
+                {Array.from({ length: 12 }).map((_, i) => (
+                  <div
+                    key={i}
+                    className={cn(
+                      "w-1.5 h-1 transition-all duration-100",
+                      i <= loadingFrame ? "bg-emerald-400/60" : "bg-foreground/10"
+                    )}
+                  />
+                ))}
+              </div>
             </div>
-          ))}
-
-          {/* Project rows - shown after header complete */}
-          {isHeaderComplete && (
-            <div className="project-rows">
-              {relatedProjects.map((project, index) => (
-                <ProjectRow
-                  key={project.id}
-                  project={project}
-                  index={index}
-                  isExpanded={expandedProject === project.id}
-                  onToggle={() => setExpandedProject(
-                    expandedProject === project.id ? null : project.id
-                  )}
-                />
+          ) : (
+            <>
+              {/* Header lines with typewriter */}
+              {headerLines.slice(0, currentLine + 1).map((line, i) => (
+                <div key={i} className="min-h-[1.4em]">
+                  {i < currentLine ? (
+                    highlightLine(line)
+                  ) : i === currentLine ? (
+                    <>
+                      {highlightLine(line.slice(0, currentChar))}
+                      {showCursor && !isHeaderComplete && (
+                        <span className="inline-block w-2 h-4 bg-emerald-400 ml-0.5 animate-pulse" />
+                      )}
+                    </>
+                  ) : null}
+                </div>
               ))}
-              
-              {/* Footer line */}
-              <div className="mt-3 min-h-[1.4em]">
-                <span className="text-violet-300/70">[OK]</span>
-                <span className="text-foreground/50"> Query complete. {relatedProjects.length} result(s) found.</span>
-              </div>
-              <div className="min-h-[1.4em]">
-                <span className="text-emerald-300/80">$</span>
-                <span className="text-foreground/30"> _</span>
-                {showCursor && (
-                  <span className="inline-block w-2 h-4 bg-emerald-400 ml-0.5 animate-pulse" />
-                )}
-              </div>
-            </div>
+
+              {/* Project rows - shown after header complete */}
+              {isHeaderComplete && (
+                <div className="project-rows">
+                  {relatedProjects.map((project, index) => (
+                    <ProjectRow
+                      key={project.id}
+                      project={project}
+                      index={index}
+                      isExpanded={expandedProject === project.id}
+                      onToggle={() => setExpandedProject(
+                        expandedProject === project.id ? null : project.id
+                      )}
+                    />
+                  ))}
+                  
+                  {/* Footer line */}
+                  <div className="mt-3 min-h-[1.4em]">
+                    <span className="text-violet-300/70">[OK]</span>
+                    <span className="text-foreground/50"> Query complete. {relatedProjects.length} result(s) found.</span>
+                  </div>
+                  <div className="min-h-[1.4em]">
+                    <span className="text-emerald-300/80">$</span>
+                    <span className="text-foreground/30"> _</span>
+                    {showCursor && (
+                      <span className="inline-block w-2 h-4 bg-emerald-400 ml-0.5 animate-pulse" />
+                    )}
+                  </div>
+                </div>
+              )}
+            </>
           )}
         </div>
 
         {/* Terminal footer */}
         <div className="px-4 py-2 border-t border-foreground/10 flex items-center justify-between">
           <div className="font-mono text-[8px] text-foreground/20">
-            {isHeaderComplete ? "READY" : "RUNNING..."}
+            {isLoading ? "LOADING..." : isHeaderComplete ? "READY" : "RUNNING..."}
           </div>
           <div className="font-mono text-[8px] text-foreground/20">
             {relatedProjects.length} project(s)
@@ -688,7 +747,7 @@ export function ProjectsSection() {
           <AsciiBorderLine position="bottom" className="ascii-decoration mt-4" />
         </div>
 
-        {/* Skills display */}
+        {/* Skills display with inline terminal */}
         <div
           ref={skillsContainerRef}
           className="relative text-center py-6 sm:py-10"
@@ -696,30 +755,36 @@ export function ProjectsSection() {
           {/* Skills flow - wrapped on all screen sizes */}
           <div className="flex flex-row flex-wrap justify-center items-baseline gap-x-[0.15em] gap-y-1 sm:gap-x-[0.2em] sm:gap-y-3 px-2">
             {allSkills.map((skill, index) => (
-              <span key={skill} className="inline-flex items-baseline">
-                <SkillButton
-                  skill={skill}
-                  projectCount={skillsMap.get(skill)?.length || 0}
-                  isActive={activeSkill === skill}
-                  isAnyActive={activeSkill !== null}
-                  onClick={() => handleSkillClick(skill)}
-                />
-                {index < allSkills.length - 1 && (
-                  <span className="font-mono text-[3vw] sm:text-[2vw] text-foreground/10 mx-[0.1em] select-none">
-                    ·
-                  </span>
+              <span key={skill} className="inline-flex flex-col items-center">
+                <span className="inline-flex items-baseline">
+                  <SkillButton
+                    skill={skill}
+                    projectCount={skillsMap.get(skill)?.length || 0}
+                    isActive={activeSkill === skill}
+                    isAnyActive={activeSkill !== null}
+                    onClick={() => handleSkillClick(skill)}
+                  />
+                  {index < allSkills.length - 1 && (
+                    <span className="font-mono text-[3vw] sm:text-[2vw] text-foreground/10 mx-[0.1em] select-none">
+                      ·
+                    </span>
+                  )}
+                </span>
+                
+                {/* Inline terminal below selected skill */}
+                {activeSkill === skill && (
+                  <div className="w-screen relative left-1/2 -translate-x-1/2 px-4 sm:px-6 md:px-8">
+                    <TerminalOutput
+                      skill={activeSkill}
+                      isActive={true}
+                      onClose={() => setActiveSkill(null)}
+                    />
+                  </div>
                 )}
               </span>
             ))}
           </div>
         </div>
-
-        {/* Terminal output */}
-        <TerminalOutput
-          skill={activeSkill}
-          isActive={activeSkill !== null}
-          onClose={() => setActiveSkill(null)}
-        />
 
         {/* Legend */}
         <div className="max-w-6xl mx-auto mt-10 sm:mt-14">
