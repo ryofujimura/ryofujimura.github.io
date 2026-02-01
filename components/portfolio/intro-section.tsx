@@ -1,9 +1,8 @@
 "use client"
 
-import { useRef, useState, useEffect, useMemo } from "react"
+import { useRef, useState, useEffect, useCallback } from "react"
 import { gsap } from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
-import { useIsMobile } from "@/hooks/use-mobile"
 import { useReducedMotion } from "@/hooks/use-reduced-motion"
 import { GSAPText } from "@/components/gsap-text"
 import { BrutalistBackground } from "@/components/brutalist-background"
@@ -17,10 +16,7 @@ if (typeof window !== "undefined") {
 }
 
 const SITE_URL = "https://ryofujimura.github.io/"
-
-// ASCII terminal dimensions
-const ASCII_W = 70
-const ASCII_MOBILE_W = 32
+const MOBILE_BREAKPOINT = 768
 
 // Mode verb rotator config
 const MODE_VERBS = [
@@ -37,13 +33,45 @@ const MODE_VERBS = [
 ]
 const MODE_ROTATE_MS = 2600
 const VERB_SLOT_CH_DESKTOP = 11
-const VERB_SLOT_CH_MOBILE = 7
+const VERB_SLOT_CH_MOBILE = 8
 
 // Location config
 const LOC_DEFAULT = "IRVINE_CA"
 const LOC_HOVER = "OPEN_TO_RELOCATE"
 const LOC_SLOT_CH_DESKTOP = 16
 const LOC_SLOT_CH_MOBILE = 16
+
+// Custom hook for responsive mobile detection with resize listener
+function useResponsiveMobile() {
+  const [isMobile, setIsMobile] = useState(false)
+
+  useEffect(() => {
+    const mql = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT - 1}px)`)
+    
+    const updateMobile = () => {
+      setIsMobile(mql.matches)
+    }
+    
+    // Initial check
+    updateMobile()
+    
+    // Listen for changes via matchMedia
+    mql.addEventListener("change", updateMobile)
+    
+    // Also listen for resize for additional reliability
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < MOBILE_BREAKPOINT)
+    }
+    window.addEventListener("resize", handleResize)
+    
+    return () => {
+      mql.removeEventListener("change", updateMobile)
+      window.removeEventListener("resize", handleResize)
+    }
+  }, [])
+
+  return isMobile
+}
 
 function revLabel() {
   const d = new Date()
@@ -129,7 +157,7 @@ function LocHoverReveal({
         </span>
         <span
           ref={hoverRef}
-          className="absolute left-0 top-0 w-full tabular-nums whitespace-pre"
+          className="absolute left-0 top-0 w-full tabular-nums whitespace-pre text-green-500"
           style={{ minWidth: `${slotWidthCh}ch` }}
         >
           {hov}
@@ -220,12 +248,11 @@ function ModeVerbRotator({
 }
 
 /** Social links with globe copy functionality */
-function SocialLinks() {
+function SocialLinks({ className = "" }: { className?: string }) {
   const { toast } = useToast()
   const [copied, setCopied] = useState(false)
   const socialIconsRef = useRef<HTMLDivElement>(null)
 
-  // GSAP stagger-in animation
   useEffect(() => {
     if (!socialIconsRef.current) return
     const icons = socialIconsRef.current.querySelectorAll("[data-social-icon]")
@@ -247,7 +274,7 @@ function SocialLinks() {
   }
 
   return (
-    <div ref={socialIconsRef} className="flex flex-wrap items-center gap-1 pt-2">
+    <div ref={socialIconsRef} className={`flex flex-wrap items-center gap-1 ${className}`}>
       {[
         { href: "https://github.com/ryofujimura", Icon: Github, label: "GitHub", external: true },
         { href: "https://linkedin.com/in/ryofujimura", Icon: Linkedin, label: "LinkedIn", external: true },
@@ -294,568 +321,534 @@ function SocialLinks() {
   )
 }
 
+/** Technical SVG frame element */
+function TechnicalFrame({ className = "" }: { className?: string }) {
+  const frameRef = useRef<SVGSVGElement>(null)
+
+  useEffect(() => {
+    if (!frameRef.current) return
+    const paths = frameRef.current.querySelectorAll("path, line, rect")
+    
+    paths.forEach((el) => {
+      const geom = el as SVGGeometryElement
+      if (typeof geom.getTotalLength === "function") {
+        try {
+          const len = geom.getTotalLength()
+          gsap.set(geom, { strokeDasharray: len, strokeDashoffset: len })
+        } catch {
+          // Skip
+        }
+      }
+    })
+
+    gsap.to(paths, {
+      strokeDashoffset: 0,
+      duration: 1.5,
+      stagger: 0.1,
+      ease: "power2.inOut",
+      delay: 0.5,
+    })
+  }, [])
+
+  return (
+    <svg
+      ref={frameRef}
+      className={`absolute inset-0 w-full h-full pointer-events-none ${className}`}
+      viewBox="0 0 100 100"
+      preserveAspectRatio="none"
+      fill="none"
+      stroke="currentColor"
+    >
+      {/* Corner brackets */}
+      <path d="M 0 15 L 0 0 L 15 0" strokeWidth="0.5" className="text-foreground/20" />
+      <path d="M 85 0 L 100 0 L 100 15" strokeWidth="0.5" className="text-foreground/20" />
+      <path d="M 100 85 L 100 100 L 85 100" strokeWidth="0.5" className="text-foreground/20" />
+      <path d="M 15 100 L 0 100 L 0 85" strokeWidth="0.5" className="text-foreground/20" />
+      {/* Center crosshairs */}
+      <line x1="48" y1="50" x2="52" y2="50" strokeWidth="0.3" className="text-foreground/10" />
+      <line x1="50" y1="48" x2="50" y2="52" strokeWidth="0.3" className="text-foreground/10" />
+    </svg>
+  )
+}
+
 /**
  * IntroSection - Brutalist intro combining hero + about content
- * Uses CSS scroll-snap for paginated reveal on scroll
+ * Uses CSS scroll-snap for paginated reveal with GSAP animations
  */
 export function IntroSection() {
   const containerRef = useRef<HTMLDivElement>(null)
+  const snapContainerRef = useRef<HTMLDivElement>(null)
+  const page1Ref = useRef<HTMLDivElement>(null)
   const page2Ref = useRef<HTMLDivElement>(null)
   const statsGridRef = useRef<HTMLDivElement>(null)
   const stackTickerRef = useRef<HTMLDivElement>(null)
   const ctaRef = useRef<HTMLDivElement>(null)
-  const isMobile = useIsMobile()
+  const scrollIndicatorRef = useRef<HTMLDivElement>(null)
+  
+  const isMobile = useResponsiveMobile()
   const prefersReducedMotion = useReducedMotion()
+  const [currentSnap, setCurrentSnap] = useState(0)
 
   const rev = revLabel()
 
+  // Scroll snap observer
+  useEffect(() => {
+    if (!snapContainerRef.current) return
+    
+    const container = snapContainerRef.current
+    const handleScroll = () => {
+      const scrollTop = container.scrollTop
+      const pageHeight = container.clientHeight
+      const newSnap = Math.round(scrollTop / pageHeight)
+      setCurrentSnap(newSnap)
+    }
+    
+    container.addEventListener("scroll", handleScroll, { passive: true })
+    return () => container.removeEventListener("scroll", handleScroll)
+  }, [])
+
+  // Page 1 entrance animations
+  useEffect(() => {
+    if (!page1Ref.current || prefersReducedMotion) return
+
+    const ctx = gsap.context(() => {
+      // Stagger in the main elements
+      gsap.fromTo(
+        "[data-intro-animate]",
+        { opacity: 0, y: 30 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.8,
+          stagger: 0.1,
+          ease: "power3.out",
+          delay: 0.2,
+        }
+      )
+
+      // Scroll indicator pulse
+      if (scrollIndicatorRef.current) {
+        gsap.to(scrollIndicatorRef.current, {
+          y: 8,
+          repeat: -1,
+          yoyo: true,
+          duration: 1.2,
+          ease: "power1.inOut",
+        })
+      }
+    }, page1Ref)
+
+    return () => ctx.revert()
+  }, [prefersReducedMotion])
+
   // Page 2 GSAP entrance animations with ScrollTrigger
-  // Respects prefers-reduced-motion
   useEffect(() => {
     if (!page2Ref.current || prefersReducedMotion) return
 
     const ctx = gsap.context(() => {
-      // Stats cards stagger animation
+      // Stats grid stagger
       if (statsGridRef.current) {
-        const cards = statsGridRef.current.querySelectorAll("button")
-        gsap.set(cards, { opacity: 0, y: isMobile ? 20 : 30 })
-        
-        ScrollTrigger.create({
-          trigger: statsGridRef.current,
-          start: () => isMobile ? "top 90%" : "top 85%",
-          once: true,
-          onEnter: () => {
-            gsap.to(cards, {
-              opacity: 1,
-              y: 0,
-              duration: isMobile ? 0.4 : 0.6,
-              stagger: isMobile ? 0.08 : 0.1,
-              ease: "power3.out",
-            })
-          },
-        })
+        const statItems = statsGridRef.current.querySelectorAll("[data-stat]")
+        gsap.fromTo(
+          statItems,
+          { opacity: 0, y: 20, scale: 0.95 },
+          {
+            opacity: 1,
+            y: 0,
+            scale: 1,
+            duration: 0.6,
+            stagger: 0.1,
+            ease: "power3.out",
+            scrollTrigger: {
+              trigger: page2Ref.current,
+              start: "top 80%",
+              toggleActions: "play none none none",
+            },
+          }
+        )
       }
 
       // Stack ticker fade in
       if (stackTickerRef.current) {
-        gsap.set(stackTickerRef.current, { opacity: 0, x: isMobile ? -20 : -30 })
-        
-        ScrollTrigger.create({
-          trigger: stackTickerRef.current,
-          start: () => isMobile ? "top 95%" : "top 90%",
-          once: true,
-          onEnter: () => {
-            gsap.to(stackTickerRef.current, {
-              opacity: 1,
-              x: 0,
-              duration: isMobile ? 0.5 : 0.7,
-              ease: "power2.out",
-            })
-          },
-        })
+        gsap.fromTo(
+          stackTickerRef.current,
+          { opacity: 0, x: -20 },
+          {
+            opacity: 1,
+            x: 0,
+            duration: 0.8,
+            ease: "power3.out",
+            scrollTrigger: {
+              trigger: stackTickerRef.current,
+              start: "top 85%",
+              toggleActions: "play none none none",
+            },
+          }
+        )
       }
 
-      // CTA buttons entrance
+      // CTA buttons
       if (ctaRef.current) {
-        const buttons = ctaRef.current.querySelectorAll("a")
-        gsap.set(buttons, { opacity: 0, y: 15 })
-        
-        ScrollTrigger.create({
-          trigger: ctaRef.current,
-          start: () => isMobile ? "top 95%" : "top 90%",
-          once: true,
-          onEnter: () => {
-            gsap.to(buttons, {
-              opacity: 1,
-              y: 0,
-              duration: 0.5,
-              stagger: 0.1,
-              ease: "power3.out",
-            })
-          },
-        })
+        gsap.fromTo(
+          ctaRef.current.querySelectorAll("a, button"),
+          { opacity: 0, y: 15 },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.6,
+            stagger: 0.1,
+            ease: "power3.out",
+            scrollTrigger: {
+              trigger: ctaRef.current,
+              start: "top 90%",
+              toggleActions: "play none none none",
+            },
+          }
+        )
       }
     }, page2Ref)
 
     return () => ctx.revert()
-  }, [isMobile, prefersReducedMotion])
+  }, [prefersReducedMotion])
 
-  // ASCII terminal lines
-  const asciiHeaderLines = useMemo(() => {
-    return [
-      "╔" + "═".repeat(ASCII_W) + "╗",
-      null, // line 1 = custom LOC hover reveal
-      null, // line 2 = custom mode + rotator
-      "╚" + "═".repeat(ASCII_W) + "╝",
-    ]
-  }, [])
-
-  const asciiHeaderLinesMobile = useMemo(() => {
-    return [
-      "╔" + "═".repeat(ASCII_MOBILE_W) + "╗",
-      null,
-      null,
-      "╚" + "═".repeat(ASCII_MOBILE_W) + "╝",
-    ]
-  }, [])
-
-  // ASCII line content templates
-  const locLineLeftDesktop = "║   SYS_ID: RF.001   │   CLASS: ENGINEER   │   LOC: "
-  const locLineRightDesktop = " ".repeat(3) + "║"
-  const locLineLeftMobile = " RF.001 │ ENG │ "
-  const locLineRightMobile = "║"
-  const modeLineLeftDesktop = "║   mode: "
-  const modeLineRightDesktop = ("│   status: AVAILABLE │   rev: " + rev).padEnd(50) + "║"
-  const modeLineLeftMobile = " AVAILABLE │ "
-  const modeLineRightMobile = ((" │ " + rev).slice(0, 11)).padEnd(11)
-
-  // Refs for GSAP line animations
-  const locLineDesktopRef = useRef<HTMLSpanElement>(null)
-  const locLineMobileRef = useRef<HTMLSpanElement>(null)
-  const modeLineDesktopRef = useRef<HTMLSpanElement>(null)
-  const modeLineMobileRef = useRef<HTMLSpanElement>(null)
-
-  // GSAP: line entrance animations
-  useEffect(() => {
-    const run = () => {
-      const animate = (el: HTMLSpanElement | null, delay: number, duration: number) => {
-        if (!el) return
-        gsap.fromTo(el, { y: "100%" }, { y: 0, delay, duration, ease: "power4.out" })
-      }
-      animate(locLineDesktopRef.current, 0.15 + 1 * 0.06, 0.4)
-      animate(locLineMobileRef.current, 0.15 + 1 * 0.06, 0.35)
-      animate(modeLineDesktopRef.current, 0.15 + 2 * 0.06, 0.4)
-      animate(modeLineMobileRef.current, 0.15 + 2 * 0.06, 0.35)
+  // Pinning values responsive to mobile
+  const getPinValues = useCallback(() => {
+    return {
+      snapHeight: isMobile ? "100svh" : "100vh",
+      padding: isMobile ? "16px" : "32px",
     }
-    const t = setTimeout(run, 0)
-    return () => clearTimeout(t)
-  }, [])
+  }, [isMobile])
+
+  const pinValues = getPinValues()
+
+  const scrollToNextSnap = () => {
+    if (!snapContainerRef.current) return
+    const pageHeight = snapContainerRef.current.clientHeight
+    snapContainerRef.current.scrollTo({
+      top: (currentSnap + 1) * pageHeight,
+      behavior: "smooth",
+    })
+  }
 
   return (
     <section
+      id="intro"
       ref={containerRef}
       className="relative"
-      aria-label="Introduction"
+      style={{ height: `calc(${pinValues.snapHeight} * 2)` }}
     >
-      {/* Skip to main content link for keyboard users */}
-      <a 
-        href="#experience" 
-        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-primary focus:text-primary-foreground focus:font-mono focus:text-sm focus:outline-none focus:ring-2 focus:ring-primary-foreground"
-      >
-        Skip to main content
-      </a>
-      {/* Scroll Snap Container */}
-      <div 
-        className="snap-container"
-        style={{
+      {/* Scroll snap container */}
+      <div
+        ref={snapContainerRef}
+        className="fixed inset-0 overflow-y-auto snap-y snap-mandatory"
+        style={{ 
+          height: pinValues.snapHeight,
           scrollSnapType: "y mandatory",
-          overflowY: "auto",
-          height: "100dvh",
-          minHeight: "100vh",
         }}
       >
-        {/* Page 1: Identity */}
-        <div 
-          className="snap-page relative flex items-center justify-center px-3 sm:px-6 pt-[max(4rem,env(safe-area-inset-top))] pb-6 sm:pb-8 overflow-hidden"
-          style={{
-            scrollSnapAlign: "start",
-            minHeight: "100dvh",
-            height: "100vh",
+        {/* ═══════════════════════════════════════════════════════════════════
+            PAGE 1: Hero Identity
+        ═══════════════════════════════════════════════════════════════════ */}
+        <div
+          ref={page1Ref}
+          className="relative w-full flex items-center justify-center snap-start snap-always"
+          style={{ 
+            height: pinValues.snapHeight,
+            minHeight: isMobile ? "600px" : "700px",
           }}
         >
-          {/* Technical Background - Hidden on mobile for performance */}
-          <div className="hidden sm:block">
-            <BrutalistBackground variant="full" />
+          {/* Brutalist background */}
+          <div className="absolute inset-0 opacity-60">
+            <BrutalistBackground variant="dense" />
           </div>
+          
+          {/* Technical frame overlay */}
+          <TechnicalFrame className="opacity-30" />
 
-          <div className="relative z-10 w-full max-w-5xl mx-auto px-0">
-            <div className="flex flex-col items-start gap-4 sm:gap-6 md:gap-8">
-              
-              {/* ASCII Terminal Block */}
-              <div
-                className="font-mono text-foreground/50 whitespace-pre tabular-nums touch-manipulation w-full min-w-0"
-                style={{ fontFamily: "ui-monospace, monospace" }}
-              >
-                {/* Mobile ASCII */}
-                <div className="block sm:hidden text-[9px] leading-tight overflow-x-auto scrollbar-hide" style={{ minWidth: "34ch" }}>
-                  {asciiHeaderLinesMobile.map((line, i) =>
-                    line === null && i === 1 ? (
-                      <div key="m-1" className="block overflow-hidden leading-tight">
-                        <span
-                          ref={locLineMobileRef}
-                          className="block translate-y-full"
-                          style={{ fontFamily: "ui-monospace, monospace" }}
-                        >
-                          {"║"}
-                          {locLineLeftMobile}
-                          <LocHoverReveal
-                            defaultText={LOC_DEFAULT}
-                            hoverText={LOC_HOVER}
-                            slotWidthCh={LOC_SLOT_CH_MOBILE}
-                            className="text-foreground/50"
-                          />
-                          {locLineRightMobile}
-                        </span>
-                      </div>
-                    ) : line === null && i === 2 ? (
-                      <div key="m-2" className="block overflow-hidden leading-tight">
-                        <span
-                          ref={modeLineMobileRef}
-                          className="block translate-y-full"
-                          style={{ fontFamily: "ui-monospace, monospace" }}
-                        >
-                          {modeLineLeftMobile}
-                          <ModeVerbRotator
-                            verbs={MODE_VERBS}
-                            slotWidthCh={VERB_SLOT_CH_MOBILE}
-                            className="text-foreground/50"
-                          />
-                          {modeLineRightMobile}
-                        </span>
-                      </div>
-                    ) : (
-                      <GSAPText
-                        key={`m-${i}`}
-                        variant="lines"
-                        delay={0.15 + i * 0.06}
-                        duration={0.35}
-                        immediate
-                        className="block leading-tight"
-                      >
-                        {line ?? ""}
-                      </GSAPText>
-                    )
-                  )}
-                </div>
+          {/* Content */}
+          <div 
+            className="relative z-10 w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8"
+            style={{ padding: pinValues.padding }}
+          >
+            {/* System status bar */}
+            <div 
+              data-intro-animate
+              className="flex items-center gap-2 sm:gap-4 mb-6 sm:mb-8 font-mono text-[9px] sm:text-[10px] uppercase tracking-[0.2em] text-muted-foreground"
+            >
+              <span className="text-green-500">● ONLINE</span>
+              <span className="text-foreground/20">│</span>
+              <span>REV: {rev}</span>
+              <span className="text-foreground/20">│</span>
+              <span className="hidden sm:inline">SYS: OPERATIONAL</span>
+            </div>
 
-                {/* Desktop ASCII */}
-                <div className="hidden sm:block text-[10px] sm:text-[11px] leading-tight overflow-x-auto scrollbar-hide" style={{ minWidth: "min(100%, 67ch)" }}>
-                  {asciiHeaderLines.map((line, i) =>
-                    line === null && i === 1 ? (
-                      <div key="d-1" className="block overflow-hidden leading-tight">
-                        <span
-                          ref={locLineDesktopRef}
-                          className="block translate-y-full"
-                          style={{ fontFamily: "ui-monospace, monospace" }}
-                        >
-                          {locLineLeftDesktop}
-                          <LocHoverReveal
-                            defaultText={LOC_DEFAULT}
-                            hoverText={LOC_HOVER}
-                            slotWidthCh={LOC_SLOT_CH_DESKTOP}
-                            className="text-foreground/50"
-                          />
-                          {locLineRightDesktop}
-                        </span>
-                      </div>
-                    ) : line === null && i === 2 ? (
-                      <div key="d-2" className="block overflow-hidden leading-tight">
-                        <span
-                          ref={modeLineDesktopRef}
-                          className="block translate-y-full"
-                          style={{ fontFamily: "ui-monospace, monospace" }}
-                        >
-                          {modeLineLeftDesktop}
-                          <ModeVerbRotator
-                            verbs={MODE_VERBS}
-                            slotWidthCh={VERB_SLOT_CH_DESKTOP}
-                            className="text-foreground/50"
-                          />
-                          {modeLineRightDesktop}
-                        </span>
-                      </div>
-                    ) : (
-                      <GSAPText
-                        key={`d-${i}`}
-                        variant="lines"
-                        delay={0.15 + i * 0.06}
-                        duration={0.4}
-                        immediate
-                        className="block leading-tight"
-                      >
-                        {line ?? ""}
-                      </GSAPText>
-                    )
-                  )}
-                </div>
-              </div>
-
-              {/* Role Line */}
-              <GSAPText
-                variant="scramble"
-                delay={0.5}
-                immediate
-                className="text-[9px] sm:text-[10px] md:text-xs font-mono uppercase tracking-[0.2em] sm:tracking-[0.3em] text-muted-foreground"
-              >
-                Software Engineer & AI Researcher
-              </GSAPText>
-
-              {/* Name - Brutalist Typography */}
-              <div className="space-y-0 leading-[0.88]">
-                <GSAPText
-                  variant="chars"
-                  stagger={0.03}
-                  duration={0.45}
-                  delay={0.7}
-                  immediate
-                  className="text-3xl min-[375px]:text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black text-foreground tracking-tighter font-mono block"
-                >
+            {/* Name - Large brutalist typography */}
+            <div data-intro-animate className="mb-4 sm:mb-6">
+              <h1 className="font-mono text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-tight leading-[0.9]">
+                <GSAPText immediate variant="chars" stagger={0.03} duration={0.6}>
                   RYO
                 </GSAPText>
-                <GSAPText
-                  variant="chars"
-                  stagger={0.03}
-                  duration={0.45}
-                  delay={0.9}
-                  immediate
-                  className="text-3xl min-[375px]:text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black text-foreground tracking-tighter font-mono block"
-                >
-                  FUJIMURA
-                </GSAPText>
+                <br />
+                <span className="text-muted-foreground">
+                  <GSAPText immediate variant="chars" stagger={0.03} duration={0.6} delay={0.3}>
+                    FUJIMURA
+                  </GSAPText>
+                </span>
+              </h1>
+            </div>
+
+            {/* Role descriptor with rotating verb */}
+            <div 
+              data-intro-animate
+              className="font-mono text-sm sm:text-base md:text-lg uppercase tracking-[0.15em] text-foreground/80 mb-6 sm:mb-8"
+            >
+              <span className="text-muted-foreground">MODE: </span>
+              <ModeVerbRotator
+                verbs={MODE_VERBS}
+                slotWidthCh={isMobile ? VERB_SLOT_CH_MOBILE : VERB_SLOT_CH_DESKTOP}
+                className="text-foreground font-bold"
+              />
+              <br className="sm:hidden" />
+              <span className="hidden sm:inline text-foreground/20"> │ </span>
+              <span className="text-muted-foreground">LOC: </span>
+              <LocHoverReveal
+                defaultText={LOC_DEFAULT}
+                hoverText={LOC_HOVER}
+                slotWidthCh={isMobile ? LOC_SLOT_CH_MOBILE : LOC_SLOT_CH_DESKTOP}
+              />
+            </div>
+
+            {/* Tagline */}
+            <div data-intro-animate className="max-w-xl mb-8 sm:mb-10">
+              <p className="font-mono text-xs sm:text-sm text-muted-foreground leading-relaxed">
+                Software Engineer crafting intelligent systems at the intersection of{" "}
+                <span className="text-foreground font-medium">AI/ML</span>,{" "}
+                <span className="text-foreground font-medium">Mobile</span>, and{" "}
+                <span className="text-foreground font-medium">Full-Stack</span> development.
+              </p>
+            </div>
+
+            {/* Social links */}
+            <div data-intro-animate>
+              <SocialLinks />
+            </div>
+
+            {/* Scroll indicator */}
+            <div 
+              data-intro-animate
+              className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 cursor-pointer"
+              onClick={scrollToNextSnap}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => e.key === "Enter" && scrollToNextSnap()}
+            >
+              <span className="font-mono text-[8px] uppercase tracking-[0.3em] text-muted-foreground">
+                Scroll
+              </span>
+              <div ref={scrollIndicatorRef}>
+                <ArrowDown className="w-4 h-4 text-muted-foreground" />
               </div>
-
-              {/* Tagline */}
-              <GSAPText
-                variant="words"
-                delay={1.25}
-                stagger={0.05}
-                duration={0.45}
-                immediate
-                className="text-xs sm:text-sm md:text-base lg:text-lg text-muted-foreground font-mono max-w-xl leading-relaxed"
-              >
-                Building systems at the intersection of AI research and real-world applications.
-              </GSAPText>
-
             </div>
           </div>
 
-          {/* Scroll indicator */}
-          <div className="absolute bottom-6 sm:bottom-10 left-1/2 -translate-x-1/2 pb-[env(safe-area-inset-bottom)]">
-            <div className="flex flex-col items-center gap-2">
-              <span className="font-mono text-[9px] uppercase tracking-[0.3em] text-muted-foreground/60">
-                scroll
-              </span>
-              <div className="w-px h-8 sm:h-12 bg-foreground/20 relative overflow-hidden">
-                <div
-                  className="absolute top-0 left-0 w-full h-4 bg-foreground/60"
-                  style={{ animation: "scrollIndicator 2s ease-in-out infinite" }}
-                />
-              </div>
-            </div>
+          {/* Decorative corner elements */}
+          <div className="absolute top-4 left-4 font-mono text-[8px] text-muted-foreground/50 hidden lg:block">
+            [00:00:00]
+          </div>
+          <div className="absolute top-4 right-4 font-mono text-[8px] text-muted-foreground/50 hidden lg:block">
+            v2.0.0
           </div>
         </div>
 
-        {/* Page 2: Data + Action */}
-        <div 
+        {/* ═══════════════════════════════════════════════════════════════════
+            PAGE 2: Skills & Stats
+        ═══════════════════════════════════════════════════════════════════ */}
+        <div
           ref={page2Ref}
-          className="snap-page relative flex items-center justify-center px-4 sm:px-6 py-12 sm:py-16"
-          style={{
-            scrollSnapAlign: "start",
-            minHeight: "100dvh",
-            height: "100vh",
+          className="relative w-full flex items-center justify-center snap-start snap-always"
+          style={{ 
+            height: pinValues.snapHeight,
+            minHeight: isMobile ? "600px" : "700px",
           }}
         >
-          {/* Subtle background for page 2 */}
-          <div className="hidden sm:block opacity-50">
+          {/* Subtle background variant */}
+          <div className="absolute inset-0 opacity-40">
             <BrutalistBackground variant="circuit" />
           </div>
 
-          <div className="relative z-10 w-full max-w-5xl mx-auto">
-            <div className="grid md:grid-cols-[1fr_auto] gap-8 lg:gap-12 items-start">
-              
-              {/* Left Column: Stats + Stack */}
-              <div className="space-y-8 sm:space-y-10">
-                
-                {/* Available Badge */}
-                <div className="flex items-center gap-3">
-                  <div className="relative">
-                    <div className="w-2.5 h-2.5 bg-green-500 rounded-full animate-pulse" />
-                    <div className="absolute inset-0 w-2.5 h-2.5 bg-green-500 rounded-full animate-ping opacity-75" />
-                  </div>
-                  <span className="font-mono text-xs sm:text-sm uppercase tracking-[0.2em] text-green-500">
-                    Available for Opportunities
-                  </span>
-                </div>
+          <div 
+            className="relative z-10 w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8"
+            style={{ padding: pinValues.padding }}
+          >
+            {/* Section label */}
+            <div className="flex items-center gap-3 mb-6 sm:mb-8">
+              <div className="relative">
+                <div className="w-2.5 h-2.5 bg-green-500 rounded-full animate-pulse" />
+                <div className="absolute inset-0 w-2.5 h-2.5 bg-green-500 rounded-full animate-ping opacity-75" />
+              </div>
+              <span className="font-mono text-[10px] sm:text-xs uppercase tracking-[0.2em] text-green-500">
+                Available for Opportunities
+              </span>
+            </div>
 
-                {/* Stats Grid */}
-                <div ref={statsGridRef} className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
-                  {[
-                    { label: "Years Coding", value: "8+", link: null },
-                    { label: "Internships", value: "2", link: "experience" },
-                    { label: "Projects Shipped", value: "10+", link: "projects" },
-                    { label: "Publications", value: "2", link: "publications" },
-                  ].map((stat) => {
-                    const isLink = !!stat.link
-                    const handleClick = () => {
-                      if (stat.link) {
-                        document.getElementById(stat.link)?.scrollIntoView({ behavior: "smooth" })
+            {/* Stats Grid */}
+            <div 
+              ref={statsGridRef} 
+              className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-8 sm:mb-10"
+            >
+              {[
+                { label: "Years Coding", value: "8+", link: null },
+                { label: "Internships", value: "2", link: "experience" },
+                { label: "Projects Shipped", value: "10+", link: "projects" },
+                { label: "Publications", value: "2", link: "publications" },
+              ].map((stat) => {
+                const isLink = !!stat.link
+                const handleClick = () => {
+                  if (stat.link) {
+                    document.getElementById(stat.link)?.scrollIntoView({ behavior: "smooth" })
+                  }
+                }
+                return (
+                  <button
+                    key={stat.label}
+                    data-stat
+                    type="button"
+                    onClick={isLink ? handleClick : undefined}
+                    disabled={!isLink}
+                    className={`
+                      relative border bg-background/80 backdrop-blur-sm px-3 py-4 sm:px-4 sm:py-5 
+                      flex flex-col justify-between min-h-[5rem] sm:min-h-[5.5rem] text-left
+                      transition-all duration-300 group
+                      ${isLink 
+                        ? "border-foreground/25 cursor-pointer hover:border-foreground hover:shadow-[4px_4px_0_0_var(--foreground)]" 
+                        : "border-foreground/15 cursor-default"
                       }
-                    }
-                    return (
-                      <button
-                        key={stat.label}
-                        type="button"
-                        onClick={isLink ? handleClick : undefined}
-                        disabled={!isLink}
-                        className={`
-                          relative border bg-background px-3 py-4 sm:px-4 sm:py-5 
-                          flex flex-col justify-between min-h-[5rem] sm:min-h-[5.5rem] text-left
-                          transition-all duration-300 group
-                          ${isLink 
-                            ? "border-foreground/25 cursor-pointer hover:border-foreground hover:shadow-[4px_4px_0_0_var(--foreground)]" 
-                            : "border-foreground/15 cursor-default"
-                          }
-                        `}
+                    `}
+                  >
+                    {/* Technical pattern overlay on hover */}
+                    {isLink && (
+                      <svg
+                        className="absolute inset-0 w-full h-full pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                        viewBox="0 0 48 48"
+                        fill="none"
+                        aria-hidden
                       >
-                        {/* Technical pattern overlay on hover */}
-                        {isLink && (
-                          <svg
-                            className="absolute inset-0 w-full h-full pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                            viewBox="0 0 48 48"
-                            fill="none"
-                            aria-hidden
-                          >
-                            <line x1="0" y1="0" x2="48" y2="48" stroke="currentColor" strokeWidth="0.3" className="text-foreground/10" />
-                            <line x1="48" y1="0" x2="0" y2="48" stroke="currentColor" strokeWidth="0.3" className="text-foreground/10" />
-                          </svg>
-                        )}
-                        <span className="font-mono text-[9px] sm:text-[10px] uppercase tracking-[0.15em] text-muted-foreground">
-                          {stat.label}
-                        </span>
-                        <span className="font-mono text-2xl sm:text-3xl md:text-4xl font-black text-foreground">
-                          {stat.value}
-                        </span>
-                      </button>
-                    )
-                  })}
-                </div>
-
-                {/* Stack Ticker */}
-                <div ref={stackTickerRef} className="border border-foreground/20 bg-background/50 overflow-hidden">
-                  <div className="px-3 py-2 border-b border-foreground/10">
-                    <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-muted-foreground">
-                      Tech Stack
+                        <line x1="0" y1="0" x2="48" y2="48" stroke="currentColor" strokeWidth="0.3" className="text-foreground/10" />
+                        <line x1="48" y1="0" x2="0" y2="48" stroke="currentColor" strokeWidth="0.3" className="text-foreground/10" />
+                      </svg>
+                    )}
+                    <span className="font-mono text-[9px] sm:text-[10px] uppercase tracking-[0.15em] text-muted-foreground">
+                      {stat.label}
                     </span>
-                  </div>
-                  <div className="relative overflow-hidden py-3">
-                    <div className={`stack-ticker flex gap-8 whitespace-nowrap ${prefersReducedMotion ? "" : "animate-ticker"}`}>
-                      {[
-                        "Python", "Swift", "Kotlin", "TypeScript", "React", 
-                        "Firebase", "PyTorch", "CoreML", "On-device LLMs", 
-                        "CUDA", "Docker", "Node.js", "REST APIs"
-                      ].map((tech, i) => (
-                        <span 
-                          key={i} 
-                          className="font-mono text-sm sm:text-base text-foreground/80"
-                        >
-                          {tech}
-                        </span>
-                      ))}
-                      {/* Duplicate for seamless loop */}
-                      {[
-                        "Python", "Swift", "Kotlin", "TypeScript", "React", 
-                        "Firebase", "PyTorch", "CoreML", "On-device LLMs", 
-                        "CUDA", "Docker", "Node.js", "REST APIs"
-                      ].map((tech, i) => (
-                        <span 
-                          key={`dup-${i}`} 
-                          className="font-mono text-sm sm:text-base text-foreground/80"
-                        >
-                          {tech}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                </div>
+                    <span className="font-mono text-2xl sm:text-3xl md:text-4xl font-black text-foreground">
+                      {stat.value}
+                    </span>
+                  </button>
+                )
+              })}
+            </div>
 
-                {/* Focus Areas */}
-                <div className="flex flex-wrap gap-2">
-                  {["AI / ML", "Mobile", "Backend", "Full-Stack"].map((area) => (
+            {/* Stack Ticker */}
+            <div 
+              ref={stackTickerRef} 
+              className="border border-foreground/20 bg-background/50 backdrop-blur-sm overflow-hidden mb-6 sm:mb-8"
+            >
+              <div className="px-3 py-2 border-b border-foreground/10">
+                <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-muted-foreground">
+                  Tech Stack
+                </span>
+              </div>
+              <div className="relative overflow-hidden py-3">
+                <div className={`stack-ticker flex gap-8 whitespace-nowrap ${prefersReducedMotion ? "" : "animate-ticker"}`}>
+                  {[
+                    "Python", "Swift", "Kotlin", "TypeScript", "React", 
+                    "Firebase", "PyTorch", "CoreML", "On-device LLMs", 
+                    "CUDA", "Docker", "Node.js", "REST APIs"
+                  ].map((tech, i) => (
                     <span 
-                      key={area}
-                      className="font-mono text-[10px] sm:text-xs uppercase tracking-wider px-3 py-1.5 border border-foreground/30 text-foreground/70"
+                      key={i} 
+                      className="font-mono text-sm sm:text-base text-foreground/80"
                     >
-                      {area}
+                      {tech}
+                    </span>
+                  ))}
+                  {/* Duplicate for seamless loop */}
+                  {[
+                    "Python", "Swift", "Kotlin", "TypeScript", "React", 
+                    "Firebase", "PyTorch", "CoreML", "On-device LLMs", 
+                    "CUDA", "Docker", "Node.js", "REST APIs"
+                  ].map((tech, i) => (
+                    <span 
+                      key={`dup-${i}`} 
+                      className="font-mono text-sm sm:text-base text-foreground/80"
+                    >
+                      {tech}
                     </span>
                   ))}
                 </div>
-
-                {/* CTA Buttons */}
-                <div ref={ctaRef} className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4 pt-4">
-                  <MagneticButton
-                    as="a"
-                    href="#experience"
-                    className="touch-target group relative inline-flex items-center justify-center gap-2 sm:gap-3 px-6 sm:px-8 py-3 sm:py-4 min-h-[48px] text-xs sm:text-sm font-mono uppercase tracking-wider text-primary-foreground bg-primary border-2 border-primary hover:bg-transparent hover:text-primary transition-all duration-300"
-                  >
-                    View Work
-                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform shrink-0" />
-                  </MagneticButton>
-                  <MagneticButton
-                    as="a"
-                    href="#contact"
-                    className="touch-target group inline-flex items-center justify-center gap-2 sm:gap-3 px-6 sm:px-8 py-3 sm:py-4 min-h-[48px] text-xs sm:text-sm font-mono uppercase tracking-wider text-foreground bg-transparent border-2 border-foreground hover:bg-foreground hover:text-background transition-all duration-300"
-                  >
-                    Contact
-                    <ArrowDown className="w-4 h-4 group-hover:translate-y-1 transition-transform shrink-0" />
-                  </MagneticButton>
-                </div>
-
-                {/* Social Links */}
-                <SocialLinks />
-              </div>
-
-              {/* Right Column: Profile Image */}
-              <div className="hidden md:block">
-                <div className="relative">
-                  {/* Brutalist frame */}
-                  <div className="absolute -inset-2 border-2 border-foreground/20" />
-                  <div className="absolute -inset-4 border border-foreground/10" />
-                  
-                  {/* Image */}
-                  <div className="w-32 h-32 lg:w-40 lg:h-40 border-[3px] border-foreground bg-background overflow-hidden">
-                    <img
-                      src="/images/profile.jpg"
-                      alt="Ryo Fujimura"
-                      className="w-full h-full object-cover object-top"
-                      width={160}
-                      height={160}
-                    />
-                  </div>
-                  
-                  {/* Coordinates */}
-                  <button
-                    type="button"
-                    onClick={() => document.getElementById("hobbies")?.scrollIntoView({ behavior: "smooth" })}
-                    className="font-mono text-[8px] text-muted-foreground uppercase tracking-widest mt-2 hover:text-foreground hover:underline transition-colors"
-                  >
-                    33.67°N, 117.85°W
-                  </button>
-                </div>
               </div>
             </div>
+
+            {/* Focus Areas */}
+            <div className="flex flex-wrap gap-2 mb-8 sm:mb-10">
+              {["AI / ML", "Mobile", "Backend", "Full-Stack"].map((area) => (
+                <span 
+                  key={area}
+                  className="font-mono text-[10px] sm:text-xs uppercase tracking-wider px-3 py-1.5 border border-foreground/30 text-foreground/70 bg-background/50"
+                >
+                  {area}
+                </span>
+              ))}
+            </div>
+
+            {/* CTA Buttons */}
+            <div ref={ctaRef} className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4">
+              <MagneticButton
+                as="a"
+                href="#experience"
+                className="touch-target group relative inline-flex items-center justify-center gap-2 sm:gap-3 px-6 sm:px-8 py-3 sm:py-4 min-h-[48px] text-xs sm:text-sm font-mono uppercase tracking-wider text-primary-foreground bg-primary border-2 border-primary hover:bg-transparent hover:text-primary transition-all duration-300"
+              >
+                View Work
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform shrink-0" />
+              </MagneticButton>
+              <MagneticButton
+                as="a"
+                href="#contact"
+                className="touch-target group inline-flex items-center justify-center gap-2 sm:gap-3 px-6 sm:px-8 py-3 sm:py-4 min-h-[48px] text-xs sm:text-sm font-mono uppercase tracking-wider text-foreground bg-transparent border-2 border-foreground hover:bg-foreground hover:text-background transition-all duration-300"
+              >
+                Contact
+                <ArrowDown className="w-4 h-4 group-hover:translate-y-1 transition-transform shrink-0" />
+              </MagneticButton>
+            </div>
+          </div>
+
+          {/* Page indicator */}
+          <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-2">
+            {[0, 1].map((i) => (
+              <div
+                key={i}
+                className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                  currentSnap === i 
+                    ? "bg-foreground w-6" 
+                    : "bg-foreground/30"
+                }`}
+              />
+            ))}
           </div>
         </div>
       </div>
 
-      {/* Debug: Mobile indicator */}
-      {process.env.NODE_ENV === "development" && (
-        <div className="fixed bottom-4 right-4 z-50 font-mono text-[10px] bg-background/80 border border-foreground/20 px-2 py-1">
-          {isMobile ? "MOBILE" : "DESKTOP"}
-        </div>
-      )}
-
+      {/* CSS for ticker animation */}
       <style jsx>{`
-        @keyframes scrollIndicator {
-          0% { transform: translateY(-100%); }
-          50% { transform: translateY(200%); }
-          100% { transform: translateY(200%); }
-        }
         @keyframes ticker {
           0% { transform: translateX(0); }
           100% { transform: translateX(-50%); }
         }
         .animate-ticker {
           animation: ticker 30s linear infinite;
+        }
+        .animate-ticker:hover {
+          animation-play-state: paused;
         }
       `}</style>
     </section>

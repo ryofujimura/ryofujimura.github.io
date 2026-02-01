@@ -6,6 +6,7 @@ import { MagneticButton } from "@/components/magnetic-button"
 import { Menu, X } from "lucide-react"
 
 const navItems = [
+  { label: "Intro", href: "#intro" },
   { label: "Experience", href: "#experience" },
   { label: "Projects", href: "#projects" },
   { label: "Hobbies", href: "#hobbies" },

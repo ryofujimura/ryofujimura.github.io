@@ -4,8 +4,9 @@ import { useEffect, useRef } from "react"
 import { gsap } from "gsap"
 
 interface BrutalistBackgroundProps {
-  variant?: "grid" | "circuit" | "full"
+  variant?: "grid" | "circuit" | "full" | "dense"
   className?: string
+  animate?: boolean
 }
 
 /**
@@ -14,16 +15,18 @@ interface BrutalistBackgroundProps {
  */
 export function BrutalistBackground({ 
   variant = "full", 
-  className = "" 
+  className = "",
+  animate = true
 }: BrutalistBackgroundProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const gridRef = useRef<SVGGElement>(null)
   const circuitRef = useRef<SVGGElement>(null)
   const measureRef = useRef<SVGGElement>(null)
   const cornersRef = useRef<SVGGElement>(null)
+  const nodesRef = useRef<SVGGElement>(null)
 
   useEffect(() => {
-    if (!containerRef.current) return
+    if (!containerRef.current || !animate) return
 
     const ctx = gsap.context(() => {
       // Helper to animate path drawing
@@ -59,18 +62,21 @@ export function BrutalistBackground({
       }
 
       // Animate each layer with staggered delays
-      if (variant === "full" || variant === "grid") {
+      if (variant === "full" || variant === "grid" || variant === "dense") {
         drawPaths(gridRef.current, 2.2, 0.1, 0.015)
       }
-      if (variant === "full" || variant === "circuit") {
+      if (variant === "full" || variant === "circuit" || variant === "dense") {
         drawPaths(circuitRef.current, 1.8, 0.5, 0.04)
       }
       drawPaths(measureRef.current, 1.4, 0.8, 0.03)
       drawPaths(cornersRef.current, 0.8, 0.3, 0.1)
+      if (variant === "dense") {
+        drawPaths(nodesRef.current, 1.2, 1.0, 0.05)
+      }
     }, containerRef)
 
     return () => ctx.revert()
-  }, [variant])
+  }, [variant, animate])
 
   return (
     <div
@@ -135,6 +141,33 @@ export function BrutalistBackground({
               className="text-foreground/[0.04]"
             />
           ))}
+          {/* Dense variant extra lines */}
+          {variant === "dense" && (
+            <>
+              {Array.from({ length: 49 }).map((_, i) => (
+                <line
+                  key={`vd-${i}`}
+                  x1={i * 25}
+                  y1={0}
+                  x2={i * 25}
+                  y2={800}
+                  strokeWidth="0.15"
+                  className="text-foreground/[0.03]"
+                />
+              ))}
+              {Array.from({ length: 33 }).map((_, i) => (
+                <line
+                  key={`hd-${i}`}
+                  x1={0}
+                  y1={i * 25}
+                  x2={1200}
+                  y2={i * 25}
+                  strokeWidth="0.15"
+                  className="text-foreground/[0.03]"
+                />
+              ))}
+            </>
+          )}
         </g>
 
         {/* Circuit Board Traces */}
@@ -148,6 +181,15 @@ export function BrutalistBackground({
           <path d="M 200 400 L 400 400" />
           <path d="M 800 400 L 1000 400" />
           <path d="M 600 200 L 600 600" />
+          {/* Additional pathways for dense variant */}
+          {variant === "dense" && (
+            <>
+              <path d="M 100 300 L 300 300 L 300 500 L 500 500" />
+              <path d="M 700 300 L 900 300 L 900 500 L 1100 500" />
+              <path d="M 400 150 L 400 350 L 600 350" />
+              <path d="M 800 650 L 800 450 L 600 450" />
+            </>
+          )}
           {/* Terminal nodes */}
           <circle cx="80" cy="120" r="4" strokeWidth="1" />
           <circle cx="380" cy="400" r="4" strokeWidth="1" />
@@ -155,6 +197,22 @@ export function BrutalistBackground({
           <circle cx="1120" cy="680" r="4" strokeWidth="1" />
           <circle cx="600" cy="400" r="6" strokeWidth="1.5" />
         </g>
+
+        {/* Data nodes for dense variant */}
+        {variant === "dense" && (
+          <g ref={nodesRef} className="text-foreground/[0.08]" strokeWidth="0.8">
+            {[
+              [150, 200], [300, 150], [450, 250], [750, 200], [900, 150], [1050, 250],
+              [150, 550], [300, 600], [450, 500], [750, 550], [900, 600], [1050, 500],
+            ].map(([cx, cy], i) => (
+              <g key={`node-${i}`}>
+                <circle cx={cx} cy={cy} r="8" />
+                <line x1={cx as number - 12} y1={cy} x2={cx as number + 12} y2={cy} strokeWidth="0.4" />
+                <line x1={cx} y1={cy as number - 12} x2={cx} y2={cy as number + 12} strokeWidth="0.4" />
+              </g>
+            ))}
+          </g>
+        )}
 
         {/* Measurement / Dimension Lines */}
         <g ref={measureRef} className="text-foreground/[0.08]" strokeWidth="0.4">
