@@ -1110,6 +1110,89 @@ function AsciiArt({ ascii, isActive }: { ascii: string; isActive: boolean }) {
 // PROJECT SLIDE - REDESIGNED
 // ─────────────────────────────────────────────────────────────
 
+// ─────────────────────────────────────────────────────────────
+// MOBILE TOGGLE BUTTON WITH ASCII ANIMATION
+// ─────────────────────────────────────────────────────────────
+
+function MobileToggleButton({ 
+  showDetails, 
+  onToggle 
+}: { 
+  showDetails: boolean
+  onToggle: () => void 
+}) {
+  const buttonRef = useRef<HTMLButtonElement>(null)
+  const [displayText, setDisplayText] = useState(showDetails ? "[ LESS ]" : "[ MORE ]")
+  const scrambleChars = "░▒▓█╳╱╲─│┼"
+
+  // ASCII scramble animation on toggle
+  useEffect(() => {
+    const targetText = showDetails ? "[ LESS ]" : "[ MORE ]"
+    let iteration = 0
+    const maxIterations = targetText.length * 2
+
+    const interval = setInterval(() => {
+      setDisplayText(
+        targetText
+          .split("")
+          .map((char, i) => {
+            if (char === " " || char === "[" || char === "]") return char
+            if (i < iteration / 2) return char
+            return scrambleChars[Math.floor(Math.random() * scrambleChars.length)]
+          })
+          .join("")
+      )
+
+      iteration++
+      if (iteration >= maxIterations) {
+        setDisplayText(targetText)
+        clearInterval(interval)
+      }
+    }, 30)
+
+    return () => clearInterval(interval)
+  }, [showDetails])
+
+  const handleClick = () => {
+    // Ripple animation
+    if (buttonRef.current) {
+      gsap.to(buttonRef.current, {
+        keyframes: [
+          { y: -2, duration: 0.1, ease: "sine.out" },
+          { y: 1, duration: 0.15, ease: "sine.inOut" },
+          { y: 0, duration: 0.2, ease: "sine.out" },
+        ],
+      })
+    }
+    onToggle()
+  }
+
+  return (
+    <button
+      ref={buttonRef}
+      onClick={handleClick}
+      className={cn(
+        "md:hidden w-full py-2 mt-2",
+        "font-mono text-[9px] text-foreground/60",
+        "border border-foreground/20 bg-foreground/[0.02]",
+        "transition-colors duration-200",
+        "hover:bg-foreground/10 hover:text-foreground hover:border-foreground/40",
+        "active:bg-foreground/20"
+      )}
+    >
+      <span className="inline-flex items-center gap-2">
+        <span className="text-foreground/30">{showDetails ? "▲" : "▼"}</span>
+        <span>{displayText}</span>
+        <span className="text-foreground/30">{showDetails ? "▲" : "▼"}</span>
+      </span>
+    </button>
+  )
+}
+
+// ─────────────────────────────────────────────────────────────
+// PROJECT SLIDE
+// ─────────────────────────────────────────────────────────────
+
 function ProjectSlide({ 
   project, 
   index,
@@ -1123,11 +1206,14 @@ function ProjectSlide({
 }) {
   const slideRef = useRef<HTMLDivElement>(null)
   const [isLoading, setIsLoading] = useState(false)
+  const [showDetails, setShowDetails] = useState(false)
   const prevActiveRef = useRef(isActive)
+  const contentRef = useRef<HTMLDivElement>(null)
 
-  // Trigger loading animation on project change
+  // Reset to default view when project changes
   useEffect(() => {
     if (isActive && !prevActiveRef.current) {
+      setShowDetails(false)
       setIsLoading(true)
       const timer = setTimeout(() => setIsLoading(false), 300)
       return () => clearTimeout(timer)
@@ -1135,33 +1221,48 @@ function ProjectSlide({
     prevActiveRef.current = isActive
   }, [isActive])
 
+  // Animate content transition
+  useEffect(() => {
+    if (!contentRef.current) return
+
+    const elements = contentRef.current.querySelectorAll('.mobile-content')
+    
+    gsap.fromTo(
+      elements,
+      { opacity: 0, y: 10 },
+      { 
+        opacity: 1, 
+        y: 0, 
+        duration: 0.4, 
+        stagger: 0.05, 
+        ease: "sine.out" 
+      }
+    )
+  }, [showDetails])
+
   // GSAP entrance animations
   useEffect(() => {
     if (!isActive || !slideRef.current) return
 
     const ctx = gsap.context(() => {
-      // Animate all elements with stagger
       gsap.fromTo(
         ".slide-animate",
         { opacity: 0, y: 15 },
         { opacity: 1, y: 0, duration: 0.4, stagger: 0.05, ease: "power2.out" }
       )
 
-      // Tech stack animation
       gsap.fromTo(
         ".tech-tag",
         { opacity: 0, scale: 0.8, rotation: -5 },
         { opacity: 1, scale: 1, rotation: 0, duration: 0.3, stagger: 0.05, delay: 0.3, ease: "back.out(1.5)" }
       )
 
-      // Feature tags
       gsap.fromTo(
         ".feature-tag",
         { opacity: 0, x: -10 },
         { opacity: 1, x: 0, duration: 0.3, stagger: 0.03, delay: 0.4, ease: "power2.out" }
       )
 
-      // Border flash
       gsap.fromTo(
         ".border-flash",
         { borderColor: "rgba(var(--foreground), 0.1)" },
@@ -1187,12 +1288,11 @@ function ProjectSlide({
       <LoadingOverlay isLoading={isLoading} />
       
       <div className="h-full border border-foreground/20 border-flash bg-background relative overflow-hidden">
-        {/* Technical pattern background */}
         <TechnicalPattern className="w-full h-full opacity-30" />
 
-        <div className="h-full flex flex-col p-4 md:p-6 relative z-10">
+        <div className="h-full flex flex-col p-4 md:p-6 relative z-10 overflow-y-auto">
           {/* Header Row */}
-          <div className="slide-animate flex items-start justify-between gap-4 mb-4">
+          <div className="slide-animate flex items-start justify-between gap-4 mb-3 md:mb-4">
             <div className="flex items-center gap-3 md:gap-4">
               <ProjectIcon icon={project.icon} title={project.title} isActive={isActive} />
               <div>
@@ -1209,7 +1309,6 @@ function ProjectSlide({
               </div>
             </div>
 
-            {/* Metric display */}
             <div className="text-right flex-shrink-0">
               <div className="font-mono text-xl md:text-2xl lg:text-3xl font-black text-foreground">
                 {project.metric}
@@ -1220,21 +1319,115 @@ function ProjectSlide({
             </div>
           </div>
 
-          {/* Two Column Layout */}
-          <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4 min-h-0">
+          {/* Mobile Content - Toggle between views */}
+          <div ref={contentRef} className="flex-1 min-h-0 md:hidden">
+            {!showDetails ? (
+              /* Default View: Tech Stack, ASCII, Image */
+              <div className="flex flex-col gap-3 h-full">
+                {/* Image Gallery - Taller on mobile */}
+                <div className="mobile-content flex-1 min-h-[180px]">
+                  <div className="font-mono text-[7px] text-foreground/30 mb-2">
+                    ├── PREVIEW
+                  </div>
+                  <div className="h-[calc(100%-20px)]">
+                    <ImageGallery images={project.images} title={project.title} isActive={isActive} />
+                  </div>
+                </div>
+
+                {/* Tech Stack */}
+                <div className="mobile-content">
+                  <div className="font-mono text-[7px] text-foreground/30 mb-2">
+                    ├── TECH_STACK
+                  </div>
+                  <div className="flex flex-wrap gap-1.5">
+                    {project.techStack.map((tech) => (
+                      <span
+                        key={tech}
+                        className="tech-tag font-mono text-[8px] px-2 py-1 border border-foreground/20 text-foreground/60 bg-foreground/5"
+                      >
+                        {tech}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                {/* ASCII Art - Mobile */}
+                <div className="mobile-content border border-foreground/10 bg-foreground/[0.02] p-2">
+                  <div className="font-mono text-[7px] text-foreground/30 mb-1">
+                    └── ASCII_ART
+                  </div>
+                  <AsciiArt ascii={project.ascii} isActive={isActive && !showDetails} />
+                </div>
+              </div>
+            ) : (
+              /* Detail View: Description, Features, Growth */
+              <div className="flex flex-col gap-3 h-full">
+                {/* Description */}
+                <div className="mobile-content">
+                  <div className="font-mono text-[7px] text-foreground/30 mb-1">
+                    ├── DESCRIPTION
+                  </div>
+                  <p className="font-mono text-[9px] text-foreground/70 leading-relaxed">
+                    {project.description}
+                  </p>
+                </div>
+
+                {/* Features */}
+                <div className="mobile-content">
+                  <div className="font-mono text-[7px] text-foreground/30 mb-2">
+                    ├── FEATURES
+                  </div>
+                  <div className="flex flex-wrap gap-1.5">
+                    {project.features.map((feature, idx) => (
+                      <FeatureTag key={feature} feature={feature} index={idx} />
+                    ))}
+                  </div>
+                </div>
+
+                {/* Growth Journey */}
+                <div className="mobile-content border border-foreground/10 bg-foreground/[0.02] p-3">
+                  <div className="font-mono text-[7px] text-foreground/30 mb-2">
+                    └── GROWTH_JOURNEY
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="flex-1">
+                      <div className="font-mono text-[6px] text-foreground/30 mb-0.5">BEFORE</div>
+                      <div className="font-mono text-[8px] text-foreground/50">
+                        {project.before}
+                      </div>
+                    </div>
+                    <div className="font-mono text-foreground/20 text-[10px]">──►</div>
+                    <div className="flex-1">
+                      <div className="font-mono text-[6px] text-foreground mb-0.5">AFTER</div>
+                      <div className="font-mono text-[8px] text-foreground font-medium">
+                        {project.after}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Mobile Toggle Button */}
+            <MobileToggleButton 
+              showDetails={showDetails} 
+              onToggle={() => setShowDetails(!showDetails)} 
+            />
+          </div>
+
+          {/* Desktop Layout - Shows everything */}
+          <div className="hidden md:grid flex-1 grid-cols-2 gap-4 min-h-0">
             {/* Left Column - Info */}
             <div className="flex flex-col gap-3 min-h-0">
-              {/* Description */}
               <div className="slide-animate">
                 <div className="font-mono text-[7px] text-foreground/30 mb-1">
                   ├── DESCRIPTION
                 </div>
-                <p className="font-mono text-[9px] md:text-[10px] text-foreground/70 leading-relaxed line-clamp-3 md:line-clamp-none">
+                <p className="font-mono text-[10px] text-foreground/70 leading-relaxed">
                   {project.description}
                 </p>
               </div>
 
-              {/* Features */}
               <div className="slide-animate">
                 <div className="font-mono text-[7px] text-foreground/30 mb-2">
                   ├── FEATURES
@@ -1246,7 +1439,6 @@ function ProjectSlide({
                 </div>
               </div>
 
-              {/* Tech Stack */}
               <div className="slide-animate">
                 <div className="font-mono text-[7px] text-foreground/30 mb-2">
                   ├── TECH_STACK
@@ -1255,7 +1447,7 @@ function ProjectSlide({
                   {project.techStack.map((tech) => (
                     <span
                       key={tech}
-                      className="tech-tag font-mono text-[8px] md:text-[9px] px-2 py-1 border border-foreground/20 text-foreground/60 bg-foreground/5 hover:bg-foreground/10 transition-colors"
+                      className="tech-tag font-mono text-[9px] px-2 py-1 border border-foreground/20 text-foreground/60 bg-foreground/5 hover:bg-foreground/10 transition-colors"
                     >
                       {tech}
                     </span>
@@ -1263,7 +1455,6 @@ function ProjectSlide({
                 </div>
               </div>
 
-              {/* Growth Journey */}
               <div className="slide-animate border border-foreground/10 bg-foreground/[0.02] p-3">
                 <div className="font-mono text-[7px] text-foreground/30 mb-2">
                   └── GROWTH_JOURNEY
@@ -1271,14 +1462,14 @@ function ProjectSlide({
                 <div className="flex items-center gap-3">
                   <div className="flex-1">
                     <div className="font-mono text-[6px] text-foreground/30 mb-0.5">BEFORE</div>
-                    <div className="font-mono text-[8px] md:text-[9px] text-foreground/50">
+                    <div className="font-mono text-[9px] text-foreground/50">
                       {project.before}
                     </div>
                   </div>
                   <div className="font-mono text-foreground/20 text-[10px]">──►</div>
                   <div className="flex-1">
                     <div className="font-mono text-[6px] text-foreground mb-0.5">AFTER</div>
-                    <div className="font-mono text-[8px] md:text-[9px] text-foreground font-medium">
+                    <div className="font-mono text-[9px] text-foreground font-medium">
                       {project.after}
                     </div>
                   </div>
@@ -1288,8 +1479,7 @@ function ProjectSlide({
 
             {/* Right Column - Images & ASCII */}
             <div className="flex flex-col gap-3 min-h-0">
-              {/* Image Gallery */}
-              <div className="slide-animate flex-1 min-h-[120px] md:min-h-[160px]">
+              <div className="slide-animate flex-1 min-h-[160px]">
                 <div className="font-mono text-[7px] text-foreground/30 mb-2">
                   ├── PREVIEW
                 </div>
@@ -1298,8 +1488,7 @@ function ProjectSlide({
                 </div>
               </div>
 
-              {/* ASCII Art */}
-              <div className="slide-animate hidden md:block border border-foreground/10 bg-foreground/[0.02] p-3">
+              <div className="slide-animate border border-foreground/10 bg-foreground/[0.02] p-3">
                 <div className="font-mono text-[7px] text-foreground/30 mb-2">
                   └── ASCII_ART
                 </div>
@@ -1308,7 +1497,7 @@ function ProjectSlide({
             </div>
           </div>
 
-          {/* Footer */}
+          {/* Footer - Links shown in both states */}
           <div className="slide-animate flex items-center justify-between pt-3 mt-3 border-t border-foreground/10">
             <div className="flex items-center gap-2">
               {hasGithub && (
@@ -1323,7 +1512,7 @@ function ProjectSlide({
                 </span>
               )}
             </div>
-            <div className="font-mono text-[8px] text-foreground/30">
+            <div className="font-mono text-[8px] text-foreground/30 hidden sm:block">
               [{String(index + 1).padStart(2, "0")}/{String(total).padStart(2, "0")}] {project.growth}
             </div>
           </div>
