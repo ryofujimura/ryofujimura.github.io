@@ -162,6 +162,75 @@ const allProjects = [
 type Project = (typeof allProjects)[0]
 const TOTAL_PROJECTS = allProjects.length
 
+// ASCII characters for scramble animation
+const ASCII_CHARS = "░▒▓█▄▀■□●○◆◇╳╱╲─│┌┐└┘├┤┬┴┼"
+
+// ─────────────────────────────────────────────────────────────
+// ANIMATED TITLE WITH ASCII SCRAMBLE
+// ─────────────────────────────────────────────────────────────
+
+function AnimatedTitle({ projectName, projectId }: { projectName: string; projectId: string }) {
+  const titleRef = useRef<HTMLHeadingElement>(null)
+  const [displayText, setDisplayText] = useState(`PROJECTS — ${projectName.toUpperCase()}`)
+
+  useEffect(() => {
+    const targetText = `PROJECTS — ${projectName.toUpperCase()}`
+    let iteration = 0
+    const maxIterations = targetText.length * 2
+
+    const interval = setInterval(() => {
+      setDisplayText(
+        targetText
+          .split("")
+          .map((char, i) => {
+            if (char === " " || char === "—") return char
+            if (i < iteration / 2) return char
+            return ASCII_CHARS[Math.floor(Math.random() * ASCII_CHARS.length)]
+          })
+          .join("")
+      )
+
+      iteration++
+      if (iteration >= maxIterations) {
+        setDisplayText(targetText)
+        clearInterval(interval)
+      }
+    }, 20)
+
+    return () => clearInterval(interval)
+  }, [projectName])
+
+  // GSAP glitch animation on change
+  useEffect(() => {
+    if (!titleRef.current) return
+
+    gsap.fromTo(
+      titleRef.current,
+      { 
+        opacity: 0.3,
+        x: -5,
+        skewX: 2
+      },
+      { 
+        opacity: 1,
+        x: 0,
+        skewX: 0,
+        duration: 0.3,
+        ease: "power2.out"
+      }
+    )
+  }, [projectName])
+
+  return (
+    <h2
+      ref={titleRef}
+      className="font-mono text-lg md:text-xl lg:text-2xl font-black text-black tracking-tighter"
+    >
+      {displayText}
+    </h2>
+  )
+}
+
 // ─────────────────────────────────────────────────────────────
 // GROWTH ARROW
 // ─────────────────────────────────────────────────────────────
@@ -170,7 +239,7 @@ function GrowthArrow({ isActive }: { isActive: boolean }) {
   return (
     <span className={cn(
       "font-mono text-[9px] md:text-[10px] transition-all duration-300 flex-shrink-0",
-      isActive ? "text-accent" : "text-foreground/20"
+      isActive ? "text-black" : "text-black/20"
     )}>
       {"──►"}
     </span>
@@ -184,16 +253,13 @@ function GrowthArrow({ isActive }: { isActive: boolean }) {
 function Timeline({ 
   activeIndex, 
   projects,
-  onNodeClick,
   scrollTriggerRef
 }: { 
   activeIndex: number
   projects: Project[]
-  onNodeClick: (index: number) => void
   scrollTriggerRef: React.RefObject<ScrollTrigger | null>
 }) {
   const handleClick = useCallback((index: number) => {
-    // Calculate the scroll position for this project
     const trigger = scrollTriggerRef.current
     if (!trigger) return
 
@@ -203,7 +269,6 @@ function Timeline({
     const projectProgress = index / (projects.length - 1)
     const targetScroll = start + (totalDistance * projectProgress)
 
-    // Scroll to the calculated position
     window.scrollTo({
       top: targetScroll,
       behavior: "smooth"
@@ -212,11 +277,11 @@ function Timeline({
 
   return (
     <div className="hidden md:flex flex-col w-[120px] lg:w-[140px] flex-shrink-0">
-      <div className="font-mono text-[7px] text-foreground/30 mb-2">
+      <div className="font-mono text-[7px] text-black/30 mb-2">
         ┌─ GROWTH_TIMELINE
       </div>
       
-      <div className="relative pl-3 border-l border-foreground/10 flex-1">
+      <div className="relative pl-3 border-l border-black/10 flex-1">
         {projects.map((project, index) => {
           const isActive = index === activeIndex
           const isPast = index < activeIndex
@@ -225,7 +290,7 @@ function Timeline({
           return (
             <div key={project.id}>
               {showYear && (
-                <div className="font-mono text-[7px] text-foreground/40 mb-0.5 mt-2 first:mt-0 -ml-3 pl-3 border-l-2 border-foreground/20">
+                <div className="font-mono text-[7px] text-black/40 mb-0.5 mt-2 first:mt-0 -ml-3 pl-3 border-l-2 border-black/20">
                   [{project.year}]
                 </div>
               )}
@@ -235,9 +300,9 @@ function Timeline({
                 className={cn(
                   "w-full text-left py-0.5 font-mono text-[7px] lg:text-[8px] transition-all relative cursor-pointer",
                   "-ml-3 pl-3 hover:pl-4",
-                  isActive ? "text-accent border-l-2 border-accent font-bold" : 
-                  isPast ? "text-foreground/50 border-l border-foreground/30" : 
-                  "text-foreground/20 border-l border-transparent hover:text-foreground/40 hover:border-foreground/20"
+                  isActive ? "text-black border-l-2 border-black font-bold" : 
+                  isPast ? "text-black/50 border-l border-black/30" : 
+                  "text-black/20 border-l border-transparent hover:text-black/40 hover:border-black/20"
                 )}
               >
                 <span className="truncate block">{project.growth}</span>
@@ -247,7 +312,7 @@ function Timeline({
         })}
       </div>
       
-      <div className="font-mono text-[7px] text-foreground/30 mt-2">
+      <div className="font-mono text-[7px] text-black/30 mt-2">
         └─ NOW
       </div>
     </div>
@@ -255,7 +320,7 @@ function Timeline({
 }
 
 // ─────────────────────────────────────────────────────────────
-// PROJECT SLIDE
+// PROJECT SLIDE WITH ASCII ANIMATION
 // ─────────────────────────────────────────────────────────────
 
 function ProjectSlide({ 
@@ -270,20 +335,46 @@ function ProjectSlide({
   total: number
 }) {
   const slideRef = useRef<HTMLDivElement>(null)
+  const [asciiFrame, setAsciiFrame] = useState("┌──")
+
+  // ASCII corner animation on activation
+  useEffect(() => {
+    if (!isActive) return
+
+    const frames = ["┌──", "╔══", "┏━━", "╭──", "┌──"]
+    let frameIndex = 0
+
+    const interval = setInterval(() => {
+      setAsciiFrame(frames[frameIndex])
+      frameIndex++
+      if (frameIndex >= frames.length) {
+        clearInterval(interval)
+      }
+    }, 50)
+
+    return () => clearInterval(interval)
+  }, [isActive])
 
   useEffect(() => {
     if (!isActive || !slideRef.current) return
 
     const ctx = gsap.context(() => {
+      // ASCII glitch effect on elements
       gsap.fromTo(
         ".growth-animate",
-        { opacity: 0, x: -8 },
-        { opacity: 1, x: 0, duration: 0.3, stagger: 0.04, ease: "power2.out" }
+        { opacity: 0, x: -10, skewX: 3 },
+        { opacity: 1, x: 0, skewX: 0, duration: 0.35, stagger: 0.05, ease: "power2.out" }
       )
       gsap.fromTo(
         ".tech-animate",
-        { opacity: 0, scale: 0.9 },
-        { opacity: 1, scale: 1, duration: 0.25, stagger: 0.02, delay: 0.15, ease: "back.out(1.5)" }
+        { opacity: 0, scale: 0.8, rotation: -2 },
+        { opacity: 1, scale: 1, rotation: 0, duration: 0.3, stagger: 0.03, delay: 0.2, ease: "back.out(1.5)" }
+      )
+      // ASCII border flash
+      gsap.fromTo(
+        ".ascii-border",
+        { opacity: 0.1 },
+        { opacity: 0.4, duration: 0.1, yoyo: true, repeat: 3 }
       )
     }, slideRef.current)
 
@@ -302,35 +393,35 @@ function ProjectSlide({
         isActive ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
       )}
     >
-      <div className="h-full border border-foreground/30 bg-background relative">
-        {/* ASCII corners */}
-        <span className="absolute top-0 left-0 font-mono text-[7px] text-foreground/30 p-1">┌──</span>
-        <span className="absolute top-0 right-0 font-mono text-[7px] text-foreground/30 p-1">──┐</span>
-        <span className="absolute bottom-0 left-0 font-mono text-[7px] text-foreground/30 p-1">└──</span>
-        <span className="absolute bottom-0 right-0 font-mono text-[7px] text-foreground/30 p-1">──┘</span>
+      <div className="h-full border border-black/30 bg-white relative">
+        {/* ASCII corners with animation */}
+        <span className="ascii-border absolute top-0 left-0 font-mono text-[7px] text-black/40 p-1">{asciiFrame}</span>
+        <span className="ascii-border absolute top-0 right-0 font-mono text-[7px] text-black/40 p-1">──┐</span>
+        <span className="ascii-border absolute bottom-0 left-0 font-mono text-[7px] text-black/40 p-1">└──</span>
+        <span className="ascii-border absolute bottom-0 right-0 font-mono text-[7px] text-black/40 p-1">──┘</span>
 
         <div className="h-full flex flex-col p-3 md:p-4">
           {/* Header */}
           <div className="flex items-start justify-between gap-2 mb-2">
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-0.5">
-                <span className="font-mono text-base md:text-lg font-black text-foreground/10">
+                <span className="font-mono text-base md:text-lg font-black text-black/10">
                   {project.id}
                 </span>
-                <span className="font-mono text-[7px] text-muted-foreground">
+                <span className="font-mono text-[7px] text-black/50">
                   {project.year}
                 </span>
               </div>
-              <h3 className="font-mono text-[9px] md:text-[10px] text-foreground/50 truncate">
+              <h3 className="font-mono text-[9px] md:text-[10px] text-black/60 truncate">
                 {project.title}
               </h3>
             </div>
 
             <div className="flex-shrink-0 text-right">
-              <div className="font-mono text-sm md:text-base font-black text-accent">
+              <div className="font-mono text-sm md:text-base font-black text-black">
                 {project.metric}
               </div>
-              <div className="font-mono text-[6px] md:text-[7px] text-muted-foreground">
+              <div className="font-mono text-[6px] md:text-[7px] text-black/50">
                 {project.achievement}
               </div>
             </div>
@@ -338,27 +429,27 @@ function ProjectSlide({
 
           {/* Growth Focus */}
           <div className="flex-1 flex flex-col justify-center">
-            <div className="growth-animate font-mono text-[7px] text-foreground/30 mb-1">
+            <div className="growth-animate font-mono text-[7px] text-black/30 mb-1">
               ├─ GROWTH_FOCUS
             </div>
             
-            <h4 className="growth-animate font-mono text-sm md:text-base lg:text-lg font-black text-foreground tracking-tight mb-2">
+            <h4 className="growth-animate font-mono text-sm md:text-base lg:text-lg font-black text-black tracking-tight mb-2">
               {project.growth.toUpperCase()}
             </h4>
 
             {/* Before → After */}
-            <div className="growth-animate bg-foreground/5 border border-foreground/10 p-2 mb-2">
+            <div className="growth-animate bg-black/5 border border-black/10 p-2 mb-2">
               <div className="flex items-center gap-2">
                 <div className="flex-1 min-w-0">
-                  <div className="font-mono text-[6px] text-foreground/30 mb-0.5">BEFORE</div>
-                  <div className="font-mono text-[8px] md:text-[9px] text-foreground/50 truncate">
+                  <div className="font-mono text-[6px] text-black/30 mb-0.5">BEFORE</div>
+                  <div className="font-mono text-[8px] md:text-[9px] text-black/50 truncate">
                     {project.before}
                   </div>
                 </div>
                 <GrowthArrow isActive={isActive} />
                 <div className="flex-1 min-w-0">
-                  <div className="font-mono text-[6px] text-accent mb-0.5">AFTER</div>
-                  <div className="font-mono text-[8px] md:text-[9px] text-foreground truncate font-medium">
+                  <div className="font-mono text-[6px] text-black mb-0.5">AFTER</div>
+                  <div className="font-mono text-[8px] md:text-[9px] text-black truncate font-medium">
                     {project.after}
                   </div>
                 </div>
@@ -370,7 +461,7 @@ function ProjectSlide({
               {project.techStack.map((tech) => (
                 <span
                   key={tech}
-                  className="tech-animate font-mono text-[6px] md:text-[7px] px-1 py-0.5 border border-foreground/15 text-foreground/40 bg-foreground/5"
+                  className="tech-animate font-mono text-[6px] md:text-[7px] px-1 py-0.5 border border-black/15 text-black/50 bg-black/5"
                 >
                   {tech}
                 </span>
@@ -379,27 +470,27 @@ function ProjectSlide({
           </div>
 
           {/* Footer */}
-          <div className="flex items-center justify-between pt-2 border-t border-foreground/10 mt-2">
+          <div className="flex items-center justify-between pt-2 border-t border-black/10 mt-2">
             <div className="flex items-center gap-2">
               {hasGithub && (
                 <a href={project.links.github} target="_blank" rel="noopener noreferrer"
-                  className="font-mono text-[7px] text-foreground/40 hover:text-accent transition-colors flex items-center gap-1">
+                  className="font-mono text-[7px] text-black/40 hover:text-black transition-colors flex items-center gap-1">
                   <Github className="w-2.5 h-2.5" />
                   <span className="hidden sm:inline">CODE</span>
                 </a>
               )}
               {hasDemo && (
                 <a href={(project.links as { demo?: string }).demo} target="_blank" rel="noopener noreferrer"
-                  className="font-mono text-[7px] text-foreground/40 hover:text-accent transition-colors flex items-center gap-1">
+                  className="font-mono text-[7px] text-black/40 hover:text-black transition-colors flex items-center gap-1">
                   <ExternalLink className="w-2.5 h-2.5" />
                   <span className="hidden sm:inline">DEMO</span>
                 </a>
               )}
               {hasAppStore && (
-                <span className="font-mono text-[7px] text-foreground/20">iOS</span>
+                <span className="font-mono text-[7px] text-black/20">iOS</span>
               )}
             </div>
-            <div className="font-mono text-[6px] text-foreground/20">
+            <div className="font-mono text-[6px] text-black/20">
               [{String(index + 1).padStart(2, "0")}/{String(total).padStart(2, "0")}]
             </div>
           </div>
@@ -416,22 +507,22 @@ function ProjectSlide({
 function ProgressIndicator({ activeIndex, total }: { activeIndex: number; total: number }) {
   const progressChars = 12
   const filled = Math.round((activeIndex / (total - 1)) * progressChars) || 0
-  const progressBar = "▓".repeat(filled) + "░".repeat(progressChars - filled)
+  const progressBar = "█".repeat(filled) + "░".repeat(progressChars - filled)
 
   return (
-    <div className="flex items-center justify-between py-2 font-mono border-t border-foreground/10">
-      <div className="text-[7px] text-foreground/30">
+    <div className="flex items-center justify-between py-2 font-mono border-t border-black/10">
+      <div className="text-[7px] text-black/30">
         2022
       </div>
       <div className="flex items-center gap-2">
-        <span className="text-[7px] md:text-[8px] text-foreground/20 hidden sm:inline">
+        <span className="text-[7px] md:text-[8px] text-black/30 hidden sm:inline">
           [{progressBar}]
         </span>
-        <span className="text-[9px] text-foreground/50">
+        <span className="text-[9px] text-black/60">
           {String(activeIndex + 1).padStart(2, "0")}/{String(total).padStart(2, "0")}
         </span>
       </div>
-      <div className="text-[7px] text-accent">
+      <div className="text-[7px] text-black font-bold">
         NOW
       </div>
     </div>
@@ -475,8 +566,8 @@ function MobileQuickNav({
           onClick={() => handleClick(i)}
           className={cn(
             "flex-shrink-0 w-5 h-1 transition-all",
-            i === activeIndex ? "bg-accent" : 
-            i < activeIndex ? "bg-foreground/30" : "bg-foreground/10"
+            i === activeIndex ? "bg-black" : 
+            i < activeIndex ? "bg-black/30" : "bg-black/10"
           )}
         />
       ))}
@@ -494,12 +585,13 @@ export function ProjectsSection() {
   const pinContainerRef = useRef<HTMLDivElement>(null)
   const scrollTriggerRef = useRef<ScrollTrigger | null>(null)
 
+  const currentProject = allProjects[activeIndex]
+
   // GSAP ScrollTrigger pin setup
   useEffect(() => {
     if (!sectionRef.current || !pinContainerRef.current) return
 
     const ctx = gsap.context(() => {
-      // Create the pinned scroll trigger
       scrollTriggerRef.current = ScrollTrigger.create({
         trigger: sectionRef.current,
         start: "top top",
@@ -508,7 +600,6 @@ export function ProjectsSection() {
         pinSpacing: true,
         scrub: 0.5,
         onUpdate: (self) => {
-          // Calculate which project should be active based on scroll progress
           const progress = self.progress
           const newIndex = Math.min(
             Math.floor(progress * TOTAL_PROJECTS),
@@ -529,7 +620,7 @@ export function ProjectsSection() {
     <section
       id="projects"
       ref={sectionRef}
-      className="relative bg-background"
+      className="relative bg-white"
     >
       {/* Pinned container - centered on page */}
       <div 
@@ -537,10 +628,10 @@ export function ProjectsSection() {
         className="min-h-screen flex items-center justify-center px-4 md:px-6"
       >
         {/* Background pattern */}
-        <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-[0.012]">
+        <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-[0.03]">
           <div className="absolute inset-0" style={{
-            backgroundImage: `repeating-linear-gradient(0deg, transparent, transparent 24px, currentColor 24px, currentColor 25px),
-              repeating-linear-gradient(90deg, transparent, transparent 24px, currentColor 24px, currentColor 25px)`
+            backgroundImage: `repeating-linear-gradient(0deg, transparent, transparent 24px, black 24px, black 25px),
+              repeating-linear-gradient(90deg, transparent, transparent 24px, black 24px, black 25px)`
           }} />
         </div>
 
@@ -548,25 +639,26 @@ export function ProjectsSection() {
         <div className="w-full max-w-4xl mx-auto relative">
           {/* Header */}
           <div className="mb-3 md:mb-4">
-            <div className="font-mono text-[7px] md:text-[8px] text-foreground/15 mb-2 overflow-hidden">
+            <div className="font-mono text-[7px] md:text-[8px] text-black/20 mb-2 overflow-hidden">
               ╔══════════════════════════════════════════════════════════════════════════════╗
             </div>
             
             <div className="flex items-end justify-between gap-2">
               <div>
-                <p className="font-mono text-[7px] md:text-[8px] text-muted-foreground tracking-[0.2em]">
+                <p className="font-mono text-[7px] md:text-[8px] text-black/40 tracking-[0.2em]">
                   {">>>"} SECTION_04 / GROWTH_JOURNEY
                 </p>
-                <h2 className="font-mono text-xl md:text-2xl lg:text-3xl font-black text-foreground tracking-tighter">
-                  PROJECTS
-                </h2>
+                <AnimatedTitle 
+                  projectName={currentProject.title} 
+                  projectId={currentProject.id}
+                />
               </div>
               
               <div className="text-right font-mono">
-                <div className="text-2xl md:text-3xl font-black text-foreground/5">
+                <div className="text-2xl md:text-3xl font-black text-black/10">
                   {String(activeIndex + 1).padStart(2, "0")}
                 </div>
-                <div className="text-[7px] text-muted-foreground">
+                <div className="text-[7px] text-black/40">
                   /{String(TOTAL_PROJECTS).padStart(2, "0")}
                 </div>
               </div>
@@ -586,7 +678,6 @@ export function ProjectsSection() {
             <Timeline 
               activeIndex={activeIndex}
               projects={allProjects}
-              onNodeClick={() => {}}
               scrollTriggerRef={scrollTriggerRef}
             />
 
@@ -611,13 +702,13 @@ export function ProjectsSection() {
           </div>
 
           {/* Footer */}
-          <div className="font-mono text-[7px] md:text-[8px] text-foreground/15 mt-3 overflow-hidden">
+          <div className="font-mono text-[7px] md:text-[8px] text-black/20 mt-3 overflow-hidden">
             ╚══════════════════════════════════════════════════════════════════════════════╝
           </div>
 
           {/* Scroll hint */}
           <div className="text-center mt-3">
-            <span className="font-mono text-[7px] text-foreground/20 animate-pulse">
+            <span className="font-mono text-[7px] text-black/20 animate-pulse">
               ↓ SCROLL TO EXPLORE GROWTH ↓
             </span>
           </div>
