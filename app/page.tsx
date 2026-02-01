@@ -3,7 +3,6 @@ import { HeroSection } from "@/components/portfolio/hero-section"
 import { AboutSection } from "@/components/portfolio/about-section"
 import { ExperienceSection } from "@/components/portfolio/experience-section"
 import { ProjectsSection } from "@/components/portfolio/projects-section"
-import { HobbiesSection } from "@/components/portfolio/hobbies-section"
 import { ContactSection } from "@/components/portfolio/contact-section"
 import { Footer } from "@/components/portfolio/footer"
 import { CustomCursor } from "@/components/custom-cursor"
@@ -17,7 +16,6 @@ export default function Portfolio() {
       <AboutSection />
       <ExperienceSection />
       <ProjectsSection />
-      <HobbiesSection />
       <ContactSection />
       <Footer />
     </main>
