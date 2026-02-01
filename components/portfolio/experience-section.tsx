@@ -328,10 +328,24 @@ export function ExperienceSection() {
     const exp = experiences[activeIndex]
     if (!exp) return
     const url = `${window.location.origin}${window.location.pathname}#experience-${exp.id}`
-    navigator.clipboard.writeText(url).then(() => {
+    
+    // Check if clipboard API is available (requires HTTPS or localhost)
+    if (navigator.clipboard?.writeText) {
+      navigator.clipboard.writeText(url).then(() => {
+        setLinkCopied(true)
+        setTimeout(() => setLinkCopied(false), 2000)
+      }).catch(() => {
+        // Fallback: update URL hash
+        window.location.hash = `experience-${exp.id}`
+        setLinkCopied(true)
+        setTimeout(() => setLinkCopied(false), 2000)
+      })
+    } else {
+      // Fallback for non-secure contexts: just update the hash
+      window.location.hash = `experience-${exp.id}`
       setLinkCopied(true)
       setTimeout(() => setLinkCopied(false), 2000)
-    })
+    }
   }
 
   // Handle URL hash navigation to specific experience (e.g., #experience-cpx-lab)
