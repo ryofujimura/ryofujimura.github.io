@@ -514,32 +514,39 @@ function FilterBar({
   const groups = Object.keys(SKILL_GROUPS) as SkillGroup[]
 
   return (
-    <div className="flex flex-wrap items-center gap-2 mb-6">
-      {groups.map((group) => {
-        const isSelected = selectedGroups.includes(group)
-        return (
+    <div className="mb-6">
+      {/* Full width grid of filter buttons */}
+      <div className="grid grid-cols-3 sm:grid-cols-5 lg:grid-cols-6 gap-1.5 sm:gap-2">
+        {groups.map((group) => {
+          const isSelected = selectedGroups.includes(group)
+          return (
+            <button
+              key={group}
+              onClick={() => onToggleGroup(group)}
+              className={cn(
+                "touch-target font-mono text-[9px] sm:text-[10px] lg:text-xs",
+                "py-2 sm:py-2.5 px-2",
+                "border-2 transition-all text-center",
+                isSelected
+                  ? "border-foreground bg-foreground text-background"
+                  : "border-foreground/30 text-foreground/60 hover:border-foreground hover:text-foreground"
+              )}
+            >
+              {group}
+            </button>
+          )
+        })}
+        {/* Clear button takes one cell */}
+        {selectedGroups.length > 0 && (
           <button
-            key={group}
-            onClick={() => onToggleGroup(group)}
-            className={cn(
-              "touch-target font-mono text-[9px] sm:text-[10px] px-2 sm:px-3 py-1.5 border transition-all",
-              isSelected
-                ? "border-foreground bg-foreground text-background"
-                : "border-foreground/30 text-foreground/60 hover:border-foreground"
-            )}
+            onClick={onClear}
+            className="touch-target font-mono text-[9px] sm:text-[10px] lg:text-xs py-2 sm:py-2.5 px-2 border-2 border-dashed border-foreground/30 text-muted-foreground hover:text-foreground hover:border-foreground transition-all flex items-center justify-center gap-1"
           >
-            {group}
+            <X className="w-3 h-3" />
+            <span className="hidden sm:inline">CLEAR</span>
           </button>
-        )
-      })}
-      {selectedGroups.length > 0 && (
-        <button
-          onClick={onClear}
-          className="touch-target font-mono text-[9px] sm:text-[10px] text-muted-foreground hover:text-foreground px-2 py-1"
-        >
-          <X className="w-3 h-3" />
-        </button>
-      )}
+        )}
+      </div>
     </div>
   )
 }
