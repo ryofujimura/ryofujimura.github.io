@@ -170,20 +170,21 @@ const ASCII_CHARS = "░▒▓█▄▀■□●○◆◇╳╱╲─│┌┐�
 // ─────────────────────────────────────────────────────────────
 
 function AnimatedTitle({ projectName, projectId }: { projectName: string; projectId: string }) {
-  const titleRef = useRef<HTMLHeadingElement>(null)
-  const [displayText, setDisplayText] = useState(`PROJECTS — ${projectName.toUpperCase()}`)
+  const nameRef = useRef<HTMLSpanElement>(null)
+  const [displayName, setDisplayName] = useState(projectName.toUpperCase())
 
+  // ASCII scramble animation only on project name
   useEffect(() => {
-    const targetText = `PROJECTS — ${projectName.toUpperCase()}`
+    const targetText = projectName.toUpperCase()
     let iteration = 0
     const maxIterations = targetText.length * 2
 
     const interval = setInterval(() => {
-      setDisplayText(
+      setDisplayName(
         targetText
           .split("")
           .map((char, i) => {
-            if (char === " " || char === "—") return char
+            if (char === " ") return char
             if (i < iteration / 2) return char
             return ASCII_CHARS[Math.floor(Math.random() * ASCII_CHARS.length)]
           })
@@ -192,41 +193,39 @@ function AnimatedTitle({ projectName, projectId }: { projectName: string; projec
 
       iteration++
       if (iteration >= maxIterations) {
-        setDisplayText(targetText)
+        setDisplayName(targetText)
         clearInterval(interval)
       }
-    }, 20)
+    }, 25)
 
     return () => clearInterval(interval)
   }, [projectName])
 
-  // GSAP glitch animation on change
+  // GSAP glitch animation only on project name
   useEffect(() => {
-    if (!titleRef.current) return
+    if (!nameRef.current) return
 
     gsap.fromTo(
-      titleRef.current,
+      nameRef.current,
       { 
-        opacity: 0.3,
-        x: -5,
-        skewX: 2
+        opacity: 0,
+        x: -8,
+        skewX: 5
       },
       { 
         opacity: 1,
         x: 0,
         skewX: 0,
-        duration: 0.3,
+        duration: 0.35,
         ease: "power2.out"
       }
     )
   }, [projectName])
 
   return (
-    <h2
-      ref={titleRef}
-      className="font-mono text-lg md:text-xl lg:text-2xl font-black text-foreground tracking-tighter"
-    >
-      {displayText}
+    <h2 className="font-mono text-lg md:text-xl lg:text-2xl font-black text-foreground tracking-tighter">
+      <span className="text-foreground/40">PROJECTS — </span>
+      <span ref={nameRef}>{displayName}</span>
     </h2>
   )
 }
@@ -646,7 +645,7 @@ export function ProjectsSection() {
             <div className="flex items-end justify-between gap-2">
               <div>
                 <p className="font-mono text-[7px] md:text-[8px] text-foreground/40 tracking-[0.2em]">
-                  {">>>"} SECTION_04 / GROWTH_JOURNEY
+                  {">>>"} PERSONAL PROJECTS / GROWTH_JOURNEY
                 </p>
                 <AnimatedTitle 
                   projectName={currentProject.title} 
