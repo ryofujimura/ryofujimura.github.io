@@ -136,8 +136,8 @@ function LocHoverReveal({
   return (
     <span
       ref={wrapperRef}
-      className={`inline-block overflow-hidden align-top cursor-default ${className}`}
-      style={{ height: "1em", minWidth: `${slotWidthCh}ch` }}
+      className={`inline-block overflow-hidden align-middle cursor-default ${className}`}
+      style={{ height: "1.25em", lineHeight: "1.25em", minWidth: `${slotWidthCh}ch` }}
       onMouseEnter={handleEnter}
       onMouseLeave={handleLeave}
       onFocus={handleEnter}
@@ -146,17 +146,17 @@ function LocHoverReveal({
       role="text"
       aria-label={`${defaultText}; hover for ${hoverText.replace(/_/g, " ")}`}
     >
-      <span className="block relative w-full" style={{ height: "1em" }}>
+      <span className="block relative w-full" style={{ height: "1.25em" }}>
         <span
           ref={defaultRef}
-          className="absolute left-0 top-0 w-full tabular-nums whitespace-pre"
+          className="absolute left-0 top-0 w-full tabular-nums whitespace-pre leading-[1.25em]"
           style={{ minWidth: `${slotWidthCh}ch` }}
         >
           {def}
         </span>
         <span
           ref={hoverRef}
-          className="absolute left-0 top-0 w-full tabular-nums whitespace-pre text-green-500"
+          className="absolute left-0 top-0 w-full tabular-nums whitespace-pre text-green-500 leading-[1.25em]"
           style={{ minWidth: `${slotWidthCh}ch` }}
         >
           {hov}
@@ -221,22 +221,22 @@ function ModeVerbRotator({
 
   return (
     <span
-      className={`inline-block overflow-hidden align-top ${className}`}
-      style={{ height: "1em", minWidth: `${slotWidthCh}ch` }}
+      className={`inline-block overflow-hidden align-middle ${className}`}
+      style={{ height: "1.25em", lineHeight: "1.25em", minWidth: `${slotWidthCh}ch` }}
       aria-live="polite"
       aria-atomic
     >
-      <span className="block relative w-full" style={{ height: "1em" }}>
+      <span className="block relative w-full" style={{ height: "1.25em" }}>
         <span
           ref={slot0Ref}
-          className="absolute left-0 top-0 w-full tabular-nums whitespace-pre"
+          className="absolute left-0 top-0 w-full tabular-nums whitespace-pre leading-[1.25em]"
           style={{ minWidth: `${slotWidthCh}ch` }}
         >
           {text0}
         </span>
         <span
           ref={slot1Ref}
-          className="absolute left-0 top-0 w-full tabular-nums whitespace-pre"
+          className="absolute left-0 top-0 w-full tabular-nums whitespace-pre leading-[1.25em]"
           style={{ minWidth: `${slotWidthCh}ch` }}
         >
           {text1}
