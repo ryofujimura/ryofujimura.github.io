@@ -15,7 +15,7 @@ gsap.registerPlugin(ScrollTrigger)
 const projects = [
   {
     id: "01",
-    title: "POKER%",
+    title: "PUBLISHED",
     subtitle: "WATCHOS",
     year: "2022",
     description: "Real-time poker odds calculator for Apple Watch",
@@ -26,8 +26,8 @@ const projects = [
   },
   {
     id: "02",
-    title: "SHOHEI_HG",
-    subtitle: "AUTOMATION",
+    title: "AUTOMATED",
+    subtitle: "PYTHON",
     year: "2023",
     description: "Automated content pipeline for social platforms",
     techStack: ["Python", "Instagram API", "YouTube API"],
@@ -37,8 +37,8 @@ const projects = [
   },
   {
     id: "03",
-    title: "SCHEDULE",
-    subtitle: "FLASK_API",
+    title: "OPTIMIZED",
+    subtitle: "FLASK",
     year: "2023",
     description: "Intelligent course scheduling with graph algorithms",
     techStack: ["Python", "Flask", "SQLite"],
@@ -48,8 +48,8 @@ const projects = [
   },
   {
     id: "04",
-    title: "MATCHA",
-    subtitle: "IOS_APP",
+    title: "SHIPPED",
+    subtitle: "IOS",
     year: "2024",
     description: "Minimalist matcha timer with Japanese aesthetic",
     techStack: ["Swift", "SwiftUI", "CloudKit"],
@@ -59,7 +59,7 @@ const projects = [
   },
   {
     id: "05",
-    title: "PORTFOLIO",
+    title: "ANIMATED",
     subtitle: "NEXT.JS",
     year: "2024",
     description: "This portfolio with GSAP scroll animations",
@@ -70,8 +70,8 @@ const projects = [
   },
   {
     id: "06",
-    title: "SABORIENDO",
-    subtitle: "CROSS_PLAT",
+    title: "SYNCED",
+    subtitle: "CROSS-PLAT",
     year: "2024",
     description: "Food tracking with barcode scanning and real-time sync",
     techStack: ["React 19", "SwiftUI", "Firebase"],
@@ -81,8 +81,8 @@ const projects = [
   },
   {
     id: "07",
-    title: "WITH_LLM",
-    subtitle: "ON_DEVICE",
+    title: "LOCAL",
+    subtitle: "ON-DEVICE",
     year: "2024",
     description: "Privacy-focused AI assistant running locally",
     techStack: ["Swift", "llama.cpp", "GGUF"],
@@ -92,8 +92,8 @@ const projects = [
   },
   {
     id: "08",
-    title: "HTIC_SHUTTLE",
-    subtitle: "REALTIME",
+    title: "REALTIME",
+    subtitle: "FIREBASE",
     year: "2025",
     description: "Campus shuttle tracking with sub-100ms latency",
     techStack: ["Swift", "Kotlin", "Firebase"],
@@ -103,8 +103,8 @@ const projects = [
   },
   {
     id: "09",
-    title: "CYBEREDU",
-    subtitle: "OFFLINE",
+    title: "OFFLINE",
+    subtitle: "RESILIENT",
     year: "2025",
     description: "Educational platform with offline-first architecture",
     techStack: ["Swift", "Kotlin", "Firebase"],
@@ -114,7 +114,7 @@ const projects = [
   },
   {
     id: "10",
-    title: "LAB_PM",
+    title: "ROUTED",
     subtitle: "SERVERLESS",
     year: "2025",
     description: "Research lab PM with AI-powered task routing",
@@ -125,8 +125,8 @@ const projects = [
   },
   {
     id: "11",
-    title: "WHITEBOARD",
-    subtitle: "VISION_ML",
+    title: "VISION",
+    subtitle: "ML",
     year: "2025",
     description: "Collaborative whiteboard with real-time AI vision",
     techStack: ["PyTorch", "WebSocket", "React"],
@@ -136,8 +136,8 @@ const projects = [
   },
   {
     id: "12",
-    title: "ZERO_INBOX",
-    subtitle: "PROD_AI",
+    title: "REASONED",
+    subtitle: "AI/ML",
     year: "2025",
     description: "Email management with multi-stage AI reasoning",
     techStack: ["Swift", "AI/ML", "Firebase"],
