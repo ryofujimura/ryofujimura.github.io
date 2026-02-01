@@ -3,23 +3,30 @@
 import { useState, useRef, useEffect, useMemo, useCallback } from "react"
 import { gsap } from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
-import { ExternalLink, Github, X, ChevronDown, ChevronLeft, ChevronRight } from "lucide-react"
+import { ExternalLink, Github, X, ChevronDown, ArrowUpRight } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 gsap.registerPlugin(ScrollTrigger)
 
 // ─────────────────────────────────────────────────────────────
-// ASCII PATTERNS
+// ASCII GRAPHICS
 // ─────────────────────────────────────────────────────────────
 
-const ASCII_SYNAPSE = `──●──○──●──`
-const ASCII_PULSE = `─╮╭─╮╭─╮╭─╮╭─`
-const ASCII_NODE = `◉`
+const ASCII_CORNER_TL = `┌──`
+const ASCII_CORNER_TR = `──┐`
+const ASCII_CORNER_BL = `└──`
+const ASCII_CORNER_BR = `──┘`
 
-const ASCII_NEURON_SMALL = `
-  ╭─╮
- ─●─●─
-  ╰─╯
+const ASCII_ARROW = `>>>`
+
+const ASCII_PROGRESS = `
+▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+`.trim()
+
+const ASCII_CIRCUIT = `
+┌─┬─┬─┬─┐
+├─┼─┼─┼─┤
+└─┴─┴─┴─┘
 `.trim()
 
 // ─────────────────────────────────────────────────────────────
@@ -37,199 +44,199 @@ const SKILL_GROUPS = {
 type SkillGroup = keyof typeof SKILL_GROUPS
 
 // ─────────────────────────────────────────────────────────────
-// PROJECT DATA
+// PROJECT DATA - Focus on Technical Growth
 // ─────────────────────────────────────────────────────────────
 
 const allProjects = [
   {
     id: "01",
-    code: "NODE.01",
     title: "Saboriendo Bakery",
-    domain: "FULL-STACK",
+    category: "FULL-STACK",
     year: "2024",
     image: "/images/default_image.png",
-    growth: {
-      learned: "Real-time sync architecture",
-      improved: "Barcode systems, multi-language support",
-      unlocked: "E-commerce at scale",
-    },
-    metrics: { primary: "50%", label: "faster lookup", secondary: "11+ barcode formats" },
+    learned: "First production React 19 + SwiftUI integration",
+    growth: [
+      "Mastered real-time Firestore sync patterns",
+      "Built barcode scanning with AVFoundation",
+      "Implemented FCM/APNs push architecture",
+    ],
+    metrics: { speed: "50%↑", formats: "11+", languages: "3" },
     skills: ["React 19", "SwiftUI", "Firebase", "Firestore", "AVFoundation"],
     links: { github: "https://github.com/ryofujimura", demo: "https://ryofujimura.github.io" },
   },
   {
     id: "02",
-    code: "NODE.02",
     title: "Zero Inbox",
-    domain: "AI/ML",
+    category: "AI/ML",
     year: "2025",
     image: "/images/default_image.png",
-    growth: {
-      learned: "AI reasoning engine design",
-      improved: "Classification pipelines, inference optimization",
-      unlocked: "Multi-stage decision systems",
-    },
-    metrics: { primary: "95%", label: "accuracy", secondary: "200ms latency" },
+    learned: "Built custom AI reasoning engine from scratch",
+    growth: [
+      "Designed multi-stage decision system",
+      "Achieved 95% classification accuracy",
+      "Optimized inference to <300ms",
+    ],
+    metrics: { accuracy: "95%", latency: "200ms", throughput: "200/min" },
     skills: ["Swift", "SwiftUI", "Firebase", "AI/ML", "Google APIs"],
     links: { github: "https://github.com/ryofujimura", demo: "#" },
   },
   {
     id: "03",
-    code: "NODE.03",
     title: "Research Lab Platform",
-    domain: "SERVERLESS",
+    category: "SERVERLESS",
     year: "2025",
     image: "/images/default_image.png",
-    growth: {
-      learned: "Serverless orchestration patterns",
-      improved: "Dynamic AI routing, metadata prompting",
-      unlocked: "Multi-lab workflow automation",
-    },
-    metrics: { primary: "<200ms", label: "response", secondary: "30+ researchers" },
+    learned: "Scaled serverless to 30+ concurrent researchers",
+    growth: [
+      "Architected dynamic AI routing system",
+      "Sub-200ms Cloud Functions response",
+      "Built metadata-aware prompting",
+    ],
+    metrics: { response: "<200ms", users: "30+", labs: "multi" },
     skills: ["Cloud Functions", "Firebase", "AI routing", "Node.js"],
     links: { github: "https://github.com/ryofujimura", demo: "https://ryofujimura.github.io" },
   },
   {
     id: "04",
-    code: "NODE.04",
     title: "HTIC Shuttle",
-    domain: "REAL-TIME",
+    category: "REAL-TIME",
     year: "2025",
     image: "/images/schedule.jpg",
-    growth: {
-      learned: "Event serialization & state validation",
-      improved: "Cross-platform real-time sync",
-      unlocked: "Conflict-free distributed systems",
-    },
-    metrics: { primary: "70%", label: "fewer conflicts", secondary: "<100ms sync" },
+    learned: "Solved race conditions in real-time systems",
+    growth: [
+      "Implemented event serialization",
+      "70% reduction in state conflicts",
+      "Cross-platform Swift + Kotlin",
+    ],
+    metrics: { users: "25+", reduction: "70%↓", sync: "<100ms" },
     skills: ["Swift", "Kotlin", "Firebase RTDB", "Real-time"],
     links: { github: "https://github.com/ryofujimura", demo: "https://ryofujimura.github.io", appStore: "#", playStore: "#" },
   },
   {
     id: "05",
-    code: "NODE.05",
     title: "CyberEdu",
-    domain: "CROSS-PLATFORM",
+    category: "CROSS-PLATFORM",
     year: "2025",
     image: "/images/CyberEdu.png",
-    growth: {
-      learned: "Cross-device sync reliability",
-      improved: "Network resilience patterns",
-      unlocked: "99%+ sync across unstable networks",
-    },
-    metrics: { primary: "99%", label: "sync rate", secondary: "50+ users" },
+    learned: "Achieved 99% sync across unstable networks",
+    growth: [
+      "Built resilient offline-first architecture",
+      "Unified iOS + Android codebase patterns",
+      "Handled network edge cases",
+    ],
+    metrics: { users: "50+", sync: "99%↑", platforms: "2" },
     skills: ["Swift", "Kotlin", "Firebase", "Real-time"],
     links: { github: "https://github.com/ryofujimura", demo: "https://ryofujimura.github.io", appStore: "#", playStore: "#" },
   },
   {
     id: "06",
-    code: "NODE.06",
     title: "Whiteboard AI",
-    domain: "VISION",
+    category: "VISION",
     year: "2025",
     image: "/images/whiteboardai.png",
-    growth: {
-      learned: "Transformer-based vision inference",
-      improved: "CRDT collaboration, WebSocket pipelines",
-      unlocked: "Real-time multi-user AI canvas",
-    },
-    metrics: { primary: "150ms", label: "inference", secondary: "5+ concurrent" },
+    learned: "Real-time vision inference + collaboration",
+    growth: [
+      "Transformer inference at 150ms",
+      "CRDT-like conflict resolution",
+      "Multi-user WebSocket pipeline",
+    ],
+    metrics: { inference: "150ms", users: "5+", sync: "CRDT" },
     skills: ["PyTorch", "Vision", "WebSocket", "React"],
     links: { github: "https://github.com/ryofujimura", demo: "https://ryofujimura.github.io" },
   },
   {
     id: "07",
-    code: "NODE.07",
     title: "With",
-    domain: "LOCAL AI",
+    category: "LOCAL AI",
     year: "2024–25",
     image: "/images/default_image.png",
-    growth: {
-      learned: "Local LLM deployment with llama.cpp",
-      improved: "Memory optimization, quantization",
-      unlocked: "Offline AI capabilities",
-    },
-    metrics: { primary: "<50ms", label: "per token", secondary: "2GB+ saved" },
+    learned: "On-device LLM with 2GB memory savings",
+    growth: [
+      "Integrated llama.cpp in Swift",
+      "Optimized quantization pipeline",
+      "<50ms/token local inference",
+    ],
+    metrics: { speed: "<50ms/tok", savings: "2GB↓", mode: "offline" },
     skills: ["Swift", "llama.cpp", "GGUF", "SwiftUI"],
     links: { github: "https://github.com/ryofujimura" },
   },
   {
     id: "08",
-    code: "NODE.08",
     title: "Portfolio",
-    domain: "WEB",
+    category: "WEB",
     year: "2024–25",
     image: "/images/homepage.png",
-    growth: {
-      learned: "Advanced GSAP animation systems",
-      improved: "Performance optimization, modular architecture",
-      unlocked: "Brutalist design systems",
-    },
-    metrics: { primary: "60%", label: "faster load", secondary: "modular" },
+    learned: "Brutalist design system + GSAP mastery",
+    growth: [
+      "40-60% load time improvement",
+      "Complex scroll-triggered animations",
+      "Modular component architecture",
+    ],
+    metrics: { speed: "60%↑", design: "brutalist", deploy: "Vercel" },
     skills: ["React", "Next.js", "Tailwind", "Vercel"],
     links: { github: "https://github.com/ryofujimura", demo: "https://ryofujimura.github.io" },
   },
   {
     id: "09",
-    code: "NODE.09",
     title: "Matcha Time",
-    domain: "iOS",
+    category: "iOS",
     year: "2024",
     image: "/images/matchatime_1.jpg",
-    growth: {
-      learned: "Rapid prototyping to App Store",
-      improved: "SwiftUI patterns, time zone logic",
-      unlocked: "4-week launch cycle",
-    },
-    metrics: { primary: "50", label: "users", secondary: "App Store" },
+    learned: "4-week idea-to-App-Store pipeline",
+    growth: [
+      "Rapid SwiftUI prototyping",
+      "App Store submission process",
+      "User feedback integration",
+    ],
+    metrics: { users: "50", timeline: "4 weeks", store: "App Store" },
     skills: ["Swift", "SwiftUI", "App Store"],
     links: { github: "https://github.com/ryofujimura", demo: "https://ryofujimura.github.io", appStore: "#" },
   },
   {
     id: "10",
-    code: "NODE.10",
     title: "Schedule Mastermind",
-    domain: "BACKEND",
+    category: "BACKEND",
     year: "2023–24",
     image: "/images/schedule.jpg",
-    growth: {
-      learned: "Conflict detection algorithms",
-      improved: "Flask API design, scheduling logic",
-      unlocked: "500+ course management",
-    },
-    metrics: { primary: "70%", label: "fewer errors", secondary: "500+ courses" },
+    learned: "Constraint satisfaction at scale",
+    growth: [
+      "500+ course scheduling algorithm",
+      "Real-time conflict detection",
+      "70% fewer scheduling errors",
+    ],
+    metrics: { courses: "500+", errors: "70%↓", stack: "Flask" },
     skills: ["Python", "Flask", "scheduling"],
     links: { github: "https://github.com/ryofujimura", demo: "https://ryofujimura.github.io" },
   },
   {
     id: "11",
-    code: "NODE.11",
     title: "Shohei Home Ground",
-    domain: "AUTOMATION",
+    category: "AUTOMATION",
     year: "2023",
     image: "/images/shoheihomeground_1.jpg",
-    growth: {
-      learned: "Content automation at scale",
-      improved: "Python scripting, API integration",
-      unlocked: "11K organic growth",
-    },
-    metrics: { primary: "11K", label: "followers", secondary: "685 posts" },
+    learned: "Scaled content automation to 11K followers",
+    growth: [
+      "685 automated posts",
+      "2+ hours/day time savings",
+      "Consistent monetization",
+    ],
+    metrics: { followers: "11K", posts: "685", saved: "2hr/day" },
     skills: ["Python", "automation", "Instagram"],
     links: { instagram: "#", youtube: "#" },
   },
   {
     id: "12",
-    code: "NODE.12",
     title: "Poker Percentage",
-    domain: "WATCHOS",
+    category: "WATCHOS",
     year: "2022–24",
     image: "/images/poker.png",
-    growth: {
-      learned: "WatchOS development",
-      improved: "Precomputed tables, probability math",
-      unlocked: "Sub-10ms calculations",
-    },
-    metrics: { primary: "<10ms", label: "lookup", secondary: "WatchOS" },
+    learned: "Sub-10ms lookups via precomputation",
+    growth: [
+      "Probability table optimization",
+      "WatchOS UI constraints",
+      "Real-time equity calculation",
+    ],
+    metrics: { lookup: "<10ms", platform: "WatchOS", method: "precomputed" },
     skills: ["Swift", "WatchOS", "probability"],
     links: { github: "https://github.com/ryofujimura", appStore: "#" },
   },
@@ -238,404 +245,460 @@ const allProjects = [
 type Project = (typeof allProjects)[0]
 
 // ─────────────────────────────────────────────────────────────
-// ANIMATED NEURAL BACKGROUND
+// ANIMATED TECHNICAL LINES
 // ─────────────────────────────────────────────────────────────
 
-function AnimatedNeuralBackground() {
-  const svgRef = useRef<SVGSVGElement>(null)
+function TechLines({ className }: { className?: string }) {
+  const ref = useRef<SVGSVGElement>(null)
 
   useEffect(() => {
-    if (!svgRef.current) return
-    const paths = svgRef.current.querySelectorAll(".neural-path")
-    const nodes = svgRef.current.querySelectorAll(".neural-node")
-
+    if (!ref.current) return
+    const paths = ref.current.querySelectorAll("path, line")
     const ctx = gsap.context(() => {
-      // Animate paths with flowing effect
-      paths.forEach((path, i) => {
-        gsap.to(path, {
-          strokeDashoffset: -200,
-          duration: 8 + i * 2,
-          ease: "none",
-          repeat: -1,
-        })
-      })
-
-      // Pulse nodes
-      nodes.forEach((node, i) => {
-        gsap.to(node, {
-          opacity: 0.15,
-          scale: 1.5,
-          duration: 2 + i * 0.5,
-          ease: "power1.inOut",
-          repeat: -1,
-          yoyo: true,
-          delay: i * 0.3,
-        })
-      })
-    }, svgRef.current)
-
+      gsap.fromTo(
+        paths,
+        { strokeDasharray: "0 200", opacity: 0 },
+        {
+          strokeDasharray: "200 0",
+          opacity: 1,
+          duration: 1,
+          stagger: 0.05,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: ref.current,
+            start: "top 95%",
+            toggleActions: "play none none none",
+          },
+        }
+      )
+    }, ref.current)
     return () => ctx.revert()
   }, [])
 
   return (
     <svg
-      ref={svgRef}
-      className="absolute inset-0 w-full h-full pointer-events-none"
+      ref={ref}
+      className={cn("absolute inset-0 w-full h-full pointer-events-none", className)}
       viewBox="0 0 100 100"
-      preserveAspectRatio="xMidYMid slice"
+      preserveAspectRatio="none"
     >
-      {/* Neural paths */}
-      <path
-        className="neural-path"
-        d="M-10 20 Q20 10 40 25 T80 20 T120 30"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="0.15"
-        strokeDasharray="4 8"
-        opacity="0.06"
-      />
-      <path
-        className="neural-path"
-        d="M-10 50 Q30 35 50 50 T90 45 T120 55"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="0.2"
-        strokeDasharray="6 10"
-        opacity="0.05"
-      />
-      <path
-        className="neural-path"
-        d="M-10 80 Q25 70 45 80 T85 75 T120 85"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="0.15"
-        strokeDasharray="4 8"
-        opacity="0.06"
-      />
-      <path
-        className="neural-path"
-        d="M20 -10 Q15 30 25 50 T20 90 T30 120"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="0.1"
-        strokeDasharray="3 6"
-        opacity="0.04"
-      />
-      <path
-        className="neural-path"
-        d="M70 -10 Q75 25 65 50 T75 85 T70 120"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="0.1"
-        strokeDasharray="3 6"
-        opacity="0.04"
-      />
-
-      {/* Neural nodes */}
-      <circle className="neural-node" cx="25" cy="25" r="0.8" fill="currentColor" opacity="0.08" />
-      <circle className="neural-node" cx="50" cy="50" r="1" fill="currentColor" opacity="0.1" />
-      <circle className="neural-node" cx="75" cy="30" r="0.6" fill="currentColor" opacity="0.06" />
-      <circle className="neural-node" cx="40" cy="75" r="0.7" fill="currentColor" opacity="0.07" />
-      <circle className="neural-node" cx="80" cy="70" r="0.5" fill="currentColor" opacity="0.05" />
-      <circle className="neural-node" cx="15" cy="60" r="0.6" fill="currentColor" opacity="0.06" />
-      <circle className="neural-node" cx="60" cy="15" r="0.5" fill="currentColor" opacity="0.05" />
-      <circle className="neural-node" cx="85" cy="50" r="0.4" fill="currentColor" opacity="0.04" />
+      {/* Corner marks */}
+      <path d="M0 8 L0 0 L8 0" fill="none" stroke="currentColor" strokeWidth="0.8" opacity="0.3" />
+      <path d="M92 0 L100 0 L100 8" fill="none" stroke="currentColor" strokeWidth="0.8" opacity="0.3" />
+      <path d="M0 92 L0 100 L8 100" fill="none" stroke="currentColor" strokeWidth="0.8" opacity="0.3" />
+      <path d="M92 100 L100 100 L100 92" fill="none" stroke="currentColor" strokeWidth="0.8" opacity="0.3" />
+      {/* Registration cross */}
+      <line x1="95" y1="48" x2="95" y2="52" stroke="currentColor" strokeWidth="0.3" opacity="0.2" />
+      <line x1="93" y1="50" x2="97" y2="50" stroke="currentColor" strokeWidth="0.3" opacity="0.2" />
     </svg>
   )
 }
 
 // ─────────────────────────────────────────────────────────────
-// SINGLE PROJECT VIEW - Full Focus
+// IMAGE PLACEHOLDER WITH ASCII OVERLAY
 // ─────────────────────────────────────────────────────────────
 
-function ProjectView({ project, isActive }: { project: Project; isActive: boolean }) {
-  const viewRef = useRef<HTMLDivElement>(null)
-  const contentRef = useRef<HTMLDivElement>(null)
-  const learnedRef = useRef<HTMLSpanElement>(null)
-  const hasAnimated = useRef(false)
+function ProjectImage({ src, alt, className }: { src: string; alt: string; className?: string }) {
+  const ref = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    if (!viewRef.current || !isActive || hasAnimated.current) return
-    hasAnimated.current = true
+    if (!ref.current) return
+    const ctx = gsap.context(() => {
+      gsap.fromTo(
+        ref.current,
+        { opacity: 0, scale: 1.05 },
+        {
+          opacity: 1,
+          scale: 1,
+          duration: 0.8,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: ref.current,
+            start: "top 90%",
+            toggleActions: "play none none none",
+          },
+        }
+      )
+    }, ref.current)
+    return () => ctx.revert()
+  }, [])
+
+  return (
+    <div ref={ref} className={cn("relative overflow-hidden bg-muted", className)}>
+      {/* Image */}
+      <img
+        src={src}
+        alt={alt}
+        className="w-full h-full object-cover"
+        loading="lazy"
+      />
+      {/* Scanline overlay */}
+      <div className="absolute inset-0 pointer-events-none opacity-[0.03]">
+        {[...Array(50)].map((_, i) => (
+          <div key={i} className="h-[2px] bg-foreground" style={{ marginTop: '2px' }} />
+        ))}
+      </div>
+      {/* Corner ASCII */}
+      <span className="absolute top-2 left-2 font-mono text-[8px] text-foreground/40 select-none">
+        {ASCII_CORNER_TL}
+      </span>
+      <span className="absolute top-2 right-2 font-mono text-[8px] text-foreground/40 select-none">
+        {ASCII_CORNER_TR}
+      </span>
+      <span className="absolute bottom-2 left-2 font-mono text-[8px] text-foreground/40 select-none">
+        {ASCII_CORNER_BL}
+      </span>
+      <span className="absolute bottom-2 right-2 font-mono text-[8px] text-foreground/40 select-none">
+        {ASCII_CORNER_BR}
+      </span>
+    </div>
+  )
+}
+
+// ─────────────────────────────────────────────────────────────
+// PROJECT CARD - MOBILE OPTIMIZED
+// ─────────────────────────────────────────────────────────────
+
+function ProjectCard({ project, index }: { project: Project; index: number }) {
+  const cardRef = useRef<HTMLDivElement>(null)
+  const learnedRef = useRef<HTMLParagraphElement>(null)
+
+  useEffect(() => {
+    if (!cardRef.current) return
+    const el = cardRef.current
 
     const ctx = gsap.context(() => {
-      // Stagger reveal all content
-      const items = viewRef.current?.querySelectorAll(".reveal")
-      if (items) {
-        gsap.fromTo(
-          items,
-          { opacity: 0, y: 20 },
-          {
-            opacity: 1,
-            y: 0,
-            duration: 0.5,
-            stagger: 0.08,
-            ease: "power2.out",
-          }
-        )
-      }
+      // Card entrance
+      gsap.fromTo(
+        el,
+        { opacity: 0, y: 60 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.8,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: el,
+            start: "top 92%",
+            toggleActions: "play none none none",
+          },
+        }
+      )
 
-      // Scramble learned text
+      // "What I learned" scramble effect
       if (learnedRef.current) {
-        const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ░▒▓"
-        const originalText = project.growth.learned
+        const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+        const originalText = project.learned
         let iteration = 0
 
-        const interval = setInterval(() => {
-          if (!learnedRef.current) return clearInterval(interval)
-          learnedRef.current.textContent = originalText
-            .split("")
-            .map((char, i) => {
-              if (char === " " || char === "-" || char === "&") return char
-              if (i < iteration) return char
-              return chars[Math.floor(Math.random() * chars.length)]
-            })
-            .join("")
-          if (iteration >= originalText.length) clearInterval(interval)
-          iteration += 0.6
-        }, 25)
+        ScrollTrigger.create({
+          trigger: learnedRef.current,
+          start: "top 90%",
+          onEnter: () => {
+            const interval = setInterval(() => {
+              if (!learnedRef.current) return clearInterval(interval)
+              learnedRef.current.textContent = originalText
+                .split("")
+                .map((char, i) => {
+                  if (char === " " || char === "+" || char === "-" || char === "<" || char === ">") return char
+                  if (i < iteration) return char
+                  return chars[Math.floor(Math.random() * chars.length)]
+                })
+                .join("")
+              if (iteration >= originalText.length) clearInterval(interval)
+              iteration += 0.6
+            }, 25)
+          },
+        })
       }
-    }, viewRef.current)
+
+      // Growth items stagger
+      const growthItems = el.querySelectorAll(".growth-item")
+      gsap.fromTo(
+        growthItems,
+        { opacity: 0, x: -20 },
+        {
+          opacity: 1,
+          x: 0,
+          duration: 0.5,
+          stagger: 0.1,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: el,
+            start: "top 80%",
+            toggleActions: "play none none none",
+          },
+        }
+      )
+
+      // Metrics counter animation
+      const metrics = el.querySelectorAll(".metric-value")
+      gsap.fromTo(
+        metrics,
+        { opacity: 0, scale: 0.8 },
+        {
+          opacity: 1,
+          scale: 1,
+          duration: 0.4,
+          stagger: 0.08,
+          ease: "back.out(1.7)",
+          scrollTrigger: {
+            trigger: el,
+            start: "top 85%",
+            toggleActions: "play none none none",
+          },
+        }
+      )
+    }, el)
 
     return () => ctx.revert()
-  }, [isActive, project.growth.learned])
-
-  // Reset animation flag when becoming inactive
-  useEffect(() => {
-    if (!isActive) {
-      hasAnimated.current = false
-    }
-  }, [isActive])
+  }, [project.learned])
 
   const hasGithub = project.links.github
   const hasDemo = "demo" in project.links && (project.links as { demo?: string }).demo
+  const hasAppStore = "appStore" in project.links
+  const hasPlayStore = "playStore" in project.links
 
   return (
-    <div
-      ref={viewRef}
+    <article
+      ref={cardRef}
       className={cn(
-        "w-full flex-shrink-0 snap-center",
-        "px-3 sm:px-4 md:px-6"
+        "relative group",
+        "bg-background border-2 border-foreground",
+        "shadow-[4px_4px_0_0_var(--foreground)]",
+        "sm:shadow-[6px_6px_0_0_var(--foreground)]",
+        "active:shadow-[2px_2px_0_0_var(--foreground)]",
+        "active:translate-x-[2px] active:translate-y-[2px]",
+        "transition-all duration-150"
       )}
     >
-      <div
-        ref={contentRef}
-        className={cn(
-          "max-w-3xl mx-auto",
-          "border border-foreground/60",
-          "bg-background/95 backdrop-blur-sm",
-          "shadow-[3px_3px_0_0_var(--foreground)]"
-        )}
-      >
-        {/* Header */}
-        <div className="flex items-center justify-between p-3 sm:p-4 border-b border-foreground/20">
-          <div className="flex items-center gap-2 sm:gap-3">
-            <span className="text-base sm:text-lg text-accent">{ASCII_NODE}</span>
-            <span className="reveal font-mono text-[10px] sm:text-xs text-foreground/60 tracking-wider">
-              {project.code}
-            </span>
-            <span className="reveal font-mono text-[10px] sm:text-xs text-accent tracking-[0.15em] font-medium">
-              {project.domain}
+      <TechLines className="opacity-40" />
+
+      {/* MOBILE-FIRST LAYOUT */}
+      <div className="flex flex-col">
+        {/* Image Section - Full width on mobile */}
+        <div className="relative">
+          <ProjectImage
+            src={project.image}
+            alt={project.title}
+            className="w-full aspect-[16/9] sm:aspect-[2/1]"
+          />
+          {/* Floating badges */}
+          <div className="absolute top-3 left-3 flex items-center gap-2">
+            <span className="font-mono text-[10px] sm:text-xs px-2 py-1 bg-background border border-foreground text-foreground">
+              {project.category}
             </span>
           </div>
-          <span className="reveal font-mono text-[10px] sm:text-xs text-foreground/40">
-            {project.year}
-          </span>
+          <div className="absolute top-3 right-3">
+            <span className="font-mono text-2xl sm:text-3xl font-black text-background drop-shadow-[2px_2px_0_var(--foreground)]">
+              {project.id}
+            </span>
+          </div>
         </div>
 
-        {/* Main content */}
-        <div className="p-4 sm:p-6 md:p-8">
-          {/* Title + Image row */}
-          <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 mb-6 sm:mb-8">
-            {/* Image */}
-            <div className="reveal w-full sm:w-32 md:w-40 h-32 sm:h-32 md:h-40 flex-shrink-0 border border-foreground/30 bg-foreground/5 overflow-hidden">
-              <img
-                src={project.image}
-                alt={project.title}
-                className="w-full h-full object-cover"
-                loading="lazy"
-              />
-            </div>
-
-            {/* Title + Metric */}
-            <div className="flex-1">
-              <h3 className="reveal font-mono text-xl sm:text-2xl md:text-3xl font-black text-foreground leading-tight mb-3">
+        {/* Content Section */}
+        <div className="p-4 sm:p-5 md:p-6">
+          {/* Header */}
+          <div className="flex items-start justify-between gap-3 mb-3">
+            <div className="flex-1 min-w-0">
+              <h3 className="font-mono text-lg sm:text-xl md:text-2xl font-black text-foreground leading-tight truncate">
                 {project.title}
               </h3>
-              <div className="reveal flex items-baseline gap-2">
-                <span className="font-mono text-4xl sm:text-5xl md:text-6xl font-black text-accent leading-none">
-                  {project.metrics.primary}
-                </span>
-                <span className="font-mono text-sm sm:text-base text-foreground/60">
-                  {project.metrics.label}
-                </span>
-              </div>
-              <p className="reveal font-mono text-[10px] sm:text-xs text-foreground/40 mt-2">
-                {project.metrics.secondary}
-              </p>
+              <span className="font-mono text-[10px] sm:text-xs text-muted-foreground">
+                {project.year}
+              </span>
             </div>
           </div>
 
-          {/* Growth sections */}
-          <div className="space-y-4 sm:space-y-6 mb-6 sm:mb-8">
-            {/* Learned - Main focus */}
-            <div className="reveal">
-              <div className="flex items-center gap-2 mb-2">
-                <span className="font-mono text-[9px] sm:text-[10px] text-foreground/50 tracking-[0.2em]">
-                  LEARNED
-                </span>
-                <div className="flex-1 h-px bg-foreground/10" />
-              </div>
-              <p className="font-mono text-base sm:text-lg md:text-xl text-foreground font-medium leading-relaxed">
-                <span ref={learnedRef}>{project.growth.learned}</span>
-              </p>
-            </div>
-
-            {/* Improved */}
-            <div className="reveal">
-              <div className="flex items-center gap-2 mb-2">
-                <span className="font-mono text-[9px] sm:text-[10px] text-foreground/50 tracking-[0.2em]">
-                  IMPROVED
-                </span>
-                <div className="flex-1 h-px bg-foreground/10" />
-              </div>
-              <p className="font-mono text-sm sm:text-base text-foreground/70 leading-relaxed">
-                {project.growth.improved}
-              </p>
-            </div>
-
-            {/* Unlocked */}
-            <div className="reveal">
-              <div className="flex items-center gap-2 mb-2">
-                <span className="font-mono text-[9px] sm:text-[10px] text-accent/80 tracking-[0.2em]">
-                  UNLOCKED
-                </span>
-                <div className="flex-1 h-px bg-accent/20" />
-              </div>
-              <p className="font-mono text-sm sm:text-base text-accent leading-relaxed">
-                {project.growth.unlocked}
-              </p>
-            </div>
+          {/* What I Learned - Key Focus */}
+          <div className="mb-4 p-3 sm:p-4 bg-foreground/5 border-l-4 border-accent">
+            <span className="font-mono text-[9px] sm:text-[10px] text-muted-foreground tracking-[0.2em] block mb-1">
+              {ASCII_ARROW} LEARNED
+            </span>
+            <p
+              ref={learnedRef}
+              className="font-mono text-sm sm:text-base font-bold text-foreground leading-snug"
+            >
+              {project.learned}
+            </p>
           </div>
 
-          {/* Skills + Links */}
-          <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 pt-4 border-t border-foreground/10">
-            <div className="reveal flex flex-wrap gap-1.5 sm:gap-2">
-              {project.skills.map((skill) => (
-                <span
-                  key={skill}
-                  className="font-mono text-[9px] sm:text-[10px] text-foreground/60 px-2 py-1 border border-foreground/20"
+          {/* Technical Growth List */}
+          <div className="mb-4">
+            <span className="font-mono text-[9px] sm:text-[10px] text-muted-foreground tracking-[0.2em] block mb-2">
+              GROWTH
+            </span>
+            <ul className="space-y-1.5">
+              {project.growth.map((item, i) => (
+                <li
+                  key={i}
+                  className="growth-item flex items-start gap-2 font-mono text-xs sm:text-sm text-foreground/80"
                 >
-                  {skill}
-                </span>
+                  <span className="text-accent mt-0.5 flex-shrink-0">▸</span>
+                  <span>{item}</span>
+                </li>
               ))}
-            </div>
+            </ul>
+          </div>
 
-            <div className="reveal flex items-center gap-4">
-              {hasGithub && (
-                <a
-                  href={project.links.github}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="touch-target inline-flex items-center gap-2 font-mono text-[10px] sm:text-xs text-foreground/60 hover:text-foreground transition-colors"
-                >
-                  <Github className="w-4 h-4" />
-                  <span>SOURCE</span>
-                </a>
-              )}
-              {hasDemo && (
-                <a
-                  href={(project.links as { demo?: string }).demo}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="touch-target inline-flex items-center gap-2 font-mono text-[10px] sm:text-xs text-foreground/60 hover:text-foreground transition-colors"
-                >
-                  <ExternalLink className="w-4 h-4" />
-                  <span>DEMO</span>
-                </a>
-              )}
-            </div>
+          {/* Metrics Grid - Responsive */}
+          <div className="grid grid-cols-3 gap-2 sm:gap-3 mb-4 p-2 sm:p-3 border border-dashed border-foreground/30">
+            {Object.entries(project.metrics).map(([key, value]) => (
+              <div key={key} className="text-center">
+                <span className="metric-value font-mono text-base sm:text-lg md:text-xl font-black text-foreground block">
+                  {value}
+                </span>
+                <span className="font-mono text-[8px] sm:text-[9px] text-muted-foreground uppercase tracking-wider">
+                  {key}
+                </span>
+              </div>
+            ))}
+          </div>
+
+          {/* Skills */}
+          <div className="flex flex-wrap gap-1.5 mb-4">
+            {project.skills.map((skill) => (
+              <span
+                key={skill}
+                className="font-mono text-[9px] sm:text-[10px] px-2 py-0.5 border border-foreground/30 text-foreground/70"
+              >
+                {skill}
+              </span>
+            ))}
+          </div>
+
+          {/* Links - Touch optimized */}
+          <div className="flex flex-wrap gap-2">
+            {hasGithub && (
+              <a
+                href={project.links.github}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="touch-target inline-flex items-center gap-1.5 min-h-[44px] px-3 sm:px-4 font-mono text-[10px] sm:text-xs border-2 border-foreground text-foreground bg-background hover:bg-foreground hover:text-background active:bg-foreground active:text-background transition-colors"
+              >
+                <Github className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                CODE
+              </a>
+            )}
+            {hasDemo && (
+              <a
+                href={(project.links as { demo?: string }).demo}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="touch-target inline-flex items-center gap-1.5 min-h-[44px] px-3 sm:px-4 font-mono text-[10px] sm:text-xs border-2 border-foreground bg-foreground text-background hover:bg-background hover:text-foreground active:bg-background active:text-foreground transition-colors"
+              >
+                <ArrowUpRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                DEMO
+              </a>
+            )}
+            {hasAppStore && (
+              <a
+                href={(project.links as { appStore?: string }).appStore}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="touch-target inline-flex items-center min-h-[44px] px-3 font-mono text-[10px] sm:text-xs border border-foreground/50 text-muted-foreground hover:text-foreground hover:border-foreground transition-colors"
+              >
+                iOS
+              </a>
+            )}
+            {hasPlayStore && (
+              <a
+                href={(project.links as { playStore?: string }).playStore}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="touch-target inline-flex items-center min-h-[44px] px-3 font-mono text-[10px] sm:text-xs border border-foreground/50 text-muted-foreground hover:text-foreground hover:border-foreground transition-colors"
+              >
+                Android
+              </a>
+            )}
           </div>
         </div>
       </div>
-    </div>
+    </article>
   )
 }
 
 // ─────────────────────────────────────────────────────────────
-// NAVIGATION DOTS
+// FILTER - MOBILE OPTIMIZED
 // ─────────────────────────────────────────────────────────────
 
-function NavigationDots({
-  total,
-  current,
-  onSelect,
-}: {
-  total: number
-  current: number
-  onSelect: (index: number) => void
-}) {
-  return (
-    <div className="flex items-center gap-1.5 sm:gap-2">
-      {Array.from({ length: total }).map((_, i) => (
-        <button
-          key={i}
-          onClick={() => onSelect(i)}
-          className={cn(
-            "touch-target w-2 h-2 sm:w-2.5 sm:h-2.5 transition-all duration-200",
-            i === current
-              ? "bg-foreground scale-125"
-              : "bg-foreground/20 hover:bg-foreground/40"
-          )}
-          aria-label={`Go to project ${i + 1}`}
-        />
-      ))}
-    </div>
-  )
-}
-
-// ─────────────────────────────────────────────────────────────
-// FILTER COMPONENT
-// ─────────────────────────────────────────────────────────────
-
-function FilterPanel({
+function FilterBar({
   selectedGroups,
   onToggleGroup,
   onClearFilters,
+  resultCount,
+  totalCount,
 }: {
   selectedGroups: SkillGroup[]
   onToggleGroup: (group: SkillGroup) => void
   onClearFilters: () => void
+  resultCount: number
+  totalCount: number
 }) {
+  const ref = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!ref.current) return
+    const ctx = gsap.context(() => {
+      gsap.fromTo(
+        ref.current,
+        { opacity: 0, y: -15 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.5,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: ref.current,
+            start: "top 95%",
+            toggleActions: "play none none none",
+          },
+        }
+      )
+    }, ref.current)
+    return () => ctx.revert()
+  }, [])
+
   const groups = Object.keys(SKILL_GROUPS) as SkillGroup[]
 
   return (
-    <div className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto pb-2 scrollbar-hide">
-      {groups.map((group) => {
-        const isSelected = selectedGroups.includes(group)
-        return (
+    <div ref={ref} className="mb-6 sm:mb-8">
+      {/* Horizontally scrollable on mobile */}
+      <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide -mx-4 px-4 sm:mx-0 sm:px-0 sm:flex-wrap sm:overflow-visible">
+        {groups.map((group) => {
+          const isSelected = selectedGroups.includes(group)
+          return (
+            <button
+              key={group}
+              onClick={() => onToggleGroup(group)}
+              className={cn(
+                "touch-target flex-shrink-0 font-mono text-[10px] sm:text-xs px-3 sm:px-4 py-2 border-2 transition-all whitespace-nowrap",
+                isSelected
+                  ? "border-foreground bg-foreground text-background"
+                  : "border-foreground/40 text-foreground/70 hover:border-foreground active:bg-foreground active:text-background"
+              )}
+            >
+              {group}
+            </button>
+          )
+        })}
+        {selectedGroups.length > 0 && (
           <button
-            key={group}
-            onClick={() => onToggleGroup(group)}
-            className={cn(
-              "touch-target flex-shrink-0 font-mono text-[9px] sm:text-[10px] px-2 sm:px-2.5 py-1 border transition-all duration-150",
-              isSelected
-                ? "border-foreground bg-foreground text-background"
-                : "border-foreground/30 text-foreground/50 active:bg-foreground/10"
-            )}
+            onClick={onClearFilters}
+            className="touch-target flex-shrink-0 flex items-center gap-1 font-mono text-[10px] sm:text-xs text-muted-foreground px-2"
           >
-            {group}
+            <X className="w-3 h-3" />
           </button>
-        )
-      })}
-      {selectedGroups.length > 0 && (
-        <button
-          onClick={onClearFilters}
-          className="touch-target flex-shrink-0 p-1 text-foreground/40"
-        >
-          <X className="w-3 h-3" />
-        </button>
-      )}
+        )}
+      </div>
+
+      {/* Count */}
+      <div className="flex items-center gap-2 mt-3 font-mono text-[10px] sm:text-xs text-muted-foreground">
+        <span className="text-foreground font-bold">{resultCount}</span>
+        <span>/</span>
+        <span>{totalCount}</span>
+        <span className="text-foreground/30">projects</span>
+      </div>
     </div>
   )
 }
@@ -644,56 +707,90 @@ function FilterPanel({
 // SECTION HEADER
 // ─────────────────────────────────────────────────────────────
 
-function SectionHeader({ current, total }: { current: number; total: number }) {
+function SectionHeader({ count }: { count: number }) {
+  const ref = useRef<HTMLDivElement>(null)
   const titleRef = useRef<HTMLHeadingElement>(null)
-  const hasAnimated = useRef(false)
 
   useEffect(() => {
-    if (!titleRef.current || hasAnimated.current) return
-    hasAnimated.current = true
+    if (!ref.current) return
+    const ctx = gsap.context(() => {
+      // Title scramble
+      if (titleRef.current) {
+        const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ█▓▒░"
+        const originalText = "PROJECTS"
+        let iteration = 0
 
-    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ░▒▓█"
-    const originalText = "NEURAL MAP"
-    let iteration = 0
-
-    const interval = setInterval(() => {
-      if (!titleRef.current) return clearInterval(interval)
-      titleRef.current.textContent = originalText
-        .split("")
-        .map((char, i) => {
-          if (char === " ") return " "
-          if (i < iteration) return char
-          return chars[Math.floor(Math.random() * chars.length)]
+        ScrollTrigger.create({
+          trigger: titleRef.current,
+          start: "top 95%",
+          onEnter: () => {
+            const interval = setInterval(() => {
+              if (!titleRef.current) return clearInterval(interval)
+              titleRef.current.textContent = originalText
+                .split("")
+                .map((char, i) => {
+                  if (i < iteration) return char
+                  return chars[Math.floor(Math.random() * chars.length)]
+                })
+                .join("")
+              if (iteration >= originalText.length) clearInterval(interval)
+              iteration += 0.35
+            }, 35)
+          },
         })
-        .join("")
-      if (iteration >= originalText.length) clearInterval(interval)
-      iteration += 0.4
-    }, 35)
+      }
 
-    return () => clearInterval(interval)
+      // Header elements
+      const elements = ref.current?.querySelectorAll(".header-reveal")
+      if (elements) {
+        gsap.fromTo(
+          elements,
+          { opacity: 0, y: 20 },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.6,
+            stagger: 0.1,
+            ease: "power2.out",
+            scrollTrigger: {
+              trigger: ref.current,
+              start: "top 90%",
+              toggleActions: "play none none none",
+            },
+          }
+        )
+      }
+    }, ref.current)
+    return () => ctx.revert()
   }, [])
 
   return (
-    <div className="flex items-end justify-between gap-3 mb-4 sm:mb-6">
-      <div>
-        <p className="font-mono text-[8px] sm:text-[9px] text-foreground/40 tracking-[0.2em] mb-1">
-          — PROJECTS
-        </p>
+    <div ref={ref} className="mb-6 sm:mb-8">
+      {/* Section number */}
+      <p className="header-reveal font-mono text-[9px] sm:text-[10px] text-muted-foreground tracking-[0.3em] mb-1">
+        04
+      </p>
+
+      {/* Title */}
+      <div className="flex items-end justify-between gap-4">
         <h2
           ref={titleRef}
-          className="font-mono text-xl sm:text-2xl md:text-3xl font-black text-foreground tracking-tight leading-none"
+          className="header-reveal font-mono text-4xl sm:text-5xl md:text-6xl font-black text-foreground tracking-tighter leading-none"
         >
-          NEURAL MAP
+          PROJECTS
         </h2>
+        <span className="header-reveal font-mono text-3xl sm:text-4xl font-black text-foreground/15 tabular-nums">
+          {String(count).padStart(2, "0")}
+        </span>
       </div>
-      <div className="flex items-baseline gap-1 font-mono">
-        <span className="text-lg sm:text-xl md:text-2xl font-black text-foreground tabular-nums">
-          {String(current + 1).padStart(2, "0")}
-        </span>
-        <span className="text-xs sm:text-sm text-foreground/30">/</span>
-        <span className="text-xs sm:text-sm text-foreground/30 tabular-nums">
-          {String(total).padStart(2, "0")}
-        </span>
+
+      {/* Underline */}
+      <div className="header-reveal mt-3 flex items-center gap-2">
+        <div className="h-1 w-8 sm:w-12 bg-foreground" />
+        <div className="h-px flex-1 bg-foreground/20" />
+        <pre className="font-mono text-[7px] sm:text-[8px] text-foreground/20 select-none hidden sm:block">
+          {ASCII_CIRCUIT}
+        </pre>
       </div>
     </div>
   )
@@ -705,20 +802,17 @@ function SectionHeader({ current, total }: { current: number; total: number }) {
 
 export function ProjectsSection() {
   const [selectedGroups, setSelectedGroups] = useState<SkillGroup[]>([])
-  const [currentIndex, setCurrentIndex] = useState(0)
-  const scrollRef = useRef<HTMLDivElement>(null)
+  const [showAll, setShowAll] = useState(false)
   const sectionRef = useRef<HTMLElement>(null)
 
   const toggleGroup = useCallback((group: SkillGroup) => {
     setSelectedGroups((prev) =>
       prev.includes(group) ? prev.filter((g) => g !== group) : [...prev, group]
     )
-    setCurrentIndex(0) // Reset to first when filtering
   }, [])
 
   const clearFilters = useCallback(() => {
     setSelectedGroups([])
-    setCurrentIndex(0)
   }, [])
 
   const selectedSkills = useMemo(() => {
@@ -733,195 +827,99 @@ export function ProjectsSection() {
     )
   }, [selectedSkills])
 
-  // Navigate to specific project
-  const goToProject = useCallback((index: number) => {
-    if (index < 0 || index >= filteredProjects.length) return
-    setCurrentIndex(index)
-    
-    if (scrollRef.current) {
-      const scrollContainer = scrollRef.current
-      const projectWidth = scrollContainer.scrollWidth / filteredProjects.length
-      scrollContainer.scrollTo({
-        left: projectWidth * index,
-        behavior: "smooth",
-      })
-    }
-  }, [filteredProjects.length])
-
-  const goNext = useCallback(() => {
-    goToProject(currentIndex + 1)
-  }, [currentIndex, goToProject])
-
-  const goPrev = useCallback(() => {
-    goToProject(currentIndex - 1)
-  }, [currentIndex, goToProject])
-
-  // Handle scroll snap end
-  useEffect(() => {
-    const scrollContainer = scrollRef.current
-    if (!scrollContainer) return
-
-    let scrollTimeout: NodeJS.Timeout
-
-    const handleScroll = () => {
-      clearTimeout(scrollTimeout)
-      scrollTimeout = setTimeout(() => {
-        const projectWidth = scrollContainer.scrollWidth / filteredProjects.length
-        const newIndex = Math.round(scrollContainer.scrollLeft / projectWidth)
-        if (newIndex !== currentIndex && newIndex >= 0 && newIndex < filteredProjects.length) {
-          setCurrentIndex(newIndex)
-        }
-      }, 100)
-    }
-
-    scrollContainer.addEventListener("scroll", handleScroll)
-    return () => {
-      scrollContainer.removeEventListener("scroll", handleScroll)
-      clearTimeout(scrollTimeout)
-    }
-  }, [filteredProjects.length, currentIndex])
-
-  // Keyboard navigation
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "ArrowRight") goNext()
-      if (e.key === "ArrowLeft") goPrev()
-    }
-    window.addEventListener("keydown", handleKeyDown)
-    return () => window.removeEventListener("keydown", handleKeyDown)
-  }, [goNext, goPrev])
+  const INITIAL_VISIBLE = 3
+  const displayedProjects = showAll ? filteredProjects : filteredProjects.slice(0, INITIAL_VISIBLE)
+  const remaining = filteredProjects.length - INITIAL_VISIBLE
 
   return (
     <section
       id="projects"
       ref={sectionRef}
-      className={cn(
-        "relative py-8 sm:py-12 md:py-16 lg:py-20",
-        "bg-background overflow-hidden"
-      )}
+      className="relative py-12 sm:py-16 md:py-20 lg:py-24 px-4 sm:px-6 bg-background"
     >
-      {/* Animated neural background */}
-      <AnimatedNeuralBackground />
+      {/* Subtle background pattern */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-[0.015]">
+        <div className="absolute inset-0 bg-[repeating-linear-gradient(0deg,transparent,transparent_50px,currentColor_50px,currentColor_51px)]" />
+        <div className="absolute inset-0 bg-[repeating-linear-gradient(90deg,transparent,transparent_50px,currentColor_50px,currentColor_51px)]" />
+      </div>
 
-      {/* Content */}
-      <div className="relative">
-        {/* Header area with padding */}
-        <div className="px-3 sm:px-4 md:px-6 max-w-3xl mx-auto">
-          <SectionHeader current={currentIndex} total={filteredProjects.length} />
+      <div className="max-w-4xl mx-auto relative">
+        <SectionHeader count={allProjects.length} />
 
-          {/* Filter */}
-          <div className="mb-4 sm:mb-6">
-            <FilterPanel
-              selectedGroups={selectedGroups}
-              onToggleGroup={toggleGroup}
-              onClearFilters={clearFilters}
-            />
-          </div>
+        <FilterBar
+          selectedGroups={selectedGroups}
+          onToggleGroup={toggleGroup}
+          onClearFilters={clearFilters}
+          resultCount={filteredProjects.length}
+          totalCount={allProjects.length}
+        />
 
-          {/* Pulse line */}
-          <div className="flex items-center gap-2 mb-4 sm:mb-6">
-            <span className="font-mono text-[8px] sm:text-[10px] text-foreground/15 tracking-widest overflow-hidden">
-              {ASCII_PULSE}{ASCII_PULSE}
-            </span>
-          </div>
-        </div>
-
-        {/* Projects carousel */}
+        {/* Projects Grid */}
         {filteredProjects.length === 0 ? (
-          <div className="px-3 sm:px-4 md:px-6 max-w-3xl mx-auto">
-            <div className="text-center py-10 sm:py-12 border border-dashed border-foreground/15">
-              <pre className="font-mono text-[8px] sm:text-[10px] text-foreground/20 mb-3">
-                {ASCII_NEURON_SMALL}
-              </pre>
-              <p className="font-mono text-[10px] sm:text-xs text-muted-foreground mb-3">
-                No matching nodes
-              </p>
-              <button
-                onClick={clearFilters}
-                className="font-mono text-[10px] sm:text-xs border border-foreground/40 px-3 py-1.5"
-              >
-                RESET
-              </button>
-            </div>
+          <div className="text-center py-16 border-2 border-dashed border-foreground/20">
+            <pre className="font-mono text-xs text-foreground/30 mb-4">
+              {`
+┌─────────────┐
+│  NO MATCH   │
+└─────────────┘
+              `}
+            </pre>
+            <button
+              onClick={clearFilters}
+              className="touch-target font-mono text-xs border-2 border-foreground px-4 py-2 hover:bg-foreground hover:text-background transition-colors"
+            >
+              RESET
+            </button>
           </div>
         ) : (
-          <>
-            {/* Scroll container */}
-            <div
-              ref={scrollRef}
-              className="flex overflow-x-auto snap-x snap-mandatory scrollbar-hide"
-              style={{ scrollSnapType: "x mandatory" }}
-            >
-              {filteredProjects.map((project, index) => (
-                <ProjectView
-                  key={project.id}
-                  project={project}
-                  isActive={index === currentIndex}
-                />
-              ))}
-            </div>
-
-            {/* Navigation */}
-            <div className="px-3 sm:px-4 md:px-6 max-w-3xl mx-auto mt-4 sm:mt-6">
-              <div className="flex items-center justify-between">
-                {/* Prev/Next buttons */}
-                <button
-                  onClick={goPrev}
-                  disabled={currentIndex === 0}
-                  className={cn(
-                    "touch-target p-2 border border-foreground/30 transition-all",
-                    currentIndex === 0
-                      ? "opacity-30 cursor-not-allowed"
-                      : "hover:bg-foreground hover:text-background active:bg-foreground active:text-background"
-                  )}
-                  aria-label="Previous project"
-                >
-                  <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5" />
-                </button>
-
-                {/* Dots */}
-                <NavigationDots
-                  total={filteredProjects.length}
-                  current={currentIndex}
-                  onSelect={goToProject}
-                />
-
-                {/* Next button */}
-                <button
-                  onClick={goNext}
-                  disabled={currentIndex === filteredProjects.length - 1}
-                  className={cn(
-                    "touch-target p-2 border border-foreground/30 transition-all",
-                    currentIndex === filteredProjects.length - 1
-                      ? "opacity-30 cursor-not-allowed"
-                      : "hover:bg-foreground hover:text-background active:bg-foreground active:text-background"
-                  )}
-                  aria-label="Next project"
-                >
-                  <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
-                </button>
-              </div>
-
-              {/* Synapse decoration */}
-              <div className="mt-4 sm:mt-6 text-center">
-                <span className="font-mono text-[8px] sm:text-[10px] text-foreground/15">
-                  {ASCII_SYNAPSE}{ASCII_SYNAPSE}{ASCII_SYNAPSE}
-                </span>
-              </div>
-            </div>
-          </>
+          <div className="space-y-6 sm:space-y-8">
+            {displayedProjects.map((project, index) => (
+              <ProjectCard key={project.id} project={project} index={index} />
+            ))}
+          </div>
         )}
 
-        {/* Next section link */}
-        <div className="mt-8 sm:mt-10 text-center">
-          <a
-            href="#contact"
-            className="touch-target inline-flex items-center gap-1.5 font-mono text-[10px] sm:text-xs text-foreground/40 hover:text-foreground transition-colors"
-          >
-            <span>↓</span>
-            <span>NEXT</span>
-          </a>
-        </div>
+        {/* Load More */}
+        {!showAll && remaining > 0 && (
+          <div className="mt-8 sm:mt-10 flex justify-center">
+            <button
+              onClick={() => setShowAll(true)}
+              className={cn(
+                "touch-target group flex items-center gap-2",
+                "w-full sm:w-auto justify-center",
+                "px-6 py-4 sm:py-3",
+                "font-mono text-xs tracking-[0.1em]",
+                "border-2 border-foreground bg-foreground text-background",
+                "hover:bg-background hover:text-foreground",
+                "active:translate-y-[2px] active:shadow-none",
+                "shadow-[4px_4px_0_0_var(--foreground)]",
+                "transition-all duration-150"
+              )}
+            >
+              <span>+{remaining} MORE</span>
+              <ChevronDown className="w-4 h-4" />
+            </button>
+          </div>
+        )}
+
+        {/* End */}
+        {showAll && (
+          <div className="mt-12 text-center">
+            <pre className="font-mono text-[8px] sm:text-[9px] text-foreground/20 select-none mb-4">
+              {`
+┌──────────────────────────────────┐
+│              · · ·               │
+└──────────────────────────────────┘
+              `}
+            </pre>
+            <a
+              href="#contact"
+              className="touch-target inline-flex items-center gap-2 font-mono text-xs text-muted-foreground hover:text-foreground transition-colors"
+            >
+              ↓ CONTACT
+            </a>
+          </div>
+        )}
       </div>
     </section>
   )
