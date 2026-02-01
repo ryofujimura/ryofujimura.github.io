@@ -638,14 +638,16 @@ export function ProjectsSection() {
         <div className="w-full max-w-4xl mx-auto relative">
           {/* Header */}
           <div className="mb-3 md:mb-4">
-            <div className="font-mono text-[7px] md:text-[8px] text-foreground/20 mb-2 overflow-hidden">
-              ╔══════════════════════════════════════════════════════════════════════════════╗
+            <div className="font-mono text-[7px] md:text-[8px] text-foreground/20 mb-2 flex items-center">
+              <span>╔</span>
+              <span className="flex-1 overflow-hidden">{"═".repeat(100)}</span>
+              <span>╗</span>
             </div>
             
             <div className="flex items-end justify-between gap-2">
               <div>
                 <p className="font-mono text-[7px] md:text-[8px] text-foreground/40 tracking-[0.2em]">
-                  {">>>"} PERSONAL PROJECTS / GROWTH_JOURNEY
+                  {">>>"} PROJECTS / GROWTH JOURNEY
                 </p>
                 <AnimatedTitle 
                   projectName={currentProject.title} 
@@ -701,8 +703,10 @@ export function ProjectsSection() {
           </div>
 
           {/* Footer */}
-          <div className="font-mono text-[7px] md:text-[8px] text-foreground/20 mt-3 overflow-hidden">
-            ╚══════════════════════════════════════════════════════════════════════════════╝
+          <div className="font-mono text-[7px] md:text-[8px] text-foreground/20 mt-3 flex items-center">
+            <span>╚</span>
+            <span className="flex-1 overflow-hidden">{"═".repeat(100)}</span>
+            <span>╝</span>
           </div>
 
           {/* Scroll hint */}
