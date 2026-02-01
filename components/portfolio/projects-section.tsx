@@ -758,7 +758,7 @@ export function ProjectsSection() {
 
 
           {/* Year markers */}
-          <div className="max-w-6xl mx-auto mt-12 sm:mt-16">
+          <div className="max-w-6xl mx-auto">
             <div className="ascii-decoration font-mono text-[8px] sm:text-[10px] text-foreground/30 mb-3">
               ├── TIMELINE
             </div>
