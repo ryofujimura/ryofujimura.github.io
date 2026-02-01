@@ -74,12 +74,21 @@ export function Navigation() {
   const scrollToSection = (href: string) => {
     const element = document.querySelector(href)
     if (element) {
-      const offset = 80
-      const elementPosition = element.getBoundingClientRect().top + window.scrollY
-      window.scrollTo({
-        top: elementPosition - offset,
-        behavior: "smooth",
-      })
+      // For projects section, scroll to exact top to trigger GSAP pin and show first project
+      if (href === "#projects") {
+        const elementPosition = element.getBoundingClientRect().top + window.scrollY
+        window.scrollTo({
+          top: elementPosition,
+          behavior: "smooth",
+        })
+      } else {
+        const offset = 80
+        const elementPosition = element.getBoundingClientRect().top + window.scrollY
+        window.scrollTo({
+          top: elementPosition - offset,
+          behavior: "smooth",
+        })
+      }
       setIsMobileMenuOpen(false)
     }
   }
