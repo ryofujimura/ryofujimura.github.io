@@ -9,6 +9,62 @@ import { cn } from "@/lib/utils"
 gsap.registerPlugin(ScrollTrigger)
 
 // ─────────────────────────────────────────────────────────────
+// MOBILE DETECTION HOOK
+// ─────────────────────────────────────────────────────────────
+
+const MOBILE_BREAKPOINT = 768
+
+function useIsMobile() {
+  const [isMobile, setIsMobile] = useState(false)
+
+  useEffect(() => {
+    // Check if window is available (client-side)
+    if (typeof window === "undefined") return
+
+    const mediaQuery = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT - 1}px)`)
+    
+    // Set initial value
+    setIsMobile(mediaQuery.matches)
+
+    // Handler for media query changes
+    const handleChange = (e: MediaQueryListEvent) => {
+      setIsMobile(e.matches)
+    }
+
+    // Add listener
+    mediaQuery.addEventListener("change", handleChange)
+
+    // Also listen to resize for more responsive updates
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < MOBILE_BREAKPOINT)
+    }
+    
+    window.addEventListener("resize", handleResize)
+
+    return () => {
+      mediaQuery.removeEventListener("change", handleChange)
+      window.removeEventListener("resize", handleResize)
+    }
+  }, [])
+
+  return isMobile
+}
+
+// Mobile-optimized scroll values
+const SCROLL_CONFIG = {
+  mobile: {
+    scrollPerProject: 60, // vh per project (faster scrolling on mobile)
+    scrubSpeed: 0.3,      // faster response
+    slideHeight: 180,     // px
+  },
+  desktop: {
+    scrollPerProject: 100, // vh per project
+    scrubSpeed: 0.5,
+    slideHeight: 240,      // px
+  },
+}
+
+// ─────────────────────────────────────────────────────────────
 // PROJECT DATA - REVERSED ORDER (oldest first for growth journey)
 // ─────────────────────────────────────────────────────────────
 
@@ -223,8 +279,8 @@ function AnimatedTitle({ projectName, projectId }: { projectName: string; projec
   }, [projectName])
 
   return (
-    <h2 className="font-mono text-lg md:text-xl lg:text-2xl font-black text-foreground tracking-tighter">
-      <span className="text-foreground/40">PROJECTS — </span>
+    <h2 className="font-mono text-base sm:text-lg md:text-xl lg:text-2xl font-black text-foreground tracking-tighter">
+      <span className="text-foreground/40 hidden sm:inline">PROJECTS — </span>
       <span ref={nameRef}>{displayName}</span>
     </h2>
   )
@@ -558,17 +614,26 @@ function MobileQuickNav({
   }, [total, scrollTriggerRef])
 
   return (
-    <div className="md:hidden flex gap-0.5 overflow-x-auto scrollbar-hide py-2 mb-2">
+    <div className="md:hidden flex gap-1 overflow-x-auto scrollbar-hide py-1 mb-2">
       {Array.from({ length: total }).map((_, i) => (
         <button
           key={i}
           onClick={() => handleClick(i)}
+          aria-label={`Go to project ${i + 1}`}
           className={cn(
-            "flex-shrink-0 w-5 h-1 transition-all",
-            i === activeIndex ? "bg-foreground" : 
-            i < activeIndex ? "bg-foreground/30" : "bg-foreground/10"
+            // Larger touch target (44px min recommended)
+            "flex-shrink-0 w-6 h-6 flex items-center justify-center touch-manipulation",
+            "active:scale-90 transition-transform"
           )}
-        />
+        >
+          <span 
+            className={cn(
+              "w-full h-1.5 rounded-sm transition-all",
+              i === activeIndex ? "bg-foreground" : 
+              i < activeIndex ? "bg-foreground/40" : "bg-foreground/15"
+            )}
+          />
+        </button>
       ))}
     </div>
   )
@@ -583,27 +648,16 @@ export function ProjectsSection() {
   const sectionRef = useRef<HTMLElement>(null)
   const pinContainerRef = useRef<HTMLDivElement>(null)
   const scrollTriggerRef = useRef<ScrollTrigger | null>(null)
-  const isMobileRef = useRef<boolean | null>(null)
-  const isInitializedRef = useRef(false)
+  const isMobile = useIsMobile()
 
   const currentProject = allProjects[activeIndex]
 
-  // Get mobile state helper
-  const getIsMobile = useCallback(() => {
-    if (typeof window === "undefined") return false
-    return window.matchMedia("(max-width: 768px)").matches
-  }, [])
+  // Get config based on device
+  const config = isMobile ? SCROLL_CONFIG.mobile : SCROLL_CONFIG.desktop
 
-  // Create or update ScrollTrigger
-  const setupScrollTrigger = useCallback(() => {
+  // GSAP ScrollTrigger pin setup - recreate on mobile change
+  useEffect(() => {
     if (!sectionRef.current || !pinContainerRef.current) return
-
-    const isMobile = getIsMobile()
-    
-    // Skip if mobile state hasn't changed (except on first init)
-    if (isInitializedRef.current && isMobileRef.current === isMobile) return
-    
-    isMobileRef.current = isMobile
 
     // Kill existing ScrollTrigger before creating new one
     if (scrollTriggerRef.current) {
@@ -611,63 +665,32 @@ export function ProjectsSection() {
       scrollTriggerRef.current = null
     }
 
-    // Mobile: pin later, shorter scroll distance per project
-    // Desktop: pin at top, longer scroll distance
-    const startValue = isMobile ? "top 15%" : "top top"
-    const scrollPerProject = isMobile ? 80 : 100
-    const scrubValue = isMobile ? 0.3 : 0.5
+    const scrollDistance = TOTAL_PROJECTS * config.scrollPerProject
 
-    scrollTriggerRef.current = ScrollTrigger.create({
-      trigger: sectionRef.current,
-      start: startValue,
-      end: `+=${TOTAL_PROJECTS * scrollPerProject}%`,
-      pin: pinContainerRef.current,
-      pinSpacing: true,
-      scrub: scrubValue,
-      onUpdate: (self) => {
-        const progress = self.progress
-        const newIndex = Math.min(
-          Math.floor(progress * TOTAL_PROJECTS),
-          TOTAL_PROJECTS - 1
-        )
-        setActiveIndex(newIndex)
-      },
-    })
-
-    isInitializedRef.current = true
-  }, [getIsMobile])
-
-  // Initial setup and resize handling
-  useEffect(() => {
-    if (typeof window === "undefined") return
-
-    // Initial setup
-    setupScrollTrigger()
-
-    // Handle resize with debounce to prevent flickering
-    let resizeTimeout: NodeJS.Timeout
-    const handleResize = () => {
-      clearTimeout(resizeTimeout)
-      resizeTimeout = setTimeout(() => {
-        const newIsMobile = getIsMobile()
-        // Only recreate if breakpoint actually crossed
-        if (isMobileRef.current !== newIsMobile) {
-          setupScrollTrigger()
-        }
-      }, 150)
-    }
-
-    window.addEventListener("resize", handleResize)
+    const ctx = gsap.context(() => {
+      scrollTriggerRef.current = ScrollTrigger.create({
+        trigger: sectionRef.current,
+        start: "top top",
+        end: `+=${scrollDistance}%`,
+        pin: pinContainerRef.current,
+        pinSpacing: true,
+        scrub: config.scrubSpeed,
+        onUpdate: (self) => {
+          const progress = self.progress
+          const newIndex = Math.min(
+            Math.floor(progress * TOTAL_PROJECTS),
+            TOTAL_PROJECTS - 1
+          )
+          setActiveIndex(newIndex)
+        },
+      })
+    }, sectionRef.current)
 
     return () => {
-      window.removeEventListener("resize", handleResize)
-      clearTimeout(resizeTimeout)
-      if (scrollTriggerRef.current) {
-        scrollTriggerRef.current.kill()
-        scrollTriggerRef.current = null
-      }
+      ctx.revert()
+      scrollTriggerRef.current = null
     }
-  }, [setupScrollTrigger, getIsMobile])
+  }, [isMobile, config.scrollPerProject, config.scrubSpeed])
 
   return (
     <section
@@ -675,10 +698,10 @@ export function ProjectsSection() {
       ref={sectionRef}
       className="relative bg-background"
     >
-      {/* Pinned container - centered on page */}
+      {/* Pinned container - centered on page, mobile optimized */}
       <div 
         ref={pinContainerRef}
-        className="min-h-screen flex items-center justify-center px-4 md:px-6"
+        className="min-h-screen flex items-center justify-center px-3 sm:px-4 md:px-6 py-safe"
       >
         {/* Background pattern */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-[0.02]">
@@ -690,18 +713,18 @@ export function ProjectsSection() {
 
         {/* Main centered content */}
         <div className="w-full max-w-4xl mx-auto relative">
-          {/* Header */}
-          <div className="mb-3 md:mb-4">
-            <div className="font-mono text-[7px] md:text-[8px] text-foreground/20 mb-2 flex items-center">
+          {/* Header - mobile optimized */}
+          <div className="mb-2 md:mb-4">
+            <div className="font-mono text-[6px] md:text-[8px] text-foreground/20 mb-1 md:mb-2 flex items-center">
               <span>╔</span>
               <span className="flex-1 overflow-hidden">{"═".repeat(100)}</span>
               <span>╗</span>
             </div>
             
             <div className="flex items-end justify-between gap-2">
-              <div>
-                <p className="font-mono text-[7px] md:text-[8px] text-foreground/40 tracking-[0.2em]">
-                  {">>>"} PROJECTS / GROWTH JOURNEY
+              <div className="flex-1 min-w-0">
+                <p className="font-mono text-[6px] md:text-[8px] text-foreground/40 tracking-[0.15em] md:tracking-[0.2em] truncate">
+                  {">>>"} {isMobile ? "GROWTH" : "PROJECTS / GROWTH JOURNEY"}
                 </p>
                 <AnimatedTitle 
                   projectName={currentProject.title} 
@@ -709,11 +732,11 @@ export function ProjectsSection() {
                 />
               </div>
               
-              <div className="text-right font-mono">
-                <div className="text-2xl md:text-3xl font-black text-foreground/10">
+              <div className="text-right font-mono flex-shrink-0">
+                <div className="text-xl md:text-3xl font-black text-foreground/10">
                   {String(activeIndex + 1).padStart(2, "0")}
                 </div>
-                <div className="text-[7px] text-foreground/40">
+                <div className="text-[6px] md:text-[7px] text-foreground/40">
                   /{String(TOTAL_PROJECTS).padStart(2, "0")}
                 </div>
               </div>
@@ -738,8 +761,11 @@ export function ProjectsSection() {
 
             {/* Project display */}
             <div className="flex-1 flex flex-col min-w-0">
-              {/* Project container - fixed height */}
-              <div className="relative h-[200px] md:h-[220px] lg:h-[240px]">
+              {/* Project container - responsive height */}
+              <div 
+                className="relative transition-[height] duration-300"
+                style={{ height: `${config.slideHeight}px` }}
+              >
                 {allProjects.map((project, index) => (
                   <ProjectSlide
                     key={project.id}
@@ -756,17 +782,17 @@ export function ProjectsSection() {
             </div>
           </div>
 
-          {/* Footer */}
-          <div className="font-mono text-[7px] md:text-[8px] text-foreground/20 mt-3 flex items-center">
+          {/* Footer - mobile optimized */}
+          <div className="font-mono text-[6px] md:text-[8px] text-foreground/20 mt-2 md:mt-3 flex items-center">
             <span>╚</span>
             <span className="flex-1 overflow-hidden">{"═".repeat(100)}</span>
             <span>╝</span>
           </div>
 
-          {/* Scroll hint */}
-          <div className="text-center mt-3">
-            <span className="font-mono text-[7px] text-foreground/20 animate-pulse">
-              ↓ SCROLL TO EXPLORE GROWTH ↓
+          {/* Scroll hint - hidden on mobile for cleaner look */}
+          <div className="text-center mt-2 md:mt-3">
+            <span className="font-mono text-[6px] md:text-[7px] text-foreground/20 animate-pulse">
+              {isMobile ? "↓ SCROLL ↓" : "↓ SCROLL TO EXPLORE GROWTH ↓"}
             </span>
           </div>
         </div>
