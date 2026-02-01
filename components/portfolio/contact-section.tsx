@@ -86,13 +86,12 @@ function VerticalWordRotator({
   return (
     <span
       ref={containerRef}
-      className={`relative inline-block overflow-hidden align-baseline ${className}`}
+      className={`inline-flex overflow-hidden ${className}`}
       style={{ 
         minWidth: `${slotWidthCh}ch`,
-        height: "1.2em",
       }}
     >
-      <span ref={wordRef} className="absolute inset-0 flex items-center">
+      <span ref={wordRef} className="inline-flex">
         {currentWord.split("").map((char, i) => (
           <span
             key={`${currentIndex}-${i}`}
