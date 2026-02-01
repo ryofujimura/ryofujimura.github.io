@@ -81,12 +81,14 @@ function ProjectRow({
   project, 
   index,
   isExpanded,
-  onToggle 
+  onToggle,
+  onSkillClick
 }: { 
   project: typeof projects[0]
   index: number
   isExpanded: boolean
   onToggle: () => void
+  onSkillClick?: (skill: string) => void
 }) {
   const detailsRef = useRef<HTMLDivElement>(null)
 
@@ -137,12 +139,20 @@ function ProjectRow({
         )}
       </button>
 
-      {/* Tech stack */}
+      {/* Tech stack - clickable skills */}
       <div className="text-foreground/30 ml-6">
         {"["}
         {project.skills.map((tech, i) => (
           <span key={tech}>
-            <span className="text-amber-200/60">{tech}</span>
+            <button
+              onClick={(e) => {
+                e.stopPropagation()
+                onSkillClick?.(tech)
+              }}
+              className="text-amber-200/60 hover:text-amber-200 hover:underline transition-colors"
+            >
+              {tech}
+            </button>
             {i < project.skills.length - 1 && <span className="text-foreground/20">, </span>}
           </span>
         ))}
@@ -184,11 +194,13 @@ function ProjectRow({
 function TerminalOutput({ 
   skill, 
   isActive,
-  onClose 
+  onClose,
+  onSkillClick
 }: { 
   skill: string | null
   isActive: boolean
   onClose: () => void
+  onSkillClick?: (skill: string) => void
 }) {
   const outputRef = useRef<HTMLDivElement>(null)
   const [isLoading, setIsLoading] = useState(true)
@@ -199,6 +211,7 @@ function TerminalOutput({
   const [showCursor, setShowCursor] = useState(true)
   const [isHeaderComplete, setIsHeaderComplete] = useState(false)
   const [expandedProject, setExpandedProject] = useState<string | null>(null)
+  const [allExpanded, setAllExpanded] = useState(false)
 
   const relatedProjects = skill ? skillsMap.get(skill) || [] : []
 
@@ -398,16 +411,23 @@ function TerminalOutput({
               <span className="absolute inset-0 flex items-center justify-center text-[6px] text-red-900 opacity-0 group-hover/buttons:opacity-100 transition-opacity">×</span>
             </button>
             <button 
-              className="w-2.5 h-2.5 rounded-full bg-yellow-500/60 hover:bg-yellow-500 transition-colors relative cursor-default"
-              title="Minimize"
+              onClick={onClose}
+              className="w-2.5 h-2.5 rounded-full bg-yellow-500/60 hover:bg-yellow-500 transition-colors relative"
+              title="Close"
             >
               <span className="absolute inset-0 flex items-center justify-center text-[6px] text-yellow-900 opacity-0 group-hover/buttons:opacity-100 transition-opacity">−</span>
             </button>
             <button 
-              className="w-2.5 h-2.5 rounded-full bg-green-500/60 hover:bg-green-500 transition-colors relative cursor-default"
-              title="Maximize"
+              onClick={() => setAllExpanded(prev => !prev)}
+              className={cn(
+                "w-2.5 h-2.5 rounded-full transition-colors relative",
+                allExpanded ? "bg-green-500" : "bg-green-500/60 hover:bg-green-500"
+              )}
+              title={allExpanded ? "Collapse all" : "Expand all"}
             >
-              <span className="absolute inset-0 flex items-center justify-center text-[6px] text-green-900 opacity-0 group-hover/buttons:opacity-100 transition-opacity">+</span>
+              <span className="absolute inset-0 flex items-center justify-center text-[6px] text-green-900 opacity-0 group-hover/buttons:opacity-100 transition-opacity">
+                {allExpanded ? "−" : "+"}
+              </span>
             </button>
             <span className="hidden md:inline font-mono text-[9px] text-foreground/40 ml-2">
               ryofujimura@MacBookPro
@@ -479,10 +499,19 @@ function TerminalOutput({
                       key={project.id}
                       project={project}
                       index={index}
-                      isExpanded={expandedProject === project.id}
-                      onToggle={() => setExpandedProject(
-                        expandedProject === project.id ? null : project.id
-                      )}
+                      isExpanded={allExpanded || expandedProject === project.id}
+                      onToggle={() => {
+                        if (allExpanded) {
+                          // When all expanded, clicking collapses just that one
+                          setAllExpanded(false)
+                          setExpandedProject(null)
+                        } else {
+                          setExpandedProject(
+                            expandedProject === project.id ? null : project.id
+                          )
+                        }
+                      }}
+                      onSkillClick={onSkillClick}
                     />
                   ))}
                   
@@ -871,6 +900,7 @@ export function ProjectsSection() {
                 skill={activeSkill}
                 isActive={true}
                 onClose={() => setActiveSkill(null)}
+                onSkillClick={(newSkill) => setActiveSkill(newSkill)}
               />
             </div>
           )}
