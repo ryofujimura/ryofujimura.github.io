@@ -6,7 +6,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger"
 import { AnimatedSection } from "@/components/animated-section"
 import { MagneticButton } from "@/components/magnetic-button"
 import { RevealText } from "@/components/reveal-text"
-import { Mail, Github, Linkedin, MapPin, Send } from "lucide-react"
+import { Github, Linkedin, Mail, MapPin, Send, X } from "lucide-react"
 import { LocationHoverText } from "@/components/portfolio/location-hover-text"
 
 gsap.registerPlugin(ScrollTrigger)
@@ -21,301 +21,6 @@ const ROTATING_WORDS = [
 ]
 const WORD_ROTATE_MS = 2800
 const WORD_SLOT_CH = 14
-
-// Animated floating cloud SVG component
-function FloatingCloud({ 
-  className = "", 
-  delay = 0,
-  scale = 1,
-}: { 
-  className?: string
-  delay?: number
-  scale?: number
-}) {
-  const cloudRef = useRef<SVGSVGElement>(null)
-
-  useEffect(() => {
-    if (!cloudRef.current) return
-
-    const cloud = cloudRef.current
-
-    // Initial floating animation
-    gsap.fromTo(cloud, 
-      { opacity: 0, y: 20, scale: 0.8 },
-      { 
-        opacity: 0.6, 
-        y: 0, 
-        scale: 1,
-        duration: 1.2,
-        delay: delay,
-        ease: "power2.out"
-      }
-    )
-
-    // Continuous gentle float
-    gsap.to(cloud, {
-      y: "random(-8, 8)",
-      x: "random(-5, 5)",
-      duration: "random(3, 5)",
-      repeat: -1,
-      yoyo: true,
-      ease: "sine.inOut",
-      delay: delay + 1.2,
-    })
-
-    return () => {
-      gsap.killTweensOf(cloud)
-    }
-  }, [delay])
-
-  return (
-    <svg
-      ref={cloudRef}
-      className={className}
-      viewBox="0 0 100 60"
-      fill="currentColor"
-      style={{ transform: `scale(${scale})` }}
-    >
-      <path
-        d="M85 35c0-8.284-6.716-15-15-15-.688 0-1.364.047-2.027.138C65.224 11.437 57.168 5 47.5 5c-11.322 0-20.5 9.178-20.5 20.5 0 .338.009.673.025 1.007C19.892 27.38 15 32.802 15 39.5 15 47.508 21.492 54 29.5 54h41c8.284 0 15-6.716 15-15 0-.338-.011-.673-.033-1.005A15.005 15.005 0 0085 35z"
-        opacity="0.8"
-      />
-    </svg>
-  )
-}
-
-// Expandable cloud message form
-function CloudMessageForm({ isExpanded, onClose }: { isExpanded: boolean; onClose: () => void }) {
-  const formRef = useRef<HTMLDivElement>(null)
-  const contentRef = useRef<HTMLDivElement>(null)
-  const textareaRef = useRef<HTMLTextAreaElement>(null)
-  const [message, setMessage] = useState("")
-  const [isSending, setIsSending] = useState(false)
-  const [showSuccess, setShowSuccess] = useState(false)
-
-  useEffect(() => {
-    if (!formRef.current || !contentRef.current) return
-
-    const form = formRef.current
-    const content = contentRef.current
-
-    if (isExpanded) {
-      // Expansion animation - cloud morphs into form
-      const tl = gsap.timeline()
-      
-      tl.set(form, { display: "block" })
-        .fromTo(form, 
-          { 
-            scale: 0.3,
-            opacity: 0,
-            borderRadius: "100px",
-            width: "200px",
-            height: "60px",
-          },
-          { 
-            scale: 1,
-            opacity: 1,
-            borderRadius: "24px",
-            width: "100%",
-            height: "auto",
-            duration: 0.6,
-            ease: "power3.out",
-          }
-        )
-        .fromTo(content,
-          { opacity: 0, y: 30 },
-          { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" },
-          "-=0.2"
-        )
-        .add(() => {
-          textareaRef.current?.focus()
-        })
-
-      // Animate decorative clouds
-      const clouds = form.querySelectorAll(".cloud-decor")
-      gsap.fromTo(clouds, 
-        { scale: 0, opacity: 0 },
-        { 
-          scale: 1, 
-          opacity: 0.15, 
-          duration: 0.5, 
-          stagger: 0.1,
-          ease: "back.out(1.7)",
-          delay: 0.3
-        }
-      )
-    } else {
-      // Collapse animation
-      const tl = gsap.timeline()
-      
-      tl.to(content, { opacity: 0, y: -20, duration: 0.2, ease: "power2.in" })
-        .to(form, {
-          scale: 0.3,
-          opacity: 0,
-          borderRadius: "100px",
-          duration: 0.4,
-          ease: "power3.in",
-          onComplete: () => {
-            gsap.set(form, { display: "none" })
-          }
-        }, "-=0.1")
-    }
-  }, [isExpanded])
-
-  const handleSend = useCallback(async () => {
-    if (!message.trim() || isSending) return
-    
-    setIsSending(true)
-    
-    // Animate send button
-    const sendBtn = formRef.current?.querySelector(".send-btn")
-    if (sendBtn) {
-      gsap.to(sendBtn, {
-        scale: 0.9,
-        duration: 0.1,
-        yoyo: true,
-        repeat: 1,
-      })
-    }
-
-    // Simulate send (no backend for now)
-    await new Promise(resolve => setTimeout(resolve, 800))
-    
-    setIsSending(false)
-    setShowSuccess(true)
-
-    // Success animation
-    const successEl = formRef.current?.querySelector(".success-message")
-    if (successEl) {
-      gsap.fromTo(successEl,
-        { opacity: 0, scale: 0.8, y: 10 },
-        { opacity: 1, scale: 1, y: 0, duration: 0.4, ease: "back.out(1.7)" }
-      )
-    }
-
-    // Reset and close after delay
-    setTimeout(() => {
-      setMessage("")
-      setShowSuccess(false)
-      onClose()
-    }, 2000)
-  }, [message, isSending, onClose])
-
-  return (
-    <div 
-      ref={formRef}
-      className="hidden absolute left-1/2 top-0 -translate-x-1/2 w-full max-w-lg z-20 overflow-hidden"
-      style={{ 
-        background: "linear-gradient(135deg, rgba(var(--card-rgb, 255, 255, 255), 0.95), rgba(var(--card-rgb, 255, 255, 255), 0.85))",
-        backdropFilter: "blur(20px)",
-        boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(var(--border-rgb, 0, 0, 0), 0.1)",
-      }}
-    >
-      {/* Decorative clouds */}
-      <div className="cloud-decor absolute -top-4 -left-6 w-20 h-12 text-accent/30 pointer-events-none">
-        <FloatingCloud scale={0.8} />
-      </div>
-      <div className="cloud-decor absolute -bottom-2 -right-4 w-16 h-10 text-accent/20 pointer-events-none">
-        <FloatingCloud scale={0.6} delay={0.2} />
-      </div>
-      <div className="cloud-decor absolute top-1/2 -left-8 w-12 h-8 text-muted-foreground/10 pointer-events-none">
-        <FloatingCloud scale={0.5} delay={0.4} />
-      </div>
-
-      <div ref={contentRef} className="p-6 sm:p-8">
-        {/* Close button */}
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-muted/50 hover:bg-muted transition-colors group"
-          aria-label="Close"
-        >
-          <svg 
-            className="w-4 h-4 text-muted-foreground group-hover:text-foreground transition-colors" 
-            viewBox="0 0 24 24" 
-            fill="none" 
-            stroke="currentColor" 
-            strokeWidth="2"
-          >
-            <path d="M18 6L6 18M6 6l12 12" />
-          </svg>
-        </button>
-
-        {/* Header with cloud animation */}
-        <div className="mb-6 text-center">
-          <div className="inline-flex items-center gap-2 mb-2">
-            <svg className="w-5 h-5 text-accent" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96z"/>
-            </svg>
-            <span className="text-sm font-mono text-muted-foreground uppercase tracking-wider">
-              Drop a message
-            </span>
-          </div>
-          <h3 className="text-xl sm:text-2xl font-bold font-mono text-foreground">
-            What&apos;s on your mind?
-          </h3>
-        </div>
-
-        {/* Message input */}
-        {!showSuccess ? (
-          <div className="space-y-4">
-            <div className="relative">
-              <textarea
-                ref={textareaRef}
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                placeholder="Type your message here..."
-                rows={4}
-                className="w-full px-4 py-3 bg-background/50 border border-border/50 rounded-xl font-mono text-sm text-foreground placeholder:text-muted-foreground/50 resize-none focus:outline-none focus:border-accent/50 focus:ring-2 focus:ring-accent/20 transition-all"
-                style={{ caretColor: "var(--accent)" }}
-              />
-              {/* Character shimmer effect on focus */}
-              <div className="absolute inset-0 rounded-xl pointer-events-none opacity-0 peer-focus:opacity-100 transition-opacity"
-                style={{
-                  background: "linear-gradient(90deg, transparent, rgba(var(--accent-rgb, 100, 180, 200), 0.05), transparent)",
-                }}
-              />
-            </div>
-
-            {/* Send button */}
-            <div className="flex justify-end">
-              <button
-                onClick={handleSend}
-                disabled={!message.trim() || isSending}
-                className="send-btn group inline-flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-full font-mono text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-lg hover:shadow-primary/20 transition-all duration-300"
-              >
-                {isSending ? (
-                  <>
-                    <svg className="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <circle cx="12" cy="12" r="10" strokeOpacity="0.25" />
-                      <path d="M12 2a10 10 0 0 1 10 10" strokeLinecap="round" />
-                    </svg>
-                    Sending...
-                  </>
-                ) : (
-                  <>
-                    Send Message
-                    <Send className="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-                  </>
-                )}
-              </button>
-            </div>
-          </div>
-        ) : (
-          /* Success state */
-          <div className="success-message text-center py-8">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-accent/10 mb-4">
-              <svg className="w-8 h-8 text-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <polyline points="20 6 9 17 4 12" />
-              </svg>
-            </div>
-            <p className="text-lg font-mono text-foreground font-medium">Message received!</p>
-            <p className="text-sm text-muted-foreground mt-1">I&apos;ll get back to you soon.</p>
-          </div>
-        )}
-      </div>
-    </div>
-  )
-}
 
 // Vertical letter-by-letter word rotator
 function VerticalWordRotator({
@@ -507,144 +212,457 @@ function AnimatedHeaderSVG({ className = "" }: { className?: string }) {
   )
 }
 
-// Cloud-themed contact button with expandable form
-function CloudContactButton() {
-  const [isExpanded, setIsExpanded] = useState(false)
-  const buttonRef = useRef<HTMLButtonElement>(null)
+// Floating cloud particles for atmospheric effect
+function FloatingParticles({ isActive }: { isActive: boolean }) {
   const containerRef = useRef<HTMLDivElement>(null)
-  const cloudsRef = useRef<HTMLDivElement>(null)
+  const particlesRef = useRef<HTMLDivElement[]>([])
 
-  // Initial animation for the button
   useEffect(() => {
-    if (!buttonRef.current || !cloudsRef.current) return
+    if (!containerRef.current || !isActive) return
 
-    const button = buttonRef.current
-    const clouds = cloudsRef.current.querySelectorAll(".btn-cloud")
+    const particles = particlesRef.current
+    
+    particles.forEach((particle, i) => {
+      if (!particle) return
+      
+      // Random initial positions
+      const startX = Math.random() * 100 - 50
+      const startY = Math.random() * 100 + 50
+      
+      gsap.set(particle, {
+        x: startX,
+        y: startY,
+        scale: 0,
+        opacity: 0,
+      })
 
-    // Animate clouds around button
-    clouds.forEach((cloud, i) => {
-      gsap.to(cloud, {
-        y: "random(-6, 6)",
-        x: "random(-4, 4)",
-        duration: "random(2, 4)",
+      // Floating animation
+      gsap.to(particle, {
+        y: startY - 150 - Math.random() * 100,
+        x: startX + (Math.random() - 0.5) * 80,
+        scale: 0.5 + Math.random() * 0.5,
+        opacity: 0.3 + Math.random() * 0.4,
+        duration: 2 + Math.random() * 2,
+        delay: i * 0.15,
+        ease: "power1.out",
+        onComplete: () => {
+          gsap.to(particle, {
+            y: "-=50",
+            opacity: 0,
+            duration: 1.5,
+            ease: "power1.in",
+          })
+        },
+      })
+    })
+  }, [isActive])
+
+  if (!isActive) return null
+
+  return (
+    <div ref={containerRef} className="absolute inset-0 pointer-events-none overflow-hidden">
+      {Array.from({ length: 12 }).map((_, i) => (
+        <div
+          key={i}
+          ref={(el) => {
+            if (el) particlesRef.current[i] = el
+          }}
+          className="absolute left-1/2 top-1/2 w-3 h-3 rounded-full bg-accent/40 blur-sm"
+          style={{
+            width: 8 + Math.random() * 16,
+            height: 8 + Math.random() * 16,
+          }}
+        />
+      ))}
+    </div>
+  )
+}
+
+// Cloud-morphing expandable message form
+function CloudMessageForm({ 
+  isExpanded, 
+  onToggle,
+  onClose,
+}: { 
+  isExpanded: boolean
+  onToggle: () => void
+  onClose: () => void
+}) {
+  const containerRef = useRef<HTMLDivElement>(null)
+  const buttonRef = useRef<HTMLButtonElement>(null)
+  const formRef = useRef<HTMLDivElement>(null)
+  const textareaRef = useRef<HTMLTextAreaElement>(null)
+  const blobsRef = useRef<SVGSVGElement>(null)
+  const sendButtonRef = useRef<HTMLButtonElement>(null)
+  const [message, setMessage] = useState("")
+  const [isSending, setIsSending] = useState(false)
+  const tlRef = useRef<gsap.core.Timeline | null>(null)
+
+  // Morph cloud shape paths
+  const cloudPaths = {
+    button: "M50,25 C50,11 61,0 75,0 L325,0 C339,0 350,11 350,25 L350,35 C350,49 339,60 325,60 L75,60 C61,60 50,49 50,35 Z",
+    expanded: "M0,40 C0,18 18,0 40,0 L560,0 C582,0 600,18 600,40 L600,320 C600,342 582,360 560,360 L40,360 C18,360 0,342 0,320 Z",
+  }
+
+  // Initial blob animation on mount
+  useEffect(() => {
+    if (!blobsRef.current) return
+
+    const blobs = blobsRef.current.querySelectorAll(".cloud-blob")
+    
+    blobs.forEach((blob, i) => {
+      gsap.to(blob, {
+        scale: 1 + Math.random() * 0.1,
+        x: Math.sin(i) * 3,
+        y: Math.cos(i) * 3,
+        duration: 3 + Math.random() * 2,
         repeat: -1,
         yoyo: true,
         ease: "sine.inOut",
-        delay: i * 0.3,
       })
     })
-
-    // Subtle button pulse
-    gsap.to(button, {
-      boxShadow: "0 20px 40px -10px rgba(var(--accent-rgb, 100, 180, 200), 0.3)",
-      duration: 2,
-      repeat: -1,
-      yoyo: true,
-      ease: "sine.inOut",
-    })
-
-    return () => {
-      gsap.killTweensOf(button)
-      gsap.killTweensOf(clouds)
-    }
   }, [])
 
-  const handleClick = useCallback(() => {
-    if (!buttonRef.current) return
+  // Expand/collapse animation
+  useEffect(() => {
+    if (!containerRef.current || !formRef.current || !buttonRef.current) return
 
-    // Animate button before expanding
-    const tl = gsap.timeline()
+    const ctx = gsap.context(() => {
+      if (tlRef.current) {
+        tlRef.current.kill()
+      }
+
+      const tl = gsap.timeline({
+        defaults: { ease: "power3.inOut" },
+      })
+
+      if (isExpanded) {
+        // Expansion animation
+        tl.to(buttonRef.current, {
+          scale: 0.95,
+          duration: 0.15,
+        })
+        .to(containerRef.current, {
+          width: "100%",
+          maxWidth: 600,
+          height: 360,
+          duration: 0.8,
+          ease: "elastic.out(1, 0.75)",
+        }, 0.1)
+        .to(".cloud-main-path", {
+          attr: { d: cloudPaths.expanded },
+          duration: 0.8,
+          ease: "elastic.out(1, 0.75)",
+        }, 0.1)
+        .to(".button-content", {
+          opacity: 0,
+          y: -20,
+          duration: 0.2,
+        }, 0)
+        .fromTo(formRef.current, {
+          opacity: 0,
+          y: 30,
+          scale: 0.9,
+        }, {
+          opacity: 1,
+          y: 0,
+          scale: 1,
+          duration: 0.5,
+          ease: "back.out(1.5)",
+        }, 0.4)
+        .fromTo(".form-title-char", {
+          opacity: 0,
+          y: 20,
+          rotateX: -90,
+        }, {
+          opacity: 1,
+          y: 0,
+          rotateX: 0,
+          stagger: 0.03,
+          duration: 0.4,
+          ease: "back.out(2)",
+        }, 0.5)
+        .fromTo(".form-textarea", {
+          opacity: 0,
+          scale: 0.95,
+          y: 10,
+        }, {
+          opacity: 1,
+          scale: 1,
+          y: 0,
+          duration: 0.4,
+        }, 0.7)
+        .fromTo(sendButtonRef.current, {
+          opacity: 0,
+          scale: 0.8,
+          y: 10,
+        }, {
+          opacity: 1,
+          scale: 1,
+          y: 0,
+          duration: 0.3,
+        }, 0.85)
+        .fromTo(".close-btn", {
+          opacity: 0,
+          scale: 0,
+          rotate: -180,
+        }, {
+          opacity: 1,
+          scale: 1,
+          rotate: 0,
+          duration: 0.4,
+          ease: "back.out(2)",
+        }, 0.6)
+
+        // Focus textarea after animation
+        setTimeout(() => textareaRef.current?.focus(), 800)
+      } else {
+        // Collapse animation
+        tl.to(".close-btn", {
+          opacity: 0,
+          scale: 0,
+          rotate: 180,
+          duration: 0.2,
+        })
+        .to(formRef.current, {
+          opacity: 0,
+          y: 20,
+          scale: 0.95,
+          duration: 0.3,
+        }, 0)
+        .to(containerRef.current, {
+          width: 200,
+          height: 60,
+          duration: 0.6,
+          ease: "power3.inOut",
+        }, 0.2)
+        .to(".cloud-main-path", {
+          attr: { d: cloudPaths.button },
+          duration: 0.6,
+          ease: "power3.inOut",
+        }, 0.2)
+        .to(".button-content", {
+          opacity: 1,
+          y: 0,
+          duration: 0.3,
+        }, 0.5)
+        .to(buttonRef.current, {
+          scale: 1,
+          duration: 0.2,
+        }, 0.6)
+      }
+
+      tlRef.current = tl
+    }, containerRef)
+
+    return () => ctx.revert()
+  }, [isExpanded, cloudPaths.button, cloudPaths.expanded])
+
+  // Send button hover animation
+  const handleSendHover = useCallback((hovering: boolean) => {
+    if (!sendButtonRef.current) return
     
-    tl.to(buttonRef.current, {
-      scale: 0.95,
-      duration: 0.1,
-      ease: "power2.in",
-    })
-    .to(buttonRef.current, {
-      scale: 1.05,
-      opacity: 0,
-      y: -10,
+    gsap.to(sendButtonRef.current, {
+      scale: hovering ? 1.05 : 1,
       duration: 0.3,
       ease: "power2.out",
-      onComplete: () => {
-        setIsExpanded(true)
-      }
+    })
+
+    gsap.to(".send-icon", {
+      x: hovering ? 3 : 0,
+      y: hovering ? -3 : 0,
+      duration: 0.3,
+      ease: "power2.out",
     })
   }, [])
 
-  const handleClose = useCallback(() => {
-    setIsExpanded(false)
+  // Mock send handler
+  const handleSend = useCallback(() => {
+    if (!message.trim() || isSending) return
     
-    // Animate button back in
-    if (buttonRef.current) {
-      gsap.fromTo(buttonRef.current,
-        { scale: 0.8, opacity: 0, y: 20 },
-        { scale: 1, opacity: 1, y: 0, duration: 0.5, ease: "back.out(1.7)", delay: 0.3 }
-      )
-    }
-  }, [])
+    setIsSending(true)
+    
+    // Animate send button
+    gsap.timeline()
+      .to(sendButtonRef.current, {
+        scale: 0.9,
+        duration: 0.1,
+      })
+      .to(sendButtonRef.current, {
+        scale: 1.1,
+        duration: 0.2,
+      })
+      .to(".send-icon", {
+        x: 100,
+        y: -50,
+        opacity: 0,
+        duration: 0.4,
+        ease: "power2.in",
+      })
+      .to(sendButtonRef.current, {
+        scale: 1,
+        duration: 0.2,
+      })
+      .call(() => {
+        // Reset after mock send
+        setTimeout(() => {
+          setMessage("")
+          setIsSending(false)
+          gsap.set(".send-icon", { x: 0, y: 0, opacity: 1 })
+        }, 500)
+      })
+  }, [message, isSending])
+
+  const titleChars = "Drop a message".split("")
 
   return (
-    <div ref={containerRef} className="relative min-h-[80px]">
-      {/* Floating background clouds */}
-      <div ref={cloudsRef} className="absolute inset-0 pointer-events-none">
-        <div className="btn-cloud absolute -top-8 -left-12 w-24 h-14 text-accent/10">
-          <FloatingCloud delay={0} />
-        </div>
-        <div className="btn-cloud absolute -top-4 -right-16 w-20 h-12 text-muted-foreground/10">
-          <FloatingCloud delay={0.5} />
-        </div>
-        <div className="btn-cloud absolute -bottom-6 left-1/4 w-16 h-10 text-accent/5">
-          <FloatingCloud delay={1} />
-        </div>
-      </div>
-
-      {/* Main button */}
-      <button
-        ref={buttonRef}
-        onClick={handleClick}
-        className={`touch-target group relative inline-flex items-center justify-center gap-2 sm:gap-3 min-h-[48px] px-8 sm:px-12 py-5 sm:py-6 text-base sm:text-lg font-medium font-mono text-primary-foreground bg-primary rounded-full transition-all duration-300 w-full max-w-[320px] mx-auto sm:w-auto overflow-hidden ${isExpanded ? "pointer-events-none" : ""}`}
+    <div className="relative inline-flex justify-center">
+      <FloatingParticles isActive={isExpanded} />
+      
+      <div
+        ref={containerRef}
+        className="relative"
         style={{
-          boxShadow: "0 10px 30px -5px rgba(var(--accent-rgb, 100, 180, 200), 0.2)",
+          width: isExpanded ? "100%" : 200,
+          maxWidth: isExpanded ? 600 : 200,
+          height: isExpanded ? 360 : 60,
         }}
       >
-        {/* Cloud gradient overlay */}
-        <div 
-          className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-          style={{
-            background: "linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 50%, rgba(255,255,255,0.05) 100%)",
-          }}
-        />
-        
-        {/* Animated cloud icon */}
-        <svg 
-          className="w-5 h-5 relative z-10 group-hover:scale-110 transition-transform duration-300" 
-          viewBox="0 0 24 24" 
-          fill="currentColor"
+        {/* Cloud SVG background */}
+        <svg
+          ref={blobsRef}
+          className="absolute inset-0 w-full h-full"
+          viewBox="0 0 600 360"
+          preserveAspectRatio="none"
         >
-          <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96z"/>
+          <defs>
+            <filter id="cloud-blur" x="-20%" y="-20%" width="140%" height="140%">
+              <feGaussianBlur in="SourceGraphic" stdDeviation="2" />
+            </filter>
+            <linearGradient id="cloud-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="var(--primary)" stopOpacity="1" />
+              <stop offset="100%" stopColor="var(--primary)" stopOpacity="0.9" />
+            </linearGradient>
+          </defs>
+          
+          {/* Decorative background blobs */}
+          <ellipse
+            className="cloud-blob"
+            cx="100"
+            cy="50"
+            rx="60"
+            ry="40"
+            fill="var(--primary)"
+            opacity="0.15"
+            filter="url(#cloud-blur)"
+          />
+          <ellipse
+            className="cloud-blob"
+            cx="500"
+            cy="300"
+            rx="70"
+            ry="45"
+            fill="var(--primary)"
+            opacity="0.12"
+            filter="url(#cloud-blur)"
+          />
+          <ellipse
+            className="cloud-blob"
+            cx="550"
+            cy="80"
+            rx="50"
+            ry="35"
+            fill="var(--accent)"
+            opacity="0.1"
+            filter="url(#cloud-blur)"
+          />
+          
+          {/* Main cloud shape */}
+          <path
+            className="cloud-main-path"
+            d={cloudPaths.button}
+            fill="url(#cloud-gradient)"
+            style={{
+              filter: "drop-shadow(0 10px 30px rgba(0,0,0,0.15))",
+            }}
+          />
         </svg>
-        
-        <span className="relative z-10">Say Hello</span>
-        
-        {/* Floating particles */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          {[...Array(3)].map((_, i) => (
-            <div
-              key={i}
-              className="absolute w-1 h-1 bg-white/30 rounded-full animate-pulse"
-              style={{
-                left: `${20 + i * 30}%`,
-                top: `${30 + (i % 2) * 40}%`,
-                animationDelay: `${i * 0.5}s`,
-              }}
-            />
-          ))}
-        </div>
-      </button>
 
-      {/* Expandable message form */}
-      <CloudMessageForm isExpanded={isExpanded} onClose={handleClose} />
+        {/* Button state */}
+        <button
+          ref={buttonRef}
+          onClick={onToggle}
+          className="button-content absolute inset-0 flex items-center justify-center gap-2 text-primary-foreground font-mono font-medium z-10"
+          style={{ opacity: isExpanded ? 0 : 1 }}
+        >
+          <span>Say Hello</span>
+          <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M22 2L11 13" strokeLinecap="round" strokeLinejoin="round" />
+            <path d="M22 2L15 22L11 13L2 9L22 2Z" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </button>
+
+        {/* Expanded form state */}
+        <div
+          ref={formRef}
+          className="absolute inset-0 p-6 sm:p-8 flex flex-col z-10"
+          style={{ 
+            opacity: 0,
+            pointerEvents: isExpanded ? "auto" : "none",
+          }}
+        >
+          {/* Close button */}
+          <button
+            onClick={onClose}
+            className="close-btn absolute top-4 right-4 w-8 h-8 rounded-full bg-primary-foreground/10 hover:bg-primary-foreground/20 flex items-center justify-center transition-colors"
+          >
+            <X className="w-4 h-4 text-primary-foreground" />
+          </button>
+
+          {/* Title with character animation */}
+          <h3 className="text-xl sm:text-2xl font-mono font-bold text-primary-foreground mb-4 flex flex-wrap perspective-1000">
+            {titleChars.map((char, i) => (
+              <span
+                key={i}
+                className="form-title-char inline-block"
+                style={{ 
+                  whiteSpace: char === " " ? "pre" : "normal",
+                  transformStyle: "preserve-3d",
+                }}
+              >
+                {char === " " ? "\u00A0" : char}
+              </span>
+            ))}
+          </h3>
+
+          {/* Textarea */}
+          <textarea
+            ref={textareaRef}
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            placeholder="What's on your mind?"
+            className="form-textarea flex-1 w-full bg-primary-foreground/10 backdrop-blur-sm text-primary-foreground placeholder:text-primary-foreground/50 rounded-2xl p-4 resize-none font-mono text-sm focus:outline-none focus:ring-2 focus:ring-primary-foreground/30 transition-all"
+            style={{
+              minHeight: 120,
+            }}
+          />
+
+          {/* Send button */}
+          <div className="flex justify-end mt-4">
+            <button
+              ref={sendButtonRef}
+              onClick={handleSend}
+              onMouseEnter={() => handleSendHover(true)}
+              onMouseLeave={() => handleSendHover(false)}
+              disabled={!message.trim() || isSending}
+              className="flex items-center gap-2 px-6 py-3 bg-primary-foreground text-primary rounded-full font-mono font-medium text-sm disabled:opacity-50 disabled:pointer-events-none transition-colors hover:bg-primary-foreground/90"
+            >
+              <span>{isSending ? "Sending..." : "Send"}</span>
+              <Send className="send-icon w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   )
 }
@@ -673,6 +691,7 @@ const socialLinks = [
 export function ContactSection() {
   const containerRef = useRef<HTMLDivElement>(null)
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
+  const [isFormExpanded, setIsFormExpanded] = useState(false)
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -687,6 +706,14 @@ export function ContactSection() {
     const container = containerRef.current
     container?.addEventListener("mousemove", handleMouseMove)
     return () => container?.removeEventListener("mousemove", handleMouseMove)
+  }, [])
+
+  const handleToggleForm = useCallback(() => {
+    setIsFormExpanded((prev) => !prev)
+  }, [])
+
+  const handleCloseForm = useCallback(() => {
+    setIsFormExpanded(false)
   }, [])
 
   return (
@@ -741,12 +768,19 @@ export function ContactSection() {
           </div>
         </AnimatedSection>
 
+        {/* Cloud-morphing message form */}
         <AnimatedSection delay={300}>
-          <CloudContactButton />
+          <div className="flex justify-center mb-10 sm:mb-16">
+            <CloudMessageForm 
+              isExpanded={isFormExpanded}
+              onToggle={handleToggleForm}
+              onClose={handleCloseForm}
+            />
+          </div>
         </AnimatedSection>
 
         <AnimatedSection delay={400}>
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 sm:gap-4 mt-10 sm:mt-16 max-w-md sm:max-w-none mx-auto">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 sm:gap-4 max-w-md sm:max-w-none mx-auto">
             {socialLinks.map((link) => (
               <MagneticButton
                 key={link.label}
