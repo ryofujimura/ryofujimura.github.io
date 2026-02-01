@@ -53,13 +53,13 @@ function useIsMobile() {
 // Mobile-optimized scroll values
 const SCROLL_CONFIG = {
   mobile: {
-    scrollPerProject: 20, // vh per project (compact scrolling on mobile)
-    scrubSpeed: 0.2,      // snappier response
+    scrollPerProject: 20, // vh per project (compact scrolling)
+    scrubSpeed: 0.1,      // smoother response for short distance
     slideHeight: 180,     // px
   },
   desktop: {
     scrollPerProject: 25, // vh per project
-    scrubSpeed: 0.3,
+    scrubSpeed: 0.15,     // smooth response
     slideHeight: 240,     // px
   },
 }
