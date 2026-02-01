@@ -12,8 +12,6 @@ gsap.registerPlugin(ScrollTrigger)
 // ASCII GRAPHICS
 // ─────────────────────────────────────────────────────────────
 
-const ASCII_TIMELINE = `═══════════════════════════════════════════════════════════════════════════════`
-
 const ASCII_NODE = `
 ┌───┐
 │ ● │
@@ -680,15 +678,6 @@ function SectionHeader({ count }: { count: number }) {
           {String(count).padStart(2, "0")}
         </span>
       </div>
-
-      {/* Timeline legend - mobile */}
-      <div className="flex items-center gap-2 font-mono text-[8px] sm:text-[9px] text-muted-foreground">
-        <span>2025</span>
-        <span className="flex-1 h-px bg-foreground/20" />
-        <span className="text-accent">TIMELINE</span>
-        <span className="flex-1 h-px bg-foreground/20" />
-        <span>2022</span>
-      </div>
     </div>
   )
 }
@@ -954,12 +943,9 @@ export function ProjectsSection() {
 
         {/* Footer */}
         <div className="mt-8 sm:mt-12 text-center">
-          <pre className="font-mono text-[7px] sm:text-[8px] text-foreground/15 select-none hidden sm:block">
-            {ASCII_TIMELINE}
-          </pre>
           <a
             href="#contact"
-            className="touch-target inline-flex items-center gap-2 font-mono text-[10px] sm:text-xs text-muted-foreground hover:text-foreground transition-colors mt-3"
+            className="touch-target inline-flex items-center gap-2 font-mono text-[10px] sm:text-xs text-muted-foreground hover:text-foreground transition-colors"
           >
             ↓ NEXT
           </a>
