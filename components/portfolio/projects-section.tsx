@@ -95,7 +95,7 @@ function TerminalOutput({
 
   const relatedProjects = skill ? skillsMap.get(skill) || [] : []
 
-  // Generate terminal output lines
+  // Generate terminal output lines - simplified without ASCII box
   const generateLines = useCallback(() => {
     if (!skill) return []
     
@@ -108,16 +108,14 @@ function TerminalOutput({
       `[EXEC] Searching project database...`,
       `[████████████████████████] 100%`,
       ``,
-      `┌─────────────────────────────────────────┐`,
-      `│  SKILL: ${skill.padEnd(30)} │`,
-      `│  PROJECTS: ${String(projectCount).padEnd(27)} │`,
-      `│  YEARS: ${years.join(", ").padEnd(29)} │`,
-      `└─────────────────────────────────────────┘`,
+      `SKILL: ${skill}`,
+      `PROJECTS: ${projectCount}`,
+      `YEARS: ${years.join(", ")}`,
       ``,
       `// RELATED PROJECTS:`,
       ``,
       ...relatedProjects.map((p, i) => 
-        `  ${String(i + 1).padStart(2, "0")}. ${p.title.padEnd(12)} // ${p.description}`
+        `${String(i + 1).padStart(2, "0")}. ${p.title} // ${p.description}`
       ),
       ``,
       `[OK] Query complete. ${projectCount} result(s) found.`,
@@ -192,22 +190,22 @@ function TerminalOutput({
 
   if (!isActive || !skill) return null
 
-  // Syntax highlighting for terminal output
+  // Pastel syntax highlighting for terminal output
   const highlightLine = (line: string, lineIndex: number) => {
     // Command line
     if (line.startsWith("$")) {
       const parts = line.split(" ")
       return (
         <>
-          <span className="text-green-400">$</span>
-          <span className="text-cyan-400"> {parts[1]}</span>
-          <span className="text-yellow-400"> {parts.slice(2).join(" ")}</span>
+          <span className="text-emerald-300/80">$</span>
+          <span className="text-sky-300/80"> {parts[1]}</span>
+          <span className="text-amber-200/70"> {parts.slice(2).join(" ")}</span>
         </>
       )
     }
     // Progress bar
     if (line.includes("████")) {
-      return <span className="text-green-400">{line}</span>
+      return <span className="text-emerald-300/60">{line}</span>
     }
     // Status messages
     if (line.startsWith("[EXEC]") || line.startsWith("[OK]")) {
@@ -215,67 +213,56 @@ function TerminalOutput({
       const rest = line.replace(/^\[[^\]]+\]\s*/, "")
       return (
         <>
-          <span className="text-purple-400">[{bracket?.[1]}]</span>
-          <span className="text-foreground/60"> {rest}</span>
+          <span className="text-violet-300/70">[{bracket?.[1]}]</span>
+          <span className="text-foreground/50"> {rest}</span>
         </>
       )
     }
-    // Box characters
-    if (line.startsWith("┌") || line.startsWith("│") || line.startsWith("└")) {
-      // Highlight values inside box
-      if (line.includes("SKILL:")) {
-        const skillName = skill
-        return (
-          <>
-            <span className="text-foreground/30">│  </span>
-            <span className="text-foreground/50">SKILL: </span>
-            <span className={cn("font-bold", getSkillColor(skillName))}>{skillName.padEnd(30)}</span>
-            <span className="text-foreground/30"> │</span>
-          </>
-        )
-      }
-      if (line.includes("PROJECTS:")) {
-        return (
-          <>
-            <span className="text-foreground/30">│  </span>
-            <span className="text-foreground/50">PROJECTS: </span>
-            <span className="text-orange-400 font-bold">{String(relatedProjects.length).padEnd(27)}</span>
-            <span className="text-foreground/30"> │</span>
-          </>
-        )
-      }
-      if (line.includes("YEARS:")) {
-        const years = [...new Set(relatedProjects.map(p => p.year))].sort()
-        return (
-          <>
-            <span className="text-foreground/30">│  </span>
-            <span className="text-foreground/50">YEARS: </span>
-            <span className="text-yellow-400">{years.join(", ").padEnd(29)}</span>
-            <span className="text-foreground/30"> │</span>
-          </>
-        )
-      }
-      return <span className="text-foreground/30">{line}</span>
+    // Key-value lines (SKILL:, PROJECTS:, YEARS:)
+    if (line.startsWith("SKILL:")) {
+      return (
+        <>
+          <span className="text-foreground/40">SKILL: </span>
+          <span className="text-rose-300/80 font-medium">{skill}</span>
+        </>
+      )
+    }
+    if (line.startsWith("PROJECTS:")) {
+      return (
+        <>
+          <span className="text-foreground/40">PROJECTS: </span>
+          <span className="text-amber-200/80 font-medium">{relatedProjects.length}</span>
+        </>
+      )
+    }
+    if (line.startsWith("YEARS:")) {
+      const years = [...new Set(relatedProjects.map(p => p.year))].sort()
+      return (
+        <>
+          <span className="text-foreground/40">YEARS: </span>
+          <span className="text-lime-300/70">{years.join(", ")}</span>
+        </>
+      )
     }
     // Comments
     if (line.startsWith("//")) {
-      return <span className="text-foreground/30 italic">{line}</span>
+      return <span className="text-foreground/25 italic">{line}</span>
     }
     // Project lines
-    if (line.match(/^\s+\d+\./)) {
-      const match = line.match(/^\s+(\d+)\.\s+(\w+)\s+\/\/\s+(.+)$/)
+    if (line.match(/^\d+\./)) {
+      const match = line.match(/^(\d+)\.\s+(\w+)\s+\/\/\s+(.+)$/)
       if (match) {
         return (
           <>
-            <span className="text-foreground/30">  {match[1]}. </span>
-            <span className="text-cyan-400 font-bold">{match[2].padEnd(12)}</span>
-            <span className="text-foreground/30"> // </span>
-            <span className="text-foreground/50">{match[3]}</span>
+            <span className="text-foreground/30">{match[1]}. </span>
+            <span className="text-sky-300/80 font-medium">{match[2]}</span>
+            <span className="text-foreground/25"> // </span>
+            <span className="text-foreground/40">{match[3]}</span>
           </>
         )
       }
     }
-    return <span className="text-foreground/40">{line}</span>
+    return <span className="text-foreground/35">{line}</span>
   }
 
   return (
@@ -291,9 +278,12 @@ function TerminalOutput({
             <div className="w-2.5 h-2.5 rounded-full bg-red-500/60" />
             <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/60" />
             <div className="w-2.5 h-2.5 rounded-full bg-green-500/60" />
+            <span className="hidden md:inline font-mono text-[9px] text-foreground/40 ml-2">
+              ryofujimura@MacBookPro
+            </span>
           </div>
           <div className="font-mono text-[9px] text-foreground/30">
-            skill_query.sh — {skill}
+            <span className="hidden sm:inline">skill_query.sh — </span>{skill}
           </div>
           <button 
             onClick={onClose}
@@ -592,8 +582,8 @@ export function ProjectsSection() {
           ref={skillsContainerRef}
           className="relative text-center py-6 sm:py-10"
         >
-          {/* Skills flow - stacked on mobile, wrapped on desktop */}
-          <div className="flex flex-col sm:flex-row sm:flex-wrap justify-center items-center sm:items-baseline gap-y-2 sm:gap-x-[0.2em] sm:gap-y-3 px-2">
+          {/* Skills flow - wrapped on all screen sizes */}
+          <div className="flex flex-row flex-wrap justify-center items-baseline gap-x-[0.15em] gap-y-1 sm:gap-x-[0.2em] sm:gap-y-3 px-2">
             {allSkills.map((skill, index) => (
               <span key={skill} className="inline-flex items-baseline">
                 <SkillButton
@@ -604,7 +594,7 @@ export function ProjectsSection() {
                   onClick={() => handleSkillClick(skill)}
                 />
                 {index < allSkills.length - 1 && (
-                  <span className="hidden sm:inline font-mono text-[2vw] text-foreground/10 mx-[0.15em] select-none">
+                  <span className="font-mono text-[3vw] sm:text-[2vw] text-foreground/10 mx-[0.1em] select-none">
                     ·
                   </span>
                 )}
