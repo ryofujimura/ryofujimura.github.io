@@ -1,11 +1,141 @@
 "use client"
 
 import { useRef, useState, useEffect } from "react"
+import { gsap } from "gsap"
+import { ScrollTrigger } from "gsap/ScrollTrigger"
 import { AnimatedSection } from "@/components/animated-section"
 import { MagneticButton } from "@/components/magnetic-button"
 import { RevealText } from "@/components/reveal-text"
 import { Mail, Github, Linkedin, MapPin, ArrowUpRight } from "lucide-react"
 import { LocationHoverText } from "@/components/portfolio/location-hover-text"
+
+gsap.registerPlugin(ScrollTrigger)
+
+// Animated SVG decoration for the header
+function AnimatedHeaderSVG({ className = "" }: { className?: string }) {
+  const svgRef = useRef<SVGSVGElement>(null)
+
+  useEffect(() => {
+    if (!svgRef.current) return
+
+    const paths = svgRef.current.querySelectorAll("path, line, circle")
+    
+    // Set initial state - hidden with stroke offset
+    paths.forEach((el) => {
+      const geom = el as SVGGeometryElement
+      if (typeof geom.getTotalLength === "function") {
+        try {
+          const len = geom.getTotalLength()
+          gsap.set(geom, { strokeDasharray: len, strokeDashoffset: len })
+        } catch {
+          // Skip unsupported elements
+        }
+      }
+    })
+
+    // Animate on scroll
+    const ctx = gsap.context(() => {
+      gsap.to(paths, {
+        strokeDashoffset: 0,
+        duration: 1.2,
+        stagger: 0.15,
+        ease: "power2.inOut",
+        scrollTrigger: {
+          trigger: svgRef.current,
+          start: "top 80%",
+          toggleActions: "play none none none",
+        },
+      })
+    }, svgRef)
+
+    return () => ctx.revert()
+  }, [])
+
+  return (
+    <svg
+      ref={svgRef}
+      className={className}
+      viewBox="0 0 400 60"
+      fill="none"
+      stroke="currentColor"
+      preserveAspectRatio="xMidYMid meet"
+    >
+      {/* Left decorative bracket */}
+      <path
+        d="M 20 10 L 5 10 L 5 50 L 20 50"
+        strokeWidth="1.5"
+        className="text-accent"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      {/* Left inner line */}
+      <line
+        x1="30"
+        y1="30"
+        x2="80"
+        y2="30"
+        strokeWidth="1"
+        className="text-foreground/30"
+        strokeLinecap="round"
+      />
+      {/* Left dot */}
+      <circle
+        cx="90"
+        cy="30"
+        r="3"
+        strokeWidth="1.5"
+        className="text-accent"
+      />
+      
+      {/* Right decorative bracket */}
+      <path
+        d="M 380 10 L 395 10 L 395 50 L 380 50"
+        strokeWidth="1.5"
+        className="text-accent"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      {/* Right inner line */}
+      <line
+        x1="370"
+        y1="30"
+        x2="320"
+        y2="30"
+        strokeWidth="1"
+        className="text-foreground/30"
+        strokeLinecap="round"
+      />
+      {/* Right dot */}
+      <circle
+        cx="310"
+        cy="30"
+        r="3"
+        strokeWidth="1.5"
+        className="text-accent"
+      />
+      
+      {/* Center decorative elements */}
+      <line
+        x1="180"
+        y1="8"
+        x2="220"
+        y2="8"
+        strokeWidth="1"
+        className="text-foreground/20"
+        strokeLinecap="round"
+      />
+      <line
+        x1="180"
+        y1="52"
+        x2="220"
+        y2="52"
+        strokeWidth="1"
+        className="text-foreground/20"
+        strokeLinecap="round"
+      />
+    </svg>
+  )
+}
 
 const socialLinks = [
   {
@@ -62,10 +192,14 @@ export function ContactSection() {
 
       <div className="max-w-4xl mx-auto text-center relative z-10">
         <AnimatedSection>
-          <div className="flex justify-center mb-6 sm:mb-8">
-            <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-foreground font-mono">
-              What's Next?
-            </h2>
+          <div className="flex flex-col items-center mb-6 sm:mb-8">
+            {/* Animated SVG decoration */}
+            <div className="relative w-full max-w-md">
+              <AnimatedHeaderSVG className="w-full h-12 sm:h-16" />
+              <h2 className="absolute inset-0 flex items-center justify-center text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-foreground font-mono">
+                What's Next?
+              </h2>
+            </div>
           </div>
         </AnimatedSection>
 
