@@ -468,27 +468,17 @@ export function HeroBrutalistRight() {
             {/* Embedding space */}
             <ellipse cx="0" cy="0" rx="45" ry="20" strokeWidth="0.4" strokeDasharray="2 3" />
             
-            {/* Embedding dots */}
-            {[-30, -15, 0, 15, 30].map((x, i) => (
-              <circle
-                key={i}
-                cx={x}
-                cy={Math.sin(i * 1.2) * 8}
-                r="2"
-                fill="currentColor"
-                className="embedding-dot text-foreground/40"
-              />
-            ))}
-            {[-22, -7, 7, 22].map((x, i) => (
-              <circle
-                key={`b-${i}`}
-                cx={x}
-                cy={Math.cos(i * 0.8) * 6}
-                r="1.5"
-                fill="currentColor"
-                className="embedding-dot text-foreground/30"
-              />
-            ))}
+            {/* Embedding dots - pre-computed positions to avoid hydration mismatch */}
+            <circle cx="-30" cy="0" r="2" fill="currentColor" className="embedding-dot text-foreground/40" />
+            <circle cx="-15" cy="7.46" r="2" fill="currentColor" className="embedding-dot text-foreground/40" />
+            <circle cx="0" cy="5.40" r="2" fill="currentColor" className="embedding-dot text-foreground/40" />
+            <circle cx="15" cy="-3.53" r="2" fill="currentColor" className="embedding-dot text-foreground/40" />
+            <circle cx="30" cy="-7.93" r="2" fill="currentColor" className="embedding-dot text-foreground/40" />
+            
+            <circle cx="-22" cy="6" r="1.5" fill="currentColor" className="embedding-dot text-foreground/30" />
+            <circle cx="-7" cy="4.18" r="1.5" fill="currentColor" className="embedding-dot text-foreground/30" />
+            <circle cx="7" cy="-0.17" r="1.5" fill="currentColor" className="embedding-dot text-foreground/30" />
+            <circle cx="22" cy="-4.42" r="1.5" fill="currentColor" className="embedding-dot text-foreground/30" />
           </g>
           
           {/* Retrieval arrow */}
