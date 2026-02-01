@@ -95,12 +95,18 @@ function TerminalOutput({
 
   const relatedProjects = skill ? skillsMap.get(skill) || [] : []
 
-  // Generate terminal output lines - simplified without ASCII box
+  // Generate terminal output lines
   const generateLines = useCallback(() => {
     if (!skill) return []
     
     const projectCount = relatedProjects.length
     const years = [...new Set(relatedProjects.map(p => p.year))].sort()
+    
+    const projectLines: string[] = []
+    relatedProjects.forEach((p, i) => {
+      projectLines.push(`${String(i + 1).padStart(2, "0")}. ${p.title}`)
+      projectLines.push(`    [${p.skills.join(", ")}]`)
+    })
     
     return [
       `$ skill --query "${skill}"`,
@@ -114,9 +120,7 @@ function TerminalOutput({
       ``,
       `// RELATED PROJECTS:`,
       ``,
-      ...relatedProjects.map((p, i) => 
-        `${String(i + 1).padStart(2, "0")}. ${p.title} // ${p.description}`
-      ),
+      ...projectLines,
       ``,
       `[OK] Query complete. ${projectCount} result(s) found.`,
       `$ _`
@@ -248,19 +252,33 @@ function TerminalOutput({
     if (line.startsWith("//")) {
       return <span className="text-foreground/25 italic">{line}</span>
     }
-    // Project lines
+    // Project name line (e.g., "01. SIMULATE")
     if (line.match(/^\d+\./)) {
-      const match = line.match(/^(\d+)\.\s+(\w+)\s+\/\/\s+(.+)$/)
+      const match = line.match(/^(\d+)\.\s+(.+)$/)
       if (match) {
         return (
           <>
             <span className="text-foreground/30">{match[1]}. </span>
             <span className="text-sky-300/80 font-medium">{match[2]}</span>
-            <span className="text-foreground/25"> // </span>
-            <span className="text-foreground/40">{match[3]}</span>
           </>
         )
       }
+    }
+    // Tech stack line (e.g., "    [Swift, SwiftUI, WatchOS]")
+    if (line.match(/^\s+\[.+\]$/)) {
+      const techs = line.trim().slice(1, -1).split(", ")
+      return (
+        <span className="text-foreground/30">
+          {"    ["}
+          {techs.map((tech, i) => (
+            <span key={tech}>
+              <span className="text-amber-200/60">{tech}</span>
+              {i < techs.length - 1 && <span className="text-foreground/20">, </span>}
+            </span>
+          ))}
+          {"]"}
+        </span>
+      )
     }
     return <span className="text-foreground/35">{line}</span>
   }
