@@ -175,7 +175,7 @@ const experiences = [
     icon: "/images/CSU-Longbeach.svg",
     panelImage: "/images/lb.csulb.png",
     mediaImages: ["/images/ACMIEEEICCPS2025.pdf", "/images/IEEEICRA2026.pdf"],
-    mediaLabels: ["Proof 1", "Proof 2"],
+    mediaLabels: ["ICCPS 2025", "ICRA 2026"],
     startDate: "Aug 2024",
     endDate: new Date().toLocaleDateString("en-US", { month: "short", year: "numeric" }),
     description: "Contributing to a 30+ person robotics/AI research group, supporting two peer-reviewed publications (ICCPS 2025, ICRA 2026).",
