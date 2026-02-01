@@ -3,13 +3,13 @@
 import { useState, useRef, useEffect, useCallback } from "react"
 import { gsap } from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
-import { ExternalLink, Github, ChevronUp, ChevronDown } from "lucide-react"
+import { ExternalLink, Github } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 gsap.registerPlugin(ScrollTrigger)
 
 // ─────────────────────────────────────────────────────────────
-// PROJECT DATA
+// PROJECT DATA - GROWTH FOCUSED
 // ─────────────────────────────────────────────────────────────
 
 const allProjects = [
@@ -17,23 +17,27 @@ const allProjects = [
     id: "01",
     year: "2025",
     title: "Zero Inbox",
-    images: ["/images/profile.jpg","/images/profile.jpg", "/images/profile.jpg"],
+    images: ["/images/profile.jpg"],
     growth: "Production AI Engine",
-    learned: ["Multi-stage AI", "95% accuracy tuning", "High-throughput systems"],
+    before: "Basic ML models",
+    after: "Multi-stage reasoning pipeline",
     techStack: ["Swift", "AI/ML", "Firebase"],
-    achievement: "95% accuracy, 200ms",
-    description: "Multi-stage reasoning with production-grade performance.",
+    achievement: "95% accuracy",
+    metric: "200ms",
+    description: "High-throughput AI with production-grade performance.",
     links: { github: "https://github.com/ryofujimura", demo: "#" },
   },
   {
     id: "02",
     year: "2025",
     title: "Whiteboard AI",
-    images: ["/images/whiteboardai.png", "/images/whiteboardai-1.jpg", "/images/whiteboardai-2.jpg"],
+    images: ["/images/whiteboardai.png"],
     growth: "Vision ML + Collab",
-    learned: ["PyTorch vision", "CRDT patterns", "WebSocket pipelines"],
+    before: "Static image processing",
+    after: "Real-time vision + CRDT sync",
     techStack: ["PyTorch", "WebSocket", "React"],
     achievement: "150ms inference",
+    metric: "60fps",
     description: "Computer vision with real-time collaboration.",
     links: { github: "https://github.com/ryofujimura", demo: "https://ryofujimura.github.io" },
   },
@@ -42,24 +46,28 @@ const allProjects = [
     year: "2025",
     title: "Research Lab PM",
     images: ["/images/profile.jpg"],
-    growth: "Serverless + AI Routing",
-    learned: ["Cloud Functions", "Dynamic AI routing", "Multi-tenant systems"],
+    growth: "Serverless Architecture",
+    before: "Monolithic backend",
+    after: "Dynamic AI routing system",
     techStack: ["Cloud Functions", "Firebase"],
-    achievement: "<200ms response",
-    description: "Serverless orchestration for 30+ researchers.",
+    achievement: "30+ researchers",
+    metric: "<200ms",
+    description: "Serverless orchestration at scale.",
     links: { github: "https://github.com/ryofujimura", demo: "https://ryofujimura.github.io" },
   },
   {
     id: "04",
     year: "2025",
     title: "CyberEdu",
-    images: ["/images/CyberEdu.png", "/images/CyberEdu-1.PNG", "/images/CyberEdu-2.PNG", "/images/CyberEdu-3.PNG", "/images/CyberEdu-4.PNG", "/images/CyberEdu-5.jpg"],
+    images: ["/images/CyberEdu.png"],
     growth: "Network Resilience",
-    learned: ["Offline-first patterns", "Sync strategies", "Error recovery"],
+    before: "Online-only sync",
+    after: "Offline-first architecture",
     techStack: ["Swift", "Kotlin", "Firebase"],
-    achievement: "99%+ sync reliability",
+    achievement: "99%+ reliability",
+    metric: "0 data loss",
     description: "Cross-device sync across unstable networks.",
-    links: { github: "https://github.com/ryofujimura", appStore: "#", playStore: "#" },
+    links: { github: "https://github.com/ryofujimura", appStore: "#" },
   },
   {
     id: "05",
@@ -67,11 +75,13 @@ const allProjects = [
     title: "HTIC Shuttle",
     images: ["/images/schedule.jpg"],
     growth: "Real-Time Systems",
-    learned: ["Firebase RTDB", "Event serialization", "Cross-platform native"],
+    before: "Polling-based updates",
+    after: "Event-driven RTDB",
     techStack: ["Swift", "Kotlin", "Firebase"],
     achievement: "70% fewer conflicts",
+    metric: "<100ms",
     description: "Cross-platform native with real-time sync.",
-    links: { github: "https://github.com/ryofujimura", appStore: "#", playStore: "#" },
+    links: { github: "https://github.com/ryofujimura", appStore: "#" },
   },
   {
     id: "06",
@@ -79,82 +89,96 @@ const allProjects = [
     title: "With (Local LLM)",
     images: ["/images/profile.jpg"],
     growth: "On-Device AI",
-    learned: ["llama.cpp integration", "Model quantization", "Memory optimization"],
+    before: "Cloud-dependent AI",
+    after: "Local llama.cpp inference",
     techStack: ["Swift", "llama.cpp", "GGUF"],
-    achievement: "<50ms/token, 2GB saved",
-    description: "Local AI with efficient inference.",
+    achievement: "2GB saved",
+    metric: "<50ms/tok",
+    description: "Privacy-first local AI.",
     links: { github: "https://github.com/ryofujimura" },
   },
   {
     id: "07",
     year: "2024",
-    title: "Saboriendo Platform",
+    title: "Saboriendo",
     images: ["/images/profile.jpg"],
     growth: "Full-Stack + Mobile",
-    learned: ["React 19 features", "Cross-platform sync", "Barcode systems"],
+    before: "Single platform apps",
+    after: "Cross-platform sync system",
     techStack: ["React 19", "SwiftUI", "Firebase"],
-    achievement: "50% faster lookup",
+    achievement: "50% faster",
+    metric: "barcode<1s",
     description: "Full-stack with real-time sync.",
     links: { github: "https://github.com/ryofujimura", demo: "https://ryofujimura.github.io" },
   },
   {
     id: "08",
     year: "2024",
-    title: "Portfolio Website",
-    images: ["/images/homepage.png", "/images/experiencepage.png"],
+    title: "Portfolio",
+    images: ["/images/homepage.png"],
     growth: "Modern Web Stack",
-    learned: ["Next.js App Router", "GSAP animations", "Performance tuning"],
+    before: "Static HTML sites",
+    after: "Next.js + GSAP animations",
     techStack: ["React", "Next.js", "GSAP"],
-    achievement: "40-60% faster load",
-    description: "React with advanced animations.",
+    achievement: "60% faster",
+    metric: "LCP<1.5s",
+    description: "Performance-optimized React.",
     links: { github: "https://github.com/ryofujimura", demo: "https://ryofujimura.github.io" },
   },
   {
     id: "09",
     year: "2024",
     title: "Matcha Time",
-    images: ["/images/matchatime_1.jpg", "/images/matchatime_2.jpg", "/images/matchatime_3.jpg"],
+    images: ["/images/matchatime_1.jpg"],
     growth: "App Store Launch",
-    learned: ["SwiftUI patterns", "App Store submission", "4-week sprint"],
+    before: "Local dev projects",
+    after: "Production iOS app",
     techStack: ["Swift", "SwiftUI"],
-    achievement: "50 users at launch",
-    description: "First iOS app on App Store.",
+    achievement: "50 users",
+    metric: "4 weeks",
+    description: "First App Store launch.",
     links: { github: "https://github.com/ryofujimura", appStore: "#" },
   },
   {
     id: "10",
     year: "2023",
-    title: "Schedule Mastermind",
+    title: "Schedule Master",
     images: ["/images/schedule.jpg"],
     growth: "Backend Architecture",
-    learned: ["Flask routing", "Conflict algorithms", "Database design"],
+    before: "Frontend-only apps",
+    after: "Flask API + algorithms",
     techStack: ["Python", "Flask"],
-    achievement: "500+ courses, 70% fewer errors",
-    description: "Backend for university scheduling.",
+    achievement: "500+ courses",
+    metric: "70% fewer errors",
+    description: "University scheduling system.",
     links: { github: "https://github.com/ryofujimura", demo: "https://ryofujimura.github.io" },
   },
   {
     id: "11",
     year: "2023",
-    title: "Shohei Home Ground",
-    images: ["/images/shoheihomeground_1.jpg", "/images/shoheihomeground_2.jpg", "/images/shoheihomeground_3.jpg"],
+    title: "Shohei HG",
+    images: ["/images/shoheihomeground_1.jpg"],
     growth: "Python Automation",
-    learned: ["API automation", "Content scheduling", "Growth hacking"],
+    before: "Manual content posting",
+    after: "Automated pipeline",
     techStack: ["Python", "Instagram API"],
-    achievement: "11K followers, 685 posts",
-    description: "Automated content pipeline.",
+    achievement: "11K followers",
+    metric: "685 posts",
+    description: "Automated content at scale.",
     links: { instagram: "#", youtube: "#" },
   },
   {
     id: "12",
     year: "2022",
-    title: "Poker Percentage",
-    images: ["/images/poker.png", "/images/poker_1.jpg", "/images/poker_2.jpg", "/images/poker_3.jpg", "/images/poker_4.jpg"],
+    title: "Poker %",
+    images: ["/images/poker.png"],
     growth: "First WatchOS App",
-    learned: ["WatchKit basics", "Precomputed tables", "Real-time probability"],
+    before: "No native dev experience",
+    after: "Published WatchOS app",
     techStack: ["Swift", "WatchOS"],
-    achievement: "<10ms lookup speed",
-    description: "WatchOS with precomputed probability tables.",
+    achievement: "Published",
+    metric: "<10ms",
+    description: "Real-time probability engine.",
     links: { github: "https://github.com/ryofujimura", appStore: "#" },
   },
 ]
@@ -162,22 +186,26 @@ const allProjects = [
 type Project = (typeof allProjects)[0]
 
 // ─────────────────────────────────────────────────────────────
-// TECHNICAL PATTERNS
+// ASCII PATTERNS
 // ─────────────────────────────────────────────────────────────
 
-function TechnicalPatterns() {
+const ASCII_CORNER_TL = `┌──`
+const ASCII_CORNER_TR = `──┐`
+const ASCII_CORNER_BL = `└──`
+const ASCII_CORNER_BR = `──┘`
+const ASCII_DIVIDER = `├──────────────────────┤`
+const ASCII_ARROW = `>>>`
+const ASCII_PROGRESS = `▓▓▓░░░░░░░`
+
+// Growth indicator ASCII
+function GrowthArrow({ isActive }: { isActive: boolean }) {
   return (
-    <div className="absolute inset-0 pointer-events-none overflow-hidden">
-      <svg className="absolute inset-0 w-full h-full opacity-[0.02]" preserveAspectRatio="none">
-        <defs>
-          <pattern id="diagonal-grid-projects" width="60" height="60" patternUnits="userSpaceOnUse">
-            <path d="M 60 0 L 0 60" stroke="currentColor" strokeWidth="0.5" fill="none" />
-            <path d="M 0 0 L 60 60" stroke="currentColor" strokeWidth="0.5" fill="none" />
-          </pattern>
-        </defs>
-        <rect width="100%" height="100%" fill="url(#diagonal-grid-projects)" />
-      </svg>
-    </div>
+    <span className={cn(
+      "font-mono text-[10px] transition-all duration-300",
+      isActive ? "text-accent" : "text-foreground/30"
+    )}>
+      {"─────►"}
+    </span>
   )
 }
 
@@ -186,21 +214,23 @@ function TechnicalPatterns() {
 // ─────────────────────────────────────────────────────────────
 
 function SectionHeader({ count, activeIndex }: { count: number; activeIndex: number }) {
+  const headerRef = useRef<HTMLDivElement>(null)
   const titleRef = useRef<HTMLHeadingElement>(null)
-  const [hasAnimated, setHasAnimated] = useState(false)
 
   useEffect(() => {
-    if (!titleRef.current || hasAnimated) return
+    if (!headerRef.current) return
+    
     const ctx = gsap.context(() => {
-      const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ░▒▓█"
-      const originalText = "PROJECTS"
-      let iteration = 0
-
+      // Animate title on scroll
       ScrollTrigger.create({
-        trigger: titleRef.current,
-        start: "top 95%",
+        trigger: headerRef.current,
+        start: "top 90%",
         onEnter: () => {
-          setHasAnimated(true)
+          if (!titleRef.current) return
+          const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ░▒▓█"
+          const originalText = "PROJECTS"
+          let iteration = 0
+
           const interval = setInterval(() => {
             if (!titleRef.current) return clearInterval(interval)
             titleRef.current.textContent = originalText
@@ -208,122 +238,41 @@ function SectionHeader({ count, activeIndex }: { count: number; activeIndex: num
               .map((char, i) => (i < iteration ? char : chars[Math.floor(Math.random() * chars.length)]))
               .join("")
             if (iteration >= originalText.length) clearInterval(interval)
-            iteration += 0.3
-          }, 35)
+            iteration += 0.4
+          }, 30)
         },
       })
-    }, titleRef.current)
+    }, headerRef.current)
+
     return () => ctx.revert()
-  }, [hasAnimated])
+  }, [])
 
   return (
-    <div className="mb-6 lg:mb-8">
-      <div className="flex items-end justify-between gap-4">
+    <div ref={headerRef} className="mb-4 md:mb-6">
+      {/* ASCII top border */}
+      <div className="font-mono text-[8px] md:text-[10px] text-foreground/20 mb-2 overflow-hidden">
+        ╔══════════════════════════════════════════════════════════════╗
+      </div>
+      
+      <div className="flex items-end justify-between gap-2">
         <div>
-          <p className="font-mono text-[10px] text-muted-foreground tracking-[0.15em] mb-1">— 04</p>
+          <p className="font-mono text-[8px] md:text-[10px] text-muted-foreground tracking-[0.2em]">
+            {ASCII_ARROW} SECTION_04
+          </p>
           <h2
             ref={titleRef}
-            className="font-mono text-3xl md:text-4xl lg:text-5xl font-black text-foreground tracking-tighter leading-none"
+            className="font-mono text-2xl md:text-3xl lg:text-4xl font-black text-foreground tracking-tighter"
           >
             PROJECTS
           </h2>
         </div>
-        <div className="text-right">
-          <span className="font-mono text-4xl md:text-5xl lg:text-6xl font-black text-foreground/5 tabular-nums">
+        
+        <div className="text-right font-mono">
+          <div className="text-3xl md:text-4xl font-black text-foreground/5">
             {String(activeIndex + 1).padStart(2, "0")}
-          </span>
-          <p className="font-mono text-[9px] text-muted-foreground">
-            OF {String(count).padStart(2, "0")}
-          </p>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-// ─────────────────────────────────────────────────────────────
-// TIMELINE SIDEBAR
-// ─────────────────────────────────────────────────────────────
-
-function TimelineSidebar({ 
-  activeIndex, 
-  projects,
-  onNodeClick 
-}: { 
-  activeIndex: number
-  projects: Project[]
-  onNodeClick: (index: number) => void
-}) {
-  const connectorRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    if (!connectorRef.current) return
-    const progress = projects.length > 1 ? (activeIndex / (projects.length - 1)) * 100 : 0
-    
-    gsap.to(connectorRef.current, {
-      height: `${progress}%`,
-      duration: 0.4,
-      ease: "power2.out"
-    })
-  }, [activeIndex, projects.length])
-
-  return (
-    <div className="hidden lg:flex flex-col w-[180px] xl:w-[200px] flex-shrink-0 h-full">
-      <div className="flex-1 overflow-y-auto pr-2">
-        <div className="relative pl-4">
-          {/* Track line */}
-          <div className="absolute left-[7px] top-0 bottom-0 w-px bg-foreground/10" />
-          <div 
-            ref={connectorRef}
-            className="absolute left-[7px] top-0 w-px bg-accent"
-            style={{ height: "0%" }}
-          />
-
-          {/* Nodes */}
-          <div className="space-y-0.5">
-            {projects.map((project, index) => {
-              const isActive = index === activeIndex
-              const isPast = index < activeIndex
-              const showYear = index === 0 || projects[index - 1]?.year !== project.year
-
-              return (
-                <div key={project.id}>
-                  {showYear && (
-                    <div className="flex items-center gap-2 mb-1.5 mt-3 first:mt-0">
-                      <div className="w-3 h-px bg-foreground/20" />
-                      <span className="font-mono text-[9px] font-bold text-foreground/40 tracking-wider">
-                        {project.year}
-                      </span>
-                    </div>
-                  )}
-
-                  <button
-                    onClick={() => onNodeClick(index)}
-                    className="w-full flex items-start gap-2 py-1 text-left transition-all group"
-                  >
-                    <div 
-                      className={cn(
-                        "w-2.5 h-2.5 rounded-full border-2 flex-shrink-0 mt-0.5 transition-all",
-                        isActive ? "bg-accent border-accent scale-125" : 
-                        isPast ? "bg-foreground/50 border-foreground/50" : 
-                        "bg-transparent border-foreground/20 group-hover:border-foreground/40"
-                      )}
-                    />
-                    
-                    <span 
-                      className={cn(
-                        "font-mono text-[9px] block truncate transition-colors leading-tight",
-                        isActive ? "text-foreground font-bold" : 
-                        isPast ? "text-foreground/50" : 
-                        "text-foreground/25 group-hover:text-foreground/40"
-                      )}
-                    >
-                      {project.growth}
-                    </span>
-                  </button>
-                </div>
-              )
-            })}
+          </div>
+          <div className="text-[8px] text-muted-foreground">
+            /{String(count).padStart(2, "0")}
           </div>
         </div>
       </div>
@@ -332,116 +281,106 @@ function TimelineSidebar({
 }
 
 // ─────────────────────────────────────────────────────────────
-// IMAGE GALLERY
+// TIMELINE - COMPACT VERTICAL
 // ─────────────────────────────────────────────────────────────
 
-function ImageGallery({ 
-  images, 
-  projectTitle,
-  isActive 
+function Timeline({ 
+  activeIndex, 
+  projects,
+  onNodeClick 
 }: { 
-  images: string[]
-  projectTitle: string
-  isActive: boolean 
+  activeIndex: number
+  projects: Project[]
+  onNodeClick: (index: number) => void
 }) {
-  const [activeImage, setActiveImage] = useState(0)
-
-  useEffect(() => {
-    if (!isActive || images.length <= 1) return
-    const interval = setInterval(() => {
-      setActiveImage(prev => (prev + 1) % images.length)
-    }, 3500)
-    return () => clearInterval(interval)
-  }, [isActive, images.length])
-
-  useEffect(() => {
-    if (!isActive) setActiveImage(0)
-  }, [isActive])
-
   return (
-    <div className="relative w-full h-full bg-muted">
-      {images.map((img, idx) => (
-        <img
-          key={idx}
-          src={img}
-          alt={`${projectTitle} - ${idx + 1}`}
-          className={cn(
-            "absolute inset-0 w-full h-full object-cover transition-all duration-700",
-            idx === activeImage ? "opacity-100 scale-100" : "opacity-0 scale-105"
-          )}
-          style={{ filter: isActive ? "grayscale(0%)" : "grayscale(100%)" }}
-          loading={idx === 0 ? "eager" : "lazy"}
-        />
-      ))}
-
-      <div className="absolute inset-0 bg-gradient-to-r from-background/60 via-transparent to-transparent" />
-      <div className="absolute inset-0 bg-gradient-to-t from-background/40 via-transparent to-transparent" />
+    <div className="hidden md:flex flex-col w-[140px] lg:w-[160px] flex-shrink-0">
+      <div className="font-mono text-[8px] text-foreground/30 mb-2">
+        ┌─ TIMELINE
+      </div>
       
-      {images.length > 1 && (
-        <div className="absolute bottom-3 right-3 flex gap-1">
-          {images.map((_, idx) => (
-            <button
-              key={idx}
-              onClick={() => setActiveImage(idx)}
-              className={cn(
-                "w-5 h-0.5 transition-all",
-                idx === activeImage ? "bg-foreground" : "bg-foreground/30"
+      <div className="relative pl-3 border-l border-foreground/10">
+        {projects.map((project, index) => {
+          const isActive = index === activeIndex
+          const isPast = index < activeIndex
+          const showYear = index === 0 || projects[index - 1]?.year !== project.year
+
+          return (
+            <div key={project.id}>
+              {showYear && (
+                <div className="font-mono text-[8px] text-foreground/40 mb-1 mt-2 first:mt-0 -ml-3 pl-3 border-l-2 border-foreground/20">
+                  [{project.year}]
+                </div>
               )}
-            />
-          ))}
-        </div>
-      )}
+
+              <button
+                onClick={() => onNodeClick(index)}
+                className={cn(
+                  "w-full text-left py-0.5 font-mono text-[8px] transition-all relative",
+                  "-ml-3 pl-3",
+                  isActive ? "text-accent border-l-2 border-accent" : 
+                  isPast ? "text-foreground/40 border-l border-foreground/20" : 
+                  "text-foreground/20 border-l border-transparent hover:text-foreground/40"
+                )}
+              >
+                <span className="truncate block">{project.growth}</span>
+              </button>
+            </div>
+          )
+        })}
+      </div>
+      
+      <div className="font-mono text-[8px] text-foreground/30 mt-2">
+        └─ END
+      </div>
     </div>
   )
 }
 
 // ─────────────────────────────────────────────────────────────
-// PROJECT SLIDE - FULL HEIGHT OF CONTAINER
+// PROJECT SLIDE - COMPACT, GROWTH-FOCUSED
 // ─────────────────────────────────────────────────────────────
 
 function ProjectSlide({ 
   project, 
+  index,
   isActive 
 }: { 
   project: Project
+  index: number
   isActive: boolean
 }) {
-  const titleRef = useRef<HTMLHeadingElement>(null)
-  const [hasAnimated, setHasAnimated] = useState(false)
+  const slideRef = useRef<HTMLDivElement>(null)
+  const growthRef = useRef<HTMLDivElement>(null)
 
-  // Text scramble animation
+  // GSAP animations when active
   useEffect(() => {
-    if (!isActive || hasAnimated || !titleRef.current) return
-    
-    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ░▒▓█"
-    const originalText = project.growth.toUpperCase()
-    let iteration = 0
+    if (!isActive || !slideRef.current) return
 
-    const interval = setInterval(() => {
-      if (!titleRef.current) return clearInterval(interval)
-      
-      titleRef.current.textContent = originalText
-        .split("")
-        .map((char, i) => {
-          if (char === " ") return " "
-          if (i < iteration) return char
-          return chars[Math.floor(Math.random() * chars.length)]
-        })
-        .join("")
+    const ctx = gsap.context(() => {
+      // Animate growth section
+      gsap.fromTo(
+        ".growth-animate",
+        { opacity: 0, x: -10 },
+        { opacity: 1, x: 0, duration: 0.4, stagger: 0.05, ease: "power2.out" }
+      )
 
-      if (iteration >= originalText.length) {
-        clearInterval(interval)
-        setHasAnimated(true)
-      }
-      iteration += 0.5
-    }, 25)
+      // Animate tech tags
+      gsap.fromTo(
+        ".tech-animate",
+        { opacity: 0, scale: 0.9 },
+        { opacity: 1, scale: 1, duration: 0.3, stagger: 0.03, delay: 0.2, ease: "back.out(1.7)" }
+      )
 
-    return () => clearInterval(interval)
-  }, [isActive, hasAnimated, project.growth])
+      // Animate metric numbers
+      gsap.fromTo(
+        ".metric-animate",
+        { opacity: 0, y: 5 },
+        { opacity: 1, y: 0, duration: 0.4, stagger: 0.1, delay: 0.3 }
+      )
+    }, slideRef.current)
 
-  // Reset animation when becoming inactive
-  useEffect(() => {
-    if (!isActive) setHasAnimated(false)
+    return () => ctx.revert()
   }, [isActive])
 
   const hasGithub = project.links.github
@@ -450,125 +389,136 @@ function ProjectSlide({
 
   return (
     <div 
+      ref={slideRef}
       className={cn(
-        "h-full w-full snap-start snap-always flex flex-col lg:flex-row border-2 border-foreground bg-background transition-opacity duration-500",
-        isActive ? "opacity-100" : "opacity-40"
+        "h-full w-full snap-start snap-always transition-opacity duration-300",
+        isActive ? "opacity-100" : "opacity-30"
       )}
     >
-      {/* Corner brackets */}
-      <svg className="absolute -top-1 -left-1 w-4 h-4 text-foreground z-10">
-        <path d="M 0 16 L 0 0 L 16 0" stroke="currentColor" strokeWidth="2" fill="none" />
-      </svg>
-      <svg className="absolute -top-1 -right-1 w-4 h-4 text-foreground z-10">
-        <path d="M 0 0 L 16 0 L 16 16" stroke="currentColor" strokeWidth="2" fill="none" />
-      </svg>
-      <svg className="absolute -bottom-1 -left-1 w-4 h-4 text-foreground z-10">
-        <path d="M 0 0 L 0 16 L 16 16" stroke="currentColor" strokeWidth="2" fill="none" />
-      </svg>
-      <svg className="absolute -bottom-1 -right-1 w-4 h-4 text-foreground z-10">
-        <path d="M 0 16 L 16 16 L 16 0" stroke="currentColor" strokeWidth="2" fill="none" />
-      </svg>
-
-      {/* Image Section */}
-      <div className="relative h-[35%] lg:h-full lg:w-[45%] border-b lg:border-b-0 lg:border-r border-foreground/20 flex-shrink-0">
-        <ImageGallery 
-          images={project.images} 
-          projectTitle={project.title}
-          isActive={isActive}
-        />
+      {/* Main container with ASCII frame */}
+      <div className="h-full border border-foreground/30 bg-background relative overflow-hidden">
         
-        {/* Project number */}
-        <div className="absolute top-3 left-3 font-mono text-5xl lg:text-6xl font-black text-foreground/10">
-          {project.id}
-        </div>
-        
-        {/* Year badge */}
-        <div className="absolute top-3 right-3 bg-foreground text-background px-2 py-0.5">
-          <span className="font-mono text-[9px] font-bold tracking-wider">{project.year}</span>
-        </div>
-      </div>
+        {/* ASCII corners */}
+        <span className="absolute top-0 left-0 font-mono text-[8px] text-foreground/40 p-1">{ASCII_CORNER_TL}</span>
+        <span className="absolute top-0 right-0 font-mono text-[8px] text-foreground/40 p-1">{ASCII_CORNER_TR}</span>
+        <span className="absolute bottom-0 left-0 font-mono text-[8px] text-foreground/40 p-1">{ASCII_CORNER_BL}</span>
+        <span className="absolute bottom-0 right-0 font-mono text-[8px] text-foreground/40 p-1">{ASCII_CORNER_BR}</span>
 
-      {/* Content Section */}
-      <div className="flex-1 p-4 lg:p-6 xl:p-8 flex flex-col overflow-y-auto">
-        {/* Title */}
-        <div className="mb-3">
-          <span className="font-mono text-[9px] text-muted-foreground tracking-[0.15em] block mb-0.5">
-            {project.title}
-          </span>
-          <h3 
-            ref={titleRef}
-            className="font-mono text-lg md:text-xl lg:text-2xl xl:text-3xl font-black text-foreground tracking-tight leading-none"
-          >
-            {project.growth.toUpperCase()}
-          </h3>
-        </div>
+        {/* Content grid - Mobile optimized */}
+        <div className="h-full flex flex-col p-3 md:p-4">
+          
+          {/* Header row */}
+          <div className="flex items-start justify-between gap-2 mb-2 md:mb-3">
+            {/* Project ID & Title */}
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 mb-1">
+                <span className="font-mono text-lg md:text-xl font-black text-foreground/10">
+                  {project.id}
+                </span>
+                <span className="font-mono text-[8px] text-muted-foreground">
+                  {project.year}
+                </span>
+              </div>
+              <h3 className="font-mono text-[10px] md:text-xs text-foreground/60 truncate">
+                {project.title}
+              </h3>
+            </div>
 
-        {/* Achievement */}
-        <div className="mb-3">
-          <span className="inline-block font-mono text-[9px] font-bold text-accent bg-accent/10 px-2 py-0.5 border border-accent/30">
-            {project.achievement}
-          </span>
-        </div>
+            {/* Metric badge */}
+            <div className="metric-animate flex-shrink-0 text-right">
+              <div className="font-mono text-sm md:text-base font-black text-accent">
+                {project.metric}
+              </div>
+              <div className="font-mono text-[7px] text-muted-foreground">
+                {project.achievement}
+              </div>
+            </div>
+          </div>
 
-        {/* Description */}
-        <p className="font-mono text-[11px] text-muted-foreground mb-3 leading-relaxed">
-          {project.description}
-        </p>
+          {/* ═══ GROWTH SECTION - THE MAIN FOCUS ═══ */}
+          <div ref={growthRef} className="flex-1 flex flex-col justify-center">
+            
+            {/* Growth title */}
+            <div className="growth-animate font-mono text-[8px] text-foreground/40 mb-1">
+              ├─ GROWTH_FOCUS
+            </div>
+            
+            <h4 className="growth-animate font-mono text-base md:text-lg lg:text-xl font-black text-foreground tracking-tight mb-2 md:mb-3">
+              {project.growth.toUpperCase()}
+            </h4>
 
-        {/* Tech stack */}
-        <div className="flex flex-wrap gap-1 mb-3">
-          {project.techStack.map((tech) => (
-            <span
-              key={tech}
-              className="font-mono text-[8px] px-1.5 py-0.5 border border-foreground/20 text-foreground/50"
-            >
-              {tech}
-            </span>
-          ))}
-        </div>
+            {/* Before → After visualization */}
+            <div className="growth-animate bg-foreground/5 border border-foreground/10 p-2 md:p-3 mb-2 md:mb-3">
+              <div className="flex items-center gap-2 md:gap-3">
+                {/* Before */}
+                <div className="flex-1 min-w-0">
+                  <div className="font-mono text-[7px] text-foreground/40 mb-0.5">BEFORE</div>
+                  <div className="font-mono text-[9px] md:text-[10px] text-foreground/60 truncate">
+                    {project.before}
+                  </div>
+                </div>
 
-        {/* Learnings */}
-        <div className="mb-3">
-          <span className="font-mono text-[8px] text-muted-foreground tracking-[0.15em] block mb-1">
-            KEY LEARNINGS
-          </span>
-          <ul className="space-y-0.5">
-            {project.learned.map((item, i) => (
-              <li key={i} className="font-mono text-[9px] text-foreground/50 flex items-start gap-1">
-                <span className="text-accent">▸</span>
-                {item}
-              </li>
-            ))}
-          </ul>
-        </div>
+                {/* Arrow */}
+                <GrowthArrow isActive={isActive} />
 
-        {/* Links */}
-        <div className="flex items-center gap-3 mt-auto pt-3 border-t border-foreground/10">
-          {hasGithub && (
-            <a
-              href={project.links.github}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 font-mono text-[9px] text-foreground hover:text-accent transition-colors"
-            >
-              <Github className="w-3 h-3" />
-              <span>CODE</span>
-            </a>
-          )}
-          {hasDemo && (
-            <a
-              href={(project.links as { demo?: string }).demo}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 font-mono text-[9px] text-foreground hover:text-accent transition-colors"
-            >
-              <ExternalLink className="w-3 h-3" />
-              <span>DEMO</span>
-            </a>
-          )}
-          {hasAppStore && (
-            <span className="font-mono text-[9px] text-muted-foreground">iOS App</span>
-          )}
+                {/* After */}
+                <div className="flex-1 min-w-0">
+                  <div className="font-mono text-[7px] text-accent mb-0.5">AFTER</div>
+                  <div className="font-mono text-[9px] md:text-[10px] text-foreground truncate font-medium">
+                    {project.after}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Tech stack */}
+            <div className="flex flex-wrap gap-1">
+              {project.techStack.map((tech) => (
+                <span
+                  key={tech}
+                  className="tech-animate font-mono text-[7px] md:text-[8px] px-1.5 py-0.5 border border-foreground/20 text-foreground/50 bg-foreground/5"
+                >
+                  {tech}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          {/* Footer - Links */}
+          <div className="flex items-center justify-between pt-2 border-t border-foreground/10 mt-2">
+            <div className="flex items-center gap-2">
+              {hasGithub && (
+                <a
+                  href={project.links.github}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-mono text-[8px] text-foreground/50 hover:text-accent transition-colors flex items-center gap-1"
+                >
+                  <Github className="w-3 h-3" />
+                  <span className="hidden md:inline">CODE</span>
+                </a>
+              )}
+              {hasDemo && (
+                <a
+                  href={(project.links as { demo?: string }).demo}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-mono text-[8px] text-foreground/50 hover:text-accent transition-colors flex items-center gap-1"
+                >
+                  <ExternalLink className="w-3 h-3" />
+                  <span className="hidden md:inline">DEMO</span>
+                </a>
+              )}
+              {hasAppStore && (
+                <span className="font-mono text-[8px] text-foreground/30">iOS</span>
+              )}
+            </div>
+
+            {/* Project index indicator */}
+            <div className="font-mono text-[7px] text-foreground/30">
+              [{String(index + 1).padStart(2, "0")}/12]
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -576,69 +526,94 @@ function ProjectSlide({
 }
 
 // ─────────────────────────────────────────────────────────────
-// NAVIGATION CONTROLS
+// NAVIGATION - MOBILE OPTIMIZED
 // ─────────────────────────────────────────────────────────────
 
-function NavigationControls({
+function Navigation({
   activeIndex,
   total,
   onPrev,
   onNext,
-  currentProject
 }: {
   activeIndex: number
   total: number
   onPrev: () => void
   onNext: () => void
-  currentProject: Project
 }) {
+  // Generate ASCII progress bar
+  const progressChars = 12
+  const filled = Math.round((activeIndex / (total - 1)) * progressChars)
+  const progressBar = "▓".repeat(filled) + "░".repeat(progressChars - filled)
+
   return (
-    <div className="flex items-center justify-between py-3 border-t border-foreground/10">
-      {/* Progress info */}
-      <div className="flex items-center gap-3">
-        <div className="h-0.5 w-20 bg-foreground/10">
-          <div 
-            className="h-full bg-accent transition-all duration-300"
-            style={{ width: `${((activeIndex + 1) / total) * 100}%` }}
-          />
-        </div>
-        <span className="font-mono text-[10px] text-muted-foreground">
-          {String(activeIndex + 1).padStart(2, "0")} / {String(total).padStart(2, "0")}
+    <div className="flex items-center justify-between py-2 md:py-3 font-mono">
+      {/* Prev button */}
+      <button
+        onClick={onPrev}
+        disabled={activeIndex === 0}
+        className={cn(
+          "text-[10px] md:text-xs px-2 md:px-3 py-1 border border-foreground/20 transition-all",
+          activeIndex === 0 
+            ? "opacity-20 cursor-not-allowed" 
+            : "hover:bg-foreground hover:text-background active:scale-95"
+        )}
+      >
+        {"<"} PREV
+      </button>
+
+      {/* Progress bar */}
+      <div className="flex items-center gap-2">
+        <span className="text-[8px] md:text-[10px] text-foreground/30 hidden sm:inline">
+          [{progressBar}]
+        </span>
+        <span className="text-[10px] text-foreground/60">
+          {String(activeIndex + 1).padStart(2, "0")}/{String(total).padStart(2, "0")}
         </span>
       </div>
 
-      {/* Current project name (mobile) */}
-      <span className="lg:hidden font-mono text-[9px] text-foreground/50 truncate max-w-[30%]">
-        {currentProject.growth}
-      </span>
+      {/* Next button */}
+      <button
+        onClick={onNext}
+        disabled={activeIndex === total - 1}
+        className={cn(
+          "text-[10px] md:text-xs px-2 md:px-3 py-1 border border-foreground/20 transition-all",
+          activeIndex === total - 1 
+            ? "opacity-20 cursor-not-allowed" 
+            : "hover:bg-foreground hover:text-background active:scale-95"
+        )}
+      >
+        NEXT {">"}
+      </button>
+    </div>
+  )
+}
 
-      {/* Navigation buttons */}
-      <div className="flex items-center gap-1">
+// ─────────────────────────────────────────────────────────────
+// MOBILE QUICK NAV
+// ─────────────────────────────────────────────────────────────
+
+function MobileQuickNav({
+  activeIndex,
+  total,
+  onSelect
+}: {
+  activeIndex: number
+  total: number
+  onSelect: (index: number) => void
+}) {
+  return (
+    <div className="md:hidden flex gap-0.5 overflow-x-auto scrollbar-hide py-2 -mx-4 px-4">
+      {Array.from({ length: total }).map((_, i) => (
         <button
-          onClick={onPrev}
-          disabled={activeIndex === 0}
+          key={i}
+          onClick={() => onSelect(i)}
           className={cn(
-            "p-2 border border-foreground/20 transition-all",
-            activeIndex === 0 
-              ? "opacity-30 cursor-not-allowed" 
-              : "hover:bg-foreground hover:text-background"
+            "flex-shrink-0 w-6 h-1 transition-all",
+            i === activeIndex ? "bg-accent" : 
+            i < activeIndex ? "bg-foreground/30" : "bg-foreground/10"
           )}
-        >
-          <ChevronUp className="w-3 h-3" />
-        </button>
-        <button
-          onClick={onNext}
-          disabled={activeIndex === total - 1}
-          className={cn(
-            "p-2 border border-foreground/20 transition-all",
-            activeIndex === total - 1 
-              ? "opacity-30 cursor-not-allowed" 
-              : "hover:bg-foreground hover:text-background"
-          )}
-        >
-          <ChevronDown className="w-3 h-3" />
-        </button>
-      </div>
+        />
+      ))}
     </div>
   )
 }
@@ -651,7 +626,6 @@ export function ProjectsSection() {
   const [activeIndex, setActiveIndex] = useState(0)
   const sectionRef = useRef<HTMLElement>(null)
   const scrollContainerRef = useRef<HTMLDivElement>(null)
-  const projectRefs = useRef<(HTMLDivElement | null)[]>([])
 
   // Handle scroll snap detection
   useEffect(() => {
@@ -672,8 +646,8 @@ export function ProjectsSection() {
     return () => container.removeEventListener("scroll", handleScroll)
   }, [activeIndex])
 
-  // Handle timeline node click
-  const handleNodeClick = useCallback((index: number) => {
+  // Scroll to project
+  const scrollToProject = useCallback((index: number) => {
     const container = scrollContainerRef.current
     if (!container) return
     
@@ -683,68 +657,119 @@ export function ProjectsSection() {
     })
   }, [])
 
-  // Navigation handlers
   const handlePrev = useCallback(() => {
-    if (activeIndex > 0) handleNodeClick(activeIndex - 1)
-  }, [activeIndex, handleNodeClick])
+    if (activeIndex > 0) scrollToProject(activeIndex - 1)
+  }, [activeIndex, scrollToProject])
 
   const handleNext = useCallback(() => {
-    if (activeIndex < allProjects.length - 1) handleNodeClick(activeIndex + 1)
-  }, [activeIndex, handleNodeClick])
+    if (activeIndex < allProjects.length - 1) scrollToProject(activeIndex + 1)
+  }, [activeIndex, scrollToProject])
+
+  // Animate section on scroll into view
+  useEffect(() => {
+    if (!sectionRef.current) return
+
+    const ctx = gsap.context(() => {
+      gsap.fromTo(
+        sectionRef.current,
+        { opacity: 0 },
+        {
+          opacity: 1,
+          duration: 0.6,
+          scrollTrigger: {
+            trigger: sectionRef.current,
+            start: "top 80%",
+            toggleActions: "play none none none",
+          },
+        }
+      )
+    }, sectionRef.current)
+
+    return () => ctx.revert()
+  }, [])
 
   return (
     <section
       id="projects"
       ref={sectionRef}
-      className="relative py-12 md:py-16 lg:py-20 px-4 md:px-6 bg-background overflow-hidden"
+      className="relative py-8 md:py-12 lg:py-16 px-4 md:px-6 bg-background"
     >
-      <TechnicalPatterns />
+      {/* Background pattern */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-[0.015]">
+        <div className="absolute inset-0" style={{
+          backgroundImage: `repeating-linear-gradient(
+            0deg,
+            transparent,
+            transparent 20px,
+            currentColor 20px,
+            currentColor 21px
+          ),
+          repeating-linear-gradient(
+            90deg,
+            transparent,
+            transparent 20px,
+            currentColor 20px,
+            currentColor 21px
+          )`
+        }} />
+      </div>
 
-      <div className="max-w-7xl mx-auto relative">
-        {/* Section header */}
+      <div className="max-w-5xl mx-auto relative">
+        {/* Header */}
         <SectionHeader count={allProjects.length} activeIndex={activeIndex} />
 
-        {/* Main layout: Timeline + Scroll Container */}
-        <div className="flex gap-6 lg:gap-8">
-          {/* Timeline sidebar (desktop) */}
-          <TimelineSidebar 
+        {/* Mobile quick nav */}
+        <MobileQuickNav 
+          activeIndex={activeIndex}
+          total={allProjects.length}
+          onSelect={scrollToProject}
+        />
+
+        {/* Main content */}
+        <div className="flex gap-4 md:gap-6">
+          {/* Timeline (desktop) */}
+          <Timeline 
             activeIndex={activeIndex}
             projects={allProjects}
-            onNodeClick={handleNodeClick}
+            onNodeClick={scrollToProject}
           />
 
-          {/* Projects scroll container */}
-          <div className="flex-1 flex flex-col">
-            {/* Scroll container with fixed height */}
+          {/* Projects container */}
+          <div className="flex-1 flex flex-col min-w-0">
+            {/* Scroll container - HALF HEIGHT */}
             <div 
               ref={scrollContainerRef}
-              className="relative h-[500px] md:h-[550px] lg:h-[600px] overflow-y-auto snap-y snap-mandatory scrollbar-hide"
+              className="h-[260px] md:h-[280px] lg:h-[300px] overflow-y-auto snap-y snap-mandatory scrollbar-hide"
               style={{ scrollSnapType: "y mandatory" }}
             >
               {allProjects.map((project, index) => (
                 <div
                   key={project.id}
-                  ref={el => { projectRefs.current[index] = el }}
-                  className="relative h-full w-full"
+                  className="h-full w-full"
                   style={{ scrollSnapAlign: "start" }}
                 >
                   <ProjectSlide
                     project={project}
+                    index={index}
                     isActive={index === activeIndex}
                   />
                 </div>
               ))}
             </div>
 
-            {/* Navigation controls */}
-            <NavigationControls
+            {/* Navigation */}
+            <Navigation
               activeIndex={activeIndex}
               total={allProjects.length}
               onPrev={handlePrev}
               onNext={handleNext}
-              currentProject={allProjects[activeIndex]}
             />
           </div>
+        </div>
+
+        {/* ASCII footer */}
+        <div className="font-mono text-[8px] md:text-[10px] text-foreground/20 mt-4 overflow-hidden">
+          ╚══════════════════════════════════════════════════════════════╝
         </div>
       </div>
     </section>
