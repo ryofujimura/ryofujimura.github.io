@@ -606,7 +606,7 @@ export function IntroSection() {
       ═══════════════════════════════════════════════════════════════════ */}
       <div
         ref={statsRef}
-        className="relative w-full py-16 sm:py-24"
+        className="relative w-full pt-8 sm:pt-12 pb-16 sm:pb-24"
       >
         {/* Subtle background variant */}
         <div className="absolute inset-0 opacity-40">
