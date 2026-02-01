@@ -186,7 +186,7 @@ function AnimatedPlaceholder({
 
   return (
     <span className={`inline-flex items-baseline ${className}`}>
-      <span className="text-muted-foreground/60">What is your&nbsp;</span>
+      <span className="text-muted-foreground/60">What is your?&nbsp;</span>
       <span
         className="inline-flex overflow-hidden"
         style={{ minWidth: `${slotWidthCh}ch` }}
@@ -203,7 +203,6 @@ function AnimatedPlaceholder({
           ))}
         </span>
       </span>
-      <span className="text-muted-foreground/60">?</span>
     </span>
   )
 }
