@@ -480,10 +480,7 @@ export function HeroSection() {
             {/* Right column - Portrait */}
             <div className="order-1 lg:order-2 flex justify-center lg:justify-end">
               <div data-intro-animate className="w-[280px] sm:w-[320px] lg:w-[340px]">
-                <HeroPortrait
-                  src="/images/profile/profile.jpg"
-                  alt="Ryo Fujimura - Software Engineer"
-                />
+                <HeroPortrait />
               </div>
             </div>
           </div>

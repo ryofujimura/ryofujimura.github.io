@@ -1,12 +1,10 @@
 "use client"
 
 import { useRef, useEffect, useState } from "react"
-import Image from "next/image"
 import { gsap } from "gsap"
+import { useGazeTracking } from "@/hooks/use-gaze-tracking"
 
 interface HeroPortraitProps {
-  src: string
-  alt: string
   className?: string
 }
 
@@ -209,65 +207,6 @@ function ViewfinderOverlay({ isHovered }: { isHovered: boolean }) {
         className="text-foreground/20"
       />
 
-      {/* === LAYER 3: Center crosshairs === */}
-      <g className="text-foreground/30">
-        {/* Horizontal crosshair */}
-        <line
-          data-draw
-          data-crosshair
-          x1="160"
-          y1="250"
-          x2="240"
-          y2="250"
-          strokeWidth="1"
-          stroke="currentColor"
-        />
-        {/* Vertical crosshair */}
-        <line
-          data-draw
-          data-crosshair
-          x1="200"
-          y1="210"
-          x2="200"
-          y2="290"
-          strokeWidth="1"
-          stroke="currentColor"
-        />
-        {/* Center circle */}
-        <circle
-          data-draw
-          data-crosshair
-          cx="200"
-          cy="250"
-          r="20"
-          strokeWidth="0.5"
-          stroke="currentColor"
-        />
-        {/* Outer focus circle */}
-        <circle
-          data-draw
-          data-crosshair
-          cx="200"
-          cy="250"
-          r="40"
-          strokeWidth="0.5"
-          stroke="currentColor"
-          strokeDasharray="4 4"
-        />
-      </g>
-
-      {/* === LAYER 4: Focus ring (animated on hover) === */}
-      <circle
-        data-focus-ring
-        cx="200"
-        cy="250"
-        r="60"
-        strokeWidth="1.5"
-        stroke="url(#focusGradient)"
-        className="text-foreground origin-center"
-        style={{ transformOrigin: "200px 250px", opacity: 0.6 }}
-      />
-
       {/* === LAYER 5: Rule of thirds grid === */}
       <g className="text-foreground/10">
         {/* Vertical lines */}
@@ -316,8 +255,6 @@ function ViewfinderOverlay({ isHovered }: { isHovered: boolean }) {
 
       {/* === LAYER 8: Focus point indicators === */}
       <g className="text-foreground/40">
-        {/* Center focus point */}
-        <rect data-pulse x="196" y="246" width="8" height="8" rx="1" fill="currentColor" />
         {/* Rule-of-thirds intersection points */}
         <circle data-pulse cx="133" cy="167" r="3" fill="currentColor" fillOpacity="0.3" />
         <circle data-pulse cx="267" cy="167" r="3" fill="currentColor" fillOpacity="0.3" />
@@ -418,12 +355,15 @@ function DiagonalPatternOverlay() {
 
 /**
  * HeroPortrait - Award-winning brutalist camera viewfinder portrait component
- * Features layered SVG overlays with GSAP animations
+ * Features gaze-tracking face with layered SVG overlays and GSAP animations
  */
-export function HeroPortrait({ src, alt, className = "" }: HeroPortraitProps) {
+export function HeroPortrait({ className = "" }: HeroPortraitProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const imageRef = useRef<HTMLDivElement>(null)
   const [isHovered, setIsHovered] = useState(false)
+  
+  // Gaze tracking hook - face follows cursor/touch
+  const { currentImage, isLoading } = useGazeTracking(containerRef, '/faces/')
 
   // Container entrance animation
   useEffect(() => {
@@ -504,19 +444,28 @@ export function HeroPortrait({ src, alt, className = "" }: HeroPortraitProps) {
     >
       {/* Base container with rounded corners */}
       <div className="absolute inset-0 rounded-xl overflow-hidden bg-muted/20">
-        {/* Image wrapper with parallax */}
+        {/* Image wrapper with parallax - gaze tracking face */}
         <div
           ref={imageRef}
           className="absolute inset-[-10%] w-[120%] h-[120%]"
         >
-          <Image
-            src={src}
-            alt={alt}
-            fill
-            className="object-cover object-center"
-            sizes="(max-width: 768px) 280px, 340px"
-            priority
-          />
+          {currentImage && (
+            <img
+              src={currentImage}
+              alt="Portrait following gaze"
+              className="w-full h-full object-cover object-center"
+              style={{
+                transition: 'opacity 0.1s ease-out',
+                userSelect: 'none',
+                pointerEvents: 'none',
+              }}
+            />
+          )}
+          {isLoading && (
+            <div className="absolute inset-0 flex items-center justify-center bg-muted/50">
+              <span className="text-sm text-muted-foreground">Loading...</span>
+            </div>
+          )}
         </div>
 
         {/* Gradient overlays for depth */}
