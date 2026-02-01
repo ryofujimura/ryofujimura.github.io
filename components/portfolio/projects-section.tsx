@@ -1229,7 +1229,7 @@ function ProjectSlide({
           {/* Header Row */}
           <div className="slide-animate flex items-start justify-between gap-4 mb-3 md:mb-4">
             <div>
-              <div className="flex items-center gap-2 mb-1">
+              <div className="hidden md:flex items-center gap-2 mb-1">
                 <span className="font-mono text-[8px] text-foreground/40">{project.year}</span>
                 <StatusBadge status={project.status} />
               </div>
