@@ -18,6 +18,20 @@ if (typeof window !== "undefined") {
 const SITE_URL = "https://ryofujimura.github.io/"
 const MOBILE_BREAKPOINT = 768
 
+// Responsive pinning values
+const PIN_VALUES = {
+  mobile: {
+    sectionHeight: 600,
+    contentPadding: 16,
+    minPageHeight: 550,
+  },
+  desktop: {
+    sectionHeight: 700,
+    contentPadding: 32,
+    minPageHeight: 650,
+  },
+}
+
 // Mode verb rotator config
 const MODE_VERBS = [
   "BUILD",
@@ -41,26 +55,40 @@ const LOC_HOVER = "OPEN_TO_RELOCATE"
 const LOC_SLOT_CH_DESKTOP = 16
 const LOC_SLOT_CH_MOBILE = 16
 
-// Custom hook for responsive mobile detection with resize listener
+/**
+ * Custom hook for responsive mobile detection
+ * Uses window.matchMedia with resize event listener for dynamic updates
+ */
 function useResponsiveMobile() {
   const [isMobile, setIsMobile] = useState(false)
+  const [viewportHeight, setViewportHeight] = useState(0)
 
   useEffect(() => {
+    // Create matchMedia query
     const mql = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT - 1}px)`)
     
+    // Update function using matchMedia.matches
     const updateMobile = () => {
       setIsMobile(mql.matches)
     }
     
+    // Update viewport height
+    const updateViewportHeight = () => {
+      setViewportHeight(window.innerHeight)
+    }
+    
     // Initial check
     updateMobile()
+    updateViewportHeight()
     
-    // Listen for changes via matchMedia
+    // Listen for matchMedia changes
     mql.addEventListener("change", updateMobile)
     
-    // Also listen for resize for additional reliability
+    // Also listen for resize to dynamically update matchMedia.matches
     const handleResize = () => {
-      setIsMobile(window.innerWidth < MOBILE_BREAKPOINT)
+      // Re-check matchMedia on resize
+      setIsMobile(mql.matches)
+      setViewportHeight(window.innerHeight)
     }
     window.addEventListener("resize", handleResize)
     
@@ -70,7 +98,36 @@ function useResponsiveMobile() {
     }
   }, [])
 
-  return isMobile
+  return { isMobile, viewportHeight }
+}
+
+/**
+ * Hook to get responsive pin values
+ * Returns pixel values based on mobile state
+ */
+function usePinValues() {
+  const { isMobile, viewportHeight } = useResponsiveMobile()
+  
+  const getPinValues = useCallback(() => {
+    const values = isMobile ? PIN_VALUES.mobile : PIN_VALUES.desktop
+    // Use actual viewport height if available, otherwise use default
+    const effectiveHeight = viewportHeight > 0 
+      ? Math.max(viewportHeight, values.minPageHeight) 
+      : values.sectionHeight
+    
+    return {
+      // Return pixel string values as requested
+      sectionHeight: isMobile ? `${effectiveHeight}px` : `${effectiveHeight}px`,
+      totalHeight: isMobile ? `${effectiveHeight * 2}px` : `${effectiveHeight * 2}px`,
+      contentPadding: isMobile ? `${values.contentPadding}px` : `${values.contentPadding}px`,
+      minPageHeight: isMobile ? `${values.minPageHeight}px` : `${values.minPageHeight}px`,
+      // Raw numbers for calculations
+      heightNum: effectiveHeight,
+      paddingNum: values.contentPadding,
+    }
+  }, [isMobile, viewportHeight])
+
+  return { ...getPinValues(), isMobile, viewportHeight }
 }
 
 function revLabel() {
@@ -373,11 +430,12 @@ function TechnicalFrame({ className = "" }: { className?: string }) {
 
 /**
  * IntroSection - Brutalist intro combining hero + about content
- * Uses CSS scroll-snap for paginated reveal with GSAP animations
+ * Uses GSAP ScrollTrigger pinning with snap for paginated reveal
  */
 export function IntroSection() {
-  const containerRef = useRef<HTMLDivElement>(null)
-  const snapContainerRef = useRef<HTMLDivElement>(null)
+  const sectionRef = useRef<HTMLDivElement>(null)
+  const pinContainerRef = useRef<HTMLDivElement>(null)
+  const pagesWrapperRef = useRef<HTMLDivElement>(null)
   const page1Ref = useRef<HTMLDivElement>(null)
   const page2Ref = useRef<HTMLDivElement>(null)
   const statsGridRef = useRef<HTMLDivElement>(null)
@@ -385,34 +443,77 @@ export function IntroSection() {
   const ctaRef = useRef<HTMLDivElement>(null)
   const scrollIndicatorRef = useRef<HTMLDivElement>(null)
   
-  const isMobile = useResponsiveMobile()
+  const { sectionHeight, totalHeight, contentPadding, heightNum, isMobile } = usePinValues()
   const prefersReducedMotion = useReducedMotion()
-  const [currentSnap, setCurrentSnap] = useState(0)
+  const [currentPage, setCurrentPage] = useState(0)
 
   const rev = revLabel()
 
-  // Scroll snap observer
+  // GSAP ScrollTrigger pinning with snap
   useEffect(() => {
-    if (!snapContainerRef.current) return
-    
-    const container = snapContainerRef.current
-    const handleScroll = () => {
-      const scrollTop = container.scrollTop
-      const pageHeight = container.clientHeight
-      const newSnap = Math.round(scrollTop / pageHeight)
-      setCurrentSnap(newSnap)
-    }
-    
-    container.addEventListener("scroll", handleScroll, { passive: true })
-    return () => container.removeEventListener("scroll", handleScroll)
-  }, [])
+    if (!sectionRef.current || !pinContainerRef.current || !pagesWrapperRef.current) return
+    if (heightNum === 0) return // Wait for viewport measurement
 
-  // Page 1 entrance animations
+    const ctx = gsap.context(() => {
+      // Pin the container and scroll horizontally through pages
+      const scrollDistance = heightNum // One page height of scroll
+
+      gsap.to(pagesWrapperRef.current, {
+        yPercent: -50, // Move from page 1 to page 2
+        ease: "none",
+        scrollTrigger: {
+          trigger: sectionRef.current,
+          start: "top top",
+          end: `+=${scrollDistance}`,
+          pin: pinContainerRef.current,
+          scrub: 0.5,
+          snap: {
+            snapTo: 1, // Snap to end (page 2)
+            duration: { min: 0.2, max: 0.4 },
+            ease: "power2.inOut",
+          },
+          onUpdate: (self) => {
+            setCurrentPage(self.progress > 0.5 ? 1 : 0)
+          },
+          invalidateOnRefresh: true,
+        },
+      })
+
+      // Page 2 elements animate in when scrolling to page 2
+      if (statsGridRef.current) {
+        const statItems = statsGridRef.current.querySelectorAll("[data-stat]")
+        gsap.fromTo(
+          statItems,
+          { opacity: 0, y: 30, scale: 0.95 },
+          {
+            opacity: 1,
+            y: 0,
+            scale: 1,
+            duration: 0.5,
+            stagger: 0.08,
+            ease: "power3.out",
+            scrollTrigger: {
+              trigger: sectionRef.current,
+              start: "top top",
+              end: `+=${scrollDistance}`,
+              scrub: false,
+              toggleActions: "play none none reverse",
+              // Start animation when 40% scrolled
+              onEnter: () => {},
+            },
+          }
+        )
+      }
+    }, sectionRef)
+
+    return () => ctx.revert()
+  }, [heightNum, isMobile])
+
+  // Page 1 entrance animations (immediate, no scroll trigger)
   useEffect(() => {
     if (!page1Ref.current || prefersReducedMotion) return
 
     const ctx = gsap.context(() => {
-      // Stagger in the main elements
       gsap.fromTo(
         "[data-intro-animate]",
         { opacity: 0, y: 30 },
@@ -426,7 +527,6 @@ export function IntroSection() {
         }
       )
 
-      // Scroll indicator pulse
       if (scrollIndicatorRef.current) {
         gsap.to(scrollIndicatorRef.current, {
           y: 8,
@@ -441,399 +541,321 @@ export function IntroSection() {
     return () => ctx.revert()
   }, [prefersReducedMotion])
 
-  // Page 2 GSAP entrance animations with ScrollTrigger
-  useEffect(() => {
-    if (!page2Ref.current || prefersReducedMotion) return
-
-    const ctx = gsap.context(() => {
-      // Stats grid stagger
-      if (statsGridRef.current) {
-        const statItems = statsGridRef.current.querySelectorAll("[data-stat]")
-        gsap.fromTo(
-          statItems,
-          { opacity: 0, y: 20, scale: 0.95 },
-          {
-            opacity: 1,
-            y: 0,
-            scale: 1,
-            duration: 0.6,
-            stagger: 0.1,
-            ease: "power3.out",
-            scrollTrigger: {
-              trigger: page2Ref.current,
-              start: "top 80%",
-              toggleActions: "play none none none",
-            },
-          }
-        )
-      }
-
-      // Stack ticker fade in
-      if (stackTickerRef.current) {
-        gsap.fromTo(
-          stackTickerRef.current,
-          { opacity: 0, x: -20 },
-          {
-            opacity: 1,
-            x: 0,
-            duration: 0.8,
-            ease: "power3.out",
-            scrollTrigger: {
-              trigger: stackTickerRef.current,
-              start: "top 85%",
-              toggleActions: "play none none none",
-            },
-          }
-        )
-      }
-
-      // CTA buttons
-      if (ctaRef.current) {
-        gsap.fromTo(
-          ctaRef.current.querySelectorAll("a, button"),
-          { opacity: 0, y: 15 },
-          {
-            opacity: 1,
-            y: 0,
-            duration: 0.6,
-            stagger: 0.1,
-            ease: "power3.out",
-            scrollTrigger: {
-              trigger: ctaRef.current,
-              start: "top 90%",
-              toggleActions: "play none none none",
-            },
-          }
-        )
-      }
-    }, page2Ref)
-
-    return () => ctx.revert()
-  }, [prefersReducedMotion])
-
-  // Pinning values responsive to mobile
-  const getPinValues = useCallback(() => {
-    return {
-      snapHeight: isMobile ? "100svh" : "100vh",
-      padding: isMobile ? "16px" : "32px",
+  const scrollToNextPage = () => {
+    if (currentPage === 0) {
+      // Scroll to page 2
+      window.scrollTo({
+        top: heightNum,
+        behavior: "smooth",
+      })
+    } else {
+      // Scroll to next section
+      document.getElementById("experience")?.scrollIntoView({ behavior: "smooth" })
     }
-  }, [isMobile])
-
-  const pinValues = getPinValues()
-
-  const scrollToNextSnap = () => {
-    if (!snapContainerRef.current) return
-    const pageHeight = snapContainerRef.current.clientHeight
-    snapContainerRef.current.scrollTo({
-      top: (currentSnap + 1) * pageHeight,
-      behavior: "smooth",
-    })
   }
 
   return (
     <section
       id="intro"
-      ref={containerRef}
+      ref={sectionRef}
       className="relative"
-      style={{ height: `calc(${pinValues.snapHeight} * 2)` }}
+      style={{ height: totalHeight }}
     >
-      {/* Scroll snap container */}
+      {/* Pinned container */}
       <div
-        ref={snapContainerRef}
-        className="fixed inset-0 overflow-y-auto snap-y snap-mandatory"
-        style={{ 
-          height: pinValues.snapHeight,
-          scrollSnapType: "y mandatory",
-        }}
+        ref={pinContainerRef}
+        className="relative w-full overflow-hidden"
+        style={{ height: sectionHeight }}
       >
-        {/* ═══════════════════════════════════════════════════════════════════
-            PAGE 1: Hero Identity
-        ═══════════════════════════════════════════════════════════════════ */}
+        {/* Pages wrapper - moves vertically */}
         <div
-          ref={page1Ref}
-          className="relative w-full flex items-center justify-center snap-start snap-always"
-          style={{ 
-            height: pinValues.snapHeight,
-            minHeight: isMobile ? "600px" : "700px",
-          }}
+          ref={pagesWrapperRef}
+          className="relative w-full"
+          style={{ height: `calc(${sectionHeight} * 2)` }}
         >
-          {/* Brutalist background */}
-          <div className="absolute inset-0 opacity-60">
-            <BrutalistBackground variant="dense" />
-          </div>
-          
-          {/* Technical frame overlay */}
-          <TechnicalFrame className="opacity-30" />
-
-          {/* Content */}
-          <div 
-            className="relative z-10 w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8"
-            style={{ padding: pinValues.padding }}
+          {/* ═══════════════════════════════════════════════════════════════════
+              PAGE 1: Hero Identity
+          ═══════════════════════════════════════════════════════════════════ */}
+          <div
+            ref={page1Ref}
+            className="relative w-full flex items-center justify-center"
+            style={{ height: sectionHeight }}
           >
-            {/* System status bar */}
-            <div 
-              data-intro-animate
-              className="flex items-center gap-2 sm:gap-4 mb-6 sm:mb-8 font-mono text-[9px] sm:text-[10px] uppercase tracking-[0.2em] text-muted-foreground"
-            >
-              <span className="text-green-500">● ONLINE</span>
-              <span className="text-foreground/20">│</span>
-              <span>REV: {rev}</span>
-              <span className="text-foreground/20">│</span>
-              <span className="hidden sm:inline">SYS: OPERATIONAL</span>
+            {/* Brutalist background */}
+            <div className="absolute inset-0 opacity-60">
+              <BrutalistBackground variant="dense" />
             </div>
+            
+            {/* Technical frame overlay */}
+            <TechnicalFrame className="opacity-30" />
 
-            {/* Name - Large brutalist typography */}
-            <div data-intro-animate className="mb-4 sm:mb-6">
-              <h1 className="font-mono text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-tight leading-[0.9]">
-                <GSAPText immediate variant="chars" stagger={0.03} duration={0.6}>
-                  RYO
-                </GSAPText>
-                <br />
-                <span className="text-muted-foreground">
-                  <GSAPText immediate variant="chars" stagger={0.03} duration={0.6} delay={0.3}>
-                    FUJIMURA
+            {/* Content */}
+            <div 
+              className="relative z-10 w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8"
+              style={{ padding: contentPadding }}
+            >
+              {/* System status bar */}
+              <div 
+                data-intro-animate
+                className="flex items-center gap-2 sm:gap-4 mb-6 sm:mb-8 font-mono text-[9px] sm:text-[10px] uppercase tracking-[0.2em] text-muted-foreground"
+              >
+                <span className="text-green-500">● ONLINE</span>
+                <span className="text-foreground/20">│</span>
+                <span>REV: {rev}</span>
+                <span className="text-foreground/20">│</span>
+                <span className="hidden sm:inline">SYS: OPERATIONAL</span>
+              </div>
+
+              {/* Name - Large brutalist typography */}
+              <div data-intro-animate className="mb-4 sm:mb-6">
+                <h1 className="font-mono text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-tight leading-[0.9]">
+                  <GSAPText immediate variant="chars" stagger={0.03} duration={0.6}>
+                    RYO
                   </GSAPText>
+                  <br />
+                  <span className="text-muted-foreground">
+                    <GSAPText immediate variant="chars" stagger={0.03} duration={0.6} delay={0.3}>
+                      FUJIMURA
+                    </GSAPText>
+                  </span>
+                </h1>
+              </div>
+
+              {/* Role descriptor with rotating verb */}
+              <div 
+                data-intro-animate
+                className="font-mono text-sm sm:text-base md:text-lg uppercase tracking-[0.15em] text-foreground/80 mb-6 sm:mb-8"
+              >
+                <span className="text-muted-foreground">MODE: </span>
+                <ModeVerbRotator
+                  verbs={MODE_VERBS}
+                  slotWidthCh={isMobile ? VERB_SLOT_CH_MOBILE : VERB_SLOT_CH_DESKTOP}
+                  className="text-foreground font-bold"
+                />
+                <br className="sm:hidden" />
+                <span className="hidden sm:inline text-foreground/20"> │ </span>
+                <span className="text-muted-foreground">LOC: </span>
+                <LocHoverReveal
+                  defaultText={LOC_DEFAULT}
+                  hoverText={LOC_HOVER}
+                  slotWidthCh={isMobile ? LOC_SLOT_CH_MOBILE : LOC_SLOT_CH_DESKTOP}
+                />
+              </div>
+
+              {/* Tagline */}
+              <div data-intro-animate className="max-w-xl mb-8 sm:mb-10">
+                <p className="font-mono text-xs sm:text-sm text-muted-foreground leading-relaxed">
+                  Software Engineer crafting intelligent systems at the intersection of{" "}
+                  <span className="text-foreground font-medium">AI/ML</span>,{" "}
+                  <span className="text-foreground font-medium">Mobile</span>, and{" "}
+                  <span className="text-foreground font-medium">Full-Stack</span> development.
+                </p>
+              </div>
+
+              {/* Social links */}
+              <div data-intro-animate>
+                <SocialLinks />
+              </div>
+
+              {/* Scroll indicator */}
+              <div 
+                data-intro-animate
+                className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 cursor-pointer"
+                onClick={scrollToNextPage}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => e.key === "Enter" && scrollToNextPage()}
+              >
+                <span className="font-mono text-[8px] uppercase tracking-[0.3em] text-muted-foreground">
+                  Scroll
                 </span>
-              </h1>
-            </div>
-
-            {/* Role descriptor with rotating verb */}
-            <div 
-              data-intro-animate
-              className="font-mono text-sm sm:text-base md:text-lg uppercase tracking-[0.15em] text-foreground/80 mb-6 sm:mb-8"
-            >
-              <span className="text-muted-foreground">MODE: </span>
-              <ModeVerbRotator
-                verbs={MODE_VERBS}
-                slotWidthCh={isMobile ? VERB_SLOT_CH_MOBILE : VERB_SLOT_CH_DESKTOP}
-                className="text-foreground font-bold"
-              />
-              <br className="sm:hidden" />
-              <span className="hidden sm:inline text-foreground/20"> │ </span>
-              <span className="text-muted-foreground">LOC: </span>
-              <LocHoverReveal
-                defaultText={LOC_DEFAULT}
-                hoverText={LOC_HOVER}
-                slotWidthCh={isMobile ? LOC_SLOT_CH_MOBILE : LOC_SLOT_CH_DESKTOP}
-              />
-            </div>
-
-            {/* Tagline */}
-            <div data-intro-animate className="max-w-xl mb-8 sm:mb-10">
-              <p className="font-mono text-xs sm:text-sm text-muted-foreground leading-relaxed">
-                Software Engineer crafting intelligent systems at the intersection of{" "}
-                <span className="text-foreground font-medium">AI/ML</span>,{" "}
-                <span className="text-foreground font-medium">Mobile</span>, and{" "}
-                <span className="text-foreground font-medium">Full-Stack</span> development.
-              </p>
-            </div>
-
-            {/* Social links */}
-            <div data-intro-animate>
-              <SocialLinks />
-            </div>
-
-            {/* Scroll indicator */}
-            <div 
-              data-intro-animate
-              className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 cursor-pointer"
-              onClick={scrollToNextSnap}
-              role="button"
-              tabIndex={0}
-              onKeyDown={(e) => e.key === "Enter" && scrollToNextSnap()}
-            >
-              <span className="font-mono text-[8px] uppercase tracking-[0.3em] text-muted-foreground">
-                Scroll
-              </span>
-              <div ref={scrollIndicatorRef}>
-                <ArrowDown className="w-4 h-4 text-muted-foreground" />
-              </div>
-            </div>
-          </div>
-
-          {/* Decorative corner elements */}
-          <div className="absolute top-4 left-4 font-mono text-[8px] text-muted-foreground/50 hidden lg:block">
-            [00:00:00]
-          </div>
-          <div className="absolute top-4 right-4 font-mono text-[8px] text-muted-foreground/50 hidden lg:block">
-            v2.0.0
-          </div>
-        </div>
-
-        {/* ═══════════════════════════════════════════════════════════════════
-            PAGE 2: Skills & Stats
-        ═══════════════════════════════════════════════════════════════════ */}
-        <div
-          ref={page2Ref}
-          className="relative w-full flex items-center justify-center snap-start snap-always"
-          style={{ 
-            height: pinValues.snapHeight,
-            minHeight: isMobile ? "600px" : "700px",
-          }}
-        >
-          {/* Subtle background variant */}
-          <div className="absolute inset-0 opacity-40">
-            <BrutalistBackground variant="circuit" />
-          </div>
-
-          <div 
-            className="relative z-10 w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8"
-            style={{ padding: pinValues.padding }}
-          >
-            {/* Section label */}
-            <div className="flex items-center gap-3 mb-6 sm:mb-8">
-              <div className="relative">
-                <div className="w-2.5 h-2.5 bg-green-500 rounded-full animate-pulse" />
-                <div className="absolute inset-0 w-2.5 h-2.5 bg-green-500 rounded-full animate-ping opacity-75" />
-              </div>
-              <span className="font-mono text-[10px] sm:text-xs uppercase tracking-[0.2em] text-green-500">
-                Available for Opportunities
-              </span>
-            </div>
-
-            {/* Stats Grid */}
-            <div 
-              ref={statsGridRef} 
-              className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-8 sm:mb-10"
-            >
-              {[
-                { label: "Years Coding", value: "8+", link: null },
-                { label: "Internships", value: "2", link: "experience" },
-                { label: "Projects Shipped", value: "10+", link: "projects" },
-                { label: "Publications", value: "2", link: "publications" },
-              ].map((stat) => {
-                const isLink = !!stat.link
-                const handleClick = () => {
-                  if (stat.link) {
-                    document.getElementById(stat.link)?.scrollIntoView({ behavior: "smooth" })
-                  }
-                }
-                return (
-                  <button
-                    key={stat.label}
-                    data-stat
-                    type="button"
-                    onClick={isLink ? handleClick : undefined}
-                    disabled={!isLink}
-                    className={`
-                      relative border bg-background/80 backdrop-blur-sm px-3 py-4 sm:px-4 sm:py-5 
-                      flex flex-col justify-between min-h-[5rem] sm:min-h-[5.5rem] text-left
-                      transition-all duration-300 group
-                      ${isLink 
-                        ? "border-foreground/25 cursor-pointer hover:border-foreground hover:shadow-[4px_4px_0_0_var(--foreground)]" 
-                        : "border-foreground/15 cursor-default"
-                      }
-                    `}
-                  >
-                    {/* Technical pattern overlay on hover */}
-                    {isLink && (
-                      <svg
-                        className="absolute inset-0 w-full h-full pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                        viewBox="0 0 48 48"
-                        fill="none"
-                        aria-hidden
-                      >
-                        <line x1="0" y1="0" x2="48" y2="48" stroke="currentColor" strokeWidth="0.3" className="text-foreground/10" />
-                        <line x1="48" y1="0" x2="0" y2="48" stroke="currentColor" strokeWidth="0.3" className="text-foreground/10" />
-                      </svg>
-                    )}
-                    <span className="font-mono text-[9px] sm:text-[10px] uppercase tracking-[0.15em] text-muted-foreground">
-                      {stat.label}
-                    </span>
-                    <span className="font-mono text-2xl sm:text-3xl md:text-4xl font-black text-foreground">
-                      {stat.value}
-                    </span>
-                  </button>
-                )
-              })}
-            </div>
-
-            {/* Stack Ticker */}
-            <div 
-              ref={stackTickerRef} 
-              className="border border-foreground/20 bg-background/50 backdrop-blur-sm overflow-hidden mb-6 sm:mb-8"
-            >
-              <div className="px-3 py-2 border-b border-foreground/10">
-                <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-muted-foreground">
-                  Tech Stack
-                </span>
-              </div>
-              <div className="relative overflow-hidden py-3">
-                <div className={`stack-ticker flex gap-8 whitespace-nowrap ${prefersReducedMotion ? "" : "animate-ticker"}`}>
-                  {[
-                    "Python", "Swift", "Kotlin", "TypeScript", "React", 
-                    "Firebase", "PyTorch", "CoreML", "On-device LLMs", 
-                    "CUDA", "Docker", "Node.js", "REST APIs"
-                  ].map((tech, i) => (
-                    <span 
-                      key={i} 
-                      className="font-mono text-sm sm:text-base text-foreground/80"
-                    >
-                      {tech}
-                    </span>
-                  ))}
-                  {/* Duplicate for seamless loop */}
-                  {[
-                    "Python", "Swift", "Kotlin", "TypeScript", "React", 
-                    "Firebase", "PyTorch", "CoreML", "On-device LLMs", 
-                    "CUDA", "Docker", "Node.js", "REST APIs"
-                  ].map((tech, i) => (
-                    <span 
-                      key={`dup-${i}`} 
-                      className="font-mono text-sm sm:text-base text-foreground/80"
-                    >
-                      {tech}
-                    </span>
-                  ))}
+                <div ref={scrollIndicatorRef}>
+                  <ArrowDown className="w-4 h-4 text-muted-foreground" />
                 </div>
               </div>
             </div>
 
-            {/* Focus Areas */}
-            <div className="flex flex-wrap gap-2 mb-8 sm:mb-10">
-              {["AI / ML", "Mobile", "Backend", "Full-Stack"].map((area) => (
-                <span 
-                  key={area}
-                  className="font-mono text-[10px] sm:text-xs uppercase tracking-wider px-3 py-1.5 border border-foreground/30 text-foreground/70 bg-background/50"
-                >
-                  {area}
-                </span>
-              ))}
+            {/* Decorative corner elements */}
+            <div className="absolute top-4 left-4 font-mono text-[8px] text-muted-foreground/50 hidden lg:block">
+              [00:00:00]
             </div>
-
-            {/* CTA Buttons */}
-            <div ref={ctaRef} className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4">
-              <MagneticButton
-                as="a"
-                href="#experience"
-                className="touch-target group relative inline-flex items-center justify-center gap-2 sm:gap-3 px-6 sm:px-8 py-3 sm:py-4 min-h-[48px] text-xs sm:text-sm font-mono uppercase tracking-wider text-primary-foreground bg-primary border-2 border-primary hover:bg-transparent hover:text-primary transition-all duration-300"
-              >
-                View Work
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform shrink-0" />
-              </MagneticButton>
-              <MagneticButton
-                as="a"
-                href="#contact"
-                className="touch-target group inline-flex items-center justify-center gap-2 sm:gap-3 px-6 sm:px-8 py-3 sm:py-4 min-h-[48px] text-xs sm:text-sm font-mono uppercase tracking-wider text-foreground bg-transparent border-2 border-foreground hover:bg-foreground hover:text-background transition-all duration-300"
-              >
-                Contact
-                <ArrowDown className="w-4 h-4 group-hover:translate-y-1 transition-transform shrink-0" />
-              </MagneticButton>
+            <div className="absolute top-4 right-4 font-mono text-[8px] text-muted-foreground/50 hidden lg:block">
+              v2.0.0
             </div>
           </div>
 
-          {/* Page indicator */}
-          <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-2">
-            {[0, 1].map((i) => (
-              <div
-                key={i}
-                className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                  currentSnap === i 
-                    ? "bg-foreground w-6" 
-                    : "bg-foreground/30"
-                }`}
-              />
-            ))}
+          {/* ═══════════════════════════════════════════════════════════════════
+              PAGE 2: Skills & Stats
+          ═══════════════════════════════════════════════════════════════════ */}
+          <div
+            ref={page2Ref}
+            className="relative w-full flex items-center justify-center"
+            style={{ height: sectionHeight }}
+          >
+            {/* Subtle background variant */}
+            <div className="absolute inset-0 opacity-40">
+              <BrutalistBackground variant="circuit" />
+            </div>
+
+            <div 
+              className="relative z-10 w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8"
+              style={{ padding: contentPadding }}
+            >
+              {/* Section label */}
+              <div className="flex items-center gap-3 mb-6 sm:mb-8">
+                <div className="relative">
+                  <div className="w-2.5 h-2.5 bg-green-500 rounded-full animate-pulse" />
+                  <div className="absolute inset-0 w-2.5 h-2.5 bg-green-500 rounded-full animate-ping opacity-75" />
+                </div>
+                <span className="font-mono text-[10px] sm:text-xs uppercase tracking-[0.2em] text-green-500">
+                  Available for Opportunities
+                </span>
+              </div>
+
+              {/* Stats Grid */}
+              <div 
+                ref={statsGridRef} 
+                className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-8 sm:mb-10"
+              >
+                {[
+                  { label: "Years Coding", value: "8+", link: null },
+                  { label: "Internships", value: "2", link: "experience" },
+                  { label: "Projects Shipped", value: "10+", link: "projects" },
+                  { label: "Publications", value: "2", link: "publications" },
+                ].map((stat) => {
+                  const isLink = !!stat.link
+                  const handleClick = () => {
+                    if (stat.link) {
+                      document.getElementById(stat.link)?.scrollIntoView({ behavior: "smooth" })
+                    }
+                  }
+                  return (
+                    <button
+                      key={stat.label}
+                      data-stat
+                      type="button"
+                      onClick={isLink ? handleClick : undefined}
+                      disabled={!isLink}
+                      className={`
+                        relative border bg-background/80 backdrop-blur-sm px-3 py-4 sm:px-4 sm:py-5 
+                        flex flex-col justify-between min-h-[5rem] sm:min-h-[5.5rem] text-left
+                        transition-all duration-300 group
+                        ${isLink 
+                          ? "border-foreground/25 cursor-pointer hover:border-foreground hover:shadow-[4px_4px_0_0_var(--foreground)]" 
+                          : "border-foreground/15 cursor-default"
+                        }
+                      `}
+                    >
+                      {/* Technical pattern overlay on hover */}
+                      {isLink && (
+                        <svg
+                          className="absolute inset-0 w-full h-full pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                          viewBox="0 0 48 48"
+                          fill="none"
+                          aria-hidden
+                        >
+                          <line x1="0" y1="0" x2="48" y2="48" stroke="currentColor" strokeWidth="0.3" className="text-foreground/10" />
+                          <line x1="48" y1="0" x2="0" y2="48" stroke="currentColor" strokeWidth="0.3" className="text-foreground/10" />
+                        </svg>
+                      )}
+                      <span className="font-mono text-[9px] sm:text-[10px] uppercase tracking-[0.15em] text-muted-foreground">
+                        {stat.label}
+                      </span>
+                      <span className="font-mono text-2xl sm:text-3xl md:text-4xl font-black text-foreground">
+                        {stat.value}
+                      </span>
+                    </button>
+                  )
+                })}
+              </div>
+
+              {/* Stack Ticker */}
+              <div 
+                ref={stackTickerRef} 
+                className="border border-foreground/20 bg-background/50 backdrop-blur-sm overflow-hidden mb-6 sm:mb-8"
+              >
+                <div className="px-3 py-2 border-b border-foreground/10">
+                  <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-muted-foreground">
+                    Tech Stack
+                  </span>
+                </div>
+                <div className="relative overflow-hidden py-3">
+                  <div className={`stack-ticker flex gap-8 whitespace-nowrap ${prefersReducedMotion ? "" : "animate-ticker"}`}>
+                    {[
+                      "Python", "Swift", "Kotlin", "TypeScript", "React", 
+                      "Firebase", "PyTorch", "CoreML", "On-device LLMs", 
+                      "CUDA", "Docker", "Node.js", "REST APIs"
+                    ].map((tech, i) => (
+                      <span 
+                        key={i} 
+                        className="font-mono text-sm sm:text-base text-foreground/80"
+                      >
+                        {tech}
+                      </span>
+                    ))}
+                    {/* Duplicate for seamless loop */}
+                    {[
+                      "Python", "Swift", "Kotlin", "TypeScript", "React", 
+                      "Firebase", "PyTorch", "CoreML", "On-device LLMs", 
+                      "CUDA", "Docker", "Node.js", "REST APIs"
+                    ].map((tech, i) => (
+                      <span 
+                        key={`dup-${i}`} 
+                        className="font-mono text-sm sm:text-base text-foreground/80"
+                      >
+                        {tech}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Focus Areas */}
+              <div className="flex flex-wrap gap-2 mb-8 sm:mb-10">
+                {["AI / ML", "Mobile", "Backend", "Full-Stack"].map((area) => (
+                  <span 
+                    key={area}
+                    className="font-mono text-[10px] sm:text-xs uppercase tracking-wider px-3 py-1.5 border border-foreground/30 text-foreground/70 bg-background/50"
+                  >
+                    {area}
+                  </span>
+                ))}
+              </div>
+
+              {/* CTA Buttons */}
+              <div ref={ctaRef} className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4">
+                <MagneticButton
+                  as="a"
+                  href="#experience"
+                  className="touch-target group relative inline-flex items-center justify-center gap-2 sm:gap-3 px-6 sm:px-8 py-3 sm:py-4 min-h-[48px] text-xs sm:text-sm font-mono uppercase tracking-wider text-primary-foreground bg-primary border-2 border-primary hover:bg-transparent hover:text-primary transition-all duration-300"
+                >
+                  View Work
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform shrink-0" />
+                </MagneticButton>
+                <MagneticButton
+                  as="a"
+                  href="#contact"
+                  className="touch-target group inline-flex items-center justify-center gap-2 sm:gap-3 px-6 sm:px-8 py-3 sm:py-4 min-h-[48px] text-xs sm:text-sm font-mono uppercase tracking-wider text-foreground bg-transparent border-2 border-foreground hover:bg-foreground hover:text-background transition-all duration-300"
+                >
+                  Contact
+                  <ArrowDown className="w-4 h-4 group-hover:translate-y-1 transition-transform shrink-0" />
+                </MagneticButton>
+              </div>
+            </div>
+
+            {/* Page indicator */}
+            <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-2">
+              {[0, 1].map((i) => (
+                <div
+                  key={i}
+                  className={`h-2 rounded-full transition-all duration-300 ${
+                    currentPage === i 
+                      ? "bg-foreground w-6" 
+                      : "bg-foreground/30 w-2"
+                  }`}
+                />
+              ))}
+            </div>
           </div>
         </div>
       </div>
