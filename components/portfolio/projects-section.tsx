@@ -374,6 +374,103 @@ const allProjects = [
    ═══════════════`,
     status: "ALPHA",
   },
+  {
+    id: "13",
+    year: "2025",
+    title: "Zero Inbox",
+    subtitle: "PRODUCTION AI",
+    growth: "Production AI Engine",
+    description: "Email management with multi-stage AI reasoning. Uses a chain-of-thought pipeline with 95% accuracy for categorization and response drafting.",
+    features: ["Multi-stage AI", "Auto Categorize", "Draft Responses", "Priority Scoring"],
+    before: "Basic ML models",
+    after: "Multi-stage reasoning pipeline",
+    techStack: ["Swift", "AI/ML", "Firebase"],
+    achievement: "95% accuracy",
+    metric: "200ms",
+    metricLabel: "INFERENCE",
+    icon: "/images/automation.svg",
+    images: [],
+    links: { github: "https://github.com/ryofujimura", demo: "#" },
+    ascii: `
+   ═══════════════
+   │ INBOX: 0    │
+   │ ▓▓▓▓▓▓▓▓▓▓ │
+   │ AI: ACTIVE  │
+   ═══════════════`,
+    status: "ALPHA",
+  },{
+    id: "14",
+    year: "2025",
+    title: "Zero Inbox",
+    subtitle: "PRODUCTION AI",
+    growth: "Production AI Engine",
+    description: "Email management with multi-stage AI reasoning. Uses a chain-of-thought pipeline with 95% accuracy for categorization and response drafting.",
+    features: ["Multi-stage AI", "Auto Categorize", "Draft Responses", "Priority Scoring"],
+    before: "Basic ML models",
+    after: "Multi-stage reasoning pipeline",
+    techStack: ["Swift", "AI/ML", "Firebase"],
+    achievement: "95% accuracy",
+    metric: "200ms",
+    metricLabel: "INFERENCE",
+    icon: "/images/automation.svg",
+    images: [],
+    links: { github: "https://github.com/ryofujimura", demo: "#" },
+    ascii: `
+   ═══════════════
+   │ INBOX: 0    │
+   │ ▓▓▓▓▓▓▓▓▓▓ │
+   │ AI: ACTIVE  │
+   ═══════════════`,
+    status: "ALPHA",
+  },{
+    id: "15",
+    year: "2025",
+    title: "Zero Inbox",
+    subtitle: "PRODUCTION AI",
+    growth: "Production AI Engine",
+    description: "Email management with multi-stage AI reasoning. Uses a chain-of-thought pipeline with 95% accuracy for categorization and response drafting.",
+    features: ["Multi-stage AI", "Auto Categorize", "Draft Responses", "Priority Scoring"],
+    before: "Basic ML models",
+    after: "Multi-stage reasoning pipeline",
+    techStack: ["Swift", "AI/ML", "Firebase"],
+    achievement: "95% accuracy",
+    metric: "200ms",
+    metricLabel: "INFERENCE",
+    icon: "/images/automation.svg",
+    images: [],
+    links: { github: "https://github.com/ryofujimura", demo: "#" },
+    ascii: `
+   ═══════════════
+   │ INBOX: 0    │
+   │ ▓▓▓▓▓▓▓▓▓▓ │
+   │ AI: ACTIVE  │
+   ═══════════════`,
+    status: "ALPHA",
+  },{
+    id: "16",
+    year: "2025",
+    title: "Zero Inbox",
+    subtitle: "PRODUCTION AI",
+    growth: "Production AI Engine",
+    description: "Email management with multi-stage AI reasoning. Uses a chain-of-thought pipeline with 95% accuracy for categorization and response drafting.",
+    features: ["Multi-stage AI", "Auto Categorize", "Draft Responses", "Priority Scoring"],
+    before: "Basic ML models",
+    after: "Multi-stage reasoning pipeline",
+    techStack: ["Swift", "AI/ML", "Firebase"],
+    achievement: "95% accuracy",
+    metric: "200ms",
+    metricLabel: "INFERENCE",
+    icon: "/images/automation.svg",
+    images: [],
+    links: { github: "https://github.com/ryofujimura", demo: "#" },
+    ascii: `
+   ═══════════════
+   │ INBOX: 0    │
+   │ ▓▓▓▓▓▓▓▓▓▓ │
+   │ AI: ACTIVE  │
+   ═══════════════`,
+    status: "ALPHA",
+  },
 ]
 
 type Project = (typeof allProjects)[0]
@@ -545,214 +642,108 @@ function TechnicalPattern({ className }: { className?: string }) {
 }
 
 // ─────────────────────────────────────────────────────────────
-// STACKED IMAGE CAROUSEL WITH WATER RIPPLE ANIMATIONS
+// HORIZONTAL SCROLL IMAGE GALLERY WITH SNAP
 // ─────────────────────────────────────────────────────────────
 
 function ImageGallery({ images, title, isActive }: { images: string[]; title: string; isActive?: boolean }) {
   const [activeIndex, setActiveIndex] = useState(0)
   const [loadedImages, setLoadedImages] = useState<Set<number>>(new Set())
-  const [isAnimating, setIsAnimating] = useState(false)
-  const [isDragging, setIsDragging] = useState(false)
-  const [dragStart, setDragStart] = useState(0)
-  const containerRef = useRef<HTMLDivElement>(null)
-  const cardsRef = useRef<(HTMLDivElement | null)[]>([])
-  const rippleRef = useRef<HTMLDivElement>(null)
+  const scrollContainerRef = useRef<HTMLDivElement>(null)
+  const itemsRef = useRef<(HTMLDivElement | null)[]>([])
 
-  // Reset to first image when project changes
+  // Reset scroll position when project changes
   useEffect(() => {
     setActiveIndex(0)
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollTo({ left: 0, behavior: 'instant' })
+    }
   }, [title])
 
-  // Initial water-like entrance animation - cards rise like bubbles
+  // Entrance animation with water ripple effect
   useEffect(() => {
-    if (!containerRef.current || !isActive || images.length === 0) return
+    if (!isActive || images.length === 0) return
 
-    const cards = cardsRef.current.filter(Boolean)
+    const items = itemsRef.current.filter(Boolean)
     
-    gsap.killTweensOf(cards)
+    gsap.killTweensOf(items)
 
-    // Fluid entrance - cards float up like objects surfacing
-    cards.forEach((card, idx) => {
-      if (!card) return
+    // Water surface entrance - items rise with ripple delay
+    items.forEach((item, idx) => {
+      if (!item) return
       
-      const offset = idx - activeIndex
-      const isMain = offset === 0
-      // Ripple delay - further cards take longer (like concentric waves)
-      const rippleDelay = 0.15 + Math.abs(offset) * 0.08
+      const rippleDelay = 0.1 + idx * 0.08
       
       gsap.fromTo(
-        card,
-        {
-          y: 60,
-          x: offset * 15,
-          rotation: offset * 2,
-          scale: 0.85,
-          opacity: 0,
-        },
-        {
-          y: 0,
-          x: offset * 25,
-          rotation: offset * 3,
-          scale: isMain ? 1 : 0.92 - Math.abs(offset) * 0.04,
-          opacity: isMain ? 1 : 0.6 - Math.abs(offset) * 0.12,
-          duration: 1.2,
-          delay: rippleDelay,
-          ease: "sine.out", // Smooth, water-like deceleration
+        item,
+        { y: 30, opacity: 0 },
+        { 
+          y: 0, 
+          opacity: 1, 
+          duration: 0.8, 
+          delay: rippleDelay, 
+          ease: "sine.out" 
         }
       )
     })
   }, [isActive, images.length, title])
 
-  // Water ripple effect - propagates outward from touched card
-  const createRipple = useCallback((originIdx: number) => {
-    const cards = cardsRef.current.filter(Boolean)
+  // Handle scroll to detect active image
+  const handleScroll = useCallback(() => {
+    if (!scrollContainerRef.current) return
     
-    cards.forEach((card, idx) => {
-      if (!card) return
+    const container = scrollContainerRef.current
+    const scrollLeft = container.scrollLeft
+    const containerWidth = container.clientWidth
+    const itemWidth = containerWidth * 0.85 + 12 // 85% width + gap
+    
+    const newIndex = Math.round(scrollLeft / itemWidth)
+    if (newIndex !== activeIndex && newIndex >= 0 && newIndex < images.length) {
+      setActiveIndex(newIndex)
       
-      // Distance from origin determines delay (like ripples spreading)
-      const distance = Math.abs(idx - originIdx)
-      const rippleDelay = distance * 0.06
-      
-      // Gentle wave motion - amplitude decreases with distance
-      const waveAmplitude = Math.max(2, 8 - distance * 2)
-      
-      gsap.to(card, {
-        keyframes: [
-          { y: -waveAmplitude, duration: 0.15, ease: "sine.out" },
-          { y: waveAmplitude * 0.5, duration: 0.2, ease: "sine.inOut" },
-          { y: -waveAmplitude * 0.25, duration: 0.2, ease: "sine.inOut" },
-          { y: 0, duration: 0.25, ease: "sine.out" },
-        ],
-        delay: rippleDelay,
+      // Trigger ripple animation on visible items
+      itemsRef.current.forEach((item, idx) => {
+        if (!item) return
+        const distance = Math.abs(idx - newIndex)
+        const rippleDelay = distance * 0.03
+        const waveAmplitude = Math.max(1, 4 - distance * 1.5)
+        
+        gsap.to(item, {
+          keyframes: [
+            { y: -waveAmplitude, duration: 0.12, ease: "sine.out" },
+            { y: waveAmplitude * 0.3, duration: 0.15, ease: "sine.inOut" },
+            { y: 0, duration: 0.2, ease: "sine.out" },
+          ],
+          delay: rippleDelay,
+        })
       })
+    }
+  }, [activeIndex, images.length])
+
+  // Scroll to specific image
+  const scrollToImage = useCallback((idx: number) => {
+    if (!scrollContainerRef.current) return
+    
+    const container = scrollContainerRef.current
+    const containerWidth = container.clientWidth
+    const itemWidth = containerWidth * 0.85 + 12
+    
+    container.scrollTo({
+      left: idx * itemWidth,
+      behavior: 'smooth'
     })
   }, [])
 
-  // Animate cards when activeIndex changes - fluid water transition
-  const animateCards = useCallback((newIndex: number, direction: 'left' | 'right') => {
-    if (isAnimating || images.length <= 1) return
-    
-    setIsAnimating(true)
-    const cards = cardsRef.current.filter(Boolean)
-
-    // Water displacement animation
-    cards.forEach((card, idx) => {
-      if (!card) return
-      
-      const offset = idx - newIndex
-      const isMain = offset === 0
-      const prevOffset = idx - activeIndex
-      
-      // Calculate ripple delay from the interaction point
-      const distanceFromNew = Math.abs(offset)
-      const rippleDelay = distanceFromNew * 0.04
-      
-      // Smooth sine wave for Y motion - like water surface
-      const wavePhase = direction === 'right' ? 1 : -1
-      const waveHeight = isMain ? 12 : 6 - distanceFromNew * 1.5
-      
-      // Timeline for fluid motion
-      const tl = gsap.timeline({
-        onComplete: idx === newIndex ? () => setIsAnimating(false) : undefined,
-      })
-      
-      // Phase 1: Initial displacement (water pushed aside)
-      tl.to(card, {
-        y: waveHeight * wavePhase,
-        x: offset * 25 + (wavePhase * 5),
-        rotation: offset * 3 + (wavePhase * 1),
-        duration: 0.25,
-        delay: rippleDelay,
-        ease: "sine.out",
-      })
-      // Phase 2: Settling wave
-      .to(card, {
-        y: -waveHeight * 0.4 * wavePhase,
-        x: offset * 25,
-        rotation: offset * 3,
-        scale: isMain ? 1 : 0.92 - Math.abs(offset) * 0.04,
-        opacity: isMain ? 1 : Math.max(0.25, 0.6 - Math.abs(offset) * 0.12),
-        duration: 0.35,
-        ease: "sine.inOut",
-      })
-      // Phase 3: Final rest (water settling)
-      .to(card, {
-        y: 0,
-        duration: 0.3,
-        ease: "sine.out",
-      })
-    })
-
-    setActiveIndex(newIndex)
-  }, [activeIndex, isAnimating, images.length])
-
-  // Navigate to next/prev image
-  const goToNext = useCallback(() => {
-    if (images.length <= 1) return
-    const newIndex = (activeIndex + 1) % images.length
-    animateCards(newIndex, 'right')
-  }, [activeIndex, images.length, animateCards])
-
-  const goToPrev = useCallback(() => {
-    if (images.length <= 1) return
-    const newIndex = (activeIndex - 1 + images.length) % images.length
-    animateCards(newIndex, 'left')
-  }, [activeIndex, images.length, animateCards])
-
-  // Click on card to select it
-  const selectCard = useCallback((idx: number) => {
-    if (idx === activeIndex || isAnimating) return
-    const direction = idx > activeIndex ? 'right' : 'left'
-    animateCards(idx, direction)
-  }, [activeIndex, isAnimating, animateCards])
-
-  // Drag/swipe handling
-  const handleDragStart = (e: React.MouseEvent | React.TouchEvent) => {
-    if (images.length <= 1) return
-    setIsDragging(true)
-    const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX
-    setDragStart(clientX)
-  }
-
-  const handleDragEnd = (e: React.MouseEvent | React.TouchEvent) => {
-    if (!isDragging || images.length <= 1) return
-    setIsDragging(false)
-    
-    const clientX = 'changedTouches' in e ? e.changedTouches[0].clientX : e.clientX
-    const diff = dragStart - clientX
-    
-    if (Math.abs(diff) > 50) {
-      if (diff > 0) goToNext()
-      else goToPrev()
-    }
-  }
-
-  // Hover ripple effect on main card - gentle water touch
+  // Hover ripple effect
   const handleHover = (idx: number, isEntering: boolean) => {
-    const card = cardsRef.current[idx]
-    if (!card) return
+    const item = itemsRef.current[idx]
+    if (!item) return
 
-    if (isEntering && idx === activeIndex) {
-      // Main card: gentle lift like finger touching water surface
-      gsap.to(card, {
-        y: -4,
-        scale: 1.01,
-        duration: 0.4,
-        ease: "sine.out",
-      })
-      // Trigger subtle ripple on neighboring cards
-      createRipple(idx)
-    } else if (!isEntering && idx === activeIndex) {
-      // Settle back down
-      gsap.to(card, {
-        y: 0,
-        scale: 1,
-        duration: 0.5,
-        ease: "sine.inOut",
-      })
-    }
-    }
+    gsap.to(item, {
+      y: isEntering ? -3 : 0,
+      duration: isEntering ? 0.3 : 0.4,
+      ease: isEntering ? "sine.out" : "sine.inOut",
+    })
+  }
 
   if (images.length === 0) {
     return (
@@ -773,159 +764,106 @@ function ImageGallery({ images, title, isActive }: { images: string[]; title: st
 
   return (
     <div className="h-full flex flex-col">
-      {/* Main stacked card area */}
+      {/* Horizontal scroll container */}
       <div 
-        ref={containerRef}
-        className="flex-1 relative flex items-center justify-center overflow-visible cursor-grab active:cursor-grabbing"
-        onMouseDown={handleDragStart}
-        onMouseUp={handleDragEnd}
-        onMouseLeave={() => isDragging && setIsDragging(false)}
-        onTouchStart={handleDragStart}
-        onTouchEnd={handleDragEnd}
-      >
-        {/* Stacked cards */}
-        <div className="relative w-[85%] h-[90%]">
-          {images.slice(0, 5).map((img, idx) => {
-            const offset = idx - activeIndex
-            const isMain = idx === activeIndex
-            
-            return (
-              <div
-                key={`${title}-${idx}`}
-                ref={el => { cardsRef.current[idx] = el }}
-                onClick={() => selectCard(idx)}
-                onMouseEnter={() => handleHover(idx, true)}
-                onMouseLeave={() => handleHover(idx, false)}
-                className={cn(
-                  "absolute inset-0 border bg-background overflow-hidden",
-                  "transition-shadow duration-300",
-                  isMain 
-                    ? "border-foreground/30 shadow-[6px_6px_0_0_var(--foreground)] cursor-default z-10" 
-                    : "border-foreground/10 cursor-pointer hover:border-foreground/20"
-                )}
-                style={{
-                  transform: `translateX(${offset * 25}px) rotate(${offset * 3}deg) scale(${isMain ? 1 : 0.9 - Math.abs(offset) * 0.05})`,
-                  opacity: isMain ? 1 : Math.max(0.2, 0.6 - Math.abs(offset) * 0.15),
-                  zIndex: images.length - Math.abs(offset),
-                }}
-              >
-                {/* Loading state */}
-                {!loadedImages.has(idx) && (
-                  <div className="absolute inset-0 bg-foreground/5 flex items-center justify-center z-20">
-                    <div className="font-mono text-center">
-                      <div className="text-[8px] text-foreground/30 animate-pulse mb-1">
-                        ░▒▓ LOADING ▓▒░
-                      </div>
-                      <div className="text-[6px] text-foreground/20">
-                        {String(idx + 1).padStart(2, "0")}/{String(images.length).padStart(2, "0")}
-                      </div>
-                    </div>
-                  </div>
-                )}
-                
-                {/* Image */}
-                <div className="relative w-full h-full">
-                  <Image
-                    src={img}
-                    alt={`${title} preview ${idx + 1}`}
-                    fill
-                    className={cn(
-                      "object-cover transition-all duration-500",
-                      isMain ? "grayscale-0" : "grayscale-[0.5]",
-                      loadedImages.has(idx) ? "opacity-100" : "opacity-0"
-                    )}
-                    onLoad={() => setLoadedImages(prev => new Set(prev).add(idx))}
-                    draggable={false}
-                  />
-                </div>
-
-                {/* Corner ASCII marks */}
-                <span className="absolute top-2 left-2 font-mono text-[7px] text-white/60 drop-shadow-lg">┌──</span>
-                <span className="absolute top-2 right-2 font-mono text-[7px] text-white/60 drop-shadow-lg">──┐</span>
-                <span className="absolute bottom-2 left-2 font-mono text-[7px] text-white/60 drop-shadow-lg">└──</span>
-                <span className="absolute bottom-2 right-2 font-mono text-[7px] text-white/60 drop-shadow-lg">──┘</span>
-
-                {/* Main card overlay info */}
-                {isMain && (
-                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent p-3">
-                    <div className="font-mono text-white/90 text-[9px] md:text-[10px] font-bold">
-                      {title}
-                    </div>
-                    <div className="font-mono text-white/60 text-[7px] md:text-[8px]">
-                      IMG_{String(idx + 1).padStart(2, "0")}.jpg — {images.length} total
-                    </div>
-                  </div>
-                )}
-
-                {/* Scanline effect for main card */}
-                {isMain && (
-                  <div 
-                    className="absolute inset-0 pointer-events-none opacity-20"
-                    style={{
-                      background: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.03) 2px, rgba(255,255,255,0.03) 4px)'
-                    }}
-                  />
-                )}
-              </div>
-            )
-          })}
-        </div>
-
-        {/* Navigation arrows - fluid hover */}
-        {images.length > 1 && (
-          <>
-            <button
-              onClick={(e) => { e.stopPropagation(); goToPrev(); }}
-              onMouseEnter={(e) => {
-                gsap.to(e.currentTarget, { y: -2, duration: 0.3, ease: "sine.out" })
-              }}
-              onMouseLeave={(e) => {
-                gsap.to(e.currentTarget, { y: 0, duration: 0.4, ease: "sine.inOut" })
-              }}
-              className={cn(
-                "absolute left-0 top-1/2 -translate-y-1/2 z-20",
-                "w-8 h-8 md:w-10 md:h-10 flex items-center justify-center",
-                "border border-foreground/20 bg-background/80 backdrop-blur-sm",
-                "font-mono text-foreground/60 text-sm",
-                "transition-colors duration-300",
-                "hover:bg-foreground hover:text-background hover:border-foreground"
-              )}
-            >
-              ◄
-            </button>
-            <button
-              onClick={(e) => { e.stopPropagation(); goToNext(); }}
-              onMouseEnter={(e) => {
-                gsap.to(e.currentTarget, { y: -2, duration: 0.3, ease: "sine.out" })
-              }}
-              onMouseLeave={(e) => {
-                gsap.to(e.currentTarget, { y: 0, duration: 0.4, ease: "sine.inOut" })
-              }}
-              className={cn(
-                "absolute right-0 top-1/2 -translate-y-1/2 z-20",
-                "w-8 h-8 md:w-10 md:h-10 flex items-center justify-center",
-                "border border-foreground/20 bg-background/80 backdrop-blur-sm",
-                "font-mono text-foreground/60 text-sm",
-                "transition-colors duration-300",
-                "hover:bg-foreground hover:text-background hover:border-foreground"
-              )}
-            >
-              ►
-            </button>
-          </>
+        ref={scrollContainerRef}
+        onScroll={handleScroll}
+        className={cn(
+          "flex-1 flex gap-3 overflow-x-auto scrollbar-hide",
+          "snap-x snap-mandatory scroll-smooth",
+          "px-[7.5%]" // Center first/last items
         )}
+        style={{
+          scrollPaddingLeft: '7.5%',
+          scrollPaddingRight: '7.5%',
+        }}
+      >
+        {images.map((img, idx) => {
+          const isMain = idx === activeIndex
+          
+          return (
+            <div
+              key={`${title}-${idx}`}
+              ref={el => { itemsRef.current[idx] = el }}
+              onMouseEnter={() => handleHover(idx, true)}
+              onMouseLeave={() => handleHover(idx, false)}
+              className={cn(
+                "flex-shrink-0 w-[85%] h-full snap-center",
+                "relative border bg-background overflow-hidden",
+                "transition-all duration-300",
+                isMain 
+                  ? "border-foreground/30 shadow-[4px_4px_0_0_var(--foreground)]" 
+                  : "border-foreground/10 opacity-60"
+              )}
+            >
+              {/* Loading state */}
+              {!loadedImages.has(idx) && (
+                <div className="absolute inset-0 bg-foreground/5 flex items-center justify-center z-20">
+                  <div className="font-mono text-center">
+                    <div className="text-[8px] text-foreground/30 animate-pulse mb-1">
+                      ░▒▓ LOADING ▓▒░
+                    </div>
+                    <div className="text-[6px] text-foreground/20">
+                      {String(idx + 1).padStart(2, "0")}/{String(images.length).padStart(2, "0")}
+                    </div>
+                  </div>
+                </div>
+              )}
+              
+              {/* Image */}
+              <div className="relative w-full h-full">
+                <Image
+                  src={img}
+                  alt={`${title} preview ${idx + 1}`}
+                  fill
+                  className={cn(
+                    "object-cover transition-all duration-500",
+                    isMain ? "grayscale-0" : "grayscale-[0.3]",
+                    loadedImages.has(idx) ? "opacity-100" : "opacity-0"
+                  )}
+                  onLoad={() => setLoadedImages(prev => new Set(prev).add(idx))}
+                  draggable={false}
+                />
+              </div>
+
+              {/* Corner ASCII marks */}
+              <span className="absolute top-2 left-2 font-mono text-[7px] text-white/60 drop-shadow-lg">┌──</span>
+              <span className="absolute top-2 right-2 font-mono text-[7px] text-white/60 drop-shadow-lg">──┐</span>
+              <span className="absolute bottom-2 left-2 font-mono text-[7px] text-white/60 drop-shadow-lg">└──</span>
+              <span className="absolute bottom-2 right-2 font-mono text-[7px] text-white/60 drop-shadow-lg">──┘</span>
+
+              {/* Overlay info */}
+              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent p-3">
+                <div className="font-mono text-white/90 text-[9px] md:text-[10px] font-bold">
+                  {title}
+                </div>
+                <div className="font-mono text-white/60 text-[7px] md:text-[8px]">
+                  IMG_{String(idx + 1).padStart(2, "0")}.jpg — {images.length} total
+                </div>
+              </div>
+
+              {/* Scanline effect */}
+              <div 
+                className="absolute inset-0 pointer-events-none opacity-20"
+                style={{
+                  background: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.03) 2px, rgba(255,255,255,0.03) 4px)'
+                }}
+              />
+            </div>
+          )
+        })}
       </div>
 
-      {/* Dot indicators - wave selection */}
+      {/* Dot indicators */}
       {images.length > 1 && (
         <div className="flex items-center justify-center gap-2 mt-2">
           <span className="font-mono text-[7px] text-foreground/30">~</span>
-          {images.slice(0, 5).map((_, idx) => {
+          {images.map((_, idx) => {
             const distance = Math.abs(idx - activeIndex)
             return (
               <button
                 key={idx}
-                onClick={() => selectCard(idx)}
+                onClick={() => scrollToImage(idx)}
                 onMouseEnter={(e) => {
                   gsap.to(e.currentTarget, { 
                     y: -3, 
@@ -949,7 +887,6 @@ function ImageGallery({ images, title, isActive }: { images: string[]; title: st
                     : "w-4 bg-foreground/20 hover:bg-foreground/40"
                 )}
                 style={{
-                  // Wave-like width based on distance from active
                   opacity: idx === activeIndex ? 1 : Math.max(0.3, 1 - distance * 0.2),
                 }}
                 aria-label={`View image ${idx + 1}`}
@@ -1252,20 +1189,6 @@ function ProjectSlide({
       <div className="h-full border border-foreground/20 border-flash bg-background relative overflow-hidden">
         {/* Technical pattern background */}
         <TechnicalPattern className="w-full h-full opacity-30" />
-        
-        {/* ASCII corner decorations */}
-        <span className="absolute top-0 left-0 font-mono text-[8px] text-foreground/30 p-2">
-          ╔══════════════════════
-        </span>
-        <span className="absolute top-0 right-0 font-mono text-[8px] text-foreground/30 p-2">
-          ══════════════════════╗
-        </span>
-        <span className="absolute bottom-0 left-0 font-mono text-[8px] text-foreground/30 p-2">
-          ╚══════════════════════
-        </span>
-        <span className="absolute bottom-0 right-0 font-mono text-[8px] text-foreground/30 p-2">
-          ══════════════════════╝
-        </span>
 
         <div className="h-full flex flex-col p-4 md:p-6 relative z-10">
           {/* Header Row */}
@@ -1554,9 +1477,6 @@ function MobileNav({
 
   return (
     <div className="lg:hidden mb-3">
-      <div className="font-mono text-[7px] text-foreground/30 mb-2">
-        ├── QUICK_NAV
-      </div>
       <div className="flex gap-1 overflow-x-auto scrollbar-hide py-1">
         {projects.map((project, i) => (
           <button
