@@ -487,7 +487,7 @@ export function IntroSection() {
       ═══════════════════════════════════════════════════════════════════ */}
       <div
         ref={heroRef}
-        className="relative w-full pt-32 sm:pt-40 pb-24 sm:pb-32"
+        className="relative w-full pt-40 sm:pt-48 pb-24 sm:pb-32"
       >
         {/* Brutalist background */}
         <div className="absolute inset-0 opacity-60">
