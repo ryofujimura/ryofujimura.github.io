@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef, useEffect, useCallback } from "react"
+import { useState, useRef, useEffect, useCallback, useLayoutEffect } from "react"
 import { gsap } from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
 import { cn } from "@/lib/utils"
@@ -512,14 +512,22 @@ function SkillButton({
   isActive,
   isAnyActive,
   onClick,
+  onRefChange,
 }: {
   skill: string
   projectCount: number
   isActive: boolean
   isAnyActive: boolean
   onClick: () => void
+  onRefChange?: (el: HTMLButtonElement | null) => void
 }) {
   const buttonRef = useRef<HTMLButtonElement>(null)
+  
+  // Report ref to parent
+  useEffect(() => {
+    onRefChange?.(buttonRef.current)
+    return () => onRefChange?.(null)
+  }, [onRefChange])
   const [displayText, setDisplayText] = useState(skill)
   const glitchChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 
@@ -648,12 +656,76 @@ export function ProjectsSection() {
   const [activeSkill, setActiveSkill] = useState<string | null>(null)
   const sectionRef = useRef<HTMLElement>(null)
   const skillsContainerRef = useRef<HTMLDivElement>(null)
+  const skillRefsMap = useRef<Map<string, HTMLButtonElement>>(new Map())
+  const terminalRef = useRef<HTMLDivElement>(null)
+  const [terminalRowBottom, setTerminalRowBottom] = useState<number | null>(null)
+  const [terminalHeight, setTerminalHeight] = useState(0)
   const isMobile = useIsMobile()
+
+  // Track skill button ref
+  const setSkillRef = useCallback((skill: string, el: HTMLButtonElement | null) => {
+    if (el) {
+      skillRefsMap.current.set(skill, el)
+    } else {
+      skillRefsMap.current.delete(skill)
+    }
+  }, [])
 
   // Toggle skill
   const handleSkillClick = useCallback((skill: string) => {
     setActiveSkill(prev => prev === skill ? null : skill)
   }, [])
+
+  // Calculate terminal position based on active skill's row
+  useLayoutEffect(() => {
+    if (!activeSkill || !skillsContainerRef.current) {
+      setTerminalRowBottom(null)
+      return
+    }
+
+    const activeEl = skillRefsMap.current.get(activeSkill)
+    if (!activeEl) return
+
+    const containerRect = skillsContainerRef.current.getBoundingClientRect()
+    const activeRect = activeEl.getBoundingClientRect()
+    const activeTop = activeRect.top - containerRect.top
+
+    // Find all skills on the same row (same offsetTop within tolerance)
+    let maxBottom = activeRect.bottom - containerRect.top
+    skillRefsMap.current.forEach((el) => {
+      const rect = el.getBoundingClientRect()
+      const elTop = rect.top - containerRect.top
+      // Check if on same row (within 5px tolerance for alignment variations)
+      if (Math.abs(elTop - activeTop) < 5) {
+        const elBottom = rect.bottom - containerRect.top
+        if (elBottom > maxBottom) {
+          maxBottom = elBottom
+        }
+      }
+    })
+
+    setTerminalRowBottom(maxBottom)
+  }, [activeSkill])
+
+  // Measure terminal height for container padding
+  useEffect(() => {
+    if (!activeSkill || !terminalRef.current) {
+      setTerminalHeight(0)
+      return
+    }
+
+    const measureHeight = () => {
+      if (terminalRef.current) {
+        setTerminalHeight(terminalRef.current.offsetHeight)
+      }
+    }
+
+    // Measure after render and after potential animations
+    measureHeight()
+    const timeout = setTimeout(measureHeight, 500)
+
+    return () => clearTimeout(timeout)
+  }, [activeSkill])
 
   // Scroll animation
   useEffect(() => {
@@ -745,10 +817,11 @@ export function ProjectsSection() {
           <AsciiBorderLine position="bottom" className="ascii-decoration mt-4" />
         </div>
 
-        {/* Skills display */}
+        {/* Skills display with inline terminal */}
         <div
           ref={skillsContainerRef}
           className="relative text-center py-6 sm:py-10"
+          style={{ paddingBottom: activeSkill ? `${terminalHeight + 40}px` : undefined }}
         >
           {/* Skills flow - wrapped on all screen sizes */}
           <div className="flex flex-row flex-wrap justify-center items-baseline gap-x-[0.15em] gap-y-1 sm:gap-x-[0.2em] sm:gap-y-3 px-2">
@@ -760,6 +833,7 @@ export function ProjectsSection() {
                   isActive={activeSkill === skill}
                   isAnyActive={activeSkill !== null}
                   onClick={() => handleSkillClick(skill)}
+                  onRefChange={(el) => setSkillRef(skill, el)}
                 />
                 {index < allSkills.length - 1 && (
                   <span className="font-mono text-[3vw] sm:text-[2vw] text-foreground/10 mx-[0.1em] select-none">
@@ -769,10 +843,14 @@ export function ProjectsSection() {
               </span>
             ))}
           </div>
-          
-          {/* Terminal below skills - doesn't affect skill flow */}
-          {activeSkill && (
-            <div className="px-4 sm:px-6 md:px-8 mt-4">
+
+          {/* Terminal positioned below the active skill's row */}
+          {activeSkill && terminalRowBottom !== null && (
+            <div 
+              ref={terminalRef}
+              className="absolute left-0 right-0 px-4 sm:px-6 md:px-8 z-10"
+              style={{ top: `${terminalRowBottom + 8}px` }}
+            >
               <TerminalOutput
                 skill={activeSkill}
                 isActive={true}
