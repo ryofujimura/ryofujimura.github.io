@@ -290,6 +290,102 @@ const ASCII_PATTERNS = {
 // ASCII ANIMATION COMPONENTS
 // ─────────────────────────────────────────────────────────────
 
+// Animated ASCII pattern background
+function ASCIIPatternBackground({ isActive }: { isActive: boolean }) {
+  const canvasRef = useRef<HTMLDivElement>(null)
+  const [pattern, setPattern] = useState<string[]>([])
+
+  useEffect(() => {
+    if (!isActive) return
+
+    // Generate random ASCII pattern
+    const generatePattern = () => {
+      const chars = "░▒▓│─┼┌┐└┘├┤┬┴"
+      const rows: string[] = []
+      for (let i = 0; i < 8; i++) {
+        let row = ""
+        for (let j = 0; j < 24; j++) {
+          row += chars[Math.floor(Math.random() * chars.length)]
+        }
+        rows.push(row)
+      }
+      return rows
+    }
+
+    setPattern(generatePattern())
+
+    const interval = setInterval(() => {
+      setPattern(prev => {
+        // Slowly mutate pattern
+        return prev.map(row => {
+          const chars = row.split("")
+          const mutateIndex = Math.floor(Math.random() * chars.length)
+          const newChars = "░▒▓│─┼┌┐└┘├┤┬┴"
+          chars[mutateIndex] = newChars[Math.floor(Math.random() * newChars.length)]
+          return chars.join("")
+        })
+      })
+    }, 150)
+
+    return () => clearInterval(interval)
+  }, [isActive])
+
+  return (
+    <div 
+      ref={canvasRef}
+      className={cn(
+        "absolute inset-0 overflow-hidden pointer-events-none transition-opacity duration-500",
+        isActive ? "opacity-[0.03]" : "opacity-0"
+      )}
+    >
+      <pre className="font-mono text-[6px] leading-[8px] text-foreground whitespace-pre">
+        {pattern.join("\n")}
+      </pre>
+    </div>
+  )
+}
+
+// Animated data stream effect
+function DataStream({ isActive }: { isActive: boolean }) {
+  const [streams, setStreams] = useState<string[]>([])
+
+  useEffect(() => {
+    if (!isActive) return
+
+    const generateStream = () => {
+      const chars = "01"
+      let stream = ""
+      for (let i = 0; i < 32; i++) {
+        stream += chars[Math.floor(Math.random() * chars.length)]
+      }
+      return stream
+    }
+
+    setStreams([generateStream(), generateStream(), generateStream()])
+
+    const interval = setInterval(() => {
+      setStreams(prev => prev.map(() => generateStream()))
+    }, 100)
+
+    return () => clearInterval(interval)
+  }, [isActive])
+
+  if (!isActive) return null
+
+  return (
+    <div className="absolute right-0 top-0 bottom-0 w-[80px] overflow-hidden pointer-events-none opacity-[0.06]">
+      {streams.map((stream, i) => (
+        <div 
+          key={i} 
+          className="font-mono text-[7px] text-foreground leading-tight animate-pulse"
+          style={{ animationDelay: `${i * 100}ms` }}
+        >
+          {stream}
+        </div>
+      ))}
+    </div>
+  )
+}
 
 // ─────────────────────────────────────────────────────────────
 // ANIMATED TITLE WITH ASCII SCRAMBLE
@@ -341,6 +437,21 @@ function AnimatedTitle({ projectName, projectId }: { projectName: string; projec
       <span className="text-foreground/40 hidden sm:inline">PROJECTS — </span>
       <span ref={nameRef}>{displayName}</span>
     </h2>
+  )
+}
+
+// ─────────────────────────────────────────────────────────────
+// GROWTH ARROW
+// ─────────────────────────────────────────────────────────────
+
+function GrowthArrow({ isActive }: { isActive: boolean }) {
+  return (
+    <span className={cn(
+      "font-mono text-[9px] md:text-[10px] transition-all duration-300 flex-shrink-0",
+      isActive ? "text-foreground" : "text-foreground/20"
+    )}>
+      {"──►"}
+    </span>
   )
 }
 
@@ -498,69 +609,66 @@ function TechnicalGridSVG({ isActive }: { isActive: boolean }) {
 }
 
 // ─────────────────────────────────────────────────────────────
-// STICKER IMAGE GALLERY - AWARD-WINNING UNIQUE DESIGN
+// STORAGE DRAWER GALLERY - HORIZONTAL FILM STRIP STYLE
 // ─────────────────────────────────────────────────────────────
 
-// Sticker positions - scattered like real stickers
-const STICKER_POSITIONS = [
-  { x: "5%", y: "0%", rotate: -8, scale: 1 },
-  { x: "35%", y: "5%", rotate: 4, scale: 0.95 },
-  { x: "65%", y: "-2%", rotate: -3, scale: 1.05 },
-  { x: "20%", y: "15%", rotate: 6, scale: 0.9 },
-  { x: "50%", y: "12%", rotate: -5, scale: 1 },
-]
-
-function StickerGallery({ 
+function StorageDrawerGallery({ 
   images, 
   isActive, 
-  projectId
+  projectId,
+  projectTitle 
 }: { 
   images: string[]
   isActive: boolean
   projectId: string
+  projectTitle: string
 }) {
-  const galleryRef = useRef<HTMLDivElement>(null)
+  const drawerRef = useRef<HTMLDivElement>(null)
   const [imageErrors, setImageErrors] = useState<Set<number>>(new Set())
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
 
-  // GSAP sticker animation - each sticker flies in from different angles
+  // GSAP drawer slide animation
   useEffect(() => {
-    if (!isActive || !galleryRef.current) return
+    if (!isActive || !drawerRef.current) return
 
-    const stickers = galleryRef.current.querySelectorAll(".sticker-item")
-    
-    // Kill any existing animations
-    gsap.killTweensOf(stickers)
+    const items = drawerRef.current.querySelectorAll(".storage-item")
+    const drawer = drawerRef.current.querySelector(".drawer-container")
+    const labels = drawerRef.current.querySelectorAll(".storage-label")
 
-    // Animate each sticker with unique entrance
-    stickers.forEach((sticker, i) => {
-      const angle = (i * 72) * (Math.PI / 180) // Spread around
-      const distance = 100 + Math.random() * 50
-      const startX = Math.cos(angle) * distance
-      const startY = Math.sin(angle) * distance + 50
-      const startRotation = (Math.random() - 0.5) * 60
+    // Drawer slides open from left
+    gsap.fromTo(
+      drawer,
+      { x: "-100%", opacity: 0 },
+      { x: "0%", opacity: 1, duration: 0.6, ease: "power3.out" }
+    )
 
-      gsap.fromTo(
-        sticker,
-        { 
-          x: startX, 
-          y: startY, 
-          rotation: startRotation,
-          scale: 0,
-          opacity: 0 
-        },
-        { 
-          x: 0, 
-          y: 0, 
-          rotation: STICKER_POSITIONS[i % STICKER_POSITIONS.length].rotate,
-          scale: STICKER_POSITIONS[i % STICKER_POSITIONS.length].scale,
-          opacity: 1,
-          duration: 0.6,
-          delay: 0.15 + i * 0.08,
-          ease: "back.out(1.2)"
-        }
-      )
-    })
+    // Items fan out with stagger
+    gsap.fromTo(
+      items,
+      { 
+        x: -50, 
+        opacity: 0, 
+        scale: 0.8,
+        rotateY: -15
+      },
+      { 
+        x: 0, 
+        opacity: 1, 
+        scale: 1,
+        rotateY: 0,
+        duration: 0.5, 
+        stagger: 0.08, 
+        delay: 0.3,
+        ease: "back.out(1.2)" 
+      }
+    )
+
+    // Labels type in
+    gsap.fromTo(
+      labels,
+      { opacity: 0, y: 5 },
+      { opacity: 1, y: 0, duration: 0.3, stagger: 0.05, delay: 0.5 }
+    )
   }, [isActive])
 
   const handleImageError = (index: number) => {
@@ -568,97 +676,130 @@ function StickerGallery({
   }
 
   const validImages = images.filter((_, i) => !imageErrors.has(i))
+  const displayImages = validImages.slice(0, 4) // Max 4 images for performance
 
-  // No images - show ASCII placeholder stickers
-  if (validImages.length === 0) {
-    return (
-      <div ref={galleryRef} className="relative h-full flex items-center justify-center">
-        <div className="sticker-item font-mono text-[8px] sm:text-[10px] text-foreground/20 border-2 border-dashed border-foreground/10 px-3 py-2 bg-background/50">
-          <span className="block text-center">┌─────────┐</span>
-          <span className="block text-center">│ NO IMG  │</span>
-          <span className="block text-center">│ ◇◇◇◇◇ │</span>
-          <span className="block text-center">└─────────┘</span>
-        </div>
-      </div>
-    )
-  }
+  // Generate barcode pattern
+  const barcode = useMemo(() => {
+    const chars = "║│┃"
+    return Array.from({ length: 20 }, () => chars[Math.floor(Math.random() * chars.length)]).join("")
+  }, [projectId])
 
   return (
-    <div 
-      ref={galleryRef}
-      className="relative h-full w-full"
-    >
-      {/* Sticker items - positioned absolutely for overlap effect */}
-      {validImages.slice(0, 3).map((src, i) => {
-        const pos = STICKER_POSITIONS[i % STICKER_POSITIONS.length]
-        const isHovered = hoveredIndex === i
+    <div ref={drawerRef} className="w-full h-full relative">
+      {/* Drawer container with storage theme */}
+      <div className="drawer-container h-full border-t border-foreground/20 bg-foreground/[0.015] relative overflow-hidden">
         
-        return (
-          <div
-            key={i}
-            className={cn(
-              "sticker-item absolute cursor-pointer transition-all duration-200",
-              "w-[80px] h-[60px] sm:w-[100px] sm:h-[75px] md:w-[120px] md:h-[90px] lg:w-[140px] lg:h-[105px]",
-              isHovered ? "z-50" : `z-${10 + i}`
-            )}
-            style={{
-              left: pos.x,
-              top: pos.y,
-            }}
-            onMouseEnter={() => setHoveredIndex(i)}
-            onMouseLeave={() => setHoveredIndex(null)}
-          >
-            {/* Sticker shadow/tape effect */}
-            <div className="absolute -inset-1 bg-foreground/5 transform rotate-1" />
-            
-            {/* Main sticker */}
-            <div 
-              className={cn(
-                "relative w-full h-full border-2 border-foreground/30 bg-background overflow-hidden",
-                "shadow-[3px_3px_0_0_rgba(0,0,0,0.1)]",
-                isHovered && "shadow-[6px_6px_0_0_rgba(0,0,0,0.15)] scale-110 -translate-y-1"
-              )}
-              style={{
-                transform: isHovered ? `rotate(0deg) scale(1.1)` : undefined,
-              }}
-            >
-              <Image
-                src={src}
-                alt={`Project ${projectId} image ${i + 1}`}
-                fill
-                className={cn(
-                  "object-cover transition-all duration-300",
-                  isHovered ? "grayscale-0" : "grayscale"
-                )}
-                onError={() => handleImageError(i)}
-                sizes="(max-width: 640px) 80px, (max-width: 768px) 100px, (max-width: 1024px) 120px, 140px"
-              />
-              
-              {/* Sticker shine effect */}
-              <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-transparent pointer-events-none" />
-              
-              {/* Technical corner marks */}
-              <div className="absolute top-0.5 left-0.5 font-mono text-[4px] text-foreground/30">◢</div>
-              <div className="absolute top-0.5 right-0.5 font-mono text-[4px] text-foreground/30">◣</div>
-            </div>
-            
-            {/* Sticker label */}
-            <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 font-mono text-[5px] sm:text-[6px] text-foreground/40 bg-background px-1 whitespace-nowrap">
-              IMG_{String(i + 1).padStart(2, "0")}
-            </div>
+        {/* Storage header strip */}
+        <div className="absolute top-0 left-0 right-0 h-4 sm:h-5 bg-foreground/[0.03] border-b border-foreground/10 flex items-center justify-between px-2 sm:px-3">
+          <div className="flex items-center gap-1 sm:gap-2">
+            <span className="storage-label font-mono text-[5px] sm:text-[6px] text-foreground/40">
+              ▼ ARCHIVE_{projectId}
+            </span>
+            <span className="storage-label font-mono text-[4px] sm:text-[5px] text-foreground/20 hidden sm:inline">
+              {barcode}
+            </span>
           </div>
-        )
-      })}
-
-      {/* Extra images indicator */}
-      {validImages.length > 3 && (
-        <div 
-          className="sticker-item absolute font-mono text-[7px] sm:text-[8px] text-foreground/30 border border-dashed border-foreground/20 px-2 py-1 bg-background/80"
-          style={{ right: "5%", top: "20%" }}
-        >
-          +{validImages.length - 3} MORE
+          <div className="flex items-center gap-1 sm:gap-2">
+            <span className="storage-label font-mono text-[5px] sm:text-[6px] text-foreground/30">
+              {displayImages.length > 0 ? `${displayImages.length} FILES` : "EMPTY"}
+            </span>
+            <span className="storage-label font-mono text-[5px] sm:text-[6px] text-foreground/20">
+              ◊
+            </span>
+          </div>
         </div>
-      )}
+
+        {/* Image strip container */}
+        <div className="absolute top-4 sm:top-5 bottom-0 left-0 right-0 flex items-center px-2 sm:px-3 gap-1.5 sm:gap-2 overflow-x-auto scrollbar-hide">
+          {displayImages.length > 0 ? (
+            displayImages.map((src, i) => (
+              <div
+                key={i}
+                className="storage-item relative flex-shrink-0 group cursor-pointer"
+                onMouseEnter={() => setHoveredIndex(i)}
+                onMouseLeave={() => setHoveredIndex(null)}
+                style={{ perspective: "500px" }}
+              >
+                {/* Film frame container */}
+                <div className={cn(
+                  "relative border border-foreground/30 bg-background transition-all duration-300",
+                  "w-16 h-12 sm:w-20 sm:h-14 md:w-28 md:h-20 lg:w-36 lg:h-24",
+                  hoveredIndex === i && "border-foreground/60 scale-105 z-10"
+                )}>
+                  {/* Perforated edge effect */}
+                  <div className="absolute -left-1 top-0 bottom-0 w-1 flex flex-col justify-around">
+                    {[0,1,2,3].map(j => (
+                      <div key={j} className="w-1 h-1 rounded-full bg-foreground/10" />
+                    ))}
+                  </div>
+                  <div className="absolute -right-1 top-0 bottom-0 w-1 flex flex-col justify-around">
+                    {[0,1,2,3].map(j => (
+                      <div key={j} className="w-1 h-1 rounded-full bg-foreground/10" />
+                    ))}
+                  </div>
+
+                  {/* Image */}
+                  <div className="absolute inset-0.5 overflow-hidden">
+                    <Image
+                      src={src}
+                      alt={`${projectTitle} ${i + 1}`}
+                      fill
+                      sizes="(max-width: 640px) 64px, (max-width: 768px) 80px, (max-width: 1024px) 112px, 144px"
+                      className={cn(
+                        "object-cover transition-all duration-500",
+                        hoveredIndex === i ? "grayscale-0 scale-110" : "grayscale"
+                      )}
+                      onError={() => handleImageError(i)}
+                    />
+                    {/* Scanline overlay */}
+                    <div className="absolute inset-0 pointer-events-none opacity-20" 
+                      style={{
+                        backgroundImage: "repeating-linear-gradient(0deg, transparent, transparent 1px, rgba(0,0,0,0.05) 1px, rgba(0,0,0,0.05) 2px)"
+                      }}
+                    />
+                  </div>
+
+                  {/* Frame number label */}
+                  <div className="absolute -bottom-3 left-0 right-0 flex justify-center">
+                    <span className="storage-label font-mono text-[5px] sm:text-[6px] text-foreground/30 bg-background px-1">
+                      FRAME_{String(i + 1).padStart(2, "0")}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ))
+          ) : (
+            /* Empty storage placeholder */
+            <div className="storage-item flex-1 flex items-center justify-center">
+              <div className="text-center">
+                <pre className="font-mono text-[5px] sm:text-[6px] text-foreground/15 leading-tight">
+{`┌─────────┐
+│ ○ ○ ○ ○ │
+│  EMPTY  │
+│ STORAGE │
+│ ○ ○ ○ ○ │
+└─────────┘`}
+                </pre>
+                <span className="storage-label font-mono text-[5px] text-foreground/20 mt-1 block">
+                  NO_MEDIA_FOUND
+                </span>
+              </div>
+            </div>
+          )}
+
+          {/* Overflow indicator */}
+          {validImages.length > 4 && (
+            <div className="storage-item flex-shrink-0 w-8 sm:w-10 h-12 sm:h-14 md:h-20 lg:h-24 border border-dashed border-foreground/20 flex items-center justify-center">
+              <span className="font-mono text-[8px] sm:text-[10px] text-foreground/30">
+                +{validImages.length - 4}
+              </span>
+            </div>
+          )}
+        </div>
+
+        {/* Drawer handle indicator */}
+        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-8 sm:w-12 h-1 bg-foreground/10 rounded-t" />
+      </div>
     </div>
   )
 }
@@ -731,7 +872,7 @@ function ProjectIcon({
 }
 
 // ─────────────────────────────────────────────────────────────
-// PROJECT SLIDE - STICKER THEME WITH BOTTOM IMAGES
+// PROJECT SLIDE WITH BRUTALIST DESIGN
 // ─────────────────────────────────────────────────────────────
 
 function ProjectSlide({ 
@@ -747,6 +888,7 @@ function ProjectSlide({
 }) {
   const slideRef = useRef<HTMLDivElement>(null)
   const [asciiFrame, setAsciiFrame] = useState("┌")
+  const [scanlineOffset, setScanlineOffset] = useState(0)
 
   // ASCII corner animation
   useEffect(() => {
@@ -764,6 +906,17 @@ function ProjectSlide({
     return () => clearInterval(interval)
   }, [isActive])
 
+  // Scanline animation
+  useEffect(() => {
+    if (!isActive) return
+
+    const interval = setInterval(() => {
+      setScanlineOffset(prev => (prev + 1) % 100)
+    }, 50)
+
+    return () => clearInterval(interval)
+  }, [isActive])
+
   // Main GSAP animations
   useEffect(() => {
     if (!isActive || !slideRef.current) return
@@ -772,29 +925,29 @@ function ProjectSlide({
       // Text reveal with scramble effect
       gsap.fromTo(
         ".detail-animate",
-        { opacity: 0, x: -12, skewX: 2 },
-        { opacity: 1, x: 0, skewX: 0, duration: 0.35, stagger: 0.04, ease: "power2.out" }
+        { opacity: 0, x: -15, skewX: 3 },
+        { opacity: 1, x: 0, skewX: 0, duration: 0.4, stagger: 0.06, ease: "power2.out" }
       )
       
       // Tech tags with bounce
       gsap.fromTo(
         ".tech-tag",
         { opacity: 0, scale: 0.7, rotation: -5 },
-        { opacity: 1, scale: 1, rotation: 0, duration: 0.3, stagger: 0.03, delay: 0.2, ease: "back.out(1.7)" }
+        { opacity: 1, scale: 1, rotation: 0, duration: 0.35, stagger: 0.04, delay: 0.25, ease: "back.out(1.7)" }
       )
 
       // Border flash effect
       gsap.fromTo(
         ".frame-border",
         { opacity: 0.2 },
-        { opacity: 0.5, duration: 0.06, yoyo: true, repeat: 3 }
+        { opacity: 0.5, duration: 0.08, yoyo: true, repeat: 4 }
       )
 
       // Metric highlight pulse
       gsap.fromTo(
         ".metric-highlight",
-        { scale: 1.05, opacity: 0 },
-        { scale: 1, opacity: 1, duration: 0.4, ease: "elastic.out(1, 0.6)", delay: 0.25 }
+        { scale: 1.1, opacity: 0 },
+        { scale: 1, opacity: 1, duration: 0.5, ease: "elastic.out(1, 0.5)", delay: 0.3 }
       )
     }, slideRef.current)
 
@@ -805,6 +958,11 @@ function ProjectSlide({
   const hasDemo = "demo" in project.links
   const hasAppStore = "appStore" in project.links
 
+  // Generate storage inventory code
+  const inventoryCode = useMemo(() => {
+    return `INV-${project.year}-${project.id}`
+  }, [project.year, project.id])
+
   return (
     <div 
       ref={slideRef}
@@ -813,117 +971,140 @@ function ProjectSlide({
         isActive ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
       )}
     >
-      {/* Subtle background effects */}
+      {/* Background technical grid */}
       <TechnicalGridSVG isActive={isActive} />
+      <DataStream isActive={isActive} />
 
-      {/* Main container */}
-      <div className="h-full border border-foreground/30 bg-background/98 relative overflow-hidden flex flex-col">
-        {/* ASCII frame corners */}
-        <span className="frame-border absolute top-0 left-0 font-mono text-[6px] sm:text-[7px] text-foreground/30 p-1">
-          {asciiFrame}{"══"}
-        </span>
-        <span className="frame-border absolute top-0 right-0 font-mono text-[6px] sm:text-[7px] text-foreground/30 p-1">
-          {"══"}┐
-        </span>
-        <span className="frame-border absolute bottom-0 left-0 font-mono text-[6px] sm:text-[7px] text-foreground/30 p-1">
-          └{"══"}
-        </span>
-        <span className="frame-border absolute bottom-0 right-0 font-mono text-[6px] sm:text-[7px] text-foreground/30 p-1">
-          {"══"}┘
-        </span>
+      {/* Main container - Storage unit theme */}
+      <div className="h-full border border-foreground/30 bg-background/95 relative overflow-hidden flex flex-col">
+        {/* Animated scanline */}
+        <div 
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background: `linear-gradient(transparent ${scanlineOffset}%, rgba(0,0,0,0.015) ${scanlineOffset + 1}%, transparent ${scanlineOffset + 2}%)`,
+          }}
+        />
 
-        {/* ═══════════════════════════════════════════════════════════
-            TOP SECTION: Compact project info - maximized horizontal space
-            ═══════════════════════════════════════════════════════════ */}
-        <div className="flex-shrink-0 p-2 sm:p-3 md:p-4 pb-1 sm:pb-2">
-          {/* Row 1: Icon + Title + ID + Metrics */}
-          <div className="detail-animate flex items-start gap-2 sm:gap-3 mb-2 sm:mb-3">
-            {/* Icon */}
-            <ProjectIcon 
-              icon={project.icon} 
-              category={project.category} 
-              isActive={isActive} 
-            />
+        {/* Storage unit header */}
+        <div className="frame-border h-5 sm:h-6 border-b border-foreground/20 bg-foreground/[0.02] flex items-center justify-between px-2 sm:px-3 flex-shrink-0">
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            <span className="font-mono text-[6px] sm:text-[7px] text-foreground/50">
+              {asciiFrame} UNIT_{project.id}
+            </span>
+            <span className="font-mono text-[5px] sm:text-[6px] text-foreground/30 hidden sm:inline">
+              │ {inventoryCode}
+            </span>
+          </div>
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            <span className="font-mono text-[5px] sm:text-[6px] text-foreground/30">
+              {project.category}
+            </span>
+            <span className="font-mono text-[6px] sm:text-[7px] text-foreground/40">
+              ═══┐
+            </span>
+          </div>
+        </div>
+
+        {/* Main content - maximized space */}
+        <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
+          
+          {/* TOP: Project details - compact horizontal layout */}
+          <div className="flex-1 grid grid-cols-12 gap-2 sm:gap-3 p-2 sm:p-3 md:p-4 min-h-0 overflow-y-auto sm:overflow-hidden">
             
-            {/* Title and meta */}
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-1.5 sm:gap-2 mb-0.5">
-                <h3 className="font-mono text-sm sm:text-base md:text-lg lg:text-xl font-black text-foreground tracking-tight truncate">
+            {/* Left column: Icon + ID + Title */}
+            <div className="col-span-12 sm:col-span-4 md:col-span-3 flex flex-col gap-1 sm:gap-2">
+              <div className="detail-animate flex items-center gap-2">
+                <ProjectIcon 
+                  icon={project.icon} 
+                  category={project.category} 
+                  isActive={isActive} 
+                />
+                <div className="min-w-0">
+                  <span className="font-mono text-2xl sm:text-3xl md:text-4xl font-black text-foreground/10 block leading-none">
+                    {project.id}
+                  </span>
+                  <span className="font-mono text-[5px] sm:text-[6px] text-foreground/40">
+                    {project.year}
+                  </span>
+                </div>
+              </div>
+              <div className="detail-animate">
+                <h3 className="font-mono text-sm sm:text-base md:text-lg lg:text-xl font-black text-foreground tracking-tight leading-tight">
                   {project.title.toUpperCase()}
                 </h3>
-                <span className="font-mono text-lg sm:text-xl md:text-2xl font-black text-foreground/10 flex-shrink-0">
-                  {project.id}
-                </span>
               </div>
-              <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
-                <span className="font-mono text-[6px] sm:text-[7px] px-1 py-0.5 border border-foreground/20 text-foreground/50">
-                  {project.category}
-                </span>
-                <span className="font-mono text-[6px] sm:text-[7px] text-foreground/40">
-                  {project.year}
-                </span>
-                <span className="font-mono text-[6px] sm:text-[7px] text-foreground/20 hidden sm:inline">│</span>
-                <span className="font-mono text-[7px] sm:text-[8px] text-foreground/60 hidden sm:inline">
-                  {project.growth}
-                </span>
-              </div>
-            </div>
-
-            {/* Metrics - right aligned */}
-            <div className="metric-highlight flex-shrink-0 border-2 border-foreground/30 px-2 sm:px-3 py-1 text-right">
-              <div className="font-mono text-xs sm:text-sm md:text-base font-black text-foreground">
-                {project.metric}
-              </div>
-              <div className="font-mono text-[5px] sm:text-[6px] text-foreground/40">
-                {project.achievement}
-              </div>
-            </div>
-          </div>
-
-          {/* Row 2: Description + Growth + Tech (horizontal layout) */}
-          <div className="detail-animate grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3">
-            {/* Description */}
-            <div className="sm:col-span-1">
-              <div className="font-mono text-[5px] text-foreground/30 mb-0.5">DESCRIPTION</div>
-              <p className="font-mono text-[7px] sm:text-[8px] text-foreground/60 leading-relaxed line-clamp-2">
-                {project.description}
-              </p>
-            </div>
-            
-            {/* Growth vector - compact */}
-            <div className="sm:col-span-1">
-              <div className="font-mono text-[5px] text-foreground/30 mb-0.5">GROWTH</div>
-              <div className="flex items-center gap-1 text-[6px] sm:text-[7px]">
-                <span className="text-foreground/40 truncate">{project.before}</span>
-                <span className="text-foreground/30 flex-shrink-0">→</span>
-                <span className="text-foreground font-medium truncate">{project.after}</span>
-              </div>
-            </div>
-
-            {/* Tech + Links */}
-            <div className="sm:col-span-1">
-              <div className="font-mono text-[5px] text-foreground/30 mb-0.5">STACK</div>
-              <div className="flex flex-wrap gap-0.5 sm:gap-1 items-center">
-                {project.techStack.slice(0, 4).map((tech) => (
+              {/* Tech stack - compact */}
+              <div className="detail-animate flex flex-wrap gap-0.5 mt-auto">
+                {project.techStack.slice(0, 3).map((tech) => (
                   <span
                     key={tech}
-                    className="tech-tag font-mono text-[5px] sm:text-[6px] px-1 py-0.5 border border-foreground/15 text-foreground/50 bg-foreground/[0.02]"
+                    className="tech-tag font-mono text-[5px] sm:text-[6px] px-1 py-0.5 border border-foreground/15 text-foreground/40 bg-foreground/[0.02]"
                   >
                     {tech}
                   </span>
                 ))}
-                {project.techStack.length > 4 && (
-                  <span className="font-mono text-[5px] text-foreground/30">+{project.techStack.length - 4}</span>
+                {project.techStack.length > 3 && (
+                  <span className="font-mono text-[5px] sm:text-[6px] text-foreground/30 px-1">
+                    +{project.techStack.length - 3}
+                  </span>
                 )}
-                <span className="font-mono text-[5px] text-foreground/10 mx-1 hidden sm:inline">│</span>
+              </div>
+            </div>
+
+            {/* Middle column: Growth + Description */}
+            <div className="col-span-12 sm:col-span-5 md:col-span-6 flex flex-col gap-1.5 sm:gap-2 min-h-0">
+              {/* Growth section - compact */}
+              <div className="detail-animate bg-foreground/[0.02] border border-foreground/10 p-1.5 sm:p-2">
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="font-mono text-[5px] sm:text-[6px] text-foreground/30">GROWTH:</span>
+                  <h4 className="font-mono text-[9px] sm:text-[10px] md:text-xs font-black text-foreground">
+                    {project.growth.toUpperCase()}
+                  </h4>
+                </div>
+                <div className="flex items-center gap-1 sm:gap-2 text-[5px] sm:text-[6px] md:text-[7px]">
+                  <span className="text-foreground/40 truncate flex-1">{project.before}</span>
+                  <span className="font-mono text-foreground/30 flex-shrink-0">►</span>
+                  <span className="text-foreground/70 truncate flex-1 font-medium">{project.after}</span>
+                </div>
+              </div>
+              
+              {/* Description - compact */}
+              <div className="detail-animate flex-1 min-h-0 hidden sm:block">
+                <p className="font-mono text-[7px] sm:text-[8px] md:text-[9px] text-foreground/50 leading-relaxed line-clamp-3">
+                  {project.description}
+                </p>
+              </div>
+            </div>
+
+            {/* Right column: Metrics + Links */}
+            <div className="col-span-12 sm:col-span-3 flex flex-row sm:flex-col gap-2 items-start sm:items-end justify-between sm:justify-start">
+              {/* Metrics */}
+              <div className="detail-animate flex sm:flex-col gap-2 sm:gap-1 items-center sm:items-end">
+                <div className="metric-highlight border border-foreground/30 px-2 py-1 text-right">
+                  <div className="font-mono text-[4px] sm:text-[5px] text-foreground/40">METRIC</div>
+                  <div className="font-mono text-sm sm:text-base md:text-lg font-black text-foreground leading-none">
+                    {project.metric}
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className="font-mono text-[4px] sm:text-[5px] text-foreground/30">RESULT</div>
+                  <div className="font-mono text-[7px] sm:text-[8px] text-foreground/50">
+                    {project.achievement}
+                  </div>
+                </div>
+              </div>
+              
+              {/* Links - vertical on desktop */}
+              <div className="detail-animate flex sm:flex-col gap-2 sm:gap-1 items-center sm:items-end mt-auto">
                 {hasGithub && (
                   <a 
                     href={project.links.github} 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className="font-mono text-[6px] text-foreground/30 hover:text-foreground transition-colors"
+                    className="font-mono text-[6px] sm:text-[7px] text-foreground/40 hover:text-foreground transition-colors flex items-center gap-1"
                   >
-                    <Github className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
+                    <Github className="w-2.5 h-2.5" />
+                    <span className="hidden sm:inline">SRC</span>
                   </a>
                 )}
                 {hasDemo && (
@@ -931,51 +1112,40 @@ function ProjectSlide({
                     href={(project.links as { demo?: string }).demo} 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className="font-mono text-[6px] text-foreground/30 hover:text-foreground transition-colors"
+                    className="font-mono text-[6px] sm:text-[7px] text-foreground/40 hover:text-foreground transition-colors flex items-center gap-1"
                   >
-                    <ExternalLink className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
+                    <ExternalLink className="w-2.5 h-2.5" />
+                    <span className="hidden sm:inline">DEMO</span>
                   </a>
                 )}
                 {hasAppStore && (
-                  <span className="font-mono text-[6px] text-foreground/20">●iOS</span>
+                  <span className="font-mono text-[6px] sm:text-[7px] text-foreground/25">iOS</span>
                 )}
               </div>
             </div>
           </div>
-        </div>
 
-        {/* Divider line */}
-        <div className="px-2 sm:px-3 md:px-4">
-          <div className="border-t border-dashed border-foreground/10" />
-        </div>
-
-        {/* ═══════════════════════════════════════════════════════════
-            BOTTOM SECTION: Sticker Gallery - takes remaining space
-            ═══════════════════════════════════════════════════════════ */}
-        <div className="flex-1 relative min-h-[100px] p-2 sm:p-3 md:p-4 pt-2">
-          {/* Gallery label */}
-          <div className="absolute top-2 left-3 sm:left-4 font-mono text-[5px] sm:text-[6px] text-foreground/20 z-10">
-            ┌─ GALLERY [{project.images.length > 0 ? String(project.images.length).padStart(2, "0") : "00"}]
+          {/* BOTTOM: Storage drawer with images - always visible */}
+          <div className="h-20 sm:h-24 md:h-28 lg:h-32 flex-shrink-0">
+            <StorageDrawerGallery 
+              images={project.images} 
+              isActive={isActive}
+              projectId={project.id}
+              projectTitle={project.title}
+            />
           </div>
-          
-          {/* Sticker gallery */}
-          <StickerGallery 
-            images={project.images} 
-            isActive={isActive} 
-            projectId={project.id}
-          />
         </div>
 
-        {/* Footer status bar */}
-        <div className="flex-shrink-0 h-3 sm:h-4 border-t border-foreground/10 bg-foreground/[0.02] flex items-center justify-between px-2 sm:px-3 font-mono text-[4px] sm:text-[5px]">
-          <span className="text-foreground/25">
-            #{String(index + 1).padStart(2, "0")}
+        {/* Storage unit footer */}
+        <div className="h-4 sm:h-5 border-t border-foreground/15 bg-foreground/[0.015] flex items-center justify-between px-2 sm:px-3 flex-shrink-0">
+          <span className="font-mono text-[5px] sm:text-[6px] text-foreground/25">
+            └═══ {inventoryCode}
           </span>
-          <span className="text-foreground/30">
+          <span className="font-mono text-[5px] sm:text-[6px] text-foreground/30">
             [{String(index + 1).padStart(2, "0")}/{String(total).padStart(2, "0")}]
           </span>
-          <span className="text-foreground/25 hidden sm:inline">
-            {project.year}.{project.category}
+          <span className="font-mono text-[5px] sm:text-[6px] text-foreground/25">
+            ═══┘
           </span>
         </div>
       </div>
