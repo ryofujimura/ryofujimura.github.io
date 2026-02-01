@@ -13,28 +13,26 @@ gsap.registerPlugin(ScrollTrigger)
 // ─────────────────────────────────────────────────────────────
 
 const ASCII_NEURON = `
-     ●
-    /|\\
-   / | \\
-  ●──●──●
-   \\ | /
-    \\|/
-     ●
+    ╭───╮
+   ╱     ╲
+──●       ●──
+   ╲     ╱
+    ╰───╯
 `.trim()
 
-const ASCII_SYNAPSE = `○──────●──────○`
+const ASCII_SYNAPSE = `──●──○──●──`
 
-const ASCII_DENDRITE = `
-  ╭─╮   ╭─╮
- ╭╯ ╰─●─╯ ╰╮
- │    │    │
+const ASCII_BRAIN_SCAN = `
+┌─────────────────────────────────────┐
+│  ▓▓░░▓▓░░▓▓░░▓▓░░▓▓░░▓▓░░▓▓░░▓▓░░  │
+│  ░░▓▓░░▓▓░░▓▓░░▓▓░░▓▓░░▓▓░░▓▓░░▓▓  │
+│  ▓▓░░▓▓░░▓▓░░▓▓░░▓▓░░▓▓░░▓▓░░▓▓░░  │
+└─────────────────────────────────────┘
 `.trim()
 
-const ASCII_BRAIN_WAVE = `∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿`
+const ASCII_PULSE = `─╮╭─╮╭─╮╭─╮╭─╮╭─`
 
-const ASCII_PULSE = `─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─`
-
-const ASCII_NODES = `◉───◎───◉───◎───◉───◎───◉───◎───◉───◎───◉`
+const ASCII_NODE = `◉`
 
 // ─────────────────────────────────────────────────────────────
 // SKILL GROUPS
@@ -51,163 +49,199 @@ const SKILL_GROUPS = {
 type SkillGroup = keyof typeof SKILL_GROUPS
 
 // ─────────────────────────────────────────────────────────────
-// PROJECT DATA
+// PROJECT DATA - Focus on Growth & Learning
 // ─────────────────────────────────────────────────────────────
 
 const allProjects = [
   {
     id: "01",
-    code: "NRN.01",
-    title: "Saboriendo Bakery Platform",
-    sector: "SYNAPTIC",
-    primarySkill: "React + SwiftUI",
+    code: "NODE.01",
+    title: "Saboriendo Bakery",
+    domain: "FULL-STACK",
     year: "2024",
     image: "/images/default_image.png",
-    description: "Full-stack e-commerce with real-time order processing. Barcode verification across 11+ formats, 50%+ faster lookup.",
-    metrics: ["50%↑", "11+", "3L"],
+    growth: {
+      learned: "Real-time sync architecture",
+      improved: "Barcode systems, multi-language support",
+      unlocked: "E-commerce at scale",
+    },
+    metrics: { primary: "50%", label: "faster lookup", secondary: "11+ barcode formats" },
     skills: ["React 19", "SwiftUI", "Firebase", "Firestore", "AVFoundation"],
     links: { github: "https://github.com/ryofujimura", demo: "https://ryofujimura.github.io" },
   },
   {
     id: "02",
-    code: "NRN.02",
+    code: "NODE.02",
     title: "Zero Inbox",
-    sector: "CORTEX",
-    primarySkill: "Swift + AI",
+    domain: "AI/ML",
     year: "2025",
     image: "/images/default_image.png",
-    description: "AI email client with 95% classification accuracy. Multi-stage decision system with 100-300ms inference.",
-    metrics: ["95%", "200ms", "200/m"],
+    growth: {
+      learned: "AI reasoning engine design",
+      improved: "Classification pipelines, inference optimization",
+      unlocked: "Multi-stage decision systems",
+    },
+    metrics: { primary: "95%", label: "accuracy", secondary: "200ms latency" },
     skills: ["Swift", "SwiftUI", "Firebase", "AI/ML", "Google APIs"],
     links: { github: "https://github.com/ryofujimura", demo: "#" },
   },
   {
     id: "03",
-    code: "NRN.03",
-    title: "Research Lab Management",
-    sector: "AXON",
-    primarySkill: "Cloud Functions",
+    code: "NODE.03",
+    title: "Research Lab Platform",
+    domain: "SERVERLESS",
     year: "2025",
     image: "/images/default_image.png",
-    description: "Serverless AI routing for 30+ researchers. Sub-200ms response with metadata-aware prompting.",
-    metrics: ["<200ms", "30+", "ML"],
+    growth: {
+      learned: "Serverless orchestration patterns",
+      improved: "Dynamic AI routing, metadata prompting",
+      unlocked: "Multi-lab workflow automation",
+    },
+    metrics: { primary: "<200ms", label: "response", secondary: "30+ researchers" },
     skills: ["Cloud Functions", "Firebase", "AI routing", "Node.js"],
     links: { github: "https://github.com/ryofujimura", demo: "https://ryofujimura.github.io" },
   },
   {
     id: "04",
-    code: "NRN.04",
+    code: "NODE.04",
     title: "HTIC Shuttle",
-    sector: "DENDRITE",
-    primarySkill: "Firebase RTDB",
+    domain: "REAL-TIME",
     year: "2025",
     image: "/images/schedule.jpg",
-    description: "Live shuttle tracking for 25+ daily users. 70%+ reduction in duplicate pickups via event serialization.",
-    metrics: ["25+", "70%↓", "<100ms"],
+    growth: {
+      learned: "Event serialization & state validation",
+      improved: "Cross-platform real-time sync",
+      unlocked: "Conflict-free distributed systems",
+    },
+    metrics: { primary: "70%", label: "fewer conflicts", secondary: "<100ms sync" },
     skills: ["Swift", "Kotlin", "Firebase RTDB", "Real-time"],
     links: { github: "https://github.com/ryofujimura", demo: "https://ryofujimura.github.io", appStore: "#", playStore: "#" },
   },
   {
     id: "05",
-    code: "NRN.05",
+    code: "NODE.05",
     title: "CyberEdu",
-    sector: "SYNAPSE",
-    primarySkill: "Swift + Kotlin",
+    domain: "CROSS-PLATFORM",
     year: "2025",
     image: "/images/CyberEdu.png",
-    description: "Synchronized iOS+Android apps with 99%+ cross-device sync reliability across unstable networks.",
-    metrics: ["50+", "99%↑", "X-plat"],
+    growth: {
+      learned: "Cross-device sync reliability",
+      improved: "Network resilience patterns",
+      unlocked: "99%+ sync across unstable networks",
+    },
+    metrics: { primary: "99%", label: "sync rate", secondary: "50+ users" },
     skills: ["Swift", "Kotlin", "Firebase", "Real-time"],
     links: { github: "https://github.com/ryofujimura", demo: "https://ryofujimura.github.io", appStore: "#", playStore: "#" },
   },
   {
     id: "06",
-    code: "NRN.06",
+    code: "NODE.06",
     title: "Whiteboard AI",
-    sector: "NEURAL",
-    primarySkill: "PyTorch",
+    domain: "VISION",
     year: "2025",
     image: "/images/whiteboardai.png",
-    description: "Vision inference at 150-200ms latency with real-time CRDT collaboration for 5+ concurrent users.",
-    metrics: ["150ms", "5+", "CRDT"],
+    growth: {
+      learned: "Transformer-based vision inference",
+      improved: "CRDT collaboration, WebSocket pipelines",
+      unlocked: "Real-time multi-user AI canvas",
+    },
+    metrics: { primary: "150ms", label: "inference", secondary: "5+ concurrent" },
     skills: ["PyTorch", "Vision", "WebSocket", "React"],
     links: { github: "https://github.com/ryofujimura", demo: "https://ryofujimura.github.io" },
   },
   {
     id: "07",
-    code: "NRN.07",
+    code: "NODE.07",
     title: "With",
-    sector: "CORTEX",
-    primarySkill: "llama.cpp",
+    domain: "LOCAL AI",
     year: "2024–25",
     image: "/images/default_image.png",
-    description: "Offline LLM chat with <50ms/token local inference. 2GB+ memory savings via quantization.",
-    metrics: ["<50ms", "2GB↓", "Local"],
+    growth: {
+      learned: "Local LLM deployment with llama.cpp",
+      improved: "Memory optimization, quantization",
+      unlocked: "Offline AI capabilities",
+    },
+    metrics: { primary: "<50ms", label: "per token", secondary: "2GB+ saved" },
     skills: ["Swift", "llama.cpp", "GGUF", "SwiftUI"],
     links: { github: "https://github.com/ryofujimura" },
   },
   {
     id: "08",
-    code: "NRN.08",
-    title: "Portfolio Website",
-    sector: "AXON",
-    primarySkill: "Next.js",
+    code: "NODE.08",
+    title: "Portfolio",
+    domain: "WEB",
     year: "2024–25",
     image: "/images/homepage.png",
-    description: "40-60% faster load with brutalist design system and GSAP animations.",
-    metrics: ["60%↑", "GSAP", "SSG"],
+    growth: {
+      learned: "Advanced GSAP animation systems",
+      improved: "Performance optimization, modular architecture",
+      unlocked: "Brutalist design systems",
+    },
+    metrics: { primary: "60%", label: "faster load", secondary: "modular" },
     skills: ["React", "Next.js", "Tailwind", "Vercel"],
     links: { github: "https://github.com/ryofujimura", demo: "https://ryofujimura.github.io" },
   },
   {
     id: "09",
-    code: "NRN.09",
+    code: "NODE.09",
     title: "Matcha Time",
-    sector: "DENDRITE",
-    primarySkill: "SwiftUI",
+    domain: "iOS",
     year: "2024",
     image: "/images/matchatime_1.jpg",
-    description: "Time zone coordination tool with 50 users at launch. 4-week idea-to-App Store cycle.",
-    metrics: ["50", "4wk", "iOS"],
+    growth: {
+      learned: "Rapid prototyping to App Store",
+      improved: "SwiftUI patterns, time zone logic",
+      unlocked: "4-week launch cycle",
+    },
+    metrics: { primary: "50", label: "users", secondary: "App Store" },
     skills: ["Swift", "SwiftUI", "App Store"],
     links: { github: "https://github.com/ryofujimura", demo: "https://ryofujimura.github.io", appStore: "#" },
   },
   {
     id: "10",
-    code: "NRN.10",
+    code: "NODE.10",
     title: "Schedule Mastermind",
-    sector: "SYNAPSE",
-    primarySkill: "Python Flask",
+    domain: "BACKEND",
     year: "2023–24",
     image: "/images/schedule.jpg",
-    description: "Scheduler for 500+ courses with real-time conflict detection. 70%+ fewer scheduling errors.",
-    metrics: ["500+", "70%↓", "Flask"],
+    growth: {
+      learned: "Conflict detection algorithms",
+      improved: "Flask API design, scheduling logic",
+      unlocked: "500+ course management",
+    },
+    metrics: { primary: "70%", label: "fewer errors", secondary: "500+ courses" },
     skills: ["Python", "Flask", "scheduling"],
     links: { github: "https://github.com/ryofujimura", demo: "https://ryofujimura.github.io" },
   },
   {
     id: "11",
-    code: "NRN.11",
+    code: "NODE.11",
     title: "Shohei Home Ground",
-    sector: "NEURAL",
-    primarySkill: "Python",
+    domain: "AUTOMATION",
     year: "2023",
     image: "/images/shoheihomeground_1.jpg",
-    description: "Automated daily Instagram posting. 11K followers in 8 months, saving 2+ hours/day.",
-    metrics: ["11K", "685", "2hr↓"],
+    growth: {
+      learned: "Content automation at scale",
+      improved: "Python scripting, API integration",
+      unlocked: "11K organic growth",
+    },
+    metrics: { primary: "11K", label: "followers", secondary: "685 posts" },
     skills: ["Python", "automation", "Instagram"],
     links: { instagram: "#", youtube: "#" },
   },
   {
     id: "12",
-    code: "NRN.12",
+    code: "NODE.12",
     title: "Poker Percentage",
-    sector: "CORTEX",
-    primarySkill: "WatchKit",
+    domain: "WATCHOS",
     year: "2022–24",
     image: "/images/poker.png",
-    description: "WatchOS poker odds calculator with <10ms probability lookups via precomputed tables.",
-    metrics: ["<10ms", "Watch", "Odds"],
+    growth: {
+      learned: "WatchOS development",
+      improved: "Precomputed tables, probability math",
+      unlocked: "Sub-10ms calculations",
+    },
+    metrics: { primary: "<10ms", label: "lookup", secondary: "WatchOS" },
     skills: ["Swift", "WatchOS", "probability"],
     links: { github: "https://github.com/ryofujimura", appStore: "#" },
   },
@@ -216,24 +250,24 @@ const allProjects = [
 type Project = (typeof allProjects)[0]
 
 // ─────────────────────────────────────────────────────────────
-// NEURAL SVG PATTERN
+// NEURAL CONNECTION SVG
 // ─────────────────────────────────────────────────────────────
 
-function NeuralPattern({ className }: { className?: string }) {
+function NeuralConnections({ className }: { className?: string }) {
   const svgRef = useRef<SVGSVGElement>(null)
 
   useEffect(() => {
     if (!svgRef.current) return
-    const elements = svgRef.current.querySelectorAll("circle, line, path")
+    const paths = svgRef.current.querySelectorAll("path, circle, line")
     const ctx = gsap.context(() => {
       gsap.fromTo(
-        elements,
-        { opacity: 0, scale: 0.8 },
+        paths,
+        { strokeDasharray: "0 1000", opacity: 0 },
         {
+          strokeDasharray: "1000 0",
           opacity: 1,
-          scale: 1,
-          duration: 0.8,
-          stagger: 0.02,
+          duration: 2,
+          stagger: 0.05,
           ease: "power2.out",
           scrollTrigger: {
             trigger: svgRef.current,
@@ -251,51 +285,60 @@ function NeuralPattern({ className }: { className?: string }) {
       ref={svgRef}
       className={cn("absolute inset-0 w-full h-full pointer-events-none", className)}
       viewBox="0 0 100 100"
-      preserveAspectRatio="xMidYMid slice"
+      preserveAspectRatio="none"
     >
-      {/* Neural nodes */}
-      <circle cx="10" cy="20" r="2" fill="currentColor" opacity="0.15" />
-      <circle cx="90" cy="15" r="1.5" fill="currentColor" opacity="0.1" />
-      <circle cx="85" cy="85" r="2" fill="currentColor" opacity="0.15" />
-      <circle cx="15" cy="80" r="1.5" fill="currentColor" opacity="0.1" />
-      <circle cx="50" cy="50" r="3" fill="none" stroke="currentColor" strokeWidth="0.5" opacity="0.2" />
+      {/* Neural dendrites */}
+      <path d="M0 50 Q25 30 50 50 T100 50" fill="none" stroke="currentColor" strokeWidth="0.3" opacity="0.15" />
+      <path d="M0 30 Q30 50 60 30 T100 40" fill="none" stroke="currentColor" strokeWidth="0.2" opacity="0.1" />
+      <path d="M0 70 Q40 50 70 70 T100 60" fill="none" stroke="currentColor" strokeWidth="0.2" opacity="0.1" />
       
-      {/* Dendrite connections */}
-      <line x1="10" y1="20" x2="50" y2="50" stroke="currentColor" strokeWidth="0.3" opacity="0.1" />
-      <line x1="90" y1="15" x2="50" y2="50" stroke="currentColor" strokeWidth="0.3" opacity="0.1" />
-      <line x1="85" y1="85" x2="50" y2="50" stroke="currentColor" strokeWidth="0.3" opacity="0.1" />
-      <line x1="15" y1="80" x2="50" y2="50" stroke="currentColor" strokeWidth="0.3" opacity="0.1" />
-      
-      {/* Corner brackets - surgical precision */}
-      <path d="M2 8 L2 2 L8 2" fill="none" stroke="currentColor" strokeWidth="0.8" opacity="0.25" />
-      <path d="M92 2 L98 2 L98 8" fill="none" stroke="currentColor" strokeWidth="0.8" opacity="0.25" />
-      <path d="M2 92 L2 98 L8 98" fill="none" stroke="currentColor" strokeWidth="0.8" opacity="0.25" />
-      <path d="M92 98 L98 98 L98 92" fill="none" stroke="currentColor" strokeWidth="0.8" opacity="0.25" />
+      {/* Synaptic nodes */}
+      <circle cx="25" cy="40" r="1" fill="currentColor" opacity="0.2" />
+      <circle cx="50" cy="50" r="1.5" fill="currentColor" opacity="0.25" />
+      <circle cx="75" cy="45" r="1" fill="currentColor" opacity="0.2" />
+      <circle cx="15" cy="60" r="0.8" fill="currentColor" opacity="0.15" />
+      <circle cx="85" cy="55" r="0.8" fill="currentColor" opacity="0.15" />
     </svg>
   )
 }
 
 // ─────────────────────────────────────────────────────────────
-// PROJECT CARD - NEURAL DESIGN
+// NODE MARKER COMPONENT
 // ─────────────────────────────────────────────────────────────
 
-function ProjectCard({ project }: { project: Project }) {
-  const cardRef = useRef<HTMLDivElement>(null)
-  const titleRef = useRef<HTMLSpanElement>(null)
-  const imageRef = useRef<HTMLDivElement>(null)
+function NodeMarker({ id, active = false }: { id: string; active?: boolean }) {
+  return (
+    <div className={cn(
+      "flex items-center gap-1.5 sm:gap-2",
+      active ? "text-accent" : "text-foreground/40"
+    )}>
+      <span className="text-lg sm:text-xl">{ASCII_NODE}</span>
+      <span className="font-mono text-[10px] sm:text-xs tracking-wider">{id}</span>
+    </div>
+  )
+}
+
+// ─────────────────────────────────────────────────────────────
+// PROJECT NODE CARD - Mobile First
+// ─────────────────────────────────────────────────────────────
+
+function ProjectNode({ project, index }: { project: Project; index: number }) {
+  const nodeRef = useRef<HTMLDivElement>(null)
+  const learnedRef = useRef<HTMLSpanElement>(null)
 
   useEffect(() => {
-    if (!cardRef.current) return
-    const el = cardRef.current
+    if (!nodeRef.current) return
+    const el = nodeRef.current
 
     const ctx = gsap.context(() => {
       // Card entrance
       gsap.fromTo(
         el,
-        { opacity: 0, y: 30 },
+        { opacity: 0, y: 30, scale: 0.98 },
         {
           opacity: 1,
           y: 0,
+          scale: 1,
           duration: 0.6,
           ease: "power3.out",
           scrollTrigger: {
@@ -306,22 +349,22 @@ function ProjectCard({ project }: { project: Project }) {
         }
       )
 
-      // Title scramble
-      if (titleRef.current) {
-        const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ∿●◎◉"
-        const originalText = project.primarySkill.toUpperCase()
+      // Learned text scramble
+      if (learnedRef.current) {
+        const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ░▒▓"
+        const originalText = project.growth.learned
         let iteration = 0
 
         ScrollTrigger.create({
-          trigger: titleRef.current,
+          trigger: learnedRef.current,
           start: "top 90%",
           onEnter: () => {
             const interval = setInterval(() => {
-              if (!titleRef.current) return clearInterval(interval)
-              titleRef.current.textContent = originalText
+              if (!learnedRef.current) return clearInterval(interval)
+              learnedRef.current.textContent = originalText
                 .split("")
                 .map((char, i) => {
-                  if (char === " " || char === "+") return char
+                  if (char === " " || char === "-") return char
                   if (i < iteration) return char
                   return chars[Math.floor(Math.random() * chars.length)]
                 })
@@ -333,25 +376,7 @@ function ProjectCard({ project }: { project: Project }) {
         })
       }
 
-      // Image reveal
-      if (imageRef.current) {
-        gsap.fromTo(
-          imageRef.current,
-          { clipPath: "inset(0 100% 0 0)" },
-          {
-            clipPath: "inset(0 0% 0 0)",
-            duration: 0.8,
-            ease: "power2.inOut",
-            scrollTrigger: {
-              trigger: imageRef.current,
-              start: "top 88%",
-              toggleActions: "play none none none",
-            },
-          }
-        )
-      }
-
-      // Stagger elements
+      // Stagger reveals
       const items = el.querySelectorAll(".reveal")
       gsap.fromTo(
         items,
@@ -372,201 +397,152 @@ function ProjectCard({ project }: { project: Project }) {
     }, el)
 
     return () => ctx.revert()
-  }, [project.primarySkill])
+  }, [project.growth.learned])
 
   const hasGithub = project.links.github
   const hasDemo = "demo" in project.links && (project.links as { demo?: string }).demo
-  const hasAppStore = "appStore" in project.links
-  const hasPlayStore = "playStore" in project.links
 
   return (
     <article
-      ref={cardRef}
-      className="relative group bg-background border border-foreground/80 overflow-hidden"
+      ref={nodeRef}
+      className={cn(
+        "relative",
+        "bg-background border border-foreground",
+        "shadow-[2px_2px_0_0_var(--foreground)] sm:shadow-[3px_3px_0_0_var(--foreground)]",
+        "active:shadow-[1px_1px_0_0_var(--foreground)]",
+        "transition-shadow duration-150"
+      )}
     >
-      <NeuralPattern className="opacity-40" />
+      <NeuralConnections className="opacity-40" />
 
-      {/* Mobile: Stack layout / Desktop: Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-[200px_1fr_140px]">
+      {/* Mobile-first stacked layout */}
+      <div className="flex flex-col">
         
-        {/* IMAGE SECTION */}
-        <div className="relative h-48 sm:h-56 lg:h-auto lg:min-h-[200px] border-b lg:border-b-0 lg:border-r border-foreground/30 overflow-hidden">
-          <div
-            ref={imageRef}
-            className="absolute inset-0 bg-muted"
-          >
-            <img
-              src={project.image}
+        {/* Header: Node ID + Domain + Year */}
+        <div className="flex items-center justify-between p-3 sm:p-4 border-b border-dashed border-foreground/20">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <NodeMarker id={project.code} active />
+            <span className="font-mono text-[9px] sm:text-[10px] text-accent tracking-[0.15em] font-medium">
+              {project.domain}
+            </span>
+          </div>
+          <span className="font-mono text-[10px] sm:text-xs text-muted-foreground">
+            {project.year}
+          </span>
+        </div>
+
+        {/* Image + Title block */}
+        <div className="flex gap-3 sm:gap-4 p-3 sm:p-4 border-b border-dashed border-foreground/20">
+          {/* Image placeholder */}
+          <div className="w-16 h-16 sm:w-20 sm:h-20 flex-shrink-0 border border-foreground/30 bg-foreground/5 overflow-hidden">
+            <img 
+              src={project.image} 
               alt={project.title}
-              className="w-full h-full object-cover opacity-90 grayscale hover:grayscale-0 transition-all duration-500"
+              className="w-full h-full object-cover"
               loading="lazy"
             />
-            {/* Scan line overlay */}
-            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-foreground/5 to-transparent pointer-events-none" />
           </div>
           
-          {/* Project ID overlay */}
-          <div className="absolute top-2 left-2 sm:top-3 sm:left-3">
-            <span className="font-mono text-xl sm:text-2xl font-black text-background bg-foreground px-2 py-0.5">
-              {project.id}
-            </span>
-          </div>
-          
-          {/* Sector badge */}
-          <div className="absolute bottom-2 right-2 sm:bottom-3 sm:right-3">
-            <span className="font-mono text-[8px] sm:text-[9px] tracking-[0.2em] text-foreground/80 bg-background/90 px-2 py-1 border border-foreground/30">
-              {project.sector}
-            </span>
-          </div>
-        </div>
-
-        {/* MAIN CONTENT */}
-        <div className="p-4 sm:p-5 flex flex-col justify-between">
-          {/* Header */}
-          <div>
-            {/* Code + Year row */}
-            <div className="reveal flex items-center justify-between gap-2 mb-2">
-              <span className="font-mono text-[9px] sm:text-[10px] text-accent tracking-[0.15em]">
-                {project.code}
-              </span>
-              <span className="font-mono text-[9px] sm:text-[10px] text-foreground/50">
-                {project.year}
-              </span>
-            </div>
-
-            {/* Primary Skill - Main title */}
-            <h3 className="mb-1">
-              <span
-                ref={titleRef}
-                className="font-mono text-xl sm:text-2xl lg:text-3xl font-black text-foreground tracking-tight leading-none block"
-              >
-                {project.primarySkill.toUpperCase()}
-              </span>
-            </h3>
-
-            {/* Project name */}
-            <p className="reveal font-mono text-xs sm:text-sm text-muted-foreground mb-3">
+          {/* Title + Primary metric */}
+          <div className="flex-1 min-w-0">
+            <h3 className="reveal font-mono text-base sm:text-lg md:text-xl font-black text-foreground leading-tight mb-1 truncate">
               {project.title}
-            </p>
-
-            {/* Description */}
-            <p className="reveal text-xs sm:text-sm text-foreground/75 leading-relaxed mb-3 line-clamp-3 lg:line-clamp-none">
-              {project.description}
-            </p>
-          </div>
-
-          {/* Footer */}
-          <div>
-            {/* Skills */}
-            <div className="reveal flex flex-wrap gap-1 sm:gap-1.5 mb-3">
-              {project.skills.slice(0, 4).map((skill) => (
-                <span
-                  key={skill}
-                  className="font-mono text-[8px] sm:text-[9px] text-muted-foreground/80 border-b border-dotted border-foreground/20 pb-0.5"
-                >
-                  {skill}
-                </span>
-              ))}
-              {project.skills.length > 4 && (
-                <span className="font-mono text-[8px] sm:text-[9px] text-foreground/40">
-                  +{project.skills.length - 4}
-                </span>
-              )}
+            </h3>
+            <div className="reveal flex items-baseline gap-1.5">
+              <span className="font-mono text-2xl sm:text-3xl font-black text-accent leading-none">
+                {project.metrics.primary}
+              </span>
+              <span className="font-mono text-[10px] sm:text-xs text-muted-foreground">
+                {project.metrics.label}
+              </span>
             </div>
-
-            {/* Links row - Mobile optimized */}
-            <div className="reveal flex flex-wrap gap-2">
-              {hasGithub && (
-                <a
-                  href={project.links.github}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="touch-target inline-flex items-center gap-1.5 font-mono text-[9px] sm:text-[10px] text-foreground hover:text-accent transition-colors min-h-[44px] px-2"
-                >
-                  <Github className="w-3.5 h-3.5" />
-                  <span className="underline underline-offset-2">SRC</span>
-                </a>
-              )}
-              {hasDemo && (
-                <a
-                  href={(project.links as { demo?: string }).demo}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="touch-target inline-flex items-center gap-1.5 font-mono text-[9px] sm:text-[10px] text-foreground hover:text-accent transition-colors min-h-[44px] px-2"
-                >
-                  <ExternalLink className="w-3.5 h-3.5" />
-                  <span className="underline underline-offset-2">DEMO</span>
-                </a>
-              )}
-              {hasAppStore && (
-                <a
-                  href={(project.links as { appStore?: string }).appStore}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="touch-target font-mono text-[9px] sm:text-[10px] text-foreground/60 hover:text-foreground transition-colors min-h-[44px] flex items-center px-2"
-                >
-                  iOS
-                </a>
-              )}
-              {hasPlayStore && (
-                <a
-                  href={(project.links as { playStore?: string }).playStore}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="touch-target font-mono text-[9px] sm:text-[10px] text-foreground/60 hover:text-foreground transition-colors min-h-[44px] flex items-center px-2"
-                >
-                  Android
-                </a>
-              )}
-            </div>
+            <p className="reveal font-mono text-[9px] sm:text-[10px] text-foreground/50 mt-1">
+              {project.metrics.secondary}
+            </p>
           </div>
         </div>
 
-        {/* METRICS SIDEBAR - Desktop only */}
-        <div className="hidden lg:flex flex-col justify-between p-4 border-l border-foreground/30 bg-foreground/[0.02]">
-          {/* ASCII Neuron */}
-          <pre className="font-mono text-[6px] text-foreground/20 leading-tight select-none">
-            {ASCII_NEURON}
-          </pre>
-
-          {/* Metrics */}
-          <div className="space-y-2">
-            {project.metrics.map((m, i) => (
-              <div key={i} className="text-right">
-                <span className="font-mono text-lg font-black text-foreground block leading-none">
-                  {m}
-                </span>
-                <span className="font-mono text-[7px] text-foreground/40 tracking-wider">
-                  {["PERF", "SCALE", "TYPE"][i] || "STAT"}
-                </span>
-              </div>
-            ))}
+        {/* Growth section - THE CORE FOCUS */}
+        <div className="p-3 sm:p-4 space-y-3 sm:space-y-4 border-b border-dashed border-foreground/20">
+          {/* Learned */}
+          <div className="reveal">
+            <div className="flex items-center gap-2 mb-1">
+              <span className="font-mono text-[8px] sm:text-[9px] text-foreground/40 tracking-[0.2em]">
+                LEARNED
+              </span>
+              <div className="flex-1 h-px bg-foreground/10" />
+            </div>
+            <p className="font-mono text-xs sm:text-sm text-foreground font-medium leading-relaxed">
+              <span ref={learnedRef}>{project.growth.learned}</span>
+            </p>
           </div>
 
-          {/* Neural connection line */}
-          <div className="font-mono text-[6px] text-foreground/20 text-center select-none">
-            │<br/>●<br/>│
+          {/* Improved */}
+          <div className="reveal">
+            <div className="flex items-center gap-2 mb-1">
+              <span className="font-mono text-[8px] sm:text-[9px] text-foreground/40 tracking-[0.2em]">
+                IMPROVED
+              </span>
+              <div className="flex-1 h-px bg-foreground/10" />
+            </div>
+            <p className="font-mono text-[11px] sm:text-xs text-foreground/70 leading-relaxed">
+              {project.growth.improved}
+            </p>
+          </div>
+
+          {/* Unlocked */}
+          <div className="reveal">
+            <div className="flex items-center gap-2 mb-1">
+              <span className="font-mono text-[8px] sm:text-[9px] text-accent/70 tracking-[0.2em]">
+                UNLOCKED
+              </span>
+              <div className="flex-1 h-px bg-accent/20" />
+            </div>
+            <p className="font-mono text-[11px] sm:text-xs text-accent/90 leading-relaxed">
+              {project.growth.unlocked}
+            </p>
           </div>
         </div>
 
-        {/* METRICS ROW - Mobile only */}
-        <div className="lg:hidden border-t border-foreground/30 p-3 flex items-center justify-between bg-foreground/[0.02]">
-          <div className="flex gap-3 sm:gap-4">
-            {project.metrics.map((m, i) => (
-              <div key={i} className="text-center">
-                <span className="font-mono text-sm sm:text-base font-black text-foreground block leading-none">
-                  {m}
-                </span>
-                <span className="font-mono text-[6px] sm:text-[7px] text-foreground/40 tracking-wider">
-                  {["PERF", "SCALE", "TYPE"][i] || "STAT"}
-                </span>
-              </div>
+        {/* Skills + Links */}
+        <div className="p-3 sm:p-4 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
+          {/* Skills */}
+          <div className="reveal flex flex-wrap gap-1.5">
+            {project.skills.map((skill) => (
+              <span
+                key={skill}
+                className="font-mono text-[8px] sm:text-[9px] text-muted-foreground px-1.5 py-0.5 border border-foreground/20"
+              >
+                {skill}
+              </span>
             ))}
           </div>
-          {/* Mini neural ASCII */}
-          <span className="font-mono text-[8px] text-foreground/20 select-none">
-            ◉─●─◉
-          </span>
+
+          {/* Links */}
+          <div className="reveal flex items-center gap-3 sm:gap-4">
+            {hasGithub && (
+              <a
+                href={project.links.github}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="touch-target inline-flex items-center gap-1.5 font-mono text-[10px] sm:text-xs text-foreground/70 hover:text-foreground transition-colors"
+              >
+                <Github className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                <span className="hidden sm:inline">SOURCE</span>
+              </a>
+            )}
+            {hasDemo && (
+              <a
+                href={(project.links as { demo?: string }).demo}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="touch-target inline-flex items-center gap-1.5 font-mono text-[10px] sm:text-xs text-foreground/70 hover:text-foreground transition-colors"
+              >
+                <ExternalLink className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                <span className="hidden sm:inline">DEMO</span>
+              </a>
+            )}
+          </div>
         </div>
       </div>
     </article>
@@ -574,7 +550,7 @@ function ProjectCard({ project }: { project: Project }) {
 }
 
 // ─────────────────────────────────────────────────────────────
-// FILTER PANEL
+// FILTER COMPONENT - Mobile Optimized
 // ─────────────────────────────────────────────────────────────
 
 function FilterPanel({
@@ -597,14 +573,15 @@ function FilterPanel({
     const ctx = gsap.context(() => {
       gsap.fromTo(
         ref.current,
-        { opacity: 0 },
+        { opacity: 0, y: -15 },
         {
           opacity: 1,
-          duration: 0.5,
+          y: 0,
+          duration: 0.4,
           ease: "power2.out",
           scrollTrigger: {
             trigger: ref.current,
-            start: "top 95%",
+            start: "top 98%",
             toggleActions: "play none none none",
           },
         }
@@ -616,14 +593,9 @@ function FilterPanel({
   const groups = Object.keys(SKILL_GROUPS) as SkillGroup[]
 
   return (
-    <div ref={ref} className="mb-6 sm:mb-8">
-      {/* Synapse line */}
-      <div className="font-mono text-[8px] text-foreground/15 mb-3 overflow-hidden select-none hidden sm:block">
-        {ASCII_SYNAPSE}
-      </div>
-
-      {/* Filter row - Scrollable on mobile */}
-      <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide -mx-4 px-4 sm:mx-0 sm:px-0 sm:flex-wrap">
+    <div ref={ref} className="mb-4 sm:mb-6">
+      {/* Scrollable filter row on mobile */}
+      <div className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto pb-2 scrollbar-hide -mx-1 px-1">
         {groups.map((group) => {
           const isSelected = selectedGroups.includes(group)
           return (
@@ -631,10 +603,10 @@ function FilterPanel({
               key={group}
               onClick={() => onToggleGroup(group)}
               className={cn(
-                "touch-target flex-shrink-0 font-mono text-[10px] sm:text-xs px-3 sm:px-4 py-2 border transition-all duration-200 min-h-[44px]",
+                "touch-target flex-shrink-0 font-mono text-[10px] sm:text-xs px-2.5 sm:px-3 py-1.5 border transition-all duration-150",
                 isSelected
                   ? "border-foreground bg-foreground text-background"
-                  : "border-foreground/30 text-foreground/60 hover:border-foreground hover:text-foreground active:bg-foreground/10"
+                  : "border-foreground/30 text-foreground/60 active:bg-foreground/10"
               )}
             >
               {group}
@@ -645,7 +617,7 @@ function FilterPanel({
         {selectedGroups.length > 0 && (
           <button
             onClick={onClearFilters}
-            className="touch-target flex-shrink-0 flex items-center gap-1 font-mono text-[10px] sm:text-xs text-foreground/50 hover:text-foreground px-2 transition-colors min-h-[44px]"
+            className="touch-target flex-shrink-0 flex items-center gap-1 font-mono text-[10px] sm:text-xs text-muted-foreground px-2 py-1"
           >
             <X className="w-3 h-3" />
           </button>
@@ -653,35 +625,51 @@ function FilterPanel({
       </div>
 
       {/* Result count */}
-      <div className="flex items-center gap-2 mt-3 font-mono text-[9px] sm:text-[10px] text-foreground/40">
-        <span className="text-foreground">{resultCount}</span>
+      <div className="flex items-center gap-1.5 mt-2 font-mono text-[9px] sm:text-[10px] text-foreground/40">
+        <span className="font-medium text-foreground/60">{resultCount}</span>
         <span>/</span>
         <span>{totalCount}</span>
-        <span className="hidden sm:inline ml-2">nodes active</span>
-        {selectedGroups.length > 0 && (
-          <span className="text-accent">●</span>
-        )}
+        <span className="ml-1">nodes</span>
+        {selectedGroups.length > 0 && <span className="text-accent ml-1">●</span>}
       </div>
     </div>
   )
 }
 
 // ─────────────────────────────────────────────────────────────
-// SECTION HEADER
+// SECTION HEADER - Mobile Optimized
 // ─────────────────────────────────────────────────────────────
 
 function SectionHeader({ count }: { count: number }) {
   const headerRef = useRef<HTMLDivElement>(null)
   const titleRef = useRef<HTMLHeadingElement>(null)
-  const waveRef = useRef<HTMLDivElement>(null)
+  const asciiRef = useRef<HTMLPreElement>(null)
 
   useEffect(() => {
     if (!headerRef.current) return
     const ctx = gsap.context(() => {
+      // ASCII scan animation
+      if (asciiRef.current) {
+        gsap.fromTo(
+          asciiRef.current,
+          { opacity: 0 },
+          {
+            opacity: 1,
+            duration: 1,
+            ease: "power2.out",
+            scrollTrigger: {
+              trigger: asciiRef.current,
+              start: "top 95%",
+              toggleActions: "play none none none",
+            },
+          }
+        )
+      }
+
       // Title scramble
       if (titleRef.current) {
-        const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ∿●◎"
-        const originalText = "PROJECTS"
+        const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ░▒▓█"
+        const originalText = "NEURAL MAP"
         let iteration = 0
 
         ScrollTrigger.create({
@@ -693,79 +681,68 @@ function SectionHeader({ count }: { count: number }) {
               titleRef.current.textContent = originalText
                 .split("")
                 .map((char, i) => {
+                  if (char === " ") return " "
                   if (i < iteration) return char
                   return chars[Math.floor(Math.random() * chars.length)]
                 })
                 .join("")
               if (iteration >= originalText.length) clearInterval(interval)
-              iteration += 0.4
+              iteration += 0.35
             }, 35)
           },
         })
-      }
-
-      // Brain wave animation
-      if (waveRef.current) {
-        gsap.fromTo(
-          waveRef.current,
-          { opacity: 0, x: -20 },
-          {
-            opacity: 1,
-            x: 0,
-            duration: 1,
-            ease: "power2.out",
-            scrollTrigger: {
-              trigger: waveRef.current,
-              start: "top 95%",
-              toggleActions: "play none none none",
-            },
-          }
-        )
       }
     }, headerRef.current)
     return () => ctx.revert()
   }, [])
 
   return (
-    <div ref={headerRef} className="mb-6 sm:mb-8 relative">
-      {/* Brain wave pattern */}
-      <div
-        ref={waveRef}
-        className="font-mono text-[8px] sm:text-[10px] text-foreground/15 mb-3 overflow-hidden select-none"
+    <div ref={headerRef} className="mb-5 sm:mb-8">
+      {/* ASCII brain scan */}
+      <pre
+        ref={asciiRef}
+        className="font-mono text-[6px] sm:text-[8px] text-foreground/15 overflow-hidden whitespace-pre select-none mb-3 sm:mb-4 leading-tight"
       >
-        {ASCII_BRAIN_WAVE}
-      </div>
+        {ASCII_BRAIN_SCAN}
+      </pre>
 
-      {/* Title row */}
-      <div className="flex items-end justify-between gap-4">
-        <div>
+      {/* Header row */}
+      <div className="flex items-end justify-between gap-3">
+        <div className="min-w-0">
           <div className="flex items-center gap-2 mb-1">
-            <span className="font-mono text-[8px] sm:text-[9px] text-foreground/40 tracking-[0.2em]">
-              NEURAL.04
+            <span className="font-mono text-[8px] sm:text-[9px] text-muted-foreground tracking-[0.2em]">
+              — PROJECTS
             </span>
-            <span className="font-mono text-[10px] text-foreground/20">◉</span>
+            <span className="font-mono text-[10px] sm:text-xs text-foreground/20">
+              {ASCII_SYNAPSE}
+            </span>
           </div>
           <h2
             ref={titleRef}
-            className="font-mono text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-foreground tracking-tighter leading-none"
+            className="font-mono text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-foreground tracking-tight leading-none"
           >
-            PROJECTS
+            NEURAL MAP
           </h2>
         </div>
-        <div className="text-right hidden sm:block">
-          <span className="font-mono text-2xl sm:text-3xl lg:text-4xl font-black text-foreground/15 tabular-nums">
+        
+        {/* Node count */}
+        <div className="flex flex-col items-end flex-shrink-0">
+          <span className="font-mono text-2xl sm:text-3xl md:text-4xl font-black text-foreground/15 tabular-nums leading-none">
             {String(count).padStart(2, "0")}
+          </span>
+          <span className="font-mono text-[8px] sm:text-[9px] text-foreground/30 tracking-wider mt-0.5">
+            NODES
           </span>
         </div>
       </div>
 
-      {/* Underline with neural nodes */}
-      <div className="mt-3 flex items-center gap-2">
+      {/* Pulse line */}
+      <div className="mt-3 sm:mt-4 flex items-center gap-2">
         <div className="h-0.5 sm:h-1 w-8 sm:w-12 bg-foreground" />
-        <div className="h-px flex-1 bg-foreground/15" />
-        <span className="font-mono text-[8px] text-foreground/20 select-none hidden sm:inline">
-          ◉─◎─◉
+        <span className="font-mono text-[8px] sm:text-[10px] text-foreground/20 tracking-widest overflow-hidden">
+          {ASCII_PULSE}
         </span>
+        <div className="h-px flex-1 bg-foreground/15" />
       </div>
     </div>
   )
@@ -810,24 +787,28 @@ export function ProjectsSection() {
     <section
       id="projects"
       ref={sectionRef}
-      className="relative py-10 sm:py-14 md:py-20 lg:py-24 px-4 sm:px-6 bg-background"
+      className={cn(
+        "relative py-8 sm:py-12 md:py-16 lg:py-20 px-3 sm:px-4 md:px-6",
+        "bg-background"
+      )}
     >
-      {/* Neural background grid */}
+      {/* Subtle neural background */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <svg className="w-full h-full opacity-[0.015]" preserveAspectRatio="none">
-          {/* Radial pattern like brain scan */}
-          <defs>
-            <pattern id="neural-grid" width="40" height="40" patternUnits="userSpaceOnUse">
-              <circle cx="20" cy="20" r="1" fill="currentColor" />
-              <line x1="0" y1="20" x2="40" y2="20" stroke="currentColor" strokeWidth="0.5" />
-              <line x1="20" y1="0" x2="20" y2="40" stroke="currentColor" strokeWidth="0.5" />
-            </pattern>
-          </defs>
-          <rect width="100%" height="100%" fill="url(#neural-grid)" />
+          {/* Neural web pattern */}
+          {[...Array(8)].map((_, i) => (
+            <path
+              key={i}
+              d={`M0 ${12 + i * 12} Q${25 + i * 5} ${8 + i * 8} 50 ${12 + i * 12} T100 ${10 + i * 10}`}
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1"
+            />
+          ))}
         </svg>
       </div>
 
-      <div className="max-w-5xl mx-auto relative">
+      <div className="max-w-4xl mx-auto relative">
         <SectionHeader count={allProjects.length} />
 
         <FilterPanel
@@ -838,48 +819,51 @@ export function ProjectsSection() {
           totalCount={allProjects.length}
         />
 
-        {/* Projects */}
+        {/* ASCII connection indicator */}
+        <div className="font-mono text-[8px] sm:text-[10px] text-foreground/15 mb-4 sm:mb-6 overflow-hidden select-none">
+          {ASCII_SYNAPSE}{ASCII_SYNAPSE}{ASCII_SYNAPSE}
+        </div>
+
+        {/* Projects grid */}
         {filteredProjects.length === 0 ? (
-          <div className="text-center py-12 sm:py-16 border border-dashed border-foreground/20">
-            <pre className="font-mono text-[8px] sm:text-[10px] text-foreground/30 mb-3 select-none">
+          <div className="text-center py-10 sm:py-12 border border-dashed border-foreground/15">
+            <pre className="font-mono text-[9px] sm:text-[10px] text-foreground/25 mb-3">
               {ASCII_NEURON}
             </pre>
-            <p className="font-mono text-xs text-foreground/40 mb-4">No neural pathways found</p>
+            <p className="font-mono text-[10px] sm:text-xs text-muted-foreground mb-3">
+              No matching nodes
+            </p>
             <button
               onClick={clearFilters}
-              className="touch-target font-mono text-[10px] sm:text-xs border border-foreground/40 px-4 py-2 hover:bg-foreground hover:text-background transition-colors min-h-[44px]"
+              className="font-mono text-[10px] sm:text-xs border border-foreground/40 px-3 py-1.5 active:bg-foreground active:text-background transition-colors"
             >
               RESET
             </button>
           </div>
         ) : (
-          <div className="space-y-4 sm:space-y-5">
-            {displayedProjects.map((project) => (
-              <ProjectCard key={project.id} project={project} />
+          <div className="space-y-3 sm:space-y-4">
+            {displayedProjects.map((project, index) => (
+              <ProjectNode key={project.id} project={project} index={index} />
             ))}
           </div>
         )}
 
         {/* Load more */}
         {!showAll && remaining > 0 && (
-          <div className="mt-6 sm:mt-8 flex flex-col items-center">
-            {/* Neural pulse line */}
-            <div className="font-mono text-[8px] text-foreground/15 mb-4 select-none hidden sm:block">
-              {ASCII_NODES}
-            </div>
+          <div className="mt-6 sm:mt-8 flex justify-center">
             <button
               onClick={() => setShowAll(true)}
               className={cn(
-                "touch-target w-full sm:w-auto group flex items-center justify-center gap-2",
-                "px-6 sm:px-8 py-3 sm:py-4 min-h-[52px]",
-                "font-mono text-xs sm:text-sm tracking-[0.1em]",
+                "touch-target flex items-center gap-2",
+                "px-4 sm:px-6 py-2.5 sm:py-3",
+                "font-mono text-[10px] sm:text-xs tracking-wider",
                 "border border-foreground bg-foreground text-background",
-                "hover:bg-background hover:text-foreground transition-colors",
-                "active:scale-[0.98]"
+                "active:bg-background active:text-foreground transition-colors",
+                "shadow-[2px_2px_0_0_var(--foreground)]"
               )}
             >
-              <span>+{remaining} MORE</span>
-              <ChevronDown className="w-4 h-4" />
+              <span>+{remaining} NODES</span>
+              <ChevronDown className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </button>
           </div>
         )}
@@ -887,15 +871,15 @@ export function ProjectsSection() {
         {/* End marker */}
         {showAll && (
           <div className="mt-8 sm:mt-10 text-center">
-            <div className="font-mono text-[8px] sm:text-[9px] text-foreground/15 mb-3 select-none">
-              {ASCII_PULSE}
-            </div>
+            <pre className="font-mono text-[7px] sm:text-[8px] text-foreground/15 select-none mb-3">
+              {ASCII_NEURON}
+            </pre>
             <a
               href="#contact"
-              className="touch-target inline-flex items-center gap-2 font-mono text-[10px] sm:text-xs text-foreground/40 hover:text-foreground transition-colors min-h-[44px]"
+              className="touch-target inline-flex items-center gap-1.5 font-mono text-[10px] sm:text-xs text-muted-foreground"
             >
               <span>↓</span>
-              <span>NEXT SYNAPSE</span>
+              <span>NEXT</span>
             </a>
           </div>
         )}
