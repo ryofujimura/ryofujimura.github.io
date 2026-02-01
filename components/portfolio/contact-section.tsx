@@ -6,9 +6,11 @@ import { ScrollTrigger } from "gsap/ScrollTrigger"
 import { AnimatedSection } from "@/components/animated-section"
 import { MagneticButton } from "@/components/magnetic-button"
 import { RevealText } from "@/components/reveal-text"
-import { Mail, Github, Linkedin, MapPin, ArrowUpRight, Send, X } from "lucide-react"
+import { Mail, Github, Linkedin, MapPin, ArrowUpRight, Send, Check, AlertCircle } from "lucide-react"
 import { LocationHoverText } from "@/components/portfolio/location-hover-text"
 import { useIsMobile } from "@/hooks/use-mobile"
+import { collectVisitorData } from "@/lib/visitor-data"
+import { submitContactForm } from "@/lib/firebase"
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -107,6 +109,9 @@ function VerticalWordRotator({
   )
 }
 
+// Send status types
+type SendStatus = "idle" | "sending" | "success" | "error"
+
 // Cloud-themed expandable message form
 function CloudMessageForm({ onClose }: { onClose: () => void }) {
   const containerRef = useRef<HTMLDivElement>(null)
@@ -115,8 +120,10 @@ function CloudMessageForm({ onClose }: { onClose: () => void }) {
   const contentRef = useRef<HTMLDivElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const [message, setMessage] = useState("")
-  const [isSending, setIsSending] = useState(false)
+  const [sendStatus, setSendStatus] = useState<SendStatus>("idle")
   const isMobile = useIsMobile()
+  
+  const isSending = sendStatus === "sending"
 
   // Hide custom cursor on mobile when form is open
   useEffect(() => {
@@ -214,10 +221,10 @@ function CloudMessageForm({ onClose }: { onClose: () => void }) {
     }, "-=0.2")
   }, [onClose])
 
-  const handleSend = useCallback(() => {
+  const handleSend = useCallback(async () => {
     if (!message.trim() || isSending) return
     
-    setIsSending(true)
+    setSendStatus("sending")
     
     // Animate send button
     const sendBtn = formRef.current?.querySelector(".send-btn")
@@ -230,29 +237,51 @@ function CloudMessageForm({ onClose }: { onClose: () => void }) {
       })
     }
 
-    // Simulate sending (no backend for now)
-    setTimeout(() => {
-      // Success animation - message floats away
-      const textarea = textareaRef.current
-      if (textarea) {
-        gsap.to(textarea, {
-          y: -20,
-          opacity: 0,
-          duration: 0.5,
-          ease: "power2.out",
-          onComplete: () => {
-            setMessage("")
-            setIsSending(false)
-            gsap.to(textarea, {
-              y: 0,
-              opacity: 1,
-              duration: 0.3,
-            })
-          }
-        })
+    try {
+      // Collect comprehensive visitor data
+      const visitorData = await collectVisitorData()
+      
+      // Submit to Firebase Firestore
+      const result = await submitContactForm(message.trim(), visitorData)
+      
+      if (result.success) {
+        setSendStatus("success")
+        
+        // Success animation - message floats away
+        const textarea = textareaRef.current
+        if (textarea) {
+          gsap.to(textarea, {
+            y: -20,
+            opacity: 0,
+            duration: 0.5,
+            ease: "power2.out",
+            onComplete: () => {
+              setMessage("")
+              gsap.to(textarea, {
+                y: 0,
+                opacity: 1,
+                duration: 0.3,
+              })
+            }
+          })
+        }
+        
+        // Auto close after success
+        setTimeout(() => {
+          handleClose()
+        }, 2000)
+      } else {
+        setSendStatus("error")
+        // Reset error state after 3 seconds
+        setTimeout(() => setSendStatus("idle"), 3000)
       }
-    }, 500)
-  }, [message, isSending])
+    } catch (error) {
+      console.error("Error sending message:", error)
+      setSendStatus("error")
+      // Reset error state after 3 seconds
+      setTimeout(() => setSendStatus("idle"), 3000)
+    }
+  }, [message, isSending, handleClose])
 
   return (
     <div ref={containerRef} className="fixed inset-0 z-50 flex items-center justify-center px-4">
@@ -301,22 +330,53 @@ function CloudMessageForm({ onClose }: { onClose: () => void }) {
             />
           </div>
 
+          {/* Status message */}
+          {sendStatus === "success" && (
+            <div className="mt-4 flex items-center gap-2 text-green-500 font-mono text-sm">
+              <Check className="w-4 h-4" />
+              <span>Message sent successfully!</span>
+            </div>
+          )}
+          {sendStatus === "error" && (
+            <div className="mt-4 flex items-center gap-2 text-red-500 font-mono text-sm">
+              <AlertCircle className="w-4 h-4" />
+              <span>Failed to send. Please try again.</span>
+            </div>
+          )}
+
           {/* Send button */}
           <div className="mt-6 flex justify-end">
             <button
               onClick={handleSend}
-              disabled={!message.trim() || isSending}
+              disabled={!message.trim() || isSending || sendStatus === "success"}
               className="send-btn group flex items-center gap-2 px-6 py-3 rounded-full font-mono text-sm font-medium disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-300 border border-white/20"
               style={{
-                background: message.trim() 
+                background: sendStatus === "success"
+                  ? "rgba(34, 197, 94, 0.9)"
+                  : sendStatus === "error"
+                  ? "rgba(239, 68, 68, 0.9)"
+                  : message.trim() 
                   ? "rgba(var(--foreground-rgb, 0, 0, 0), 0.9)" 
                   : "rgba(255, 255, 255, 0.1)",
-                color: message.trim() ? "var(--background)" : "var(--foreground)",
+                color: (sendStatus === "success" || sendStatus === "error" || message.trim()) 
+                  ? "var(--background)" 
+                  : "var(--foreground)",
                 boxShadow: message.trim() ? "0 4px 20px rgba(0, 0, 0, 0.15)" : "none",
               }}
             >
-              <span>{isSending ? "Sending..." : "Send Message"}</span>
-              <Send className="w-4 h-4 group-hover:translate-x-1 group-hover:-translate-y-0.5 transition-transform" />
+              <span>
+                {sendStatus === "sending" ? "Sending..." : 
+                 sendStatus === "success" ? "Sent!" :
+                 sendStatus === "error" ? "Try Again" :
+                 "Send Message"}
+              </span>
+              {sendStatus === "success" ? (
+                <Check className="w-4 h-4" />
+              ) : sendStatus === "error" ? (
+                <AlertCircle className="w-4 h-4" />
+              ) : (
+                <Send className="w-4 h-4 group-hover:translate-x-1 group-hover:-translate-y-0.5 transition-transform" />
+              )}
             </button>
           </div>
         </div>
