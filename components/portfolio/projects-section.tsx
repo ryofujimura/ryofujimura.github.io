@@ -3,1058 +3,680 @@
 import { useState, useRef, useEffect, useCallback } from "react"
 import { gsap } from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
-import { ScrollToPlugin } from "gsap/ScrollToPlugin"
 import { cn } from "@/lib/utils"
 import Image from "next/image"
 
-gsap.registerPlugin(ScrollTrigger, ScrollToPlugin)
-
-// ─────────────────────────────────────────────────────────────
-// MOBILE DETECTION HOOK
-// ─────────────────────────────────────────────────────────────
-
-const MOBILE_BREAKPOINT = 768
-
-function useIsMobile() {
-  const [isMobile, setIsMobile] = useState(false)
-
-  useEffect(() => {
-    if (typeof window === "undefined") return
-
-    const mediaQuery = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT - 1}px)`)
-    setIsMobile(mediaQuery.matches)
-
-    const handleChange = (e: MediaQueryListEvent) => {
-      setIsMobile(e.matches)
-    }
-    
-    const handleResize = () => {
-      setIsMobile(window.innerWidth < MOBILE_BREAKPOINT)
-    }
-    
-    mediaQuery.addEventListener("change", handleChange)
-    window.addEventListener("resize", handleResize)
-
-    return () => {
-      mediaQuery.removeEventListener("change", handleChange)
-      window.removeEventListener("resize", handleResize)
-    }
-  }, [])
-
-  return isMobile
-}
+gsap.registerPlugin(ScrollTrigger)
 
 // ─────────────────────────────────────────────────────────────
 // PROJECT DATA
 // ─────────────────────────────────────────────────────────────
 
-const projectsData = [
+const projects = [
   {
     id: "01",
-    title: "POKER %",
+    title: "POKER%",
     subtitle: "WATCHOS",
     year: "2022",
-    description: "Real-time poker odds calculator for Apple Watch with Monte Carlo simulation.",
+    description: "Real-time poker odds calculator for Apple Watch",
     techStack: ["Swift", "WatchOS", "SwiftUI"],
     images: ["/images/poker_1.jpg", "/images/poker_2.jpg", "/images/poker_3.jpg"],
-    ascii: `♠♥♦♣`,
     links: { github: "https://github.com/ryofujimura", appStore: "https://apps.apple.com/us/app/poker-pocket-odds/id6499280318" },
+    ascii: `♠♥♦♣`,
   },
   {
     id: "02",
-    title: "SHOHEI HG",
+    title: "SHOHEI_HG",
     subtitle: "AUTOMATION",
     year: "2023",
-    description: "Automated content pipeline for Instagram and YouTube with Python.",
-    techStack: ["Python", "API", "Automation"],
+    description: "Automated content pipeline for social platforms",
+    techStack: ["Python", "Instagram API", "YouTube API"],
     images: ["/images/shoheihomeground_1.jpg", "/images/shoheihomeground_2.jpg", "/images/shoheihomeground_3.jpg"],
-    ascii: `▓░▓░`,
     links: { instagram: "#", youtube: "#" },
+    ascii: `▓▓▓░░`,
   },
   {
     id: "03",
     title: "SCHEDULE",
-    subtitle: "FLASK",
+    subtitle: "FLASK_API",
     year: "2023",
-    description: "Intelligent course scheduling with graph coloring algorithms.",
+    description: "Intelligent course scheduling with graph algorithms",
     techStack: ["Python", "Flask", "SQLite"],
     images: ["/images/schedule.jpg"],
-    ascii: `┌┬┐`,
     links: { github: "https://github.com/ryofujimura" },
+    ascii: `┌┬┬┬┐`,
   },
   {
     id: "04",
     title: "MATCHA",
-    subtitle: "IOS APP",
+    subtitle: "IOS_APP",
     year: "2024",
-    description: "Minimalist matcha timer with Japanese aesthetic and CloudKit sync.",
+    description: "Minimalist matcha timer with Japanese aesthetic",
     techStack: ["Swift", "SwiftUI", "CloudKit"],
     images: ["/images/matchatime_1.jpg", "/images/matchatime_2.jpg", "/images/matchatime_3.jpg"],
-    ascii: `🍵`,
-    links: { appStore: "#" },
+    links: { github: "https://github.com/ryofujimura", appStore: "#" },
+    ascii: `░▒▓█▓`,
   },
   {
     id: "05",
     title: "PORTFOLIO",
     subtitle: "NEXT.JS",
     year: "2024",
-    description: "This website. Brutalist design with GSAP scroll animations.",
+    description: "This portfolio with GSAP scroll animations",
     techStack: ["React", "Next.js", "GSAP", "Tailwind"],
     images: ["/images/homepage.png", "/images/experiencepage.png"],
-    ascii: `◆◇◆`,
     links: { github: "https://github.com/ryofujimura" },
+    ascii: `◆◇◆◇◆`,
   },
   {
     id: "06",
     title: "SABORIENDO",
-    subtitle: "CROSS-PLAT",
+    subtitle: "CROSS_PLAT",
     year: "2024",
-    description: "Food tracking with barcode scanning. iOS and web sync via Firebase.",
+    description: "Food tracking with barcode scanning and real-time sync",
     techStack: ["React 19", "SwiftUI", "Firebase"],
     images: [],
-    ascii: `║│║`,
     links: { github: "https://github.com/ryofujimura" },
+    ascii: `║│║│║`,
   },
   {
     id: "07",
-    title: "LOCAL LLM",
-    subtitle: "ON-DEVICE AI",
+    title: "WITH_LLM",
+    subtitle: "ON_DEVICE",
     year: "2024",
-    description: "Privacy-first AI assistant running entirely on-device with llama.cpp.",
+    description: "Privacy-focused AI assistant running locally",
     techStack: ["Swift", "llama.cpp", "GGUF"],
     images: [],
-    ascii: `◉●◉`,
     links: { github: "https://github.com/ryofujimura" },
+    ascii: `●○●○●`,
   },
   {
     id: "08",
-    title: "SHUTTLE",
-    subtitle: "REAL-TIME",
+    title: "HTIC_SHUTTLE",
+    subtitle: "REALTIME",
     year: "2025",
-    description: "Campus shuttle tracking with sub-100ms latency using Firebase RTDB.",
+    description: "Campus shuttle tracking with sub-100ms latency",
     techStack: ["Swift", "Kotlin", "Firebase"],
     images: [],
-    ascii: `═○═`,
     links: { github: "https://github.com/ryofujimura" },
+    ascii: `═○═○═`,
   },
   {
     id: "09",
     title: "CYBEREDU",
-    subtitle: "OFFLINE-FIRST",
+    subtitle: "OFFLINE",
     year: "2025",
-    description: "Educational platform with offline-first architecture and conflict resolution.",
+    description: "Educational platform with offline-first architecture",
     techStack: ["Swift", "Kotlin", "Firebase"],
     images: ["/images/CyberEdu-1.PNG", "/images/CyberEdu-2.PNG", "/images/CyberEdu-3.PNG"],
-    ascii: `●○●`,
     links: { github: "https://github.com/ryofujimura" },
+    ascii: `▀▄▀▄▀`,
   },
   {
     id: "10",
-    title: "LAB PM",
+    title: "LAB_PM",
     subtitle: "SERVERLESS",
     year: "2025",
-    description: "AI-powered project management for research labs with dynamic routing.",
+    description: "Research lab PM with AI-powered task routing",
     techStack: ["Cloud Functions", "Firebase", "GPT-4"],
     images: [],
-    ascii: `◇◆◇`,
     links: { github: "https://github.com/ryofujimura" },
+    ascii: `◇◆◇◆◇`,
   },
   {
     id: "11",
     title: "WHITEBOARD",
-    subtitle: "VISION ML",
+    subtitle: "VISION_ML",
     year: "2025",
-    description: "Collaborative whiteboard with real-time AI vision and CRDT sync.",
+    description: "Collaborative whiteboard with real-time AI vision",
     techStack: ["PyTorch", "WebSocket", "React"],
     images: ["/images/whiteboardai-1.jpg", "/images/whiteboardai-2.jpg"],
-    ascii: `□○□`,
     links: { github: "https://github.com/ryofujimura" },
+    ascii: `┼─┼─┼`,
   },
   {
     id: "12",
-    title: "ZERO INBOX",
-    subtitle: "AI ENGINE",
+    title: "ZERO_INBOX",
+    subtitle: "PROD_AI",
     year: "2025",
-    description: "Email management with multi-stage AI reasoning and 95% accuracy.",
+    description: "Email management with multi-stage AI reasoning",
     techStack: ["Swift", "AI/ML", "Firebase"],
     images: [],
-    ascii: `▓█▓`,
     links: { github: "https://github.com/ryofujimura" },
+    ascii: `█░█░█`,
   },
 ]
 
-type Project = (typeof projectsData)[0]
+type Project = (typeof projects)[0]
 
 // ─────────────────────────────────────────────────────────────
-// ASCII GLITCH CHARACTERS
+// MOBILE DETECTION
 // ─────────────────────────────────────────────────────────────
 
-const GLITCH_CHARS = "░▒▓█▄▀■□●○◆◇╳╱╲─│┌┐└┘├┤┬┴┼!@#$%^&*"
-const ASCII_BORDER = "═══════════════════════════════════════"
+function useIsMobile() {
+  const [isMobile, setIsMobile] = useState(false)
+
+  useEffect(() => {
+    if (typeof window === "undefined") return
+    const check = () => setIsMobile(window.innerWidth < 768)
+    check()
+    window.addEventListener("resize", check)
+    return () => window.removeEventListener("resize", check)
+  }, [])
+
+  return isMobile
+}
 
 // ─────────────────────────────────────────────────────────────
-// LOADING SCREEN
+// ASCII LOADING SCREEN
 // ─────────────────────────────────────────────────────────────
 
 function LoadingScreen({ onComplete }: { onComplete: () => void }) {
+  const [frame, setFrame] = useState(0)
   const [progress, setProgress] = useState(0)
-  const [displayText, setDisplayText] = useState("")
   const containerRef = useRef<HTMLDivElement>(null)
-  
-  const loadingMessages = [
-    "INITIALIZING_PROJECTS",
-    "LOADING_ASSETS",
-    "COMPILING_DATA",
-    "RENDERING_UI",
-    "SYSTEM_READY"
+
+  const frames = [
+    `
+    ╔════════════════════════════════╗
+    ║  ░░░░░░░░░░░░░░░░░░░░░░░░░░░░  ║
+    ║  ░ LOADING PROJECTS...     ░  ║
+    ║  ░░░░░░░░░░░░░░░░░░░░░░░░░░░░  ║
+    ╚════════════════════════════════╝
+    `,
+    `
+    ╔════════════════════════════════╗
+    ║  ▒▒▒▒▒▒▒▒░░░░░░░░░░░░░░░░░░░░  ║
+    ║  ▒ LOADING PROJECTS...     ▒  ║
+    ║  ▒▒▒▒▒▒▒▒░░░░░░░░░░░░░░░░░░░░  ║
+    ╚════════════════════════════════╝
+    `,
+    `
+    ╔════════════════════════════════╗
+    ║  ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░░░░░░  ║
+    ║  ▓ LOADING PROJECTS...     ▓  ║
+    ║  ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░░░░░░  ║
+    ╚════════════════════════════════╝
+    `,
+    `
+    ╔════════════════════════════════╗
+    ║  ████████████████████████░░░░  ║
+    ║  █ LOADING PROJECTS...     █  ║
+    ║  ████████████████████████░░░░  ║
+    ╚════════════════════════════════╝
+    `,
+    `
+    ╔════════════════════════════════╗
+    ║  ████████████████████████████  ║
+    ║  █ PROJECTS LOADED ✓       █  ║
+    ║  ████████████████████████████  ║
+    ╚════════════════════════════════╝
+    `,
   ]
 
   useEffect(() => {
-    let currentProgress = 0
-    const interval = setInterval(() => {
-      currentProgress += Math.random() * 15 + 5
-      if (currentProgress >= 100) {
-        currentProgress = 100
-        clearInterval(interval)
-        
-        // Animate out
-        if (containerRef.current) {
-          gsap.to(containerRef.current, {
-            opacity: 0,
-            y: -50,
-            duration: 0.5,
-            ease: "power2.in",
-            onComplete
-          })
+    const progressInterval = setInterval(() => {
+      setProgress(p => {
+        if (p >= 100) {
+          clearInterval(progressInterval)
+          return 100
         }
-      }
-      setProgress(Math.min(currentProgress, 100))
-    }, 100)
+        return p + 4
+      })
+    }, 30)
 
-    return () => clearInterval(interval)
-  }, [onComplete])
+    const frameInterval = setInterval(() => {
+      setFrame(f => (f + 1) % (frames.length - 1))
+    }, 150)
 
-  // Glitch text effect
-  useEffect(() => {
-    const msgIndex = Math.min(Math.floor(progress / 20), loadingMessages.length - 1)
-    const targetText = loadingMessages[msgIndex]
-    
-    let iteration = 0
-    const maxIterations = targetText.length * 2
-    
-    const interval = setInterval(() => {
-      setDisplayText(
-        targetText
-          .split("")
-          .map((char, i) => {
-            if (char === "_") return "_"
-            if (i < iteration / 2) return char
-            return GLITCH_CHARS[Math.floor(Math.random() * GLITCH_CHARS.length)]
-          })
-          .join("")
-      )
+    const completeTimer = setTimeout(() => {
+      clearInterval(frameInterval)
+      setFrame(frames.length - 1)
       
-      iteration++
-      if (iteration >= maxIterations) {
-        setDisplayText(targetText)
-        clearInterval(interval)
+      if (containerRef.current) {
+        gsap.to(containerRef.current, {
+          opacity: 0,
+          scale: 0.95,
+          duration: 0.5,
+          delay: 0.3,
+          ease: "power2.inOut",
+          onComplete,
+        })
       }
-    }, 20)
+    }, 800)
 
-    return () => clearInterval(interval)
-  }, [progress])
-
-  const barLength = 30
-  const filled = Math.floor((progress / 100) * barLength)
-  const progressBar = "█".repeat(filled) + "░".repeat(barLength - filled)
-
-  return (
-    <div 
-      ref={containerRef}
-      className="fixed inset-0 z-50 bg-background flex items-center justify-center"
-    >
-      <div className="font-mono text-center">
-        {/* ASCII art header */}
-        <pre className="text-[8px] md:text-[10px] text-foreground/20 mb-6 leading-tight">
-{`
-    ██████╗ ██████╗  ██████╗      ██╗███████╗ ██████╗████████╗███████╗
-    ██╔══██╗██╔══██╗██╔═══██╗     ██║██╔════╝██╔════╝╚══██╔══╝██╔════╝
-    ██████╔╝██████╔╝██║   ██║     ██║█████╗  ██║        ██║   ███████╗
-    ██╔═══╝ ██╔══██╗██║   ██║██   ██║██╔══╝  ██║        ██║   ╚════██║
-    ██║     ██║  ██║╚██████╔╝╚█████╔╝███████╗╚██████╗   ██║   ███████║
-    ╚═╝     ╚═╝  ╚═╝ ╚═════╝  ╚════╝ ╚══════╝ ╚═════╝   ╚═╝   ╚══════╝
-`}
-        </pre>
-        
-        <div className="text-xs text-foreground/60 mb-4 tracking-widest">
-          {displayText}
-        </div>
-        
-        <div className="text-foreground/40 text-sm mb-2">
-          [{progressBar}]
-        </div>
-        
-        <div className="text-foreground/60 text-lg font-bold">
-          {Math.floor(progress)}%
-        </div>
-        
-        <div className="text-[8px] text-foreground/20 mt-4 animate-pulse">
-          ▼ SCROLL TO EXPLORE ▼
-        </div>
-      </div>
-    </div>
-  )
-}
-
-// ─────────────────────────────────────────────────────────────
-// TECHNICAL SVG PATTERN - ANIMATED LINES
-// ─────────────────────────────────────────────────────────────
-
-function TechnicalBackground({ isActive }: { isActive: boolean }) {
-  const svgRef = useRef<SVGSVGElement>(null)
-
-  useEffect(() => {
-    if (!svgRef.current || !isActive) return
-
-    const lines = svgRef.current.querySelectorAll(".tech-line")
-    const circles = svgRef.current.querySelectorAll(".tech-circle")
-
-    gsap.fromTo(
-      lines,
-      { strokeDashoffset: 1000, opacity: 0 },
-      { 
-        strokeDashoffset: 0, 
-        opacity: 1, 
-        duration: 2, 
-        stagger: 0.1, 
-        ease: "power2.out" 
-      }
-    )
-
-    gsap.fromTo(
-      circles,
-      { scale: 0, opacity: 0 },
-      { 
-        scale: 1, 
-        opacity: 1, 
-        duration: 0.5, 
-        stagger: 0.05, 
-        delay: 0.5,
-        ease: "back.out(2)" 
-      }
-    )
-  }, [isActive])
-
-  return (
-    <svg
-      ref={svgRef}
-      className="absolute inset-0 w-full h-full pointer-events-none"
-      viewBox="0 0 1000 1000"
-      preserveAspectRatio="xMidYMid slice"
-    >
-      {/* Grid lines */}
-      {Array.from({ length: 20 }).map((_, i) => (
-        <line
-          key={`h-${i}`}
-          className="tech-line text-foreground/[0.03]"
-          x1="0"
-          y1={i * 50}
-          x2="1000"
-          y2={i * 50}
-          stroke="currentColor"
-          strokeWidth="0.5"
-          strokeDasharray="1000"
-        />
-      ))}
-      {Array.from({ length: 20 }).map((_, i) => (
-        <line
-          key={`v-${i}`}
-          className="tech-line text-foreground/[0.03]"
-          x1={i * 50}
-          y1="0"
-          x2={i * 50}
-          y2="1000"
-          stroke="currentColor"
-          strokeWidth="0.5"
-          strokeDasharray="1000"
-        />
-      ))}
-      
-      {/* Corner brackets */}
-      <path 
-        className="tech-line text-foreground/10" 
-        d="M50 100 L50 50 L100 50" 
-        fill="none" 
-        stroke="currentColor" 
-        strokeWidth="2"
-        strokeDasharray="1000"
-      />
-      <path 
-        className="tech-line text-foreground/10" 
-        d="M900 50 L950 50 L950 100" 
-        fill="none" 
-        stroke="currentColor" 
-        strokeWidth="2"
-        strokeDasharray="1000"
-      />
-      <path 
-        className="tech-line text-foreground/10" 
-        d="M950 900 L950 950 L900 950" 
-        fill="none" 
-        stroke="currentColor" 
-        strokeWidth="2"
-        strokeDasharray="1000"
-      />
-      <path 
-        className="tech-line text-foreground/10" 
-        d="M100 950 L50 950 L50 900" 
-        fill="none" 
-        stroke="currentColor" 
-        strokeWidth="2"
-        strokeDasharray="1000"
-      />
-
-      {/* Decorative circles */}
-      {[
-        { cx: 100, cy: 100 },
-        { cx: 900, cy: 100 },
-        { cx: 500, cy: 500 },
-        { cx: 100, cy: 900 },
-        { cx: 900, cy: 900 },
-      ].map((pos, i) => (
-        <circle
-          key={i}
-          className="tech-circle text-foreground/5"
-          cx={pos.cx}
-          cy={pos.cy}
-          r="30"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1"
-          strokeDasharray="4 4"
-        />
-      ))}
-    </svg>
-  )
-}
-
-// ─────────────────────────────────────────────────────────────
-// PROJECT TITLE COMPONENT - LARGE TYPOGRAPHY
-// ─────────────────────────────────────────────────────────────
-
-function ProjectTitle({ 
-  project, 
-  isActive, 
-  isExpanded,
-  onClick,
-  index
-}: { 
-  project: Project
-  isActive: boolean
-  isExpanded: boolean
-  onClick: () => void
-  index: number
-}) {
-  const titleRef = useRef<HTMLDivElement>(null)
-  const [glitchText, setGlitchText] = useState(project.title)
-  const [isHovered, setIsHovered] = useState(false)
-
-  // Glitch animation on hover/active
-  useEffect(() => {
-    if (!isActive && !isHovered) {
-      setGlitchText(project.title)
-      return
+    return () => {
+      clearInterval(progressInterval)
+      clearInterval(frameInterval)
+      clearTimeout(completeTimer)
     }
-
-    const targetText = project.title
-    let iteration = 0
-    const maxIterations = targetText.length * 3
-
-    const interval = setInterval(() => {
-      setGlitchText(
-        targetText
-          .split("")
-          .map((char, i) => {
-            if (char === " ") return " "
-            if (i < iteration / 3) return char
-            return GLITCH_CHARS[Math.floor(Math.random() * GLITCH_CHARS.length)]
-          })
-          .join("")
-      )
-
-      iteration++
-      if (iteration >= maxIterations) {
-        setGlitchText(targetText)
-        clearInterval(interval)
-      }
-    }, 25)
-
-    return () => clearInterval(interval)
-  }, [project.title, isActive, isHovered])
-
-  // GSAP entrance animation
-  useEffect(() => {
-    if (!titleRef.current || !isActive) return
-
-    gsap.fromTo(
-      titleRef.current,
-      { 
-        y: 100, 
-        opacity: 0, 
-        skewY: 5,
-        scale: 0.9
-      },
-      { 
-        y: 0, 
-        opacity: 1, 
-        skewY: 0,
-        scale: 1,
-        duration: 0.8, 
-        ease: "power3.out" 
-      }
-    )
-  }, [isActive])
+  }, [onComplete, frames.length])
 
   return (
     <div
-      ref={titleRef}
-      onClick={onClick}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      className={cn(
-        "cursor-pointer transition-all duration-500 select-none",
-        "group relative",
-        isExpanded ? "opacity-30 scale-95" : "opacity-100 scale-100"
-      )}
+      ref={containerRef}
+      className="fixed inset-0 z-50 bg-background flex items-center justify-center"
     >
-      {/* Index number */}
-      <div className="absolute -left-4 md:-left-8 top-1/2 -translate-y-1/2 font-mono text-[10px] md:text-sm text-foreground/20">
-        {project.id}
+      <div className="text-center">
+        <pre className="font-mono text-[8px] sm:text-[10px] md:text-xs text-foreground/60 leading-tight whitespace-pre">
+          {frames[frame]}
+        </pre>
+        <div className="mt-4 font-mono text-[10px] text-foreground/40">
+          [{String(progress).padStart(3, "0")}%] INITIALIZING_PROJECT_DATA
+        </div>
+        <div className="mt-2 flex justify-center gap-1">
+          {Array.from({ length: 20 }).map((_, i) => (
+            <div
+              key={i}
+              className={cn(
+                "w-2 h-1 transition-all duration-100",
+                i < progress / 5 ? "bg-foreground" : "bg-foreground/10"
+              )}
+            />
+          ))}
+        </div>
       </div>
-
-      {/* Main title */}
-      <h2 className={cn(
-        "font-mono font-black tracking-tighter leading-none",
-        "text-[15vw] md:text-[12vw] lg:text-[10vw]",
-        "text-foreground",
-        "transition-all duration-300",
-        isHovered && !isExpanded && "text-foreground/80 translate-x-2"
-      )}>
-        {glitchText}
-      </h2>
-
-      {/* Subtitle line */}
-      <div className={cn(
-        "flex items-center gap-4 mt-2 font-mono text-xs md:text-sm",
-        "transition-all duration-300",
-        isHovered && !isExpanded ? "opacity-100 translate-x-4" : "opacity-40"
-      )}>
-        <span className="text-foreground/60">{project.subtitle}</span>
-        <span className="text-foreground/20">│</span>
-        <span className="text-foreground/40">{project.year}</span>
-        <span className="text-foreground/20">│</span>
-        <span className="text-foreground/30">{project.ascii}</span>
-        <span className="text-foreground/20 ml-auto hidden md:inline">
-          [ CLICK TO EXPAND ]
-        </span>
-      </div>
-
-      {/* Hover indicator line */}
-      <div className={cn(
-        "absolute -bottom-2 left-0 h-[2px] bg-foreground",
-        "transition-all duration-500",
-        isHovered && !isExpanded ? "w-full" : "w-0"
-      )} />
     </div>
   )
 }
 
 // ─────────────────────────────────────────────────────────────
-// EXPANDED PROJECT VIEW - IMAGE GALLERY
+// PROJECT MODAL
 // ─────────────────────────────────────────────────────────────
 
-function ExpandedProjectView({ 
-  project, 
+function ProjectModal({
+  project,
+  isOpen,
   onClose,
-  isMobile
-}: { 
-  project: Project
+}: {
+  project: Project | null
+  isOpen: boolean
   onClose: () => void
-  isMobile: boolean
 }) {
-  const containerRef = useRef<HTMLDivElement>(null)
-  const [activeImageIndex, setActiveImageIndex] = useState(0)
-  const [loadedImages, setLoadedImages] = useState<Set<number>>(new Set())
+  const modalRef = useRef<HTMLDivElement>(null)
+  const contentRef = useRef<HTMLDivElement>(null)
+  const [currentImageIndex, setCurrentImageIndex] = useState(0)
+  const [imageLoaded, setImageLoaded] = useState(false)
 
-  // Entrance animation
+  // Reset state when project changes
   useEffect(() => {
-    if (!containerRef.current) return
+    setCurrentImageIndex(0)
+    setImageLoaded(false)
+  }, [project])
 
-    const tl = gsap.timeline()
-    
-    tl.fromTo(
-      containerRef.current,
-      { opacity: 0, y: 50 },
-      { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }
-    )
+  // Animation on open/close
+  useEffect(() => {
+    if (!modalRef.current || !contentRef.current) return
 
-    tl.fromTo(
-      ".expand-content",
-      { opacity: 0, y: 30 },
-      { opacity: 1, y: 0, duration: 0.4, stagger: 0.1, ease: "power2.out" },
-      "-=0.2"
-    )
-
-    return () => {
-      tl.kill()
+    if (isOpen) {
+      gsap.fromTo(
+        modalRef.current,
+        { opacity: 0 },
+        { opacity: 1, duration: 0.3, ease: "power2.out" }
+      )
+      gsap.fromTo(
+        contentRef.current,
+        { y: 50, opacity: 0, scale: 0.95 },
+        { y: 0, opacity: 1, scale: 1, duration: 0.4, delay: 0.1, ease: "power3.out" }
+      )
     }
-  }, [])
+  }, [isOpen])
 
-  // Handle close with animation
-  const handleClose = useCallback(() => {
-    if (!containerRef.current) {
-      onClose()
-      return
-    }
-
-    gsap.to(containerRef.current, {
-      opacity: 0,
-      y: -30,
-      duration: 0.3,
-      ease: "power2.in",
-      onComplete: onClose
-    })
-  }, [onClose])
-
-  // Close on escape key
+  // Keyboard close
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") handleClose()
+      if (e.key === "Escape") onClose()
+      if (e.key === "ArrowLeft" && project?.images.length) {
+        setCurrentImageIndex(i => (i > 0 ? i - 1 : project.images.length - 1))
+        setImageLoaded(false)
+      }
+      if (e.key === "ArrowRight" && project?.images.length) {
+        setCurrentImageIndex(i => (i < project.images.length - 1 ? i + 1 : 0))
+        setImageLoaded(false)
+      }
     }
-    window.addEventListener("keydown", handleKeyDown)
-    return () => window.removeEventListener("keydown", handleKeyDown)
-  }, [handleClose])
+    if (isOpen) {
+      window.addEventListener("keydown", handleKeyDown)
+      document.body.style.overflow = "hidden"
+    }
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown)
+      document.body.style.overflow = ""
+    }
+  }, [isOpen, onClose, project])
+
+  if (!isOpen || !project) return null
 
   const hasImages = project.images.length > 0
 
   return (
-    <div 
-      ref={containerRef}
-      className="fixed inset-0 z-40 bg-background/98 backdrop-blur-sm overflow-y-auto"
+    <div
+      ref={modalRef}
+      className="fixed inset-0 z-[100] bg-background/95 backdrop-blur-sm flex items-center justify-center p-4 sm:p-6"
+      onClick={onClose}
     >
-      {/* Close button */}
-      <button
-        onClick={handleClose}
-        className={cn(
-          "fixed z-50 font-mono text-foreground/60 hover:text-foreground",
-          "transition-all duration-200 hover:scale-110",
-          isMobile ? "top-4 right-4 text-2xl" : "top-8 right-8 text-3xl"
-        )}
-      >
-        ╳
-      </button>
-
-      {/* Technical pattern background */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-50">
-        <TechnicalBackground isActive={true} />
+      {/* Technical grid background */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-[0.03]">
+        <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <pattern id="modal-grid" width="40" height="40" patternUnits="userSpaceOnUse">
+              <path d="M 40 0 L 0 0 0 40" fill="none" stroke="currentColor" strokeWidth="0.5" />
+            </pattern>
+          </defs>
+          <rect width="100%" height="100%" fill="url(#modal-grid)" />
+        </svg>
       </div>
 
-      <div className={cn(
-        "relative min-h-screen flex flex-col",
-        isMobile ? "p-4 pt-16" : "p-8 pt-20"
-      )}>
-        {/* Header */}
-        <div className="expand-content mb-6">
-          <div className="font-mono text-[8px] md:text-[10px] text-foreground/30 mb-2">
-            ╔{ASCII_BORDER}╗
-          </div>
-          
-          <div className="flex items-baseline gap-4 flex-wrap">
-            <span className="font-mono text-foreground/30 text-sm">{project.id}</span>
-            <h2 className={cn(
-              "font-mono font-black tracking-tighter",
-              isMobile ? "text-4xl" : "text-6xl md:text-8xl"
-            )}>
+      <div
+        ref={contentRef}
+        className="relative w-full max-w-4xl max-h-[90vh] overflow-y-auto bg-background border border-foreground/20"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Corner marks */}
+        <span className="absolute top-0 left-0 font-mono text-[10px] text-foreground/30 p-2">┌──</span>
+        <span className="absolute top-0 right-0 font-mono text-[10px] text-foreground/30 p-2">──┐</span>
+        <span className="absolute bottom-0 left-0 font-mono text-[10px] text-foreground/30 p-2">└──</span>
+        <span className="absolute bottom-0 right-0 font-mono text-[10px] text-foreground/30 p-2">──┘</span>
+
+        {/* Close button */}
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 z-10 font-mono text-xs px-3 py-2 border border-foreground/30 bg-background hover:bg-foreground hover:text-background transition-colors"
+        >
+          [ESC] CLOSE
+        </button>
+
+        <div className="p-6 sm:p-8">
+          {/* Header */}
+          <div className="mb-6 border-b border-foreground/10 pb-6">
+            <div className="flex items-center gap-3 mb-2">
+              <span className="font-mono text-[10px] text-foreground/40">{project.id}</span>
+              <span className="font-mono text-[10px] text-foreground/40">{project.year}</span>
+              <span className="font-mono text-[10px] text-foreground/30">{project.ascii}</span>
+            </div>
+            <h2 className="font-mono text-3xl sm:text-4xl md:text-5xl font-black text-foreground tracking-tighter">
               {project.title}
             </h2>
-            <span className="font-mono text-foreground/40 text-sm">{project.subtitle}</span>
+            <div className="font-mono text-xs text-foreground/50 mt-2">{project.subtitle}</div>
           </div>
-          
-          <div className="font-mono text-[8px] md:text-[10px] text-foreground/30 mt-2">
-            ╚{ASCII_BORDER}╝
-          </div>
-        </div>
 
-        {/* Content grid */}
-        <div className={cn(
-          "expand-content flex-1 grid gap-6",
-          isMobile ? "grid-cols-1" : "grid-cols-2"
-        )}>
-          {/* Left column - Images */}
-          <div className="space-y-4">
-            <div className="font-mono text-[8px] text-foreground/30 mb-2">
-              ├── PREVIEW_IMAGES
-            </div>
-            
-            {hasImages ? (
-              <>
-                {/* Main image */}
-                <div className={cn(
-                  "relative border border-foreground/20 bg-foreground/5 overflow-hidden",
-                  isMobile ? "aspect-video" : "aspect-[4/3]"
-                )}>
-                  {project.images.map((img, idx) => (
-                    <div
-                      key={idx}
-                      className={cn(
-                        "absolute inset-0 transition-opacity duration-500",
-                        idx === activeImageIndex ? "opacity-100" : "opacity-0"
-                      )}
-                    >
-                      {!loadedImages.has(idx) && (
-                        <div className="absolute inset-0 flex items-center justify-center bg-foreground/5">
-                          <div className="font-mono text-[10px] text-foreground/30 animate-pulse">
-                            ░▒▓ LOADING ▓▒░
-                          </div>
-                        </div>
-                      )}
-                      <Image
-                        src={img}
-                        alt={`${project.title} preview ${idx + 1}`}
-                        fill
-                        className="object-cover"
-                        onLoad={() => setLoadedImages(prev => new Set(prev).add(idx))}
-                      />
+          {/* Image gallery */}
+          {hasImages ? (
+            <div className="mb-6">
+              <div className="font-mono text-[10px] text-foreground/30 mb-3">
+                ├── PREVIEW [{String(currentImageIndex + 1).padStart(2, "0")}/{String(project.images.length).padStart(2, "0")}]
+              </div>
+              <div className="relative aspect-video bg-foreground/5 border border-foreground/10 overflow-hidden">
+                {/* Loading state */}
+                {!imageLoaded && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-foreground/5 z-10">
+                    <div className="font-mono text-[10px] text-foreground/30 animate-pulse">
+                      ░▒▓ LOADING IMAGE ▓▒░
                     </div>
-                  ))}
-
-                  {/* Corner marks */}
-                  <span className="absolute top-2 left-2 font-mono text-[8px] text-white/60 drop-shadow-lg">┌──</span>
-                  <span className="absolute top-2 right-2 font-mono text-[8px] text-white/60 drop-shadow-lg">──┐</span>
-                  <span className="absolute bottom-2 left-2 font-mono text-[8px] text-white/60 drop-shadow-lg">└──</span>
-                  <span className="absolute bottom-2 right-2 font-mono text-[8px] text-white/60 drop-shadow-lg">──┘</span>
-
-                  {/* Scanlines */}
-                  <div 
-                    className="absolute inset-0 pointer-events-none opacity-10"
-                    style={{
-                      background: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.05) 2px, rgba(255,255,255,0.05) 4px)'
-                    }}
-                  />
-                </div>
-
-                {/* Thumbnail strip */}
-                {project.images.length > 1 && (
-                  <div className="flex gap-2 overflow-x-auto scrollbar-hide">
-                    {project.images.map((img, idx) => (
-                      <button
-                        key={idx}
-                        onClick={() => setActiveImageIndex(idx)}
-                        className={cn(
-                          "relative flex-shrink-0 w-16 h-12 md:w-20 md:h-14 border overflow-hidden",
-                          "transition-all duration-200",
-                          idx === activeImageIndex 
-                            ? "border-foreground opacity-100 scale-105" 
-                            : "border-foreground/20 opacity-60 hover:opacity-80"
-                        )}
-                      >
-                        <Image
-                          src={img}
-                          alt={`Thumbnail ${idx + 1}`}
-                          fill
-                          className="object-cover"
-                        />
-                      </button>
-                    ))}
                   </div>
                 )}
-              </>
-            ) : (
-              <div className={cn(
-                "flex items-center justify-center border border-dashed border-foreground/10 bg-foreground/[0.02]",
-                isMobile ? "aspect-video" : "aspect-[4/3]"
-              )}>
-                <div className="text-center font-mono">
-                  <pre className="text-foreground/20 text-[8px] leading-tight">
-{`┌─────────────────────┐
-│                     │
-│   NO_PREVIEW_DATA   │
-│                     │
-│   ░░░░░░░░░░░░░░░   │
-│                     │
-└─────────────────────┘`}
-                  </pre>
+                <Image
+                  src={project.images[currentImageIndex]}
+                  alt={`${project.title} preview`}
+                  fill
+                  className={cn(
+                    "object-cover transition-opacity duration-300",
+                    imageLoaded ? "opacity-100" : "opacity-0"
+                  )}
+                  onLoad={() => setImageLoaded(true)}
+                />
+                
+                {/* Nav arrows */}
+                {project.images.length > 1 && (
+                  <>
+                    <button
+                      onClick={() => {
+                        setCurrentImageIndex(i => (i > 0 ? i - 1 : project.images.length - 1))
+                        setImageLoaded(false)
+                      }}
+                      className="absolute left-2 top-1/2 -translate-y-1/2 font-mono text-2xl text-white/60 hover:text-white bg-black/50 px-3 py-2 transition-colors"
+                    >
+                      ◄
+                    </button>
+                    <button
+                      onClick={() => {
+                        setCurrentImageIndex(i => (i < project.images.length - 1 ? i + 1 : 0))
+                        setImageLoaded(false)
+                      }}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 font-mono text-2xl text-white/60 hover:text-white bg-black/50 px-3 py-2 transition-colors"
+                    >
+                      ►
+                    </button>
+                  </>
+                )}
+
+                {/* Scanlines */}
+                <div
+                  className="absolute inset-0 pointer-events-none opacity-10"
+                  style={{
+                    background: "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.03) 2px, rgba(255,255,255,0.03) 4px)",
+                  }}
+                />
+              </div>
+
+              {/* Image dots */}
+              {project.images.length > 1 && (
+                <div className="flex justify-center gap-2 mt-3">
+                  {project.images.map((_, i) => (
+                    <button
+                      key={i}
+                      onClick={() => {
+                        setCurrentImageIndex(i)
+                        setImageLoaded(false)
+                      }}
+                      className={cn(
+                        "w-8 h-1 transition-all",
+                        i === currentImageIndex ? "bg-foreground" : "bg-foreground/20 hover:bg-foreground/40"
+                      )}
+                    />
+                  ))}
                 </div>
-              </div>
-            )}
-          </div>
-
-          {/* Right column - Info */}
-          <div className="space-y-6">
-            {/* Description */}
-            <div>
-              <div className="font-mono text-[8px] text-foreground/30 mb-2">
-                ├── DESCRIPTION
-              </div>
-              <p className="font-mono text-sm md:text-base text-foreground/70 leading-relaxed">
-                {project.description}
-              </p>
+              )}
             </div>
-
-            {/* Tech stack */}
-            <div>
-              <div className="font-mono text-[8px] text-foreground/30 mb-2">
-                ├── TECH_STACK
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {project.techStack.map((tech, idx) => (
-                  <span
-                    key={tech}
-                    className={cn(
-                      "font-mono text-xs px-3 py-1.5",
-                      "border border-foreground/20 bg-foreground/5",
-                      "hover:bg-foreground/10 transition-colors"
-                    )}
-                  >
-                    <span className="text-foreground/30 mr-2">{String(idx + 1).padStart(2, "0")}</span>
-                    {tech}
-                  </span>
-                ))}
-              </div>
-            </div>
-
-            {/* ASCII decoration */}
-            <div className="border border-foreground/10 bg-foreground/[0.02] p-4">
-              <div className="font-mono text-[8px] text-foreground/30 mb-2">
-                └── PROJECT_SIGNATURE
-              </div>
-              <pre className="font-mono text-foreground/20 text-sm">
-{`
-╔══════════════════════════════════════╗
-║                                      ║
-║   PROJECT: ${project.title.padEnd(25)}║
-║   YEAR:    ${project.year}                       ║
-║   STATUS:  ACTIVE                    ║
-║   ID:      ${project.id}                         ║
-║                                      ║
-║   ${project.ascii}                              ║
-║                                      ║
-╚══════════════════════════════════════╝
-`}
+          ) : (
+            <div className="mb-6 aspect-video bg-foreground/[0.02] border border-dashed border-foreground/10 flex items-center justify-center">
+              <pre className="font-mono text-[8px] text-foreground/20 text-center">
+{`┌─────────────────────────┐
+│                         │
+│    NO PREVIEW IMAGE     │
+│    AVAILABLE YET        │
+│                         │
+│    ░░░░░░░░░░░░░░░░░   │
+│                         │
+└─────────────────────────┘`}
               </pre>
             </div>
+          )}
 
-            {/* Links */}
-            <div className="flex gap-3">
-              {project.links.github && (
-                <a
-                  href={project.links.github}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={cn(
-                    "font-mono text-xs px-4 py-2 border border-foreground/30",
-                    "hover:bg-foreground hover:text-background transition-all",
-                    "flex items-center gap-2"
-                  )}
+          {/* Description */}
+          <div className="mb-6">
+            <div className="font-mono text-[10px] text-foreground/30 mb-2">├── DESCRIPTION</div>
+            <p className="font-mono text-sm text-foreground/70 leading-relaxed">
+              {project.description}
+            </p>
+          </div>
+
+          {/* Tech stack */}
+          <div className="mb-6">
+            <div className="font-mono text-[10px] text-foreground/30 mb-3">└── TECH_STACK</div>
+            <div className="flex flex-wrap gap-2">
+              {project.techStack.map((tech) => (
+                <span
+                  key={tech}
+                  className="font-mono text-[10px] px-3 py-1.5 border border-foreground/20 text-foreground/60 bg-foreground/[0.02] hover:bg-foreground/10 transition-colors"
                 >
-                  <span>CODE</span>
-                  <span className="text-foreground/30">→</span>
-                </a>
-              )}
-              {"appStore" in project.links && (
-                <a
-                  href={project.links.appStore}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={cn(
-                    "font-mono text-xs px-4 py-2 border border-foreground/30",
-                    "hover:bg-foreground hover:text-background transition-all",
-                    "flex items-center gap-2"
-                  )}
-                >
-                  <span>APP STORE</span>
-                  <span className="text-foreground/30">→</span>
-                </a>
-              )}
+                  {tech}
+                </span>
+              ))}
             </div>
           </div>
-        </div>
 
-        {/* Footer */}
-        <div className="expand-content mt-8 pt-4 border-t border-foreground/10">
-          <div className="flex items-center justify-between font-mono text-[8px] text-foreground/30">
-            <span>ESC or click ╳ to close</span>
-            <span>PROJECT_{project.id}_DATA</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-// ─────────────────────────────────────────────────────────────
-// PROJECT LIST - VERTICAL SCROLL WITH SNAP
-// ─────────────────────────────────────────────────────────────
-
-function ProjectList({ 
-  isMobile,
-  activeIndex,
-  setActiveIndex,
-  expandedProject,
-  setExpandedProject
-}: {
-  isMobile: boolean
-  activeIndex: number
-  setActiveIndex: (index: number) => void
-  expandedProject: Project | null
-  setExpandedProject: (project: Project | null) => void
-}) {
-  const containerRef = useRef<HTMLDivElement>(null)
-  const projectRefs = useRef<(HTMLDivElement | null)[]>([])
-
-  // Scroll snap setup with GSAP ScrollTrigger
-  useEffect(() => {
-    if (!containerRef.current) return
-
-    const ctx = gsap.context(() => {
-      projectRefs.current.forEach((ref, index) => {
-        if (!ref) return
-
-        ScrollTrigger.create({
-          trigger: ref,
-          start: isMobile ? "top 40%" : "top 50%",
-          end: isMobile ? "bottom 60%" : "bottom 50%",
-          onEnter: () => setActiveIndex(index),
-          onEnterBack: () => setActiveIndex(index),
-        })
-      })
-    }, containerRef.current)
-
-    return () => ctx.revert()
-  }, [isMobile, setActiveIndex])
-
-  // Scroll to project on click
-  const scrollToProject = useCallback((index: number) => {
-    const target = projectRefs.current[index]
-    if (!target) return
-
-    const offset = isMobile ? window.innerHeight * 0.3 : window.innerHeight * 0.4
-    const targetY = target.getBoundingClientRect().top + window.scrollY - offset
-
-    gsap.to(window, {
-      scrollTo: { y: targetY, autoKill: false },
-      duration: 1,
-      ease: "power3.inOut"
-    })
-  }, [isMobile])
-
-  return (
-    <div ref={containerRef} className="relative">
-      {/* Progress indicator */}
-      <div className={cn(
-        "fixed z-30 font-mono",
-        isMobile 
-          ? "top-4 left-4 text-[10px]" 
-          : "top-1/2 -translate-y-1/2 right-8 text-xs"
-      )}>
-        <div className="flex flex-col gap-1">
-          <span className="text-foreground/30 mb-2 hidden md:block">INDEX</span>
-          {projectsData.map((_, idx) => (
-            <button
-              key={idx}
-              onClick={() => scrollToProject(idx)}
-              className={cn(
-                "transition-all duration-300 text-left",
-                isMobile ? "w-6 h-1" : "w-8 h-1.5",
-                idx === activeIndex 
-                  ? "bg-foreground" 
-                  : idx < activeIndex 
-                    ? "bg-foreground/30" 
-                    : "bg-foreground/10 hover:bg-foreground/20"
-              )}
-            />
-          ))}
-          <span className="text-foreground/50 mt-2 hidden md:block">
-            {String(activeIndex + 1).padStart(2, "0")}/{String(projectsData.length).padStart(2, "0")}
-          </span>
-        </div>
-      </div>
-
-      {/* Project titles */}
-      <div className={cn(
-        "space-y-0",
-        isMobile ? "py-[50vh]" : "py-[40vh]"
-      )}>
-        {projectsData.map((project, index) => (
-          <div
-            key={project.id}
-            ref={el => { projectRefs.current[index] = el }}
-            className={cn(
-              "relative flex items-center",
-              isMobile 
-                ? "min-h-[30vh] px-4" 
-                : "min-h-[40vh] px-8 md:px-16 lg:px-24"
+          {/* Links */}
+          <div className="flex flex-wrap gap-3 pt-6 border-t border-foreground/10">
+            {project.links.github && (
+              <a
+                href={project.links.github}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-mono text-[10px] px-4 py-2 border border-foreground/30 hover:bg-foreground hover:text-background transition-colors"
+              >
+                [→] VIEW_CODE
+              </a>
             )}
-          >
-            <ProjectTitle
-              project={project}
-              isActive={index === activeIndex}
-              isExpanded={expandedProject !== null}
-              onClick={() => setExpandedProject(project)}
-              index={index}
-            />
+            {"appStore" in project.links && project.links.appStore && (
+              <a
+                href={project.links.appStore as string}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-mono text-[10px] px-4 py-2 border border-foreground/30 hover:bg-foreground hover:text-background transition-colors"
+              >
+                [◉] APP_STORE
+              </a>
+            )}
           </div>
-        ))}
+        </div>
       </div>
     </div>
   )
 }
 
 // ─────────────────────────────────────────────────────────────
-// ASCII DECORATIONS
+// INTERACTIVE PROJECT TITLE
 // ─────────────────────────────────────────────────────────────
 
-function AsciiDecorations({ isMobile }: { isMobile: boolean }) {
-  const [frame, setFrame] = useState(0)
+function ProjectTitle({
+  project,
+  index,
+  onClick,
+  isHovered,
+  onHover,
+  onLeave,
+}: {
+  project: Project
+  index: number
+  onClick: () => void
+  isHovered: boolean
+  onHover: () => void
+  onLeave: () => void
+}) {
+  const titleRef = useRef<HTMLButtonElement>(null)
+  const [displayText, setDisplayText] = useState(project.title)
+  const glitchChars = "░▒▓█▄▀■□●○◆◇╳╱╲─│"
 
+  // Glitch effect on hover
   useEffect(() => {
-    const interval = setInterval(() => {
-      setFrame(f => (f + 1) % 4)
-    }, 500)
-    return () => clearInterval(interval)
-  }, [])
+    if (!isHovered) {
+      setDisplayText(project.title)
+      return
+    }
 
-  const corners = ["┌", "┐", "└", "┘"]
-  const rotatedCorner = corners[frame]
+    let iteration = 0
+    const interval = setInterval(() => {
+      setDisplayText(
+        project.title
+          .split("")
+          .map((char, i) => {
+            if (char === "_" || char === " ") return char
+            if (i < iteration / 2) return project.title[i]
+            return glitchChars[Math.floor(Math.random() * glitchChars.length)]
+          })
+          .join("")
+      )
+      iteration++
+      if (iteration > project.title.length * 2) {
+        setDisplayText(project.title)
+        clearInterval(interval)
+      }
+    }, 30)
+
+    return () => clearInterval(interval)
+  }, [isHovered, project.title])
 
   return (
-    <>
-      {/* Top left decoration */}
-      <div className={cn(
-        "fixed z-20 font-mono text-foreground/20 pointer-events-none",
-        isMobile ? "top-2 left-2 text-[6px]" : "top-4 left-4 text-[8px]"
-      )}>
-        <pre className="leading-tight">
-{`${rotatedCorner}──────────────
-│ PROJECTS.TSX
-│ v3.0.0
-├──────────────`}
-        </pre>
-      </div>
+    <button
+      ref={titleRef}
+      onClick={onClick}
+      onMouseEnter={onHover}
+      onMouseLeave={onLeave}
+      onTouchStart={onHover}
+      onTouchEnd={onLeave}
+      className={cn(
+        "project-title inline-block whitespace-nowrap transition-all duration-300 cursor-pointer touch-manipulation",
+        "font-mono font-black tracking-tighter",
+        "text-[12vw] sm:text-[10vw] md:text-[8vw] lg:text-[7vw]",
+        "leading-[0.85]",
+        isHovered
+          ? "text-foreground scale-[1.02] -skew-x-2"
+          : "text-foreground/15 hover:text-foreground/40"
+      )}
+      style={{
+        textShadow: isHovered ? "0 0 60px rgba(var(--foreground), 0.3)" : "none",
+      }}
+    >
+      <span className="relative">
+        {/* Index number */}
+        <span
+          className={cn(
+            "absolute -left-[1em] top-0 text-[0.15em] font-normal transition-opacity duration-300",
+            isHovered ? "opacity-60" : "opacity-0"
+          )}
+        >
+          {String(index + 1).padStart(2, "0")}
+        </span>
+        
+        {displayText}
+        
+        {/* ASCII decoration */}
+        <span
+          className={cn(
+            "absolute -right-[0.5em] top-1/2 -translate-y-1/2 text-[0.12em] font-normal transition-opacity duration-300",
+            isHovered ? "opacity-40" : "opacity-0"
+          )}
+        >
+          {project.ascii}
+        </span>
 
-      {/* Bottom right decoration */}
-      <div className={cn(
-        "fixed z-20 font-mono text-foreground/20 pointer-events-none text-right",
-        isMobile ? "bottom-2 right-2 text-[6px]" : "bottom-4 right-4 text-[8px]"
-      )}>
-        <pre className="leading-tight">
-{`──────────────${rotatedCorner}
-    SCROLL ▼ │
-  TO EXPLORE │
-──────────────┤`}
-        </pre>
-      </div>
-    </>
+        {/* Underline */}
+        <span
+          className={cn(
+            "absolute bottom-0 left-0 h-[0.03em] bg-foreground transition-all duration-500 ease-out",
+            isHovered ? "w-full" : "w-0"
+          )}
+        />
+      </span>
+    </button>
+  )
+}
+
+// ─────────────────────────────────────────────────────────────
+// ASCII DECORATIVE LINE
+// ─────────────────────────────────────────────────────────────
+
+function AsciiLine({ char = "─", className }: { char?: string; className?: string }) {
+  const lineRef = useRef<HTMLDivElement>(null)
+  const [chars, setChars] = useState("")
+
+  useEffect(() => {
+    const updateWidth = () => {
+      if (!lineRef.current) return
+      const width = lineRef.current.offsetWidth
+      const charCount = Math.floor(width / 8)
+      setChars(char.repeat(charCount))
+    }
+    updateWidth()
+    window.addEventListener("resize", updateWidth)
+    return () => window.removeEventListener("resize", updateWidth)
+  }, [char])
+
+  return (
+    <div ref={lineRef} className={cn("font-mono text-[10px] text-foreground/10 overflow-hidden", className)}>
+      {chars}
+    </div>
   )
 }
 
@@ -1063,100 +685,253 @@ function AsciiDecorations({ isMobile }: { isMobile: boolean }) {
 // ─────────────────────────────────────────────────────────────
 
 export function ProjectsSection() {
-  const [isLoading, setIsLoading] = useState(true)
-  const [activeIndex, setActiveIndex] = useState(0)
-  const [expandedProject, setExpandedProject] = useState<Project | null>(null)
+  const [isLoaded, setIsLoaded] = useState(false)
+  const [selectedProject, setSelectedProject] = useState<Project | null>(null)
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
   const sectionRef = useRef<HTMLElement>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
+  const titleContainerRef = useRef<HTMLDivElement>(null)
   const isMobile = useIsMobile()
 
-  // Handle loading complete
-  const handleLoadingComplete = useCallback(() => {
-    setIsLoading(false)
-  }, [])
-
-  // Lock body scroll when expanded
+  // Scroll animation
   useEffect(() => {
-    if (expandedProject) {
-      document.body.style.overflow = "hidden"
-    } else {
-      document.body.style.overflow = ""
-    }
-    return () => {
-      document.body.style.overflow = ""
-    }
-  }, [expandedProject])
+    if (!isLoaded || !sectionRef.current || !titleContainerRef.current) return
+
+    const ctx = gsap.context(() => {
+      // Animate titles on scroll
+      gsap.fromTo(
+        ".project-title",
+        { opacity: 0, y: 100, rotateX: -30 },
+        {
+          opacity: 1,
+          y: 0,
+          rotateX: 0,
+          duration: 1,
+          stagger: 0.1,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: sectionRef.current,
+            start: "top 80%",
+            end: "top 20%",
+            toggleActions: "play none none reverse",
+          },
+        }
+      )
+
+      // Parallax effect on scroll
+      gsap.to(titleContainerRef.current, {
+        y: -100,
+        ease: "none",
+        scrollTrigger: {
+          trigger: sectionRef.current,
+          start: "top bottom",
+          end: "bottom top",
+          scrub: 1,
+        },
+      })
+
+      // Animate decorative elements
+      gsap.fromTo(
+        ".ascii-decoration",
+        { opacity: 0, x: -50 },
+        {
+          opacity: 1,
+          x: 0,
+          duration: 0.8,
+          stagger: 0.05,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: sectionRef.current,
+            start: "top 70%",
+            toggleActions: "play none none reverse",
+          },
+        }
+      )
+
+      // Corner brackets animation
+      gsap.fromTo(
+        ".corner-bracket",
+        { scale: 0, opacity: 0 },
+        {
+          scale: 1,
+          opacity: 1,
+          duration: 0.6,
+          stagger: 0.1,
+          ease: "back.out(1.5)",
+          scrollTrigger: {
+            trigger: sectionRef.current,
+            start: "top 60%",
+            toggleActions: "play none none reverse",
+          },
+        }
+      )
+    }, sectionRef.current)
+
+    return () => ctx.revert()
+  }, [isLoaded])
+
+  // Grid pattern SVG
+  const GridPattern = () => (
+    <svg className="absolute inset-0 w-full h-full pointer-events-none opacity-[0.03]">
+      <defs>
+        <pattern id="projects-grid" width="60" height="60" patternUnits="userSpaceOnUse">
+          <path d="M 60 0 L 0 0 0 60" fill="none" stroke="currentColor" strokeWidth="0.5" />
+        </pattern>
+        <pattern id="projects-dots" width="20" height="20" patternUnits="userSpaceOnUse">
+          <circle cx="1" cy="1" r="0.5" fill="currentColor" />
+        </pattern>
+      </defs>
+      <rect width="100%" height="100%" fill="url(#projects-grid)" />
+      <rect width="100%" height="100%" fill="url(#projects-dots)" opacity="0.5" />
+    </svg>
+  )
 
   return (
-    <section
-      id="projects"
-      ref={sectionRef}
-      className="relative bg-background"
-    >
+    <>
       {/* Loading screen */}
-      {isLoading && <LoadingScreen onComplete={handleLoadingComplete} />}
+      {!isLoaded && <LoadingScreen onComplete={() => setIsLoaded(true)} />}
 
-      {/* Technical background */}
-      <div className="fixed inset-0 pointer-events-none z-0">
-        <TechnicalBackground isActive={!isLoading} />
-      </div>
+      <section
+        id="projects"
+        ref={sectionRef}
+        className="relative min-h-screen bg-background overflow-hidden py-16 sm:py-20 md:py-24"
+      >
+        {/* Background grid */}
+        <GridPattern />
 
-      {/* ASCII decorations */}
-      {!isLoading && <AsciiDecorations isMobile={isMobile} />}
+        {/* Corner brackets */}
+        <span className="corner-bracket absolute top-4 left-4 font-mono text-foreground/20 text-xs sm:text-sm">
+          ┌────────────
+        </span>
+        <span className="corner-bracket absolute top-4 right-4 font-mono text-foreground/20 text-xs sm:text-sm text-right">
+          ────────────┐
+        </span>
+        <span className="corner-bracket absolute bottom-4 left-4 font-mono text-foreground/20 text-xs sm:text-sm">
+          └────────────
+        </span>
+        <span className="corner-bracket absolute bottom-4 right-4 font-mono text-foreground/20 text-xs sm:text-sm text-right">
+          ────────────┘
+        </span>
 
-      {/* Section header */}
-      <div className={cn(
-        "sticky top-0 z-10 bg-background/80 backdrop-blur-sm",
-        "border-b border-foreground/10",
-        isMobile ? "py-2 px-4" : "py-4 px-8"
-      )}>
-        <div className="flex items-center justify-between font-mono">
-          <div className="flex items-center gap-2">
-            <span className="text-foreground/30 text-[8px] md:text-[10px]">SECTION://</span>
-            <span className="text-foreground font-bold text-xs md:text-sm">PROJECTS</span>
+        <div ref={containerRef} className="relative z-10 px-4 sm:px-6 md:px-8">
+          {/* Section header */}
+          <div className="max-w-6xl mx-auto mb-8 sm:mb-12">
+            <div className="ascii-decoration font-mono text-[8px] sm:text-[10px] text-foreground/30 mb-4">
+              ╔══════════════════════════════════════════════════════════╗
+            </div>
+            
+            <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+              <div>
+                <div className="ascii-decoration font-mono text-[9px] sm:text-[11px] text-foreground/40 tracking-[0.2em] mb-2">
+                  SECTION://PROJECTS
+                </div>
+                <h2 className="ascii-decoration font-mono text-2xl sm:text-3xl md:text-4xl font-black text-foreground tracking-tighter">
+                  SELECTED_WORK
+                </h2>
+              </div>
+              <div className="ascii-decoration font-mono text-[10px] text-foreground/30 text-right">
+                <div>TOTAL: {projects.length} PROJECTS</div>
+                <div>YEARS: 2022—2025</div>
+                <div>[TAP TO VIEW]</div>
+              </div>
+            </div>
+
+            <div className="ascii-decoration font-mono text-[8px] sm:text-[10px] text-foreground/30 mt-4">
+              ╚══════════════════════════════════════════════════════════╝
+            </div>
           </div>
-          <div className="text-foreground/40 text-[8px] md:text-[10px]">
-            {String(projectsData.length).padStart(2, "0")} ENTRIES
+
+          {/* Project titles */}
+          <div
+            ref={titleContainerRef}
+            className="relative text-center py-8 sm:py-12"
+          >
+            {/* Decorative lines */}
+            <AsciiLine char="═" className="absolute top-0 left-0 right-0" />
+            
+            {/* Main title flow */}
+            <div className="flex flex-wrap justify-center items-baseline gap-x-[0.15em] gap-y-2 px-2">
+              {projects.map((project, index) => (
+                <span key={project.id} className="inline-flex items-baseline">
+                  <ProjectTitle
+                    project={project}
+                    index={index}
+                    onClick={() => setSelectedProject(project)}
+                    isHovered={hoveredIndex === index}
+                    onHover={() => setHoveredIndex(index)}
+                    onLeave={() => setHoveredIndex(null)}
+                  />
+                  {index < projects.length - 1 && (
+                    <span className="font-mono text-[3vw] sm:text-[2vw] text-foreground/10 mx-[0.1em] select-none">
+                      ·
+                    </span>
+                  )}
+                </span>
+              ))}
+            </div>
+
+            <AsciiLine char="═" className="absolute bottom-0 left-0 right-0" />
+          </div>
+
+          {/* Instruction hint */}
+          <div className="text-center mt-8 sm:mt-12">
+            <div className="inline-block border border-foreground/10 px-4 py-3 bg-foreground/[0.02]">
+              <div className="font-mono text-[9px] sm:text-[10px] text-foreground/40 animate-pulse">
+                {isMobile ? (
+                  <>
+                    <span className="text-foreground/60">◉</span> TAP ANY PROJECT TO VIEW DETAILS
+                  </>
+                ) : (
+                  <>
+                    <span className="text-foreground/60">◉</span> HOVER TO HIGHLIGHT · CLICK TO VIEW DETAILS
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* ASCII footer art */}
+          <div className="mt-12 sm:mt-16 text-center">
+            <pre className="ascii-decoration inline-block font-mono text-[6px] sm:text-[8px] text-foreground/15 leading-tight">
+{`
+        ╔═══════════════════════════════════════════╗
+        ║                                           ║
+        ║  ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  ║
+        ║  ░ PROJECTS.DATA.LOADED                ░  ║
+        ║  ░ STATUS: READY                       ░  ║
+        ║  ░ INPUT: AWAITING_SELECTION           ░  ║
+        ║  ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  ║
+        ║                                           ║
+        ╚═══════════════════════════════════════════╝
+`}
+            </pre>
+          </div>
+
+          {/* Year markers */}
+          <div className="max-w-6xl mx-auto mt-12 sm:mt-16">
+            <div className="ascii-decoration font-mono text-[8px] sm:text-[10px] text-foreground/30 mb-3">
+              ├── TIMELINE
+            </div>
+            <div className="flex justify-between items-center border-t border-foreground/10 pt-3">
+              {["2022", "2023", "2024", "2025"].map((year, i) => (
+                <div key={year} className="text-center">
+                  <div className="font-mono text-[10px] sm:text-xs text-foreground/40 mb-1">{year}</div>
+                  <div className="font-mono text-[8px] text-foreground/20">
+                    {projects.filter((p) => p.year === year).length} projects
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* Main project list */}
-      {!isLoading && (
-        <ProjectList
-          isMobile={isMobile}
-          activeIndex={activeIndex}
-          setActiveIndex={setActiveIndex}
-          expandedProject={expandedProject}
-          setExpandedProject={setExpandedProject}
-        />
-      )}
-
-      {/* Expanded project view */}
-      {expandedProject && (
-        <ExpandedProjectView
-          project={expandedProject}
-          onClose={() => setExpandedProject(null)}
-          isMobile={isMobile}
-        />
-      )}
-
-      {/* Section footer */}
-      <div className={cn(
-        "relative z-10 bg-background border-t border-foreground/10",
-        isMobile ? "py-4 px-4" : "py-8 px-8"
-      )}>
-        <div className="font-mono text-center">
-          <div className="text-foreground/20 text-[8px] md:text-[10px] mb-2">
-            ═══════════════════════════════════════
-          </div>
-          <div className="text-foreground/40 text-xs">
-            END OF PROJECTS
-          </div>
-          <div className="text-foreground/20 text-[8px] md:text-[10px] mt-2">
-            ═══════════════════════════════════════
-          </div>
-        </div>
-      </div>
-    </section>
+      {/* Project modal */}
+      <ProjectModal
+        project={selectedProject}
+        isOpen={selectedProject !== null}
+        onClose={() => setSelectedProject(null)}
+      />
+    </>
   )
 }
