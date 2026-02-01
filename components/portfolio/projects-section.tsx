@@ -11,20 +11,158 @@ gsap.registerPlugin(ScrollTrigger)
 // SKILL & PROJECT DATA
 // ─────────────────────────────────────────────────────────────
 
+type LinkType = "appstore" | "playstore" | "github" | "website" | "instagram" | "youtube"
+
+interface ProjectLink {
+  type: LinkType
+  url: string
+}
+
 const projects = [
-  { id: "01", title: "SIMULATE", year: "2022", description: "Monte Carlo poker odds calculator", skills: ["Swift", "SwiftUI", "WatchOS"] },
-  { id: "02", title: "AUTOMATE", year: "2023", description: "Social media content pipeline", skills: ["Python", "API", "Automation"] },
-  { id: "03", title: "OPTIMIZE", year: "2023", description: "Graph coloring course scheduler", skills: ["Python", "Flask", "Algorithms"] },
-  { id: "04", title: "MINIMAL", year: "2024", description: "Zen matcha timer app", skills: ["Swift", "SwiftUI", "CloudKit"] },
-  { id: "05", title: "ANIMATE", year: "2024", description: "Brutalist portfolio with GSAP", skills: ["React", "Next.js", "GSAP", "Tailwind"] },
-  { id: "06", title: "SYNC", year: "2024", description: "Cross-platform food tracker", skills: ["React", "SwiftUI", "Firebase", "Realtime"] },
-  { id: "07", title: "INFERENCE", year: "2024", description: "On-device LLM assistant", skills: ["Swift", "llama.cpp", "ML", "Privacy"] },
-  { id: "08", title: "REALTIME", year: "2025", description: "Sub-100ms shuttle tracking", skills: ["Swift", "Kotlin", "Firebase", "Realtime"] },
-  { id: "09", title: "RESILIENT", year: "2025", description: "Offline-first education platform", skills: ["Swift", "Kotlin", "Firebase", "Offline"] },
-  { id: "10", title: "ROUTING", year: "2025", description: "AI-powered task routing", skills: ["Serverless", "Firebase", "GPT-4", "ML"] },
-  { id: "11", title: "COLLAB", year: "2025", description: "CRDT whiteboard with vision ML", skills: ["PyTorch", "WebSocket", "React", "ML"] },
-  { id: "12", title: "REASONING", year: "2025", description: "Multi-stage AI email manager", skills: ["Swift", "ML", "Firebase", "AI"] },
+  {
+    id: "01",
+    title: "Zero Inbox",
+    subtitle: "AI-Driven Email Prioritization",
+    year: "2025",
+    description: "Swift/SwiftUI email client with Google Mail API + Firebase + AI reasoning engine. 90-95% classification accuracy, 100-300ms inference latency.",
+    skills: ["Swift", "SwiftUI", "Firebase", "ML", "AI"],
+    links: [] as ProjectLink[]
+  },
+  {
+    id: "02",
+    title: "Research Lab PM",
+    subtitle: "AI-Powered Project Management",
+    year: "2025",
+    description: "Serverless orchestration layer enabling dynamic AI routing across 30+ researchers. Sub-200ms Cloud Functions response time.",
+    skills: ["Serverless", "Firebase", "GPT-4", "ML"],
+    links: [
+      { type: "github" as LinkType, url: "https://github.com/ryofujimura/research-lab-pm" },
+      { type: "website" as LinkType, url: "https://research-lab-pm.web.app" }
+    ]
+  },
+  {
+    id: "03",
+    title: "HTIC Shuttle",
+    subtitle: "Live Shuttle Tracking System",
+    year: "2025",
+    description: "Real-time shuttle tracking used daily by 25+ users across iOS, Android, and web. <100ms Firebase RTDB update latency.",
+    skills: ["Swift", "Kotlin", "Firebase", "Realtime"],
+    links: [
+      { type: "appstore" as LinkType, url: "https://apps.apple.com/app/htic-shuttle" },
+      { type: "playstore" as LinkType, url: "https://play.google.com/store/apps/details?id=com.htic.shuttle" },
+      { type: "github" as LinkType, url: "https://github.com/ryofujimura/htic-shuttle" },
+      { type: "website" as LinkType, url: "https://htic-shuttle.web.app" }
+    ]
+  },
+  {
+    id: "04",
+    title: "CyberEdu",
+    subtitle: "Cross-Platform Education App",
+    year: "2025",
+    description: "Synchronized iOS+Android apps supporting live event updates for 50+ users. 99%+ cross-device sync reliability.",
+    skills: ["Swift", "Kotlin", "Firebase", "Offline"],
+    links: [
+      { type: "appstore" as LinkType, url: "https://apps.apple.com/app/cyberedu" },
+      { type: "playstore" as LinkType, url: "https://play.google.com/store/apps/details?id=com.cyberedu" },
+      { type: "github" as LinkType, url: "https://github.com/ryofujimura/cyberedu" },
+      { type: "website" as LinkType, url: "https://cyberedu.web.app" }
+    ]
+  },
+  {
+    id: "05",
+    title: "Whiteboard AI",
+    subtitle: "Collaborative Vision ML Canvas",
+    year: "2025",
+    description: "Transformer-based vision inference at 150-200ms latency with CRDT-like real-time collaboration. Multi-user async WebSocket pipeline.",
+    skills: ["PyTorch", "WebSocket", "React", "ML"],
+    links: [
+      { type: "github" as LinkType, url: "https://github.com/ryofujimura/whiteboard-ai" },
+      { type: "website" as LinkType, url: "https://whiteboard-ai.web.app" }
+    ]
+  },
+  {
+    id: "06",
+    title: "With",
+    subtitle: "Offline LLM Chat App",
+    year: "2024",
+    description: "Offline-capable LLM chat using GGUF + llama.cpp with <50ms/token local inference. 2GB+ memory reduction via quantization.",
+    skills: ["Swift", "SwiftUI", "llama.cpp", "ML", "Privacy"],
+    links: [
+      { type: "github" as LinkType, url: "https://github.com/ryofujimura/with" }
+    ]
+  },
+  {
+    id: "07",
+    title: "Portfolio Website",
+    subtitle: "Brutalist Design System",
+    year: "2024",
+    description: "Optimized client-side performance with 40-60% faster page loads. Modular components with clean deployment pipelines.",
+    skills: ["React", "Next.js", "GSAP", "Tailwind"],
+    links: [
+      { type: "github" as LinkType, url: "https://github.com/ryofujimura/ryofujimura.github.io" },
+      { type: "website" as LinkType, url: "https://ryofujimura.com" }
+    ]
+  },
+  {
+    id: "08",
+    title: "Matcha Time",
+    subtitle: "Time Zone Coordination Tool",
+    year: "2024",
+    description: "Swift/SwiftUI time zone coordination tool used by 50 users at launch. 4-week idea-to-launch timeline.",
+    skills: ["Swift", "SwiftUI", "CloudKit"],
+    links: [
+      { type: "appstore" as LinkType, url: "https://apps.apple.com/app/matcha-time" },
+      { type: "github" as LinkType, url: "https://github.com/ryofujimura/matcha-time" },
+      { type: "website" as LinkType, url: "https://matcha-time.web.app" }
+    ]
+  },
+  {
+    id: "09",
+    title: "Schedule Mastermind",
+    subtitle: "Course Scheduling Engine",
+    year: "2024",
+    description: "Python Flask scheduler organizing 500+ courses with real-time conflict detection. Reduced scheduling errors by 70%+.",
+    skills: ["Python", "Flask", "Algorithms"],
+    links: [
+      { type: "github" as LinkType, url: "https://github.com/ryofujimura/schedule-mastermind" },
+      { type: "website" as LinkType, url: "https://schedule-mastermind.web.app" }
+    ]
+  },
+  {
+    id: "10",
+    title: "Shohei Home Ground",
+    subtitle: "Automated Content Pipeline",
+    year: "2023",
+    description: "Automated daily Instagram posting for 685 posts, growing to 11,000 followers in 8 months. Saved 2+ hours/day via Python automation.",
+    skills: ["Python", "API", "Automation"],
+    links: [
+      { type: "instagram" as LinkType, url: "https://instagram.com/shoheihomeground" },
+      { type: "youtube" as LinkType, url: "https://youtube.com/@shoheihomeground" }
+    ]
+  },
+  {
+    id: "11",
+    title: "Poker Percentage",
+    subtitle: "WatchOS Odds Calculator",
+    year: "2022",
+    description: "WatchOS poker odds calculator with <10ms probability lookups using precomputed tables. Real-time equity insights.",
+    skills: ["Swift", "SwiftUI", "WatchOS", "Algorithms"],
+    links: [
+      { type: "appstore" as LinkType, url: "https://apps.apple.com/app/poker-percentage" },
+      { type: "github" as LinkType, url: "https://github.com/ryofujimura/poker-percentage" }
+    ]
+  },
 ]
+
+// Link display config
+const linkConfig: Record<LinkType, { label: string; icon: string }> = {
+  appstore: { label: "App Store", icon: "" },
+  playstore: { label: "Play Store", icon: "▶" },
+  github: { label: "GitHub", icon: "" },
+  website: { label: "Website", icon: "◉" },
+  instagram: { label: "Instagram", icon: "◎" },
+  youtube: { label: "YouTube", icon: "▷" },
+}
 
 // Extract unique skills and map to projects
 const skillsMap = new Map<string, typeof projects>()
@@ -166,6 +304,11 @@ function ProjectRow({
         style={{ height: 0, opacity: 0 }}
       >
         <div className="ml-6 mt-2 mb-3 pl-3 border-l border-white/10">
+          {/* Subtitle */}
+          <div className="mb-2">
+            <span className="text-white/50">type: </span>
+            <span className="text-cyan-300">{project.subtitle}</span>
+          </div>
           {/* Description */}
           <div className="mb-2">
             <span className="text-white/50">desc: </span>
@@ -176,6 +319,31 @@ function ProjectRow({
             <span className="text-white/50">year: </span>
             <span className="text-lime-300">{project.year}</span>
           </div>
+          {/* Links */}
+          {project.links.length > 0 && (
+            <div className="mb-2">
+              <span className="text-white/50">links: </span>
+              <span className="text-white/30">[</span>
+              {project.links.map((link, i) => (
+                <span key={link.type}>
+                  <a
+                    href={link.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={(e) => e.stopPropagation()}
+                    className="text-rose-300 hover:text-rose-200 hover:underline transition-colors"
+                  >
+                    {linkConfig[link.type].icon && (
+                      <span className="mr-0.5">{linkConfig[link.type].icon}</span>
+                    )}
+                    {linkConfig[link.type].label}
+                  </a>
+                  {i < project.links.length - 1 && <span className="text-white/30">, </span>}
+                </span>
+              ))}
+              <span className="text-white/30">]</span>
+            </div>
+          )}
           {/* ID */}
           <div>
             <span className="text-white/50">id: </span>
