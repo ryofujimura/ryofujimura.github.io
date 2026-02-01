@@ -545,7 +545,7 @@ function TechnicalPattern({ className }: { className?: string }) {
 }
 
 // ─────────────────────────────────────────────────────────────
-// STACKED IMAGE CAROUSEL WITH BOUNCY ANIMATIONS
+// STACKED IMAGE CAROUSEL WITH WATER RIPPLE ANIMATIONS
 // ─────────────────────────────────────────────────────────────
 
 function ImageGallery({ images, title, isActive }: { images: string[]; title: string; isActive?: boolean }) {
@@ -556,83 +556,131 @@ function ImageGallery({ images, title, isActive }: { images: string[]; title: st
   const [dragStart, setDragStart] = useState(0)
   const containerRef = useRef<HTMLDivElement>(null)
   const cardsRef = useRef<(HTMLDivElement | null)[]>([])
+  const rippleRef = useRef<HTMLDivElement>(null)
 
   // Reset to first image when project changes
   useEffect(() => {
     setActiveIndex(0)
   }, [title])
 
-  // Initial bouncy entrance animation
+  // Initial water-like entrance animation - cards rise like bubbles
   useEffect(() => {
     if (!containerRef.current || !isActive || images.length === 0) return
 
     const cards = cardsRef.current.filter(Boolean)
     
-    // Kill any existing animations
     gsap.killTweensOf(cards)
 
-    // Entrance animation with bounce
+    // Fluid entrance - cards float up like objects surfacing
     cards.forEach((card, idx) => {
       if (!card) return
       
       const offset = idx - activeIndex
       const isMain = offset === 0
+      // Ripple delay - further cards take longer (like concentric waves)
+      const rippleDelay = 0.15 + Math.abs(offset) * 0.08
       
       gsap.fromTo(
         card,
         {
-          y: 100,
-          x: offset * 20,
-          rotation: offset * 5,
-          scale: 0.7,
+          y: 60,
+          x: offset * 15,
+          rotation: offset * 2,
+          scale: 0.85,
           opacity: 0,
         },
         {
           y: 0,
           x: offset * 25,
           rotation: offset * 3,
-          scale: isMain ? 1 : 0.9 - Math.abs(offset) * 0.05,
-          opacity: isMain ? 1 : 0.6 - Math.abs(offset) * 0.15,
-          duration: 0.8,
-          delay: 0.2 + idx * 0.1,
-          ease: "elastic.out(1, 0.5)",
+          scale: isMain ? 1 : 0.92 - Math.abs(offset) * 0.04,
+          opacity: isMain ? 1 : 0.6 - Math.abs(offset) * 0.12,
+          duration: 1.2,
+          delay: rippleDelay,
+          ease: "sine.out", // Smooth, water-like deceleration
         }
       )
     })
   }, [isActive, images.length, title])
 
-  // Animate cards when activeIndex changes
+  // Water ripple effect - propagates outward from touched card
+  const createRipple = useCallback((originIdx: number) => {
+    const cards = cardsRef.current.filter(Boolean)
+    
+    cards.forEach((card, idx) => {
+      if (!card) return
+      
+      // Distance from origin determines delay (like ripples spreading)
+      const distance = Math.abs(idx - originIdx)
+      const rippleDelay = distance * 0.06
+      
+      // Gentle wave motion - amplitude decreases with distance
+      const waveAmplitude = Math.max(2, 8 - distance * 2)
+      
+      gsap.to(card, {
+        keyframes: [
+          { y: -waveAmplitude, duration: 0.15, ease: "sine.out" },
+          { y: waveAmplitude * 0.5, duration: 0.2, ease: "sine.inOut" },
+          { y: -waveAmplitude * 0.25, duration: 0.2, ease: "sine.inOut" },
+          { y: 0, duration: 0.25, ease: "sine.out" },
+        ],
+        delay: rippleDelay,
+      })
+    })
+  }, [])
+
+  // Animate cards when activeIndex changes - fluid water transition
   const animateCards = useCallback((newIndex: number, direction: 'left' | 'right') => {
     if (isAnimating || images.length <= 1) return
     
     setIsAnimating(true)
     const cards = cardsRef.current.filter(Boolean)
 
-    // Wavy stagger animation
+    // Water displacement animation
     cards.forEach((card, idx) => {
       if (!card) return
       
       const offset = idx - newIndex
       const isMain = offset === 0
-      const isLeaving = (direction === 'right' && idx === activeIndex) || 
-                        (direction === 'left' && idx === activeIndex)
+      const prevOffset = idx - activeIndex
       
-      // Create wavy motion path
-      const wavyY = isLeaving ? [0, -15, 10, -5, 0] : [0, 10, -5, 3, 0]
+      // Calculate ripple delay from the interaction point
+      const distanceFromNew = Math.abs(offset)
+      const rippleDelay = distanceFromNew * 0.04
       
-      gsap.to(card, {
-        keyframes: {
-          y: wavyY,
-          ease: "sine.inOut",
-        },
+      // Smooth sine wave for Y motion - like water surface
+      const wavePhase = direction === 'right' ? 1 : -1
+      const waveHeight = isMain ? 12 : 6 - distanceFromNew * 1.5
+      
+      // Timeline for fluid motion
+      const tl = gsap.timeline({
+        onComplete: idx === newIndex ? () => setIsAnimating(false) : undefined,
+      })
+      
+      // Phase 1: Initial displacement (water pushed aside)
+      tl.to(card, {
+        y: waveHeight * wavePhase,
+        x: offset * 25 + (wavePhase * 5),
+        rotation: offset * 3 + (wavePhase * 1),
+        duration: 0.25,
+        delay: rippleDelay,
+        ease: "sine.out",
+      })
+      // Phase 2: Settling wave
+      .to(card, {
+        y: -waveHeight * 0.4 * wavePhase,
         x: offset * 25,
         rotation: offset * 3,
-        scale: isMain ? 1 : 0.9 - Math.abs(offset) * 0.05,
-        opacity: isMain ? 1 : Math.max(0.2, 0.6 - Math.abs(offset) * 0.15),
-        zIndex: images.length - Math.abs(offset),
-        duration: 0.6,
-        ease: "back.out(1.4)",
-        onComplete: idx === 0 ? () => setIsAnimating(false) : undefined,
+        scale: isMain ? 1 : 0.92 - Math.abs(offset) * 0.04,
+        opacity: isMain ? 1 : Math.max(0.25, 0.6 - Math.abs(offset) * 0.12),
+        duration: 0.35,
+        ease: "sine.inOut",
+      })
+      // Phase 3: Final rest (water settling)
+      .to(card, {
+        y: 0,
+        duration: 0.3,
+        ease: "sine.out",
       })
     })
 
@@ -680,18 +728,31 @@ function ImageGallery({ images, title, isActive }: { images: string[]; title: st
     }
   }
 
-  // Hover bounce effect on main card
+  // Hover ripple effect on main card - gentle water touch
   const handleHover = (idx: number, isEntering: boolean) => {
     const card = cardsRef.current[idx]
-    if (!card || idx !== activeIndex) return
+    if (!card) return
 
-    gsap.to(card, {
-      scale: isEntering ? 1.02 : 1,
-      y: isEntering ? -5 : 0,
-      duration: 0.3,
-      ease: isEntering ? "back.out(2)" : "power2.out",
-    })
-  }
+    if (isEntering && idx === activeIndex) {
+      // Main card: gentle lift like finger touching water surface
+      gsap.to(card, {
+        y: -4,
+        scale: 1.01,
+        duration: 0.4,
+        ease: "sine.out",
+      })
+      // Trigger subtle ripple on neighboring cards
+      createRipple(idx)
+    } else if (!isEntering && idx === activeIndex) {
+      // Settle back down
+      gsap.to(card, {
+        y: 0,
+        scale: 1,
+        duration: 0.5,
+        ease: "sine.inOut",
+      })
+    }
+    }
 
   if (images.length === 0) {
     return (
@@ -810,33 +871,43 @@ function ImageGallery({ images, title, isActive }: { images: string[]; title: st
           })}
         </div>
 
-        {/* Navigation arrows */}
+        {/* Navigation arrows - fluid hover */}
         {images.length > 1 && (
           <>
             <button
               onClick={(e) => { e.stopPropagation(); goToPrev(); }}
+              onMouseEnter={(e) => {
+                gsap.to(e.currentTarget, { y: -2, duration: 0.3, ease: "sine.out" })
+              }}
+              onMouseLeave={(e) => {
+                gsap.to(e.currentTarget, { y: 0, duration: 0.4, ease: "sine.inOut" })
+              }}
               className={cn(
                 "absolute left-0 top-1/2 -translate-y-1/2 z-20",
                 "w-8 h-8 md:w-10 md:h-10 flex items-center justify-center",
                 "border border-foreground/20 bg-background/80 backdrop-blur-sm",
                 "font-mono text-foreground/60 text-sm",
-                "transition-all duration-200",
-                "hover:bg-foreground hover:text-background hover:border-foreground hover:scale-110",
-                "active:scale-95"
+                "transition-colors duration-300",
+                "hover:bg-foreground hover:text-background hover:border-foreground"
               )}
             >
               ◄
             </button>
             <button
               onClick={(e) => { e.stopPropagation(); goToNext(); }}
+              onMouseEnter={(e) => {
+                gsap.to(e.currentTarget, { y: -2, duration: 0.3, ease: "sine.out" })
+              }}
+              onMouseLeave={(e) => {
+                gsap.to(e.currentTarget, { y: 0, duration: 0.4, ease: "sine.inOut" })
+              }}
               className={cn(
                 "absolute right-0 top-1/2 -translate-y-1/2 z-20",
                 "w-8 h-8 md:w-10 md:h-10 flex items-center justify-center",
                 "border border-foreground/20 bg-background/80 backdrop-blur-sm",
                 "font-mono text-foreground/60 text-sm",
-                "transition-all duration-200",
-                "hover:bg-foreground hover:text-background hover:border-foreground hover:scale-110",
-                "active:scale-95"
+                "transition-colors duration-300",
+                "hover:bg-foreground hover:text-background hover:border-foreground"
               )}
             >
               ►
@@ -845,25 +916,47 @@ function ImageGallery({ images, title, isActive }: { images: string[]; title: st
         )}
       </div>
 
-      {/* Dot indicators */}
+      {/* Dot indicators - wave selection */}
       {images.length > 1 && (
         <div className="flex items-center justify-center gap-2 mt-2">
-          <span className="font-mono text-[7px] text-foreground/30">[</span>
-          {images.slice(0, 5).map((_, idx) => (
-            <button
-              key={idx}
-              onClick={() => selectCard(idx)}
-              className={cn(
-                "w-6 h-1.5 transition-all duration-300",
-                "hover:scale-110 active:scale-95",
-                idx === activeIndex 
-                  ? "bg-foreground" 
-                  : "bg-foreground/20 hover:bg-foreground/40"
-              )}
-              aria-label={`View image ${idx + 1}`}
-            />
-          ))}
-          <span className="font-mono text-[7px] text-foreground/30">]</span>
+          <span className="font-mono text-[7px] text-foreground/30">~</span>
+          {images.slice(0, 5).map((_, idx) => {
+            const distance = Math.abs(idx - activeIndex)
+            return (
+              <button
+                key={idx}
+                onClick={() => selectCard(idx)}
+                onMouseEnter={(e) => {
+                  gsap.to(e.currentTarget, { 
+                    y: -3, 
+                    scaleY: 1.5,
+                    duration: 0.25, 
+                    ease: "sine.out" 
+                  })
+                }}
+                onMouseLeave={(e) => {
+                  gsap.to(e.currentTarget, { 
+                    y: 0, 
+                    scaleY: 1,
+                    duration: 0.4, 
+                    ease: "sine.inOut" 
+                  })
+                }}
+                className={cn(
+                  "h-1.5 transition-all duration-500 ease-out origin-bottom",
+                  idx === activeIndex 
+                    ? "w-8 bg-foreground" 
+                    : "w-4 bg-foreground/20 hover:bg-foreground/40"
+                )}
+                style={{
+                  // Wave-like width based on distance from active
+                  opacity: idx === activeIndex ? 1 : Math.max(0.3, 1 - distance * 0.2),
+                }}
+                aria-label={`View image ${idx + 1}`}
+              />
+            )
+          })}
+          <span className="font-mono text-[7px] text-foreground/30">~</span>
           <span className="font-mono text-[7px] text-foreground/40 ml-2">
             {String(activeIndex + 1).padStart(2, "0")}/{String(images.length).padStart(2, "0")}
           </span>
