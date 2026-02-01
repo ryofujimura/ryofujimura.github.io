@@ -587,22 +587,34 @@ export function ProjectsSection() {
 
   const currentProject = allProjects[activeIndex]
 
-  // Mobile detection using matchMedia
+  // Mobile detection using matchMedia + resize listener
   useEffect(() => {
     const mediaQuery = window.matchMedia("(max-width: 767px)")
     
-    const handleChange = (e: MediaQueryListEvent | MediaQueryList) => {
+    const updateMobileState = () => {
+      setIsMobile(mediaQuery.matches)
+    }
+    
+    const handleMediaChange = (e: MediaQueryListEvent) => {
       setIsMobile(e.matches)
     }
     
-    // Set initial value
-    handleChange(mediaQuery)
+    const handleResize = () => {
+      updateMobileState()
+    }
     
-    // Listen for changes
-    mediaQuery.addEventListener("change", handleChange)
+    // Set initial value
+    updateMobileState()
+    
+    // Listen for changes via matchMedia
+    mediaQuery.addEventListener("change", handleMediaChange)
+    
+    // Also listen for resize events for dynamic updates
+    window.addEventListener("resize", handleResize)
     
     return () => {
-      mediaQuery.removeEventListener("change", handleChange)
+      mediaQuery.removeEventListener("change", handleMediaChange)
+      window.removeEventListener("resize", handleResize)
     }
   }, [])
 
