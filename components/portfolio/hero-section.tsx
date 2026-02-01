@@ -26,6 +26,7 @@ const MODE_VERBS = [
   "SCALE",
   "OPTIMIZE",
   "ITERATE",
+  "LEARN",
 ]
 const MODE_ROTATE_MS = 2600
 const VERB_SLOT_CH_DESKTOP = 11
