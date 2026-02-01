@@ -3,32 +3,34 @@
 import { useState, useRef, useEffect, useMemo, useCallback } from "react"
 import { gsap } from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
-import { ExternalLink, Github, X } from "lucide-react"
+import { ExternalLink, Github, ChevronRight, ChevronLeft, X } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 gsap.registerPlugin(ScrollTrigger)
 
 // ─────────────────────────────────────────────────────────────
-// ASCII DECORATIONS
+// ASCII GRAPHICS
 // ─────────────────────────────────────────────────────────────
 
-const ASCII_CORNER_TL = `┌──`
-const ASCII_CORNER_TR = `──┐`
-const ASCII_CORNER_BL = `└──`
-const ASCII_CORNER_BR = `──┘`
+const ASCII_TIMELINE = `═══════════════════════════════════════════════════════════════════════════════`
 
-const ASCII_DIVIDER = `─────────────────────────────────────────`
+const ASCII_NODE = `
+┌───┐
+│ ● │
+└───┘
+`.trim()
 
-const ASCII_ARROW = `>>>`
+const ASCII_ARROW = `──────►`
 
-const ASCII_MATCH = `
-╔═══════════════╗
-║   MATCH  ♥    ║
-╚═══════════════╝
+const ASCII_GROWTH = `
+    ▲
+   ▲▲▲
+  ▲▲▲▲▲
+ ▲▲▲▲▲▲▲
 `.trim()
 
 // ─────────────────────────────────────────────────────────────
-// SKILL GROUPS
+// SKILL FILTER GROUPS
 // ─────────────────────────────────────────────────────────────
 
 const SKILL_GROUPS = {
@@ -42,238 +44,262 @@ const SKILL_GROUPS = {
 type SkillGroup = keyof typeof SKILL_GROUPS
 
 // ─────────────────────────────────────────────────────────────
-// PROJECT DATA - FOCUSED ON GROWTH
+// PROJECT DATA - GROWTH FOCUSED
 // ─────────────────────────────────────────────────────────────
 
 const allProjects = [
   {
     id: "01",
-    title: "Saboriendo Bakery",
-    type: "Full-Stack Platform",
-    year: "2024",
-    image: "/images/default_image.png",
-    stack: ["React 19", "SwiftUI", "Firebase"],
-    learned: "Multi-platform architecture",
-    growth: "First production app bridging web + native iOS with shared Firebase backend. Learned real-time sync patterns and cross-platform state management.",
-    metric: "50%↑ lookup speed",
-    skills: ["React 19", "SwiftUI", "Firebase", "Firestore", "AVFoundation"],
-    links: { github: "https://github.com/ryofujimura", demo: "https://ryofujimura.github.io" },
+    year: "2022",
+    title: "Poker Percentage",
+    image: "/images/poker.png",
+    growth: "First WatchOS App",
+    learned: ["WatchKit basics", "Precomputed tables", "Real-time probability"],
+    techStack: ["Swift", "WatchOS"],
+    achievement: "<10ms lookup speed",
+    description: "Built first watchOS app with precomputed probability tables for instant equity calculations.",
+    skills: ["Swift", "WatchOS", "probability"],
+    links: { github: "https://github.com/ryofujimura", appStore: "#" },
   },
   {
     id: "02",
-    title: "Zero Inbox",
-    type: "AI Email Client",
-    year: "2025",
-    image: "/images/default_image.png",
-    stack: ["Swift", "AI/ML", "Google APIs"],
-    learned: "AI reasoning systems",
-    growth: "Built multi-stage AI decision engine from scratch. Learned prompt engineering, classification pipelines, and low-latency inference optimization.",
-    metric: "95% accuracy",
-    skills: ["Swift", "SwiftUI", "Firebase", "AI/ML", "Google APIs"],
-    links: { github: "https://github.com/ryofujimura", demo: "#" },
+    year: "2023",
+    title: "Shohei Home Ground",
+    image: "/images/shoheihomeground_1.jpg",
+    growth: "Python Automation",
+    learned: ["API automation", "Content scheduling", "Growth hacking"],
+    techStack: ["Python", "Instagram API"],
+    achievement: "11K followers, 685 posts",
+    description: "Automated content pipeline saving 2+ hours daily. First major automation project.",
+    skills: ["Python", "automation", "Instagram"],
+    links: { instagram: "#", youtube: "#" },
   },
   {
     id: "03",
-    title: "Research Lab PM",
-    type: "Serverless System",
-    year: "2025",
-    image: "/images/default_image.png",
-    stack: ["Cloud Functions", "Node.js"],
-    learned: "Serverless orchestration",
-    growth: "Designed event-driven architecture for 30+ researchers. Mastered Cloud Functions patterns, cold start optimization, and metadata-aware AI routing.",
-    metric: "<200ms response",
-    skills: ["Cloud Functions", "Firebase", "AI routing", "Node.js"],
+    year: "2023",
+    title: "Schedule Mastermind",
+    image: "/images/schedule.jpg",
+    growth: "Backend Architecture",
+    learned: ["Flask routing", "Conflict algorithms", "Database design"],
+    techStack: ["Python", "Flask"],
+    achievement: "500+ courses, 70% fewer errors",
+    description: "First production backend handling complex scheduling logic for university courses.",
+    skills: ["Python", "Flask", "scheduling"],
     links: { github: "https://github.com/ryofujimura", demo: "https://ryofujimura.github.io" },
   },
   {
     id: "04",
-    title: "HTIC Shuttle",
-    type: "Real-Time Tracker",
-    year: "2025",
-    image: "/images/schedule.jpg",
-    stack: ["Swift", "Kotlin", "RTDB"],
-    learned: "Real-time sync systems",
-    growth: "Implemented conflict-free state sync across iOS, Android, web. Learned RTDB optimization, event serialization, and offline-first patterns.",
-    metric: "70%↓ conflicts",
-    skills: ["Swift", "Kotlin", "Firebase RTDB", "Real-time"],
-    links: { github: "https://github.com/ryofujimura", demo: "https://ryofujimura.github.io", appStore: "#", playStore: "#" },
+    year: "2024",
+    title: "Matcha Time",
+    image: "/images/matchatime_1.jpg",
+    growth: "App Store Launch",
+    learned: ["SwiftUI patterns", "App Store submission", "4-week sprint"],
+    techStack: ["Swift", "SwiftUI"],
+    achievement: "50 users at launch",
+    description: "First iOS app published to App Store. Learned complete app lifecycle.",
+    skills: ["Swift", "SwiftUI", "App Store"],
+    links: { github: "https://github.com/ryofujimura", appStore: "#" },
   },
   {
     id: "05",
-    title: "CyberEdu",
-    type: "Cross-Platform App",
-    year: "2025",
-    image: "/images/CyberEdu.png",
-    stack: ["Swift", "Kotlin", "Firebase"],
-    learned: "Cross-platform parity",
-    growth: "Built identical UX on iOS + Android from single codebase patterns. Mastered platform-specific optimizations while maintaining feature parity.",
-    metric: "99%↑ sync",
-    skills: ["Swift", "Kotlin", "Firebase", "Real-time"],
-    links: { github: "https://github.com/ryofujimura", demo: "https://ryofujimura.github.io", appStore: "#", playStore: "#" },
+    year: "2024",
+    title: "Portfolio Website",
+    image: "/images/homepage.png",
+    growth: "Modern Web Stack",
+    learned: ["Next.js App Router", "GSAP animations", "Performance tuning"],
+    techStack: ["React", "Next.js", "GSAP"],
+    achievement: "40-60% faster load",
+    description: "Deep dive into React ecosystem with advanced animations and optimization.",
+    skills: ["React", "Next.js", "Tailwind", "Vercel"],
+    links: { github: "https://github.com/ryofujimura", demo: "https://ryofujimura.github.io" },
   },
   {
     id: "06",
-    title: "Whiteboard AI",
-    type: "Vision Collaboration",
-    year: "2025",
-    image: "/images/whiteboardai.png",
-    stack: ["PyTorch", "WebSocket", "React"],
-    learned: "Real-time ML inference",
-    growth: "Integrated transformer vision models with live collaboration. Learned WebSocket pipelines, CRDT patterns, and GPU inference optimization.",
-    metric: "150ms latency",
-    skills: ["PyTorch", "Vision", "WebSocket", "React"],
+    year: "2024",
+    title: "Saboriendo Platform",
+    image: "/images/default_image.png",
+    growth: "Full-Stack + Mobile",
+    learned: ["React 19 features", "Cross-platform sync", "Barcode systems"],
+    techStack: ["React 19", "SwiftUI", "Firebase"],
+    achievement: "50% faster lookup",
+    description: "First full-stack project combining web and mobile with real-time sync.",
+    skills: ["React 19", "SwiftUI", "Firebase", "Firestore", "AVFoundation"],
     links: { github: "https://github.com/ryofujimura", demo: "https://ryofujimura.github.io" },
   },
   {
     id: "07",
-    title: "With",
-    type: "Local LLM Chat",
-    year: "2024–25",
+    year: "2024",
+    title: "With (Local LLM)",
     image: "/images/default_image.png",
-    stack: ["Swift", "llama.cpp", "GGUF"],
-    learned: "On-device AI",
-    growth: "Ran LLMs locally on iOS. Deep dive into quantization, memory management, Metal acceleration, and efficient token streaming.",
-    metric: "<50ms/token",
+    growth: "On-Device AI",
+    learned: ["llama.cpp integration", "Model quantization", "Memory optimization"],
+    techStack: ["Swift", "llama.cpp", "GGUF"],
+    achievement: "<50ms/token, 2GB saved",
+    description: "First local AI project. Learned model optimization and efficient inference.",
     skills: ["Swift", "llama.cpp", "GGUF", "SwiftUI"],
     links: { github: "https://github.com/ryofujimura" },
   },
   {
     id: "08",
-    title: "Portfolio Site",
-    type: "Web Performance",
-    year: "2024–25",
-    image: "/images/homepage.png",
-    stack: ["Next.js", "GSAP", "Tailwind"],
-    learned: "Animation systems",
-    growth: "Built brutalist design system with complex GSAP animations. Learned ScrollTrigger patterns, performance budgets, and mobile optimization.",
-    metric: "40-60%↑ speed",
-    skills: ["React", "Next.js", "Tailwind", "Vercel"],
-    links: { github: "https://github.com/ryofujimura", demo: "https://ryofujimura.github.io" },
+    year: "2025",
+    title: "HTIC Shuttle",
+    image: "/images/schedule.jpg",
+    growth: "Real-Time Systems",
+    learned: ["Firebase RTDB", "Event serialization", "Cross-platform native"],
+    techStack: ["Swift", "Kotlin", "Firebase"],
+    achievement: "70% fewer conflicts",
+    description: "First cross-platform native app with real-time synchronization.",
+    skills: ["Swift", "Kotlin", "Firebase RTDB", "Real-time"],
+    links: { github: "https://github.com/ryofujimura", appStore: "#", playStore: "#" },
   },
   {
     id: "09",
-    title: "Matcha Time",
-    type: "iOS Native",
-    year: "2024",
-    image: "/images/matchatime_1.jpg",
-    stack: ["Swift", "SwiftUI"],
-    learned: "Rapid prototyping",
-    growth: "4-week idea-to-App-Store. Learned to scope MVP features, iterate quickly, and navigate App Store review process.",
-    metric: "50 users",
-    skills: ["Swift", "SwiftUI", "App Store"],
-    links: { github: "https://github.com/ryofujimura", demo: "https://ryofujimura.github.io", appStore: "#" },
+    year: "2025",
+    title: "CyberEdu",
+    image: "/images/CyberEdu.png",
+    growth: "Network Resilience",
+    learned: ["Offline-first patterns", "Sync strategies", "Error recovery"],
+    techStack: ["Swift", "Kotlin", "Firebase"],
+    achievement: "99%+ sync reliability",
+    description: "Mastered cross-device sync across unstable networks.",
+    skills: ["Swift", "Kotlin", "Firebase", "Real-time"],
+    links: { github: "https://github.com/ryofujimura", appStore: "#", playStore: "#" },
   },
   {
     id: "10",
-    title: "Schedule Mastermind",
-    type: "Backend System",
-    year: "2023–24",
-    image: "/images/schedule.jpg",
-    stack: ["Python", "Flask"],
-    learned: "Algorithm design",
-    growth: "Built constraint satisfaction scheduler for 500+ courses. Learned optimization algorithms, conflict detection, and efficient data structures.",
-    metric: "70%↓ errors",
-    skills: ["Python", "Flask", "scheduling"],
+    year: "2025",
+    title: "Research Lab PM",
+    image: "/images/default_image.png",
+    growth: "Serverless + AI Routing",
+    learned: ["Cloud Functions", "Dynamic AI routing", "Multi-tenant systems"],
+    techStack: ["Cloud Functions", "Firebase"],
+    achievement: "<200ms response",
+    description: "Built serverless orchestration for 30+ researchers with AI-powered workflows.",
+    skills: ["Cloud Functions", "Firebase", "AI routing", "Node.js"],
     links: { github: "https://github.com/ryofujimura", demo: "https://ryofujimura.github.io" },
   },
   {
     id: "11",
-    title: "Shohei Home Ground",
-    type: "Social Automation",
-    year: "2023",
-    image: "/images/shoheihomeground_1.jpg",
-    stack: ["Python", "Instagram API"],
-    learned: "Automation at scale",
-    growth: "Automated 685 posts, grew to 11K followers. Learned content scheduling, API rate limits, and sustainable automation patterns.",
-    metric: "11K followers",
-    skills: ["Python", "automation", "Instagram"],
-    links: { instagram: "#", youtube: "#" },
+    year: "2025",
+    title: "Whiteboard AI",
+    image: "/images/whiteboardai.png",
+    growth: "Vision ML + Collab",
+    learned: ["PyTorch vision", "CRDT patterns", "WebSocket pipelines"],
+    techStack: ["PyTorch", "WebSocket", "React"],
+    achievement: "150ms inference",
+    description: "First computer vision project with real-time collaborative features.",
+    skills: ["PyTorch", "Vision", "WebSocket", "React"],
+    links: { github: "https://github.com/ryofujimura", demo: "https://ryofujimura.github.io" },
   },
   {
     id: "12",
-    title: "Poker Percentage",
-    type: "WatchOS App",
-    year: "2022–24",
-    image: "/images/poker.png",
-    stack: ["Swift", "WatchKit"],
-    learned: "Constrained platforms",
-    growth: "First WatchOS app. Learned to optimize for tiny screens, limited memory, and precomputed lookup tables for instant results.",
-    metric: "<10ms lookup",
-    skills: ["Swift", "WatchOS", "probability"],
-    links: { github: "https://github.com/ryofujimura", appStore: "#" },
+    year: "2025",
+    title: "Zero Inbox",
+    image: "/images/default_image.png",
+    growth: "Production AI Engine",
+    learned: ["Multi-stage AI", "95% accuracy tuning", "High-throughput systems"],
+    techStack: ["Swift", "AI/ML", "Firebase"],
+    achievement: "95% accuracy, 200ms",
+    description: "Most advanced AI project: multi-stage reasoning with production-grade performance.",
+    skills: ["Swift", "SwiftUI", "Firebase", "AI/ML", "Google APIs"],
+    links: { github: "https://github.com/ryofujimura", demo: "#" },
   },
 ]
 
 type Project = (typeof allProjects)[0]
 
 // ─────────────────────────────────────────────────────────────
-// SPEED DATE CARD - MOBILE FIRST
+// TECHNICAL LINE SVG
 // ─────────────────────────────────────────────────────────────
 
-function SpeedDateCard({ project, index }: { project: Project; index: number }) {
+function TechLines({ className }: { className?: string }) {
+  const ref = useRef<SVGSVGElement>(null)
+
+  useEffect(() => {
+    if (!ref.current) return
+    const lines = ref.current.querySelectorAll("line, path")
+    const ctx = gsap.context(() => {
+      gsap.fromTo(
+        lines,
+        { strokeDasharray: "0 200", opacity: 0 },
+        {
+          strokeDasharray: "200 0",
+          opacity: 1,
+          duration: 1,
+          stagger: 0.05,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: ref.current,
+            start: "top 95%",
+            toggleActions: "play none none none",
+          },
+        }
+      )
+    }, ref.current)
+    return () => ctx.revert()
+  }, [])
+
+  return (
+    <svg
+      ref={ref}
+      className={cn("absolute inset-0 w-full h-full pointer-events-none", className)}
+      viewBox="0 0 100 100"
+      preserveAspectRatio="none"
+    >
+      <path d="M0 8 L8 0" stroke="currentColor" strokeWidth="0.5" opacity="0.3" />
+      <path d="M92 0 L100 8" stroke="currentColor" strokeWidth="0.5" opacity="0.3" />
+      <path d="M0 92 L8 100" stroke="currentColor" strokeWidth="0.5" opacity="0.3" />
+      <path d="M92 100 L100 92" stroke="currentColor" strokeWidth="0.5" opacity="0.3" />
+      <line x1="10" y1="0" x2="30" y2="0" stroke="currentColor" strokeWidth="0.3" opacity="0.2" />
+      <line x1="70" y1="100" x2="90" y2="100" stroke="currentColor" strokeWidth="0.3" opacity="0.2" />
+    </svg>
+  )
+}
+
+// ─────────────────────────────────────────────────────────────
+// PROJECT CARD - MOBILE OPTIMIZED
+// ─────────────────────────────────────────────────────────────
+
+function ProjectCard({ project, index, isActive }: { project: Project; index: number; isActive?: boolean }) {
   const cardRef = useRef<HTMLDivElement>(null)
-  const imageRef = useRef<HTMLDivElement>(null)
-  const contentRef = useRef<HTMLDivElement>(null)
-  const learnedRef = useRef<HTMLSpanElement>(null)
+  const growthRef = useRef<HTMLSpanElement>(null)
 
   useEffect(() => {
     if (!cardRef.current) return
-    const card = cardRef.current
+    const el = cardRef.current
 
     const ctx = gsap.context(() => {
-      // Card slide in from alternating sides on mobile
-      const direction = index % 2 === 0 ? -30 : 30
-
+      // Card entrance
       gsap.fromTo(
-        card,
-        { opacity: 0, x: direction, y: 20 },
+        el,
+        { opacity: 0, y: 30, scale: 0.98 },
         {
           opacity: 1,
-          x: 0,
           y: 0,
-          duration: 0.8,
+          scale: 1,
+          duration: 0.6,
           ease: "power3.out",
           scrollTrigger: {
-            trigger: card,
+            trigger: el,
             start: "top 92%",
-            end: "top 60%",
             toggleActions: "play none none none",
           },
         }
       )
 
-      // Image reveal
-      if (imageRef.current) {
-        gsap.fromTo(
-          imageRef.current,
-          { scale: 1.2, opacity: 0 },
-          {
-            scale: 1,
-            opacity: 1,
-            duration: 1,
-            ease: "power2.out",
-            scrollTrigger: {
-              trigger: imageRef.current,
-              start: "top 90%",
-              toggleActions: "play none none none",
-            },
-          }
-        )
-      }
-
-      // Learned text scramble
-      if (learnedRef.current) {
-        const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ_-"
-        const originalText = project.learned.toUpperCase()
+      // Growth text scramble
+      if (growthRef.current) {
+        const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        const originalText = project.growth.toUpperCase()
         let iteration = 0
 
         ScrollTrigger.create({
-          trigger: learnedRef.current,
-          start: "top 88%",
+          trigger: growthRef.current,
+          start: "top 90%",
           onEnter: () => {
             const interval = setInterval(() => {
-              if (!learnedRef.current) return clearInterval(interval)
-              learnedRef.current.textContent = originalText
+              if (!growthRef.current) return clearInterval(interval)
+              growthRef.current.textContent = originalText
                 .split("")
                 .map((char, i) => {
                   if (char === " ") return " "
@@ -288,187 +314,158 @@ function SpeedDateCard({ project, index }: { project: Project; index: number }) 
         })
       }
 
-      // Content stagger
-      if (contentRef.current) {
-        const items = contentRef.current.querySelectorAll(".reveal")
-        gsap.fromTo(
-          items,
-          { opacity: 0, y: 12 },
-          {
-            opacity: 1,
-            y: 0,
-            duration: 0.4,
-            stagger: 0.05,
-            ease: "power2.out",
-            scrollTrigger: {
-              trigger: contentRef.current,
-              start: "top 85%",
-              toggleActions: "play none none none",
-            },
-          }
-        )
-      }
-    }, card)
+      // Stagger elements
+      const items = el.querySelectorAll(".reveal")
+      gsap.fromTo(
+        items,
+        { opacity: 0, y: 12 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.4,
+          stagger: 0.05,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: el,
+            start: "top 88%",
+            toggleActions: "play none none none",
+          },
+        }
+      )
+    }, el)
 
     return () => ctx.revert()
-  }, [project.learned, index])
+  }, [project.growth])
 
   const hasGithub = project.links.github
-  const hasDemo = "demo" in project.links && (project.links as { demo?: string }).demo
+  const hasDemo = "demo" in project.links
   const hasAppStore = "appStore" in project.links
   const hasPlayStore = "playStore" in project.links
 
   return (
     <article
       ref={cardRef}
-      className="relative bg-background border-2 border-foreground"
+      className={cn(
+        "relative",
+        "bg-background border-2 border-foreground",
+        "w-full",
+        // Mobile: full width vertical stack
+        // Desktop: fixed width for horizontal scroll
+        "lg:w-[380px] lg:flex-shrink-0"
+      )}
     >
-      {/* ASCII corners */}
-      <span className="absolute top-1 left-2 font-mono text-[10px] text-foreground/30 select-none">
-        {ASCII_CORNER_TL}
-      </span>
-      <span className="absolute top-1 right-2 font-mono text-[10px] text-foreground/30 select-none">
-        {ASCII_CORNER_TR}
-      </span>
-      <span className="absolute bottom-1 left-2 font-mono text-[10px] text-foreground/30 select-none">
-        {ASCII_CORNER_BL}
-      </span>
-      <span className="absolute bottom-1 right-2 font-mono text-[10px] text-foreground/30 select-none">
-        {ASCII_CORNER_BR}
-      </span>
+      <TechLines className="opacity-40" />
 
-      {/* Mobile: Stack layout / Desktop: Side by side */}
-      <div className="grid grid-cols-1 lg:grid-cols-[200px_1fr]">
-        {/* IMAGE SECTION */}
-        <div className="relative h-48 sm:h-56 lg:h-auto lg:min-h-[280px] overflow-hidden border-b-2 lg:border-b-0 lg:border-r-2 border-foreground">
-          <div
-            ref={imageRef}
-            className="absolute inset-0 bg-muted"
-          >
-            <img
-              src={project.image}
-              alt={project.title}
-              className="w-full h-full object-cover"
-              loading="lazy"
-            />
-            {/* Overlay gradient */}
-            <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent lg:bg-gradient-to-r lg:from-transparent lg:via-transparent lg:to-background/50" />
-          </div>
+      {/* Year marker - mobile top badge */}
+      <div className="absolute -top-3 left-4 sm:left-6 bg-foreground text-background px-2 py-0.5 z-10">
+        <span className="font-mono text-[10px] sm:text-xs font-bold tracking-wider">{project.year}</span>
+      </div>
 
-          {/* Project number badge */}
-          <div className="absolute top-3 left-3 sm:top-4 sm:left-4">
-            <span className="font-mono text-3xl sm:text-4xl font-black text-background drop-shadow-[2px_2px_0_var(--foreground)]">
-              {project.id}
+      {/* Image placeholder */}
+      <div className="relative h-32 sm:h-40 lg:h-36 border-b-2 border-foreground overflow-hidden bg-muted">
+        <img
+          src={project.image}
+          alt={project.title}
+          className="w-full h-full object-cover opacity-80 grayscale hover:grayscale-0 transition-all duration-500"
+          loading="lazy"
+        />
+        {/* Scan lines overlay */}
+        <div className="absolute inset-0 pointer-events-none opacity-20">
+          {[...Array(20)].map((_, i) => (
+            <div key={i} className="h-px bg-foreground/30" style={{ marginTop: `${i * 5}%` }} />
+          ))}
+        </div>
+        {/* Project number */}
+        <div className="absolute bottom-2 right-2 font-mono text-[10px] text-background bg-foreground/80 px-1.5 py-0.5">
+          {project.id}/12
+        </div>
+      </div>
+
+      {/* Content */}
+      <div className="p-4 sm:p-5">
+        {/* Growth headline - MAIN FOCUS */}
+        <div className="mb-3">
+          <span className="reveal font-mono text-[9px] sm:text-[10px] text-accent tracking-[0.2em] block mb-1">
+            GROWTH
+          </span>
+          <h3>
+            <span
+              ref={growthRef}
+              className="font-mono text-lg sm:text-xl lg:text-2xl font-black text-foreground leading-tight block"
+            >
+              {project.growth.toUpperCase()}
             </span>
-          </div>
+          </h3>
+        </div>
 
-          {/* Year badge */}
-          <div className="absolute top-3 right-3 sm:top-4 sm:right-4">
-            <span className="font-mono text-[10px] sm:text-xs text-background bg-foreground px-2 py-1">
-              {project.year}
-            </span>
-          </div>
+        {/* Project title */}
+        <p className="reveal font-mono text-xs sm:text-sm text-muted-foreground mb-3">
+          {project.title}
+        </p>
 
-          {/* Metric badge - mobile bottom */}
-          <div className="absolute bottom-3 left-3 sm:bottom-4 sm:left-4 lg:hidden">
-            <span className="font-mono text-xs sm:text-sm font-bold text-foreground bg-background/90 border border-foreground px-2 py-1">
-              {project.metric}
-            </span>
+        {/* What I learned - ASCII bullets */}
+        <div className="reveal mb-3">
+          <span className="font-mono text-[8px] sm:text-[9px] text-foreground/50 tracking-wider block mb-1.5">
+            LEARNED:
+          </span>
+          <div className="space-y-1">
+            {project.learned.map((item, i) => (
+              <div key={i} className="flex items-start gap-2">
+                <span className="font-mono text-[10px] text-accent select-none">▸</span>
+                <span className="font-mono text-[10px] sm:text-xs text-foreground/80">{item}</span>
+              </div>
+            ))}
           </div>
         </div>
 
-        {/* CONTENT SECTION */}
-        <div ref={contentRef} className="p-4 sm:p-5 lg:p-6">
-          {/* Header row */}
-          <div className="flex items-start justify-between gap-2 mb-3">
-            <div className="flex-1 min-w-0">
-              <p className="reveal font-mono text-[10px] sm:text-xs text-accent tracking-wider mb-1">
-                {project.type}
-              </p>
-              <h3 className="reveal font-mono text-lg sm:text-xl lg:text-2xl font-black text-foreground leading-tight">
-                {project.title}
-              </h3>
-            </div>
-            {/* Metric - desktop only */}
-            <div className="hidden lg:block">
-              <span className="font-mono text-xs font-bold text-foreground border border-foreground px-2 py-1">
-                {project.metric}
-              </span>
-            </div>
-          </div>
+        {/* Achievement highlight */}
+        <div className="reveal mb-3 p-2 border border-dashed border-foreground/30 bg-foreground/5">
+          <span className="font-mono text-[8px] text-foreground/50 tracking-wider block mb-0.5">RESULT:</span>
+          <span className="font-mono text-xs sm:text-sm font-bold text-foreground">{project.achievement}</span>
+        </div>
 
-          {/* LEARNED - Main focus */}
-          <div className="reveal mb-4 p-3 sm:p-4 border-2 border-dashed border-foreground/40 bg-foreground/5">
-            <p className="font-mono text-[9px] sm:text-[10px] text-muted-foreground tracking-wider mb-1">
-              {ASCII_ARROW} LEARNED
-            </p>
-            <p className="font-mono text-base sm:text-lg lg:text-xl font-black text-foreground leading-tight">
-              <span ref={learnedRef}>{project.learned.toUpperCase()}</span>
-            </p>
-          </div>
+        {/* Tech stack pills */}
+        <div className="reveal flex flex-wrap gap-1.5 mb-3">
+          {project.techStack.map((tech) => (
+            <span
+              key={tech}
+              className="font-mono text-[8px] sm:text-[9px] px-1.5 py-0.5 border border-foreground/40 text-foreground/70"
+            >
+              {tech}
+            </span>
+          ))}
+        </div>
 
-          {/* Growth description */}
-          <p className="reveal text-xs sm:text-sm text-foreground/80 leading-relaxed mb-4">
-            {project.growth}
-          </p>
-
-          {/* Stack pills */}
-          <div className="reveal flex flex-wrap gap-1.5 sm:gap-2 mb-4">
-            {project.stack.map((tech) => (
-              <span
-                key={tech}
-                className="font-mono text-[9px] sm:text-[10px] px-2 py-1 border border-foreground/50 text-foreground bg-background"
-              >
-                {tech}
-              </span>
-            ))}
-          </div>
-
-          {/* Links row */}
-          <div className="reveal flex flex-wrap gap-3 sm:gap-4 pt-3 border-t border-foreground/20">
-            {hasGithub && (
-              <a
-                href={project.links.github}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="touch-target inline-flex items-center gap-1.5 font-mono text-[10px] sm:text-xs text-foreground hover:text-accent transition-colors"
-              >
-                <Github className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                <span>CODE</span>
-              </a>
-            )}
-            {hasDemo && (
-              <a
-                href={(project.links as { demo?: string }).demo}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="touch-target inline-flex items-center gap-1.5 font-mono text-[10px] sm:text-xs text-foreground hover:text-accent transition-colors"
-              >
-                <ExternalLink className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                <span>DEMO</span>
-              </a>
-            )}
-            {hasAppStore && (
-              <a
-                href={(project.links as { appStore?: string }).appStore}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="touch-target font-mono text-[10px] sm:text-xs text-muted-foreground hover:text-foreground transition-colors"
-              >
-                iOS
-              </a>
-            )}
-            {hasPlayStore && (
-              <a
-                href={(project.links as { playStore?: string }).playStore}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="touch-target font-mono text-[10px] sm:text-xs text-muted-foreground hover:text-foreground transition-colors"
-              >
-                Android
-              </a>
-            )}
-          </div>
+        {/* Links row */}
+        <div className="reveal flex flex-wrap items-center gap-2 pt-2 border-t border-foreground/20">
+          {hasGithub && (
+            <a
+              href={project.links.github}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="touch-target inline-flex items-center gap-1.5 font-mono text-[9px] sm:text-[10px] text-foreground hover:text-accent transition-colors"
+            >
+              <Github className="w-3 h-3" />
+              <span>SRC</span>
+            </a>
+          )}
+          {hasDemo && (
+            <a
+              href={(project.links as { demo?: string }).demo}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="touch-target inline-flex items-center gap-1.5 font-mono text-[9px] sm:text-[10px] text-foreground hover:text-accent transition-colors"
+            >
+              <ExternalLink className="w-3 h-3" />
+              <span>DEMO</span>
+            </a>
+          )}
+          {hasAppStore && (
+            <span className="font-mono text-[9px] sm:text-[10px] text-muted-foreground">iOS</span>
+          )}
+          {hasPlayStore && (
+            <span className="font-mono text-[9px] sm:text-[10px] text-muted-foreground">Android</span>
+          )}
         </div>
       </div>
     </article>
@@ -476,208 +473,302 @@ function SpeedDateCard({ project, index }: { project: Project; index: number }) 
 }
 
 // ─────────────────────────────────────────────────────────────
-// FILTER - COMPACT MOBILE
+// TIMELINE NODE
+// ─────────────────────────────────────────────────────────────
+
+function TimelineNode({ year, isFirst, isLast }: { year: string; isFirst?: boolean; isLast?: boolean }) {
+  return (
+    <div className="hidden lg:flex flex-col items-center">
+      {/* Line before */}
+      {!isFirst && <div className="w-px h-4 bg-foreground/30" />}
+      
+      {/* Node */}
+      <div className="w-8 h-8 border-2 border-foreground bg-background flex items-center justify-center">
+        <div className="w-2 h-2 bg-accent" />
+      </div>
+      
+      {/* Year label */}
+      <span className="font-mono text-[10px] text-foreground/60 mt-1">{year}</span>
+      
+      {/* Line after */}
+      {!isLast && <div className="w-px h-4 bg-foreground/30" />}
+    </div>
+  )
+}
+
+// ─────────────────────────────────────────────────────────────
+// FILTER BAR
 // ─────────────────────────────────────────────────────────────
 
 function FilterBar({
   selectedGroups,
   onToggleGroup,
-  onClearFilters,
+  onClear,
 }: {
   selectedGroups: SkillGroup[]
-  onToggleGroup: (group: SkillGroup) => void
-  onClearFilters: () => void
+  onToggleGroup: (g: SkillGroup) => void
+  onClear: () => void
 }) {
-  const ref = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    if (!ref.current) return
-    const ctx = gsap.context(() => {
-      gsap.fromTo(
-        ref.current,
-        { opacity: 0, y: -15 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 0.5,
-          ease: "power2.out",
-          scrollTrigger: {
-            trigger: ref.current,
-            start: "top 95%",
-            toggleActions: "play none none none",
-          },
-        }
-      )
-    }, ref.current)
-    return () => ctx.revert()
-  }, [])
-
   const groups = Object.keys(SKILL_GROUPS) as SkillGroup[]
 
   return (
-    <div ref={ref} className="mb-6 sm:mb-8">
-      <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
-        {groups.map((group) => {
-          const isSelected = selectedGroups.includes(group)
-          return (
-            <button
-              key={group}
-              onClick={() => onToggleGroup(group)}
-              className={cn(
-                "touch-target font-mono text-[10px] sm:text-xs px-2.5 sm:px-3 py-1.5 border-2 transition-all",
-                isSelected
-                  ? "border-foreground bg-foreground text-background"
-                  : "border-foreground/30 text-foreground/60 hover:border-foreground hover:text-foreground"
-              )}
-            >
-              {group}
-            </button>
-          )
-        })}
-        {selectedGroups.length > 0 && (
+    <div className="flex flex-wrap items-center gap-2 mb-6">
+      {groups.map((group) => {
+        const isSelected = selectedGroups.includes(group)
+        return (
           <button
-            onClick={onClearFilters}
-            className="touch-target p-1.5 text-muted-foreground hover:text-foreground transition-colors"
+            key={group}
+            onClick={() => onToggleGroup(group)}
+            className={cn(
+              "touch-target font-mono text-[9px] sm:text-[10px] px-2 sm:px-3 py-1.5 border transition-all",
+              isSelected
+                ? "border-foreground bg-foreground text-background"
+                : "border-foreground/30 text-foreground/60 hover:border-foreground"
+            )}
           >
-            <X className="w-4 h-4" />
+            {group}
           </button>
-        )}
-      </div>
+        )
+      })}
+      {selectedGroups.length > 0 && (
+        <button
+          onClick={onClear}
+          className="touch-target font-mono text-[9px] sm:text-[10px] text-muted-foreground hover:text-foreground px-2 py-1"
+        >
+          <X className="w-3 h-3" />
+        </button>
+      )}
     </div>
   )
 }
 
 // ─────────────────────────────────────────────────────────────
-// SECTION HEADER - MOBILE OPTIMIZED
+// SECTION HEADER
 // ─────────────────────────────────────────────────────────────
 
-function SectionHeader({ count, filteredCount }: { count: number; filteredCount: number }) {
-  const headerRef = useRef<HTMLDivElement>(null)
+function SectionHeader({ count }: { count: number }) {
+  const ref = useRef<HTMLDivElement>(null)
   const titleRef = useRef<HTMLHeadingElement>(null)
-  const lineRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    if (!headerRef.current) return
-
+    if (!ref.current || !titleRef.current) return
     const ctx = gsap.context(() => {
       // Title scramble
-      if (titleRef.current) {
-        const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ░▒▓█"
-        const originalText = "PROJECTS"
-        let iteration = 0
+      const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ░▒▓█"
+      const originalText = "PROJECTS"
+      let iteration = 0
 
-        ScrollTrigger.create({
-          trigger: titleRef.current,
-          start: "top 92%",
-          onEnter: () => {
-            const interval = setInterval(() => {
-              if (!titleRef.current) return clearInterval(interval)
-              titleRef.current.textContent = originalText
-                .split("")
-                .map((char, i) => {
-                  if (i < iteration) return char
-                  return chars[Math.floor(Math.random() * chars.length)]
-                })
-                .join("")
-              if (iteration >= originalText.length) clearInterval(interval)
-              iteration += 0.4
-            }, 35)
-          },
-        })
-      }
-
-      // Line animation
-      if (lineRef.current) {
-        gsap.fromTo(
-          lineRef.current,
-          { scaleX: 0, transformOrigin: "left" },
-          {
-            scaleX: 1,
-            duration: 0.8,
-            ease: "power2.out",
-            scrollTrigger: {
-              trigger: lineRef.current,
-              start: "top 90%",
-              toggleActions: "play none none none",
-            },
-          }
-        )
-      }
-    }, headerRef.current)
-
+      ScrollTrigger.create({
+        trigger: titleRef.current,
+        start: "top 92%",
+        onEnter: () => {
+          const interval = setInterval(() => {
+            if (!titleRef.current) return clearInterval(interval)
+            titleRef.current.textContent = originalText
+              .split("")
+              .map((char, i) => (i < iteration ? char : chars[Math.floor(Math.random() * chars.length)]))
+              .join("")
+            if (iteration >= originalText.length) clearInterval(interval)
+            iteration += 0.3
+          }, 35)
+        },
+      })
+    }, ref.current)
     return () => ctx.revert()
   }, [])
 
   return (
-    <div ref={headerRef} className="mb-6 sm:mb-8">
-      {/* Title */}
+    <div ref={ref} className="mb-6 sm:mb-8">
       <div className="flex items-end justify-between gap-4 mb-3">
         <div>
-          <p className="font-mono text-[9px] sm:text-[10px] text-muted-foreground tracking-[0.2em] mb-1">
-            ─ 04
-          </p>
+          <p className="font-mono text-[9px] sm:text-[10px] text-muted-foreground tracking-[0.2em] mb-1">— 04</p>
           <h2
             ref={titleRef}
-            className="font-mono text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-foreground tracking-tight leading-none"
+            className="font-mono text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-foreground tracking-tighter leading-none"
           >
             PROJECTS
           </h2>
         </div>
-        <div className="text-right">
-          <span className="font-mono text-2xl sm:text-3xl lg:text-4xl font-black text-foreground/15 tabular-nums">
-            {String(count).padStart(2, "0")}
-          </span>
-        </div>
+        <span className="font-mono text-2xl sm:text-3xl lg:text-4xl font-black text-foreground/15 tabular-nums">
+          {String(count).padStart(2, "0")}
+        </span>
       </div>
 
-      {/* Animated line */}
-      <div ref={lineRef} className="h-0.5 sm:h-1 bg-foreground mb-3" />
-
-      {/* Subtext */}
-      <p className="font-mono text-[10px] sm:text-xs text-muted-foreground">
-        {filteredCount === count ? (
-          <>Showing all {count} projects</>
-        ) : (
-          <>{filteredCount} of {count} projects</>
-        )}
-      </p>
+      {/* Timeline legend - mobile */}
+      <div className="flex items-center gap-2 font-mono text-[8px] sm:text-[9px] text-muted-foreground">
+        <span>2022</span>
+        <span className="flex-1 h-px bg-foreground/20" />
+        <span className="text-accent">GROWTH TIMELINE</span>
+        <span className="flex-1 h-px bg-foreground/20" />
+        <span>2025</span>
+      </div>
     </div>
   )
 }
 
 // ─────────────────────────────────────────────────────────────
-// TIMELINE CONNECTOR - MOBILE
+// HORIZONTAL SCROLL CONTAINER (DESKTOP)
 // ─────────────────────────────────────────────────────────────
 
-function TimelineConnector() {
-  const ref = useRef<HTMLDivElement>(null)
+function HorizontalTimeline({ projects }: { projects: Project[] }) {
+  const containerRef = useRef<HTMLDivElement>(null)
+  const scrollRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    if (!ref.current) return
+    if (!containerRef.current || !scrollRef.current) return
+    const container = containerRef.current
+    const scroll = scrollRef.current
+
     const ctx = gsap.context(() => {
-      gsap.fromTo(
-        ref.current,
-        { scaleY: 0, transformOrigin: "top" },
-        {
-          scaleY: 1,
-          duration: 0.4,
-          ease: "power2.out",
-          scrollTrigger: {
-            trigger: ref.current,
-            start: "top 90%",
-            toggleActions: "play none none none",
-          },
-        }
-      )
-    }, ref.current)
+      // Horizontal scroll animation
+      const totalWidth = scroll.scrollWidth - container.clientWidth
+
+      gsap.to(scroll, {
+        x: -totalWidth,
+        ease: "none",
+        scrollTrigger: {
+          trigger: container,
+          start: "top 20%",
+          end: () => `+=${totalWidth}`,
+          scrub: 1,
+          pin: true,
+          anticipatePin: 1,
+          invalidateOnRefresh: true,
+        },
+      })
+
+      // Timeline line animation
+      const line = container.querySelector(".timeline-line")
+      if (line) {
+        gsap.fromTo(
+          line,
+          { scaleX: 0 },
+          {
+            scaleX: 1,
+            ease: "none",
+            scrollTrigger: {
+              trigger: container,
+              start: "top 20%",
+              end: () => `+=${totalWidth}`,
+              scrub: 1,
+            },
+          }
+        )
+      }
+    }, container)
+
     return () => ctx.revert()
-  }, [])
+  }, [projects])
 
   return (
-    <div ref={ref} className="h-8 sm:h-10 flex justify-center">
-      <div className="w-0.5 h-full bg-foreground/20 relative">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-2 h-2 bg-foreground/40 rotate-45" />
-        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-2 h-2 bg-foreground/40 rotate-45" />
+    <div ref={containerRef} className="hidden lg:block relative overflow-hidden">
+      {/* Timeline line */}
+      <div className="absolute top-1/2 left-0 right-0 h-0.5 bg-foreground/10 -translate-y-1/2 z-0">
+        <div className="timeline-line absolute inset-0 bg-foreground/30 origin-left" />
+      </div>
+
+      {/* Scrolling content */}
+      <div ref={scrollRef} className="flex items-center gap-8 py-8 px-4">
+        {/* Start marker */}
+        <div className="flex-shrink-0 flex flex-col items-center">
+          <pre className="font-mono text-[8px] text-foreground/30 select-none whitespace-pre">{ASCII_GROWTH}</pre>
+          <span className="font-mono text-[10px] text-foreground/50 mt-2">START</span>
+        </div>
+
+        {projects.map((project, index) => (
+          <div key={project.id} className="flex items-center gap-4">
+            {/* Node */}
+            <div className="flex-shrink-0 flex flex-col items-center">
+              <div className="w-4 h-4 border-2 border-foreground bg-background rotate-45">
+                <div className="w-full h-full bg-accent/20" />
+              </div>
+              <span className="font-mono text-[9px] text-foreground/50 mt-2">{project.year}</span>
+            </div>
+
+            {/* Connector */}
+            <div className="w-8 h-px bg-foreground/30" />
+
+            {/* Card */}
+            <ProjectCard project={project} index={index} />
+
+            {/* Connector after */}
+            {index < projects.length - 1 && <div className="w-8 h-px bg-foreground/30" />}
+          </div>
+        ))}
+
+        {/* End marker */}
+        <div className="flex-shrink-0 flex flex-col items-center ml-4">
+          <span className="font-mono text-[10px] text-accent">NOW</span>
+          <pre className="font-mono text-[8px] text-foreground/30 select-none mt-1">{ASCII_ARROW}</pre>
+        </div>
+      </div>
+
+      {/* Scroll hint */}
+      <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex items-center gap-2 font-mono text-[9px] text-foreground/40">
+        <span>SCROLL</span>
+        <ChevronRight className="w-3 h-3" />
+      </div>
+    </div>
+  )
+}
+
+// ─────────────────────────────────────────────────────────────
+// VERTICAL TIMELINE (MOBILE)
+// ─────────────────────────────────────────────────────────────
+
+function VerticalTimeline({ projects }: { projects: Project[] }) {
+  const containerRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!containerRef.current) return
+    const ctx = gsap.context(() => {
+      // Animate timeline line
+      const line = containerRef.current?.querySelector(".v-timeline-line")
+      if (line) {
+        gsap.fromTo(
+          line,
+          { scaleY: 0 },
+          {
+            scaleY: 1,
+            ease: "none",
+            scrollTrigger: {
+              trigger: containerRef.current,
+              start: "top 80%",
+              end: "bottom 20%",
+              scrub: 1,
+            },
+          }
+        )
+      }
+    }, containerRef.current)
+    return () => ctx.revert()
+  }, [projects])
+
+  return (
+    <div ref={containerRef} className="lg:hidden relative">
+      {/* Vertical timeline line */}
+      <div className="absolute left-4 sm:left-6 top-0 bottom-0 w-0.5 bg-foreground/10">
+        <div className="v-timeline-line absolute inset-0 bg-foreground/30 origin-top" />
+      </div>
+
+      {/* Projects */}
+      <div className="space-y-6 sm:space-y-8 pl-10 sm:pl-14">
+        {projects.map((project, index) => (
+          <div key={project.id} className="relative">
+            {/* Timeline node */}
+            <div className="absolute -left-10 sm:-left-14 top-6 w-4 h-4 border-2 border-foreground bg-background rotate-45 flex items-center justify-center">
+              <div className="w-1.5 h-1.5 bg-accent rotate-45" />
+            </div>
+
+            <ProjectCard project={project} index={index} />
+          </div>
+        ))}
+      </div>
+
+      {/* End marker */}
+      <div className="relative mt-6 pl-10 sm:pl-14">
+        <div className="absolute -left-10 sm:-left-14 top-0 w-4 h-4 border-2 border-accent bg-background rotate-45" />
+        <span className="font-mono text-xs text-accent">NOW →</span>
       </div>
     </div>
   )
@@ -689,7 +780,6 @@ function TimelineConnector() {
 
 export function ProjectsSection() {
   const [selectedGroups, setSelectedGroups] = useState<SkillGroup[]>([])
-  const [showAll, setShowAll] = useState(false)
   const sectionRef = useRef<HTMLElement>(null)
 
   const toggleGroup = useCallback((group: SkillGroup) => {
@@ -714,101 +804,84 @@ export function ProjectsSection() {
     )
   }, [selectedSkills])
 
-  const INITIAL_VISIBLE = 3
-  const displayedProjects = showAll ? filteredProjects : filteredProjects.slice(0, INITIAL_VISIBLE)
-  const remaining = filteredProjects.length - INITIAL_VISIBLE
-
   return (
     <section
       id="projects"
       ref={sectionRef}
-      className="relative py-10 sm:py-14 md:py-20 px-4 sm:px-6 bg-background"
+      className={cn(
+        "relative py-8 sm:py-12 md:py-16 lg:py-20 px-4 sm:px-6",
+        "bg-background overflow-hidden"
+      )}
     >
-      {/* Background pattern - subtle */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute inset-0 opacity-[0.015]">
-          {[...Array(20)].map((_, i) => (
-            <div
-              key={i}
-              className="absolute h-px bg-foreground"
-              style={{
-                top: `${i * 5}%`,
-                left: 0,
-                right: 0,
-              }}
+      {/* Background pattern */}
+      <div className="absolute inset-0 pointer-events-none opacity-[0.015]">
+        <svg className="w-full h-full" preserveAspectRatio="none">
+          {[...Array(30)].map((_, i) => (
+            <line
+              key={`v-${i}`}
+              x1={`${(i + 1) * 3.33}%`}
+              y1="0"
+              x2={`${(i + 1) * 3.33}%`}
+              y2="100%"
+              stroke="currentColor"
+              strokeWidth="1"
             />
           ))}
-        </div>
+        </svg>
       </div>
 
-      <div className="max-w-4xl mx-auto relative">
-        <SectionHeader count={allProjects.length} filteredCount={filteredProjects.length} />
+      <div className="max-w-7xl mx-auto relative">
+        <SectionHeader count={allProjects.length} />
 
         <FilterBar
           selectedGroups={selectedGroups}
           onToggleGroup={toggleGroup}
-          onClearFilters={clearFilters}
+          onClear={clearFilters}
         />
 
-        {/* Projects list */}
+        {/* Result count */}
+        <div className="flex items-center gap-2 mb-6 font-mono text-[9px] sm:text-[10px] text-muted-foreground">
+          <span className="text-foreground">{filteredProjects.length}</span>
+          <span>/</span>
+          <span>{allProjects.length}</span>
+          <span className="ml-2">projects</span>
+          {selectedGroups.length > 0 && <span className="text-accent">• filtered</span>}
+        </div>
+
         {filteredProjects.length === 0 ? (
-          <div className="text-center py-12 border-2 border-dashed border-foreground/20">
-            <pre className="font-mono text-xs text-foreground/30 mb-3 select-none">
-              {`┌─────────────┐
-│  NO MATCH   │
-└─────────────┘`}
+          <div className="text-center py-12 border border-dashed border-foreground/20">
+            <pre className="font-mono text-[9px] sm:text-[10px] text-foreground/30 mb-3">
+              {`┌─────────────┐\n│  NO MATCH   │\n└─────────────┘`}
             </pre>
             <button
               onClick={clearFilters}
-              className="font-mono text-xs border border-foreground px-4 py-2 hover:bg-foreground hover:text-background transition-colors"
+              className="font-mono text-[10px] sm:text-xs border border-foreground/50 px-3 py-1.5 hover:bg-foreground hover:text-background transition-colors"
             >
               RESET
             </button>
           </div>
         ) : (
-          <div className="space-y-0">
-            {displayedProjects.map((project, index) => (
-              <div key={project.id}>
-                <SpeedDateCard project={project} index={index} />
-                {index < displayedProjects.length - 1 && <TimelineConnector />}
-              </div>
-            ))}
-          </div>
+          <>
+            {/* Desktop: Horizontal timeline */}
+            <HorizontalTimeline projects={filteredProjects} />
+
+            {/* Mobile: Vertical timeline */}
+            <VerticalTimeline projects={filteredProjects} />
+          </>
         )}
 
-        {/* Load more */}
-        {!showAll && remaining > 0 && (
-          <div className="mt-8 sm:mt-10 flex justify-center">
-            <button
-              onClick={() => setShowAll(true)}
-              className={cn(
-                "touch-target w-full sm:w-auto",
-                "px-6 py-4 sm:py-3",
-                "font-mono text-xs tracking-wider",
-                "border-2 border-foreground bg-foreground text-background",
-                "hover:bg-background hover:text-foreground transition-colors",
-                "active:scale-[0.98]"
-              )}
-            >
-              +{remaining} MORE PROJECTS
-            </button>
-          </div>
-        )}
-
-        {/* End */}
-        {showAll && (
-          <div className="mt-10 text-center">
-            <pre className="font-mono text-[9px] sm:text-[10px] text-foreground/20 select-none mb-4">
-              {ASCII_DIVIDER}
-            </pre>
-            <a
-              href="#contact"
-              className="touch-target inline-flex items-center gap-2 font-mono text-xs text-muted-foreground hover:text-foreground transition-colors"
-            >
-              ↓ CONTACT
-            </a>
-          </div>
-        )}
+        {/* Footer */}
+        <div className="mt-8 sm:mt-12 text-center">
+          <pre className="font-mono text-[7px] sm:text-[8px] text-foreground/15 select-none hidden sm:block">
+            {ASCII_TIMELINE}
+          </pre>
+          <a
+            href="#contact"
+            className="touch-target inline-flex items-center gap-2 font-mono text-[10px] sm:text-xs text-muted-foreground hover:text-foreground transition-colors mt-3"
+          >
+            ↓ NEXT
+          </a>
+        </div>
       </div>
     </section>
   )
