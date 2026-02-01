@@ -45,17 +45,15 @@ function useIsMobile() {
   return isMobile
 }
 
-// Mobile-optimized scroll values
+// Responsive scroll config (height handled via CSS)
 const SCROLL_CONFIG = {
   mobile: {
     scrollPerProject: 25,
     scrubSpeed: 0.1,
-    slideHeight: 420,
   },
   desktop: {
     scrollPerProject: 30,
     scrubSpeed: 0.15,
-    slideHeight: 480,
   },
 }
 
@@ -794,9 +792,9 @@ function ProjectIcon({
     return (
       <div 
         ref={iconRef}
-        className="w-10 h-10 md:w-12 md:h-12 border border-foreground/20 bg-foreground/5 flex items-center justify-center"
+        className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 lg:w-14 lg:h-14 border border-foreground/20 bg-foreground/5 flex items-center justify-center flex-shrink-0"
       >
-        <span className="text-base md:text-lg">{asciiIcons[category] || "◆"}</span>
+        <span className="text-sm sm:text-base md:text-lg">{asciiIcons[category] || "◆"}</span>
       </div>
     )
   }
@@ -804,7 +802,7 @@ function ProjectIcon({
   return (
     <div 
       ref={iconRef}
-      className="w-10 h-10 md:w-12 md:h-12 border border-foreground/20 bg-foreground/5 p-1.5 relative overflow-hidden"
+      className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 lg:w-14 lg:h-14 border border-foreground/20 bg-foreground/5 p-1 sm:p-1.5 relative overflow-hidden flex-shrink-0"
     >
       <Image
         src={icon}
@@ -918,7 +916,7 @@ function ProjectSlide({
       <DataStream isActive={isActive} />
 
       {/* Main container */}
-      <div className="h-full border border-foreground/30 bg-background/95 relative overflow-hidden">
+      <div className="h-full border border-foreground/30 bg-background/95 relative overflow-hidden flex flex-col">
         {/* Animated scanline */}
         <div 
           className="absolute inset-0 pointer-events-none"
@@ -928,115 +926,115 @@ function ProjectSlide({
         />
 
         {/* ASCII frame corners */}
-        <span className="frame-border absolute top-0 left-0 font-mono text-[8px] text-foreground/40 p-1.5">
-          {asciiFrame}{"══════"}
+        <span className="frame-border absolute top-0 left-0 font-mono text-[6px] sm:text-[7px] md:text-[8px] text-foreground/40 p-1 sm:p-1.5">
+          {asciiFrame}{"═══"}
         </span>
-        <span className="frame-border absolute top-0 right-0 font-mono text-[8px] text-foreground/40 p-1.5">
-          {"══════"}┐
+        <span className="frame-border absolute top-0 right-0 font-mono text-[6px] sm:text-[7px] md:text-[8px] text-foreground/40 p-1 sm:p-1.5">
+          {"═══"}┐
         </span>
-        <span className="frame-border absolute bottom-0 left-0 font-mono text-[8px] text-foreground/40 p-1.5">
-          └{"══════"}
+        <span className="frame-border absolute bottom-0 left-0 font-mono text-[6px] sm:text-[7px] md:text-[8px] text-foreground/40 p-1 sm:p-1.5">
+          └{"═══"}
         </span>
-        <span className="frame-border absolute bottom-0 right-0 font-mono text-[8px] text-foreground/40 p-1.5">
-          {"══════"}┘
+        <span className="frame-border absolute bottom-0 right-0 font-mono text-[6px] sm:text-[7px] md:text-[8px] text-foreground/40 p-1 sm:p-1.5">
+          {"═══"}┘
         </span>
 
-        {/* Content grid layout */}
-        <div className="h-full grid grid-cols-1 md:grid-cols-2 gap-3 p-4 md:p-5">
+        {/* Content grid layout - responsive */}
+        <div className="flex-1 grid grid-cols-1 lg:grid-cols-5 gap-2 sm:gap-3 md:gap-4 p-3 sm:p-4 md:p-5 pb-6 sm:pb-7 overflow-y-auto lg:overflow-hidden">
           
-          {/* LEFT: Project details */}
-          <div className="flex flex-col min-h-0">
+          {/* LEFT: Project details - takes 3 cols on lg */}
+          <div className="lg:col-span-3 flex flex-col min-h-0 space-y-2 sm:space-y-2.5 md:space-y-3">
             {/* Header with icon and ID */}
-            <div className="detail-animate flex items-start gap-3 mb-3">
+            <div className="detail-animate flex items-start gap-2 sm:gap-3">
               <ProjectIcon 
                 icon={project.icon} 
                 category={project.category} 
                 isActive={isActive} 
               />
               <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="font-mono text-2xl md:text-3xl font-black text-foreground/10">
+                <div className="flex items-center gap-1.5 sm:gap-2 mb-0.5 sm:mb-1">
+                  <span className="font-mono text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black text-foreground/10">
                     {project.id}
                   </span>
-                  <span className="font-mono text-[8px] px-1.5 py-0.5 border border-foreground/20 text-foreground/50">
+                  <span className="font-mono text-[6px] sm:text-[7px] md:text-[8px] px-1 sm:px-1.5 py-0.5 border border-foreground/20 text-foreground/50">
                     {project.category}
                   </span>
                 </div>
-                <div className="font-mono text-[7px] text-foreground/40">
+                <div className="font-mono text-[6px] sm:text-[7px] text-foreground/40">
                   ├─ {project.year}
                 </div>
               </div>
             </div>
 
             {/* Project title */}
-            <div className="detail-animate mb-3">
-              <div className="font-mono text-[6px] text-foreground/30 mb-0.5">
+            <div className="detail-animate">
+              <div className="font-mono text-[5px] sm:text-[6px] text-foreground/30 mb-0.5">
                 └─ PROJECT_NAME
               </div>
-              <h3 className="font-mono text-lg md:text-xl font-black text-foreground tracking-tight truncate">
+              <h3 className="font-mono text-base sm:text-lg md:text-xl lg:text-2xl font-black text-foreground tracking-tight truncate">
                 {project.title.toUpperCase()}
               </h3>
             </div>
 
-            {/* Description */}
-            <div className="detail-animate mb-3 flex-shrink-0">
-              <div className="font-mono text-[6px] text-foreground/30 mb-1">
+            {/* Description - hidden on very small screens */}
+            <div className="detail-animate hidden sm:block flex-shrink-0">
+              <div className="font-mono text-[5px] sm:text-[6px] text-foreground/30 mb-0.5 sm:mb-1">
                 ├─ DESCRIPTION
               </div>
-              <p className="font-mono text-[9px] md:text-[10px] text-foreground/60 leading-relaxed line-clamp-2">
+              <p className="font-mono text-[8px] sm:text-[9px] md:text-[10px] text-foreground/60 leading-relaxed line-clamp-2 lg:line-clamp-3">
                 {project.description}
               </p>
             </div>
 
             {/* Growth section */}
-            <div className="detail-animate mb-3">
-              <div className="font-mono text-[6px] text-foreground/30 mb-1">
+            <div className="detail-animate flex-shrink-0">
+              <div className="font-mono text-[5px] sm:text-[6px] text-foreground/30 mb-0.5 sm:mb-1">
                 ├─ GROWTH_VECTOR
               </div>
-              <div className="bg-foreground/[0.03] border border-foreground/10 p-2">
-                <h4 className="font-mono text-xs md:text-sm font-black text-foreground mb-2">
+              <div className="bg-foreground/[0.03] border border-foreground/10 p-1.5 sm:p-2">
+                <h4 className="font-mono text-[10px] sm:text-xs md:text-sm font-black text-foreground mb-1 sm:mb-2">
                   {project.growth.toUpperCase()}
                 </h4>
-                <div className="flex items-center gap-2 text-[7px] md:text-[8px]">
-                  <div className="flex-1">
+                <div className="flex items-center gap-1.5 sm:gap-2 text-[6px] sm:text-[7px] md:text-[8px]">
+                  <div className="flex-1 min-w-0">
                     <span className="text-foreground/30 block">BEFORE:</span>
-                    <span className="text-foreground/50">{project.before}</span>
+                    <span className="text-foreground/50 truncate block">{project.before}</span>
                   </div>
-                  <span className="font-mono text-foreground/30 text-[10px]">──►</span>
-                  <div className="flex-1">
+                  <span className="font-mono text-foreground/30 text-[8px] sm:text-[10px] flex-shrink-0">──►</span>
+                  <div className="flex-1 min-w-0">
                     <span className="text-foreground block">AFTER:</span>
-                    <span className="text-foreground font-medium">{project.after}</span>
+                    <span className="text-foreground font-medium truncate block">{project.after}</span>
                   </div>
                 </div>
               </div>
             </div>
 
             {/* Metrics */}
-            <div className="detail-animate flex items-center gap-3 mb-3">
-              <div className="metric-highlight border-2 border-foreground/30 px-3 py-1.5">
-                <div className="font-mono text-[5px] text-foreground/40">METRIC</div>
-                <div className="font-mono text-sm md:text-base font-black text-foreground">
+            <div className="detail-animate flex items-center gap-2 sm:gap-3 flex-shrink-0">
+              <div className="metric-highlight border-2 border-foreground/30 px-2 sm:px-3 py-1 sm:py-1.5">
+                <div className="font-mono text-[4px] sm:text-[5px] text-foreground/40">METRIC</div>
+                <div className="font-mono text-xs sm:text-sm md:text-base font-black text-foreground">
                   {project.metric}
                 </div>
               </div>
-              <div className="border border-foreground/15 px-2 py-1.5">
-                <div className="font-mono text-[5px] text-foreground/30">RESULT</div>
-                <div className="font-mono text-[9px] md:text-[10px] text-foreground/60">
+              <div className="border border-foreground/15 px-1.5 sm:px-2 py-1 sm:py-1.5">
+                <div className="font-mono text-[4px] sm:text-[5px] text-foreground/30">RESULT</div>
+                <div className="font-mono text-[8px] sm:text-[9px] md:text-[10px] text-foreground/60">
                   {project.achievement}
                 </div>
               </div>
             </div>
 
             {/* Tech stack */}
-            <div className="detail-animate mt-auto">
-              <div className="font-mono text-[6px] text-foreground/30 mb-1">
+            <div className="detail-animate flex-shrink-0">
+              <div className="font-mono text-[5px] sm:text-[6px] text-foreground/30 mb-0.5 sm:mb-1">
                 └─ TECH_STACK
               </div>
-              <div className="flex flex-wrap gap-1">
+              <div className="flex flex-wrap gap-0.5 sm:gap-1">
                 {project.techStack.map((tech) => (
                   <span
                     key={tech}
-                    className="tech-tag font-mono text-[7px] md:text-[8px] px-1.5 py-0.5 border border-foreground/20 text-foreground/50 bg-foreground/[0.02] hover:bg-foreground/5 hover:text-foreground/70 transition-colors"
+                    className="tech-tag font-mono text-[6px] sm:text-[7px] md:text-[8px] px-1 sm:px-1.5 py-0.5 border border-foreground/20 text-foreground/50 bg-foreground/[0.02] hover:bg-foreground/5 hover:text-foreground/70 transition-colors"
                   >
                     {tech}
                   </span>
@@ -1044,16 +1042,16 @@ function ProjectSlide({
               </div>
             </div>
 
-            {/* Links */}
-            <div className="detail-animate flex items-center gap-3 pt-2 mt-2 border-t border-foreground/10">
+            {/* Links - pushed to bottom on larger screens */}
+            <div className="detail-animate flex items-center gap-2 sm:gap-3 pt-1.5 sm:pt-2 mt-auto border-t border-foreground/10">
               {hasGithub && (
                 <a 
                   href={project.links.github} 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="font-mono text-[8px] text-foreground/40 hover:text-foreground transition-colors flex items-center gap-1 group"
+                  className="font-mono text-[7px] sm:text-[8px] text-foreground/40 hover:text-foreground transition-colors flex items-center gap-1 group"
                 >
-                  <Github className="w-3 h-3" />
+                  <Github className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
                   <span className="group-hover:underline">SOURCE</span>
                 </a>
               )}
@@ -1062,39 +1060,44 @@ function ProjectSlide({
                   href={(project.links as { demo?: string }).demo} 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="font-mono text-[8px] text-foreground/40 hover:text-foreground transition-colors flex items-center gap-1 group"
+                  className="font-mono text-[7px] sm:text-[8px] text-foreground/40 hover:text-foreground transition-colors flex items-center gap-1 group"
                 >
-                  <ExternalLink className="w-3 h-3" />
+                  <ExternalLink className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
                   <span className="group-hover:underline">DEMO</span>
                 </a>
               )}
               {hasAppStore && (
-                <span className="font-mono text-[8px] text-foreground/30 flex items-center gap-1">
+                <span className="font-mono text-[7px] sm:text-[8px] text-foreground/30 flex items-center gap-1">
                   <span>●</span> iOS
                 </span>
               )}
             </div>
           </div>
 
-          {/* RIGHT: Image gallery */}
-          <div className="hidden md:block h-full min-h-[200px]">
-            <ImageGallery 
-              images={project.images} 
-              isActive={isActive} 
-              projectTitle={project.title}
-            />
+          {/* RIGHT: Image gallery - takes 2 cols on lg, hidden below lg */}
+          <div className="hidden lg:flex lg:col-span-2 h-full min-h-[180px]">
+            <div className="w-full h-full">
+              <ImageGallery 
+                images={project.images} 
+                isActive={isActive} 
+                projectTitle={project.title}
+              />
+            </div>
           </div>
         </div>
 
         {/* Footer status bar */}
-        <div className="absolute bottom-0 left-0 right-0 h-5 border-t border-foreground/10 bg-foreground/[0.02] flex items-center justify-between px-3 font-mono text-[6px]">
-          <span className="text-foreground/30">
+        <div className="absolute bottom-0 left-0 right-0 h-4 sm:h-5 border-t border-foreground/10 bg-foreground/[0.02] flex items-center justify-between px-2 sm:px-3 font-mono text-[5px] sm:text-[6px]">
+          <span className="text-foreground/30 hidden sm:inline">
             SLIDE_{String(index + 1).padStart(2, "0")} | STATUS: ACTIVE
+          </span>
+          <span className="text-foreground/30 sm:hidden">
+            #{String(index + 1).padStart(2, "0")}
           </span>
           <span className="text-foreground/40">
             [{String(index + 1).padStart(2, "0")}/{String(total).padStart(2, "0")}]
           </span>
-          <span className="text-foreground/30">
+          <span className="text-foreground/30 hidden sm:inline">
             {new Date().toISOString().slice(0, 10).replace(/-/g, ".")}
           </span>
         </div>
@@ -1109,11 +1112,10 @@ function ProjectSlide({
 
 function ProgressIndicator({ activeIndex, total }: { activeIndex: number; total: number }) {
   const progressRef = useRef<HTMLDivElement>(null)
-  const progressChars = 16
+  const progressChars = 12
   const filled = Math.round((activeIndex / (total - 1)) * progressChars) || 0
   const progressBar = "█".repeat(filled) + "░".repeat(progressChars - filled)
   
-  // Calculate percentage
   const percentage = Math.round((activeIndex / (total - 1)) * 100) || 0
 
   useEffect(() => {
@@ -1127,53 +1129,52 @@ function ProgressIndicator({ activeIndex, total }: { activeIndex: number; total:
   }, [activeIndex])
 
   return (
-    <div ref={progressRef} className="flex items-center justify-between py-3 font-mono border-t border-foreground/15 bg-foreground/[0.01]">
-      <div className="flex items-center gap-2">
-        <span className="text-[7px] text-foreground/30 border border-foreground/10 px-1">
+    <div ref={progressRef} className="flex items-center justify-between py-2 sm:py-3 font-mono border-t border-foreground/15 bg-foreground/[0.01]">
+      <div className="flex items-center gap-1 sm:gap-2">
+        <span className="text-[6px] sm:text-[7px] text-foreground/30 border border-foreground/10 px-0.5 sm:px-1">
           2022
         </span>
-        <span className="text-[6px] text-foreground/20 hidden md:inline">START</span>
+        <span className="text-[5px] sm:text-[6px] text-foreground/20 hidden lg:inline">START</span>
       </div>
       
-      <div className="flex items-center gap-3">
-        {/* ASCII progress bar */}
-        <span className="text-[7px] md:text-[8px] text-foreground/30 hidden sm:inline font-mono tracking-tighter">
+      <div className="flex items-center gap-1.5 sm:gap-2 md:gap-3">
+        {/* ASCII progress bar - hidden on small screens */}
+        <span className="text-[6px] sm:text-[7px] md:text-[8px] text-foreground/30 hidden md:inline font-mono tracking-tighter">
           [{progressBar}]
         </span>
         
         {/* Visual progress bar */}
-        <div className="w-20 md:w-32 h-1 bg-foreground/10 relative overflow-hidden">
+        <div className="w-12 sm:w-16 md:w-24 lg:w-32 h-0.5 sm:h-1 bg-foreground/10 relative overflow-hidden">
           <div 
-            className="progress-fill absolute inset-y-0 left-0 bg-foreground/40 origin-left"
+            className="progress-fill absolute inset-y-0 left-0 bg-foreground/40 origin-left transition-all duration-300"
             style={{ width: `${percentage}%` }}
           />
-          {/* Animated pulse at current position */}
           <div 
-            className="absolute top-1/2 -translate-y-1/2 w-1 h-2 bg-foreground animate-pulse"
+            className="absolute top-1/2 -translate-y-1/2 w-0.5 sm:w-1 h-1.5 sm:h-2 bg-foreground animate-pulse"
             style={{ left: `${percentage}%` }}
           />
         </div>
         
         {/* Counter */}
-        <div className="flex items-center gap-1">
-          <span className="text-sm md:text-base text-foreground font-black">
+        <div className="flex items-center gap-0.5 sm:gap-1">
+          <span className="text-xs sm:text-sm md:text-base text-foreground font-black">
             {String(activeIndex + 1).padStart(2, "0")}
           </span>
-          <span className="text-[8px] text-foreground/30">/</span>
-          <span className="text-[9px] text-foreground/40">
+          <span className="text-[6px] sm:text-[8px] text-foreground/30">/</span>
+          <span className="text-[7px] sm:text-[9px] text-foreground/40">
             {String(total).padStart(2, "0")}
           </span>
         </div>
         
-        {/* Percentage */}
-        <span className="text-[8px] text-foreground/40 hidden md:inline">
+        {/* Percentage - hidden on small screens */}
+        <span className="text-[7px] sm:text-[8px] text-foreground/40 hidden lg:inline">
           [{percentage}%]
         </span>
       </div>
       
-      <div className="flex items-center gap-2">
-        <span className="text-[6px] text-foreground/20 hidden md:inline">CURRENT</span>
-        <span className="text-[7px] text-foreground font-bold border border-foreground/30 px-1 bg-foreground/5">
+      <div className="flex items-center gap-1 sm:gap-2">
+        <span className="text-[5px] sm:text-[6px] text-foreground/20 hidden lg:inline">CURRENT</span>
+        <span className="text-[6px] sm:text-[7px] text-foreground font-bold border border-foreground/30 px-0.5 sm:px-1 bg-foreground/5">
           NOW
         </span>
       </div>
@@ -1386,7 +1387,7 @@ export function ProjectsSection() {
           {/* ═══════════════════════════════════════════════════════════
               MAIN LAYOUT - TIMELINE + PROJECT DISPLAY
               ═══════════════════════════════════════════════════════════ */}
-          <div className="flex gap-3 md:gap-5 lg:gap-6">
+          <div className="flex gap-2 sm:gap-3 md:gap-5 lg:gap-6">
             {/* Timeline sidebar (desktop only) */}
             <Timeline 
               activeIndex={activeIndex}
@@ -1396,10 +1397,12 @@ export function ProjectsSection() {
 
             {/* Project display area */}
             <div className="flex-1 flex flex-col min-w-0">
-              {/* Project slide container */}
+              {/* Project slide container - responsive height using CSS clamp */}
               <div 
-                className="relative transition-[height] duration-300"
-                style={{ height: `${config.slideHeight}px` }}
+                className="relative"
+                style={{ 
+                  height: "clamp(320px, 55vh, 600px)",
+                }}
               >
                 {allProjects.map((project, index) => (
                   <ProjectSlide
