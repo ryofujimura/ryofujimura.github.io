@@ -6,7 +6,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger"
 import { AnimatedSection } from "@/components/animated-section"
 import { MagneticButton } from "@/components/magnetic-button"
 import { RevealText } from "@/components/reveal-text"
-import { Mail, Github, Linkedin, MapPin, ArrowUpRight, Send, Check, AlertCircle, User } from "lucide-react"
+import { Mail, Github, Linkedin, MapPin, ArrowUpRight, Send, Check, AlertCircle } from "lucide-react"
 import { LocationHoverText } from "@/components/portfolio/location-hover-text"
 import { useIsMobile } from "@/hooks/use-mobile"
 import { submitContactForm } from "@/lib/firebase"
@@ -110,7 +110,7 @@ function VerticalWordRotator({
 
 // Animated placeholder prompts
 const PLACEHOLDER_PROMPTS = [
-  "favorite coffee",
+  "favorite coffee?",
   "favorite language",
   "dream project",
   "go-to IDE",
@@ -460,21 +460,18 @@ function CloudMessageForm({ onClose }: { onClose: () => void }) {
           {/* Username input and Send button - same row */}
           <div className="mt-6 flex items-center justify-between gap-4">
             {/* Username input */}
-            <div className="flex items-center gap-2 flex-1">
-              <User className="w-4 h-4 text-muted-foreground/60 shrink-0" />
-              <input
-                ref={usernameRef}
-                type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                placeholder="Username"
-                className="flex-1 max-w-[180px] px-3 py-2 rounded-xl border border-white/20 dark:border-white/10 font-mono text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:border-white/40 transition-all duration-300"
-                style={{
-                  background: "rgba(255, 255, 255, 0.08)",
-                  backdropFilter: "blur(4px)",
-                }}
-              />
-            </div>
+            <input
+              ref={usernameRef}
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder="Username"
+              className="flex-1 max-w-[180px] px-4 py-2 rounded-full border border-white/20 dark:border-white/10 font-mono text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:border-white/40 transition-all duration-300"
+              style={{
+                background: "rgba(255, 255, 255, 0.08)",
+                backdropFilter: "blur(4px)",
+              }}
+            />
             
             {/* Send button */}
             <button
