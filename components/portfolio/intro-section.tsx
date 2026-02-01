@@ -381,7 +381,6 @@ export function IntroSection() {
   const statsGridRef = useRef<HTMLDivElement>(null)
   const stackTickerRef = useRef<HTMLDivElement>(null)
   const ctaRef = useRef<HTMLDivElement>(null)
-  const scrollIndicatorRef = useRef<HTMLDivElement>(null)
   
   const isMobile = useResponsiveMobile()
   const prefersReducedMotion = useReducedMotion()
@@ -406,15 +405,6 @@ export function IntroSection() {
         }
       )
 
-      if (scrollIndicatorRef.current) {
-        gsap.to(scrollIndicatorRef.current, {
-          y: 8,
-          repeat: -1,
-          yoyo: true,
-          duration: 1.2,
-          ease: "power1.inOut",
-        })
-      }
     }, heroRef)
 
     return () => ctx.revert()
@@ -490,10 +480,6 @@ export function IntroSection() {
     return () => ctx.revert()
   }, [prefersReducedMotion])
 
-  const scrollToStats = () => {
-    statsRef.current?.scrollIntoView({ behavior: "smooth" })
-  }
-
   return (
     <section id="intro" ref={sectionRef} className="relative">
       {/* ═══════════════════════════════════════════════════════════════════
@@ -501,7 +487,7 @@ export function IntroSection() {
       ═══════════════════════════════════════════════════════════════════ */}
       <div
         ref={heroRef}
-        className="relative w-full min-h-screen flex items-center justify-center py-20 sm:py-24"
+        className="relative w-full pt-24 sm:pt-32 pb-16 sm:pb-20"
       >
         {/* Brutalist background */}
         <div className="absolute inset-0 opacity-60">
@@ -528,8 +514,7 @@ export function IntroSection() {
             <h1 className="font-mono text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-tight leading-[0.9]">
               <GSAPText immediate variant="chars" stagger={0.03} duration={0.6}>
                 RYO
-              </GSAPText>
-              <br />
+              </GSAPText>             
               <span className="text-muted-foreground">
                 <GSAPText immediate variant="chars" stagger={0.03} duration={0.6} delay={0.3}>
                   FUJIMURA
@@ -573,31 +558,6 @@ export function IntroSection() {
           <div data-intro-animate>
             <SocialLinks />
           </div>
-
-          {/* Scroll indicator */}
-          <div 
-            data-intro-animate
-            className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 cursor-pointer"
-            onClick={scrollToStats}
-            role="button"
-            tabIndex={0}
-            onKeyDown={(e) => e.key === "Enter" && scrollToStats()}
-          >
-            <span className="font-mono text-[8px] uppercase tracking-[0.3em] text-muted-foreground">
-              Scroll
-            </span>
-            <div ref={scrollIndicatorRef}>
-              <ArrowDown className="w-4 h-4 text-muted-foreground" />
-            </div>
-          </div>
-        </div>
-
-        {/* Decorative corner elements */}
-        <div className="absolute top-4 left-4 font-mono text-[8px] text-muted-foreground/50 hidden lg:block">
-          [00:00:00]
-        </div>
-        <div className="absolute top-4 right-4 font-mono text-[8px] text-muted-foreground/50 hidden lg:block">
-          v2.0.0
         </div>
       </div>
 
