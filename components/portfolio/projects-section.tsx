@@ -849,39 +849,6 @@ export function ProjectsSection() {
             <AsciiLine char="═" className="absolute bottom-0 left-0 right-0" />
           </div>
 
-          {/* Instruction hint */}
-          <div className="text-center mt-8 sm:mt-12">
-            <div className="inline-block border border-foreground/10 px-4 py-3 bg-foreground/[0.02]">
-              <div className="font-mono text-[9px] sm:text-[10px] text-foreground/40 animate-pulse">
-                {isMobile ? (
-                  <>
-                    <span className="text-foreground/60">◉</span> TAP ANY PROJECT TO VIEW DETAILS
-                  </>
-                ) : (
-                  <>
-                    <span className="text-foreground/60">◉</span> HOVER TO HIGHLIGHT · CLICK TO VIEW DETAILS
-                  </>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* ASCII footer art */}
-          <div className="mt-12 sm:mt-16 text-center">
-            <pre className="ascii-decoration inline-block font-mono text-[6px] sm:text-[8px] text-foreground/15 leading-tight">
-{`
-        ╔═══════════════════════════════════════════╗
-        ║                                           ║
-        ║  ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  ║
-        ║  ░ PROJECTS.DATA.LOADED                ░  ║
-        ║  ░ STATUS: READY                       ░  ║
-        ║  ░ INPUT: AWAITING_SELECTION           ░  ║
-        ║  ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  ║
-        ║                                           ║
-        ╚═══════════════════════════════════════════╝
-`}
-            </pre>
-          </div>
 
           {/* Year markers */}
           <div className="max-w-6xl mx-auto mt-12 sm:mt-16">
