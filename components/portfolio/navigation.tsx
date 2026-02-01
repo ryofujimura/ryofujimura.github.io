@@ -1,10 +1,210 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef, useCallback } from "react"
 import { cn } from "@/lib/utils"
 import { MagneticButton } from "@/components/magnetic-button"
 import { Menu, X, MessageCircle, Mail } from "lucide-react"
 import { OPEN_CONTACT_FORM_EVENT } from "@/components/portfolio/contact-section"
+import { gsap } from "gsap"
+
+// Animated pill split button for desktop
+function SplitContactButton() {
+  const containerRef = useRef<HTMLDivElement>(null)
+  const mainPillRef = useRef<HTMLDivElement>(null)
+  const mainTextRef = useRef<HTMLSpanElement>(null)
+  const leftPillRef = useRef<HTMLButtonElement>(null)
+  const rightPillRef = useRef<HTMLAnchorElement>(null)
+  const leftContentRef = useRef<HTMLSpanElement>(null)
+  const rightContentRef = useRef<HTMLSpanElement>(null)
+  const timelineRef = useRef<gsap.core.Timeline | null>(null)
+  const [isHovered, setIsHovered] = useState(false)
+
+  // Initialize GSAP timeline
+  useEffect(() => {
+    if (!containerRef.current) return
+
+    const ctx = gsap.context(() => {
+      // Set initial states
+      gsap.set([leftPillRef.current, rightPillRef.current], {
+        scale: 0,
+        opacity: 0,
+      })
+      gsap.set([leftContentRef.current, rightContentRef.current], {
+        opacity: 0,
+        y: 10,
+      })
+    }, containerRef)
+
+    return () => ctx.revert()
+  }, [])
+
+  const handleMouseEnter = useCallback(() => {
+    if (!containerRef.current) return
+    setIsHovered(true)
+
+    // Kill any existing animation
+    timelineRef.current?.kill()
+
+    const tl = gsap.timeline()
+    timelineRef.current = tl
+
+    // Phase 1: Fade out main text and start morphing
+    tl.to(mainTextRef.current, {
+      opacity: 0,
+      scale: 0.8,
+      duration: 0.15,
+      ease: "power2.in",
+    })
+
+    // Phase 2: Main pill fades and splits
+    .to(mainPillRef.current, {
+      opacity: 0,
+      scaleX: 1.5,
+      duration: 0.2,
+      ease: "power2.inOut",
+    }, "-=0.05")
+
+    // Phase 3: Two pills emerge from center with spring effect
+    .to([leftPillRef.current, rightPillRef.current], {
+      scale: 1,
+      opacity: 1,
+      duration: 0.35,
+      ease: "back.out(1.7)",
+      stagger: 0.05,
+    }, "-=0.15")
+
+    // Phase 4: Content fades in
+    .to([leftContentRef.current, rightContentRef.current], {
+      opacity: 1,
+      y: 0,
+      duration: 0.25,
+      ease: "power2.out",
+      stagger: 0.05,
+    }, "-=0.2")
+  }, [])
+
+  const handleMouseLeave = useCallback(() => {
+    if (!containerRef.current) return
+    setIsHovered(false)
+
+    // Kill any existing animation
+    timelineRef.current?.kill()
+
+    const tl = gsap.timeline()
+    timelineRef.current = tl
+
+    // Reverse: Fade out content
+    tl.to([leftContentRef.current, rightContentRef.current], {
+      opacity: 0,
+      y: 10,
+      duration: 0.15,
+      ease: "power2.in",
+    })
+
+    // Pills collapse back
+    .to([leftPillRef.current, rightPillRef.current], {
+      scale: 0,
+      opacity: 0,
+      duration: 0.25,
+      ease: "power2.in",
+    }, "-=0.1")
+
+    // Main pill returns
+    .to(mainPillRef.current, {
+      opacity: 1,
+      scaleX: 1,
+      duration: 0.25,
+      ease: "power2.out",
+    }, "-=0.15")
+
+    // Main text fades back in
+    .to(mainTextRef.current, {
+      opacity: 1,
+      scale: 1,
+      duration: 0.2,
+      ease: "power2.out",
+    }, "-=0.15")
+  }, [])
+
+  const handleMessageClick = useCallback(() => {
+    // Scroll to contact section and open form
+    const contactSection = document.getElementById("contact")
+    if (contactSection) {
+      const offset = 80
+      const elementPosition = contactSection.getBoundingClientRect().top + window.scrollY
+      window.scrollTo({
+        top: elementPosition - offset,
+        behavior: "smooth",
+      })
+    }
+    // Dispatch custom event to open the form
+    setTimeout(() => {
+      window.dispatchEvent(new CustomEvent(OPEN_CONTACT_FORM_EVENT))
+    }, 500)
+  }, [])
+
+  return (
+    <div
+      ref={containerRef}
+      className="relative h-10 flex items-center"
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
+      {/* Main pill - visible by default */}
+      <div
+        ref={mainPillRef}
+        className="absolute inset-0 bg-primary rounded-full pointer-events-none"
+        style={{ transformOrigin: "center" }}
+      />
+
+      {/* Main text overlay */}
+      <span
+        ref={mainTextRef}
+        className="relative z-10 px-5 text-sm font-medium text-primary-foreground whitespace-nowrap pointer-events-none"
+      >
+        Get in Touch
+      </span>
+
+      {/* Split pills container - positioned absolutely over the main pill */}
+      <div className="absolute inset-0 flex items-center justify-center gap-2 pointer-events-none">
+        {/* Left pill - Message */}
+        <button
+          ref={leftPillRef}
+          type="button"
+          onClick={handleMessageClick}
+          className={cn(
+            "flex items-center gap-2 px-4 py-2 bg-primary rounded-full text-primary-foreground text-sm font-medium",
+            "hover:shadow-lg hover:shadow-primary/30 transition-shadow duration-200",
+            isHovered ? "pointer-events-auto" : "pointer-events-none"
+          )}
+          style={{ transformOrigin: "right center" }}
+        >
+          <span ref={leftContentRef} className="flex items-center gap-2">
+            <MessageCircle className="w-4 h-4" />
+            <span>Message</span>
+          </span>
+        </button>
+
+        {/* Right pill - Email */}
+        <a
+          ref={rightPillRef}
+          href="mailto:ryo.fujimura1@gmail.com"
+          className={cn(
+            "flex items-center gap-2 px-4 py-2 bg-primary rounded-full text-primary-foreground text-sm font-medium",
+            "hover:shadow-lg hover:shadow-primary/30 transition-shadow duration-200",
+            isHovered ? "pointer-events-auto" : "pointer-events-none"
+          )}
+          style={{ transformOrigin: "left center" }}
+        >
+          <span ref={rightContentRef} className="flex items-center gap-2">
+            <Mail className="w-4 h-4" />
+            <span>Email</span>
+          </span>
+        </a>
+      </div>
+    </div>
+  )
+}
 
 const navItems = [
   { label: "About", href: "#about" },
@@ -150,49 +350,9 @@ export function Navigation() {
             </div>
 
             <div className="flex items-center gap-3">
-              {/* Desktop "Get in Touch" dropdown */}
-              <div className="hidden lg:block relative group">
-                <MagneticButton
-                  className="px-5 py-2.5 text-sm font-medium text-primary-foreground bg-primary rounded-full hover:shadow-lg hover:shadow-primary/20 transition-all duration-300"
-                >
-                  Get in Touch
-                </MagneticButton>
-                
-                {/* Dropdown menu */}
-                <div className="absolute right-0 top-full pt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
-                  <div className="bg-background/95 backdrop-blur-xl border border-border rounded-xl shadow-lg overflow-hidden min-w-[160px]">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        // Scroll to contact section and open form
-                        const contactSection = document.getElementById("contact")
-                        if (contactSection) {
-                          const offset = 80
-                          const elementPosition = contactSection.getBoundingClientRect().top + window.scrollY
-                          window.scrollTo({
-                            top: elementPosition - offset,
-                            behavior: "smooth",
-                          })
-                        }
-                        // Dispatch custom event to open the form
-                        setTimeout(() => {
-                          window.dispatchEvent(new CustomEvent(OPEN_CONTACT_FORM_EVENT))
-                        }, 500)
-                      }}
-                      className="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-foreground hover:bg-secondary/50 transition-colors"
-                    >
-                      <MessageCircle className="w-4 h-4" />
-                      Message
-                    </button>
-                    <a
-                      href="mailto:ryo.fujimura1@gmail.com"
-                      className="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-foreground hover:bg-secondary/50 transition-colors border-t border-border"
-                    >
-                      <Mail className="w-4 h-4" />
-                      Email
-                    </a>
-                  </div>
-                </div>
+              {/* Desktop "Get in Touch" split button */}
+              <div className="hidden lg:block">
+                <SplitContactButton />
               </div>
 
               {/* Mobile menu — 44px touch target */}
