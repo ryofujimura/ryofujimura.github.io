@@ -24,9 +24,9 @@ const ASCII_ARROW = `──────►`
 
 const ASCII_GROWTH = `
     ▲
-   ▲▲▲
-  ▲▲▲▲▲
- ▲▲▲▲▲▲▲
+   ▲▲
+  ▲▲▲
+ ▲▲▲▲
 `.trim()
 
 // ─────────────────────────────────────────────────────────────
@@ -34,7 +34,7 @@ const ASCII_GROWTH = `
 // ─────────────────────────────────────────────────────────────
 
 const SKILL_GROUPS = {
-  "Mobile": ["Swift", "SwiftUI", "Kotlin", "WatchOS", "AVFoundation", "App Store", "probability"],
+  "Mobile": ["Swift", "SwiftUI", "Kotlin", "WatchOS", "AVFoundation", "App Store"],
   "Web": ["React", "React 19", "Next.js", "Tailwind", "WebSocket", "Vercel"],
   "Cloud": ["Firebase", "Firestore", "Firebase RTDB", "Cloud Functions", "Node.js", "Real-time", "Google APIs"],
   "AI/ML": ["AI/ML", "AI routing", "PyTorch", "Vision", "llama.cpp", "GGUF"],
@@ -53,12 +53,12 @@ const allProjects = [
     id: "01",
     year: "2025",
     title: "Zero Inbox",
-    image: "/images/default_image.png",
+    images: ["/images/profile.jpg"],
     growth: "Production AI Engine",
     learned: ["Multi-stage AI", "95% accuracy tuning", "High-throughput systems"],
     techStack: ["Swift", "AI/ML", "Firebase"],
     achievement: "95% accuracy, 200ms",
-    description: "Most advanced AI project: multi-stage reasoning with production-grade performance.",
+    description: "Multi-stage reasoning with production-grade performance.",
     skills: ["Swift", "SwiftUI", "Firebase", "AI/ML", "Google APIs"],
     links: { github: "https://github.com/ryofujimura", demo: "#" },
   },
@@ -66,12 +66,12 @@ const allProjects = [
     id: "02",
     year: "2025",
     title: "Whiteboard AI",
-    image: "/images/whiteboardai.png",
+    images: ["/images/whiteboardai.png", "/images/whiteboardai-1.jpg", "/images/whiteboardai-2.jpg"],
     growth: "Vision ML + Collab",
     learned: ["PyTorch vision", "CRDT patterns", "WebSocket pipelines"],
     techStack: ["PyTorch", "WebSocket", "React"],
     achievement: "150ms inference",
-    description: "First computer vision project with real-time collaborative features.",
+    description: "Computer vision with real-time collaboration.",
     skills: ["PyTorch", "Vision", "WebSocket", "React"],
     links: { github: "https://github.com/ryofujimura", demo: "https://ryofujimura.github.io" },
   },
@@ -79,12 +79,12 @@ const allProjects = [
     id: "03",
     year: "2025",
     title: "Research Lab PM",
-    image: "/images/default_image.png",
+    images: ["/images/profile.jpg"],
     growth: "Serverless + AI Routing",
     learned: ["Cloud Functions", "Dynamic AI routing", "Multi-tenant systems"],
     techStack: ["Cloud Functions", "Firebase"],
     achievement: "<200ms response",
-    description: "Built serverless orchestration for 30+ researchers with AI-powered workflows.",
+    description: "Serverless orchestration for 30+ researchers.",
     skills: ["Cloud Functions", "Firebase", "AI routing", "Node.js"],
     links: { github: "https://github.com/ryofujimura", demo: "https://ryofujimura.github.io" },
   },
@@ -92,12 +92,12 @@ const allProjects = [
     id: "04",
     year: "2025",
     title: "CyberEdu",
-    image: "/images/CyberEdu.png",
+    images: ["/images/CyberEdu.png", "/images/CyberEdu-1.PNG", "/images/CyberEdu-2.PNG", "/images/CyberEdu-3.PNG", "/images/CyberEdu-4.PNG", "/images/CyberEdu-5.jpg"],
     growth: "Network Resilience",
     learned: ["Offline-first patterns", "Sync strategies", "Error recovery"],
     techStack: ["Swift", "Kotlin", "Firebase"],
     achievement: "99%+ sync reliability",
-    description: "Mastered cross-device sync across unstable networks.",
+    description: "Cross-device sync across unstable networks.",
     skills: ["Swift", "Kotlin", "Firebase", "Real-time"],
     links: { github: "https://github.com/ryofujimura", appStore: "#", playStore: "#" },
   },
@@ -105,12 +105,12 @@ const allProjects = [
     id: "05",
     year: "2025",
     title: "HTIC Shuttle",
-    image: "/images/schedule.jpg",
+    images: ["/images/schedule.jpg"],
     growth: "Real-Time Systems",
     learned: ["Firebase RTDB", "Event serialization", "Cross-platform native"],
     techStack: ["Swift", "Kotlin", "Firebase"],
     achievement: "70% fewer conflicts",
-    description: "First cross-platform native app with real-time synchronization.",
+    description: "Cross-platform native with real-time sync.",
     skills: ["Swift", "Kotlin", "Firebase RTDB", "Real-time"],
     links: { github: "https://github.com/ryofujimura", appStore: "#", playStore: "#" },
   },
@@ -119,12 +119,12 @@ const allProjects = [
     id: "06",
     year: "2024",
     title: "With (Local LLM)",
-    image: "/images/default_image.png",
+    images: ["/images/profile.jpg"],
     growth: "On-Device AI",
     learned: ["llama.cpp integration", "Model quantization", "Memory optimization"],
     techStack: ["Swift", "llama.cpp", "GGUF"],
     achievement: "<50ms/token, 2GB saved",
-    description: "First local AI project. Learned model optimization and efficient inference.",
+    description: "Local AI with efficient inference.",
     skills: ["Swift", "llama.cpp", "GGUF", "SwiftUI"],
     links: { github: "https://github.com/ryofujimura" },
   },
@@ -132,12 +132,12 @@ const allProjects = [
     id: "07",
     year: "2024",
     title: "Saboriendo Platform",
-    image: "/images/default_image.png",
+    images: ["/images/profile.jpg"],
     growth: "Full-Stack + Mobile",
     learned: ["React 19 features", "Cross-platform sync", "Barcode systems"],
     techStack: ["React 19", "SwiftUI", "Firebase"],
     achievement: "50% faster lookup",
-    description: "First full-stack project combining web and mobile with real-time sync.",
+    description: "Full-stack with real-time sync.",
     skills: ["React 19", "SwiftUI", "Firebase", "Firestore", "AVFoundation"],
     links: { github: "https://github.com/ryofujimura", demo: "https://ryofujimura.github.io" },
   },
@@ -145,12 +145,12 @@ const allProjects = [
     id: "08",
     year: "2024",
     title: "Portfolio Website",
-    image: "/images/homepage.png",
+    images: ["/images/homepage.png", "/images/experiencepage.png"],
     growth: "Modern Web Stack",
     learned: ["Next.js App Router", "GSAP animations", "Performance tuning"],
     techStack: ["React", "Next.js", "GSAP"],
     achievement: "40-60% faster load",
-    description: "Deep dive into React ecosystem with advanced animations and optimization.",
+    description: "React with advanced animations.",
     skills: ["React", "Next.js", "Tailwind", "Vercel"],
     links: { github: "https://github.com/ryofujimura", demo: "https://ryofujimura.github.io" },
   },
@@ -158,12 +158,12 @@ const allProjects = [
     id: "09",
     year: "2024",
     title: "Matcha Time",
-    image: "/images/matchatime_1.jpg",
+    images: ["/images/matchatime_1.jpg", "/images/matchatime_2.jpg", "/images/matchatime_3.jpg"],
     growth: "App Store Launch",
     learned: ["SwiftUI patterns", "App Store submission", "4-week sprint"],
     techStack: ["Swift", "SwiftUI"],
     achievement: "50 users at launch",
-    description: "First iOS app published to App Store. Learned complete app lifecycle.",
+    description: "First iOS app on App Store.",
     skills: ["Swift", "SwiftUI", "App Store"],
     links: { github: "https://github.com/ryofujimura", appStore: "#" },
   },
@@ -172,12 +172,12 @@ const allProjects = [
     id: "10",
     year: "2023",
     title: "Schedule Mastermind",
-    image: "/images/schedule.jpg",
+    images: ["/images/schedule.jpg"],
     growth: "Backend Architecture",
     learned: ["Flask routing", "Conflict algorithms", "Database design"],
     techStack: ["Python", "Flask"],
     achievement: "500+ courses, 70% fewer errors",
-    description: "First production backend handling complex scheduling logic for university courses.",
+    description: "Backend for university scheduling.",
     skills: ["Python", "Flask", "scheduling"],
     links: { github: "https://github.com/ryofujimura", demo: "https://ryofujimura.github.io" },
   },
@@ -185,12 +185,12 @@ const allProjects = [
     id: "11",
     year: "2023",
     title: "Shohei Home Ground",
-    image: "/images/shoheihomeground_1.jpg",
+    images: ["/images/shoheihomeground_1.jpg", "/images/shoheihomeground_2.jpg", "/images/shoheihomeground_3.jpg"],
     growth: "Python Automation",
     learned: ["API automation", "Content scheduling", "Growth hacking"],
     techStack: ["Python", "Instagram API"],
     achievement: "11K followers, 685 posts",
-    description: "Automated content pipeline saving 2+ hours daily. First major automation project.",
+    description: "Automated content pipeline.",
     skills: ["Python", "automation", "Instagram"],
     links: { instagram: "#", youtube: "#" },
   },
@@ -199,12 +199,12 @@ const allProjects = [
     id: "12",
     year: "2022",
     title: "Poker Percentage",
-    image: "/images/poker.png",
+    images: ["/images/poker.png", "/images/poker_1.jpg", "/images/poker_2.jpg", "/images/poker_3.jpg", "/images/poker_4.jpg"],
     growth: "First WatchOS App",
     learned: ["WatchKit basics", "Precomputed tables", "Real-time probability"],
     techStack: ["Swift", "WatchOS"],
     achievement: "<10ms lookup speed",
-    description: "Built first watchOS app with precomputed probability tables for instant equity calculations.",
+    description: "WatchOS with precomputed probability tables.",
     skills: ["Swift", "WatchOS", "probability"],
     links: { github: "https://github.com/ryofujimura", appStore: "#" },
   },
@@ -257,6 +257,92 @@ function TechLines({ className }: { className?: string }) {
       <line x1="10" y1="0" x2="30" y2="0" stroke="currentColor" strokeWidth="0.3" opacity="0.2" />
       <line x1="70" y1="100" x2="90" y2="100" stroke="currentColor" strokeWidth="0.3" opacity="0.2" />
     </svg>
+  )
+}
+
+// ─────────────────────────────────────────────────────────────
+// IMAGE GALLERY - VERTICAL STRIPE HOVER
+// ─────────────────────────────────────────────────────────────
+
+function ImageGallery({ images, projectId, projectTitle }: { images: string[]; projectId: string; projectTitle: string }) {
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
+  const galleryRef = useRef<HTMLDivElement>(null)
+
+  // If only one image, show it full width
+  if (images.length === 1) {
+    return (
+      <div className="relative w-full h-full">
+        <img
+          src={images[0]}
+          alt={projectTitle}
+          className="w-full h-full object-cover opacity-90 grayscale hover:grayscale-0 transition-all duration-500"
+          loading="lazy"
+        />
+      </div>
+    )
+  }
+
+  return (
+    <div
+      ref={galleryRef}
+      className="relative w-full h-full flex"
+      onMouseLeave={() => setHoveredIndex(null)}
+    >
+      {images.map((image, index) => {
+        const isHovered = hoveredIndex === index
+        const hasHover = hoveredIndex !== null
+        
+        // Calculate width percentages
+        // When hovering: hovered = 70%, others share remaining 30%
+        // Default: all equal
+        let widthPercent: number
+        if (hasHover) {
+          if (isHovered) {
+            widthPercent = 70
+          } else {
+            widthPercent = 30 / (images.length - 1)
+          }
+        } else {
+          widthPercent = 100 / images.length
+        }
+
+        return (
+          <div
+            key={`${projectId}-img-${index}`}
+            className={cn(
+              "relative h-full overflow-hidden transition-all duration-300 ease-out",
+              "border-r border-foreground/20 last:border-r-0",
+              !isHovered && hasHover && "grayscale"
+            )}
+            style={{ width: `${widthPercent}%` }}
+            onMouseEnter={() => setHoveredIndex(index)}
+          >
+            <img
+              src={image}
+              alt={`${projectTitle} - ${index + 1}`}
+              className={cn(
+                "w-full h-full object-cover transition-all duration-300",
+                isHovered ? "opacity-100 scale-105" : "opacity-80"
+              )}
+              loading="lazy"
+            />
+            {/* Stripe indicator when collapsed */}
+            {!isHovered && hasHover && (
+              <div className="absolute inset-0 bg-foreground/10 flex items-center justify-center">
+                <span className="font-mono text-[8px] text-foreground/60 writing-mode-vertical rotate-180"
+                  style={{ writingMode: 'vertical-rl' }}>
+                  {index + 1}
+                </span>
+              </div>
+            )}
+          </div>
+        )
+      })}
+      {/* Image count indicator */}
+      <div className="absolute bottom-1 right-1 font-mono text-[8px] text-background bg-foreground/70 px-1 py-0.5 z-10">
+        {images.length} imgs
+      </div>
+    </div>
   )
 }
 
@@ -363,91 +449,84 @@ function ProjectCard({ project, index, isActive }: { project: Project; index: nu
         <span className="font-mono text-[10px] sm:text-xs font-bold tracking-wider">{project.year}</span>
       </div>
 
-      {/* Image placeholder - smaller to emphasize content */}
-      <div className="relative h-20 sm:h-24 lg:h-28 border-b-2 border-foreground overflow-hidden bg-muted">
-        <img
-          src={project.image}
-          alt={project.title}
-          className="w-full h-full object-cover opacity-80 grayscale hover:grayscale-0 transition-all duration-500"
-          loading="lazy"
+      {/* Image Gallery - BIGGER with vertical stripe hover */}
+      <div className="relative h-40 sm:h-48 lg:h-56 border-b-2 border-foreground overflow-hidden bg-muted">
+        <ImageGallery 
+          images={project.images} 
+          projectId={project.id}
+          projectTitle={project.title}
         />
         {/* Scan lines overlay */}
-        <div className="absolute inset-0 pointer-events-none opacity-20">
-          {[...Array(20)].map((_, i) => (
-            <div key={i} className="h-px bg-foreground/30" style={{ marginTop: `${i * 5}%` }} />
+        <div className="absolute inset-0 pointer-events-none opacity-10">
+          {[...Array(30)].map((_, i) => (
+            <div key={i} className="h-px bg-foreground/30" style={{ marginTop: `${i * 3.33}%` }} />
           ))}
         </div>
         {/* Project number */}
-        <div className="absolute bottom-2 right-2 font-mono text-[10px] text-background bg-foreground/80 px-1.5 py-0.5">
+        <div className="absolute top-2 right-2 font-mono text-[10px] text-background bg-foreground/80 px-1.5 py-0.5 z-10">
           {project.id}/12
         </div>
       </div>
 
-      {/* Content */}
-      <div className="p-4 sm:p-5">
-        {/* Growth headline - MAIN FOCUS */}
-        <div className="mb-3">
-          <span className="reveal font-mono text-[9px] sm:text-[10px] text-accent tracking-[0.2em] block mb-1">
-            GROWTH
-          </span>
+      {/* Content - More compact */}
+      <div className="p-3 sm:p-4">
+        {/* Growth headline + Project title combined */}
+        <div className="mb-2">
+          <div className="flex items-baseline gap-2 mb-1">
+            <span className="reveal font-mono text-[8px] sm:text-[9px] text-accent tracking-[0.15em]">
+              GROWTH
+            </span>
+            <span className="font-mono text-[8px] text-foreground/40">|</span>
+            <span className="font-mono text-[9px] sm:text-[10px] text-muted-foreground">
+              {project.title}
+            </span>
+          </div>
           <h3>
             <span
               ref={growthRef}
-              className="font-mono text-lg sm:text-xl lg:text-2xl font-black text-foreground leading-tight block"
+              className="font-mono text-base sm:text-lg lg:text-xl font-black text-foreground leading-tight block"
             >
               {project.growth.toUpperCase()}
             </span>
           </h3>
         </div>
 
-        {/* Project title */}
-        <p className="reveal font-mono text-xs sm:text-sm text-muted-foreground mb-3">
-          {project.title}
-        </p>
-
-        {/* What I learned - ASCII bullets */}
-        <div className="reveal mb-3">
-          <span className="font-mono text-[8px] sm:text-[9px] text-foreground/50 tracking-wider block mb-1.5">
-            LEARNED:
+        {/* Achievement + Tech stack inline */}
+        <div className="reveal flex items-center gap-2 mb-2 flex-wrap">
+          <span className="font-mono text-[9px] sm:text-[10px] font-bold text-accent bg-accent/10 px-1.5 py-0.5">
+            {project.achievement}
           </span>
-          <div className="space-y-1">
-            {project.learned.map((item, i) => (
-              <div key={i} className="flex items-start gap-2">
-                <span className="font-mono text-[10px] text-accent select-none">▸</span>
-                <span className="font-mono text-[10px] sm:text-xs text-foreground/80">{item}</span>
-              </div>
+          <span className="font-mono text-[8px] text-foreground/30">•</span>
+          <div className="flex flex-wrap gap-1">
+            {project.techStack.slice(0, 3).map((tech) => (
+              <span
+                key={tech}
+                className="font-mono text-[7px] sm:text-[8px] px-1 py-0.5 border border-foreground/30 text-foreground/60"
+              >
+                {tech}
+              </span>
             ))}
+            {project.techStack.length > 3 && (
+              <span className="font-mono text-[7px] text-foreground/40">+{project.techStack.length - 3}</span>
+            )}
           </div>
         </div>
 
-        {/* Achievement highlight */}
-        <div className="reveal mb-3 p-2 border border-dashed border-foreground/30 bg-foreground/5">
-          <span className="font-mono text-[8px] text-foreground/50 tracking-wider block mb-0.5">RESULT:</span>
-          <span className="font-mono text-xs sm:text-sm font-bold text-foreground">{project.achievement}</span>
-        </div>
+        {/* Description - single line */}
+        <p className="reveal font-mono text-[9px] sm:text-[10px] text-foreground/60 mb-2 line-clamp-1">
+          {project.description}
+        </p>
 
-        {/* Tech stack pills */}
-        <div className="reveal flex flex-wrap gap-1.5 mb-3">
-          {project.techStack.map((tech) => (
-            <span
-              key={tech}
-              className="font-mono text-[8px] sm:text-[9px] px-1.5 py-0.5 border border-foreground/40 text-foreground/70"
-            >
-              {tech}
-            </span>
-          ))}
-        </div>
-
-        {/* Links row */}
-        <div className="reveal flex flex-wrap items-center gap-2 pt-2 border-t border-foreground/20">
+        {/* Links row - more compact */}
+        <div className="reveal flex flex-wrap items-center gap-2 pt-2 border-t border-foreground/15">
           {hasGithub && (
             <a
               href={project.links.github}
               target="_blank"
               rel="noopener noreferrer"
-              className="touch-target inline-flex items-center gap-1.5 font-mono text-[9px] sm:text-[10px] text-foreground hover:text-accent transition-colors"
+              className="touch-target inline-flex items-center gap-1 font-mono text-[8px] sm:text-[9px] text-foreground hover:text-accent transition-colors"
             >
-              <Github className="w-3 h-3" />
+              <Github className="w-2.5 h-2.5" />
               <span>SRC</span>
             </a>
           )}
@@ -456,17 +535,17 @@ function ProjectCard({ project, index, isActive }: { project: Project; index: nu
               href={(project.links as { demo?: string }).demo}
               target="_blank"
               rel="noopener noreferrer"
-              className="touch-target inline-flex items-center gap-1.5 font-mono text-[9px] sm:text-[10px] text-foreground hover:text-accent transition-colors"
+              className="touch-target inline-flex items-center gap-1 font-mono text-[8px] sm:text-[9px] text-foreground hover:text-accent transition-colors"
             >
-              <ExternalLink className="w-3 h-3" />
+              <ExternalLink className="w-2.5 h-2.5" />
               <span>DEMO</span>
             </a>
           )}
           {hasAppStore && (
-            <span className="font-mono text-[9px] sm:text-[10px] text-muted-foreground">iOS</span>
+            <span className="font-mono text-[8px] sm:text-[9px] text-muted-foreground">iOS</span>
           )}
           {hasPlayStore && (
-            <span className="font-mono text-[9px] sm:text-[10px] text-muted-foreground">Android</span>
+            <span className="font-mono text-[8px] sm:text-[9px] text-muted-foreground">Android</span>
           )}
         </div>
       </div>
