@@ -55,7 +55,7 @@ function AnimatedHeaderSVG({ className = "" }: { className?: string }) {
     <svg
       ref={svgRef}
       className={className}
-      viewBox="0 0 400 60"
+      viewBox="0 0 600 60"
       fill="none"
       stroke="currentColor"
       preserveAspectRatio="xMidYMid meet"
@@ -72,7 +72,7 @@ function AnimatedHeaderSVG({ className = "" }: { className?: string }) {
       <line
         x1="30"
         y1="30"
-        x2="80"
+        x2="70"
         y2="30"
         strokeWidth="1"
         className="text-foreground/30"
@@ -80,7 +80,7 @@ function AnimatedHeaderSVG({ className = "" }: { className?: string }) {
       />
       {/* Left dot */}
       <circle
-        cx="90"
+        cx="80"
         cy="30"
         r="3"
         strokeWidth="1.5"
@@ -89,7 +89,7 @@ function AnimatedHeaderSVG({ className = "" }: { className?: string }) {
       
       {/* Right decorative bracket */}
       <path
-        d="M 380 10 L 395 10 L 395 50 L 380 50"
+        d="M 580 10 L 595 10 L 595 50 L 580 50"
         strokeWidth="1.5"
         className="text-accent"
         strokeLinecap="round"
@@ -97,9 +97,9 @@ function AnimatedHeaderSVG({ className = "" }: { className?: string }) {
       />
       {/* Right inner line */}
       <line
-        x1="370"
+        x1="570"
         y1="30"
-        x2="320"
+        x2="530"
         y2="30"
         strokeWidth="1"
         className="text-foreground/30"
@@ -107,31 +107,11 @@ function AnimatedHeaderSVG({ className = "" }: { className?: string }) {
       />
       {/* Right dot */}
       <circle
-        cx="310"
+        cx="520"
         cy="30"
         r="3"
         strokeWidth="1.5"
         className="text-accent"
-      />
-      
-      {/* Center decorative elements */}
-      <line
-        x1="180"
-        y1="8"
-        x2="220"
-        y2="8"
-        strokeWidth="1"
-        className="text-foreground/20"
-        strokeLinecap="round"
-      />
-      <line
-        x1="180"
-        y1="52"
-        x2="220"
-        y2="52"
-        strokeWidth="1"
-        className="text-foreground/20"
-        strokeLinecap="round"
       />
     </svg>
   )
