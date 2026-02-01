@@ -790,7 +790,7 @@ function SkillButton({
       className={cn(
         "skill-btn group relative inline-flex items-baseline gap-1 transition-all duration-300",
         "font-mono font-bold tracking-tight cursor-pointer touch-manipulation",
-        "text-[11vw] sm:text-[8vw] md:text-[6vw] lg:text-[5vw]",
+        "text-[8vw] sm:text-[8vw] md:text-[6vw] lg:text-[5vw]",
         "leading-[0.9]",
         isActive
           ? cn(colorClass, "scale-[1.02]")
@@ -1072,7 +1072,7 @@ export function ProjectsSection() {
                   onRefChange={(el) => setSkillRef(skill, el)}
                 />
                 {index < allSkills.length - 1 && (
-                  <span className="font-mono text-[3vw] sm:text-[2vw] text-foreground/10 mx-[0.1em] select-none">
+                  <span className="font-mono text-[2.5vw] sm:text-[2vw] text-foreground/10 mx-[0.1em] select-none">
                     ·
                   </span>
                 )}
