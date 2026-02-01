@@ -799,9 +799,6 @@ function TerminalOutput({
                                       spellCheck={false}
                                     />
                                     <span className="text-white">&quot;</span>
-                                    {showCursor && !inputValue && (
-                                      <span className="inline-block w-2 h-4 bg-emerald-300 ml-0.5 animate-pulse" />
-                                    )}
                                   </div>
                                   <div className="mt-1 text-[8px] text-white/30">
                                     type skill name + enter · tab to autocomplete · esc/q to close
