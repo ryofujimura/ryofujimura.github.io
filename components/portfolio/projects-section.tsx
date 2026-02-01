@@ -587,29 +587,25 @@ export function ProjectsSection() {
 
   const currentProject = allProjects[activeIndex]
 
-  // Mobile detection using matchMedia + resize listener
+  // Mobile detection using matchMedia
   useEffect(() => {
     const mediaQuery = window.matchMedia("(max-width: 767px)")
     
-    const updateMobileState = () => {
-      setIsMobile(mediaQuery.matches)
-    }
+    // Set initial value
+    setIsMobile(mediaQuery.matches)
     
+    // Handler for media query changes
     const handleMediaChange = (e: MediaQueryListEvent) => {
       setIsMobile(e.matches)
     }
     
+    // Handler for resize events (backup for older browsers)
     const handleResize = () => {
-      updateMobileState()
+      setIsMobile(mediaQuery.matches)
     }
     
-    // Set initial value
-    updateMobileState()
-    
-    // Listen for changes via matchMedia
+    // Add listeners
     mediaQuery.addEventListener("change", handleMediaChange)
-    
-    // Also listen for resize events for dynamic updates
     window.addEventListener("resize", handleResize)
     
     return () => {
@@ -622,22 +618,18 @@ export function ProjectsSection() {
   useEffect(() => {
     if (!sectionRef.current || !pinContainerRef.current) return
 
-    // Mobile: shorter scroll distance for faster navigation
-    // Desktop: longer scroll distance for more granular control
-    const scrollMultiplier = isMobile ? 60 : 100
-    const scrubValue = isMobile ? 0.3 : 0.5
-    // Mobile: pin later (when top reaches 80px from viewport top)
-    // Desktop: pin immediately when section hits top
-    const startValue = isMobile ? "top 80px" : "top top"
+    // Pin later on mobile (higher value = pins later as you scroll down more)
+    const startOffset = isMobile ? 150 : 0
+    const scrollMultiplier = isMobile ? 80 : 100
 
     const ctx = gsap.context(() => {
       scrollTriggerRef.current = ScrollTrigger.create({
         trigger: sectionRef.current,
-        start: startValue,
+        start: `top ${startOffset}px`,
         end: `+=${TOTAL_PROJECTS * scrollMultiplier}%`,
         pin: pinContainerRef.current,
         pinSpacing: true,
-        scrub: scrubValue,
+        scrub: 0.5,
         onUpdate: (self) => {
           const progress = self.progress
           const newIndex = Math.min(
