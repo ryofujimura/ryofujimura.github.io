@@ -6,15 +6,16 @@ service cloud.firestore {
     // Users collection - username-based documents
     // Document ID = username for easy lookup
     match /users/{username} {
+      // Allow anyone to read (needed to check if user exists)
+      // Only exposes: username, messageCount, timestamps (no sensitive data)
+      allow read: if true;
+      
       // Allow anyone to create or update (for message count increment)
       allow create, update: if request.resource.data.keys().hasAll(['username', 'messageCount', 'firstMessageAt', 'lastMessageAt'])
                             && request.resource.data.username is string
                             && request.resource.data.username.size() > 0
                             && request.resource.data.username.size() <= 50
                             && request.resource.data.messageCount is int;
-      
-      // Only allow reading by authenticated users (for admin dashboard)
-      allow read: if request.auth != null;
       
       // Only authenticated users can delete
       allow delete: if request.auth != null;
