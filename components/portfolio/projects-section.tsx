@@ -745,7 +745,7 @@ export function ProjectsSection() {
           <AsciiBorderLine position="bottom" className="ascii-decoration mt-4" />
         </div>
 
-        {/* Skills display with inline terminal */}
+        {/* Skills display */}
         <div
           ref={skillsContainerRef}
           className="relative text-center py-6 sm:py-10"
@@ -753,35 +753,33 @@ export function ProjectsSection() {
           {/* Skills flow - wrapped on all screen sizes */}
           <div className="flex flex-row flex-wrap justify-center items-baseline gap-x-[0.15em] gap-y-1 sm:gap-x-[0.2em] sm:gap-y-3 px-2">
             {allSkills.map((skill, index) => (
-              <span key={skill} className="inline-flex flex-col items-center">
-                <span className="inline-flex items-baseline">
-                  <SkillButton
-                    skill={skill}
-                    projectCount={skillsMap.get(skill)?.length || 0}
-                    isActive={activeSkill === skill}
-                    isAnyActive={activeSkill !== null}
-                    onClick={() => handleSkillClick(skill)}
-                  />
-                  {index < allSkills.length - 1 && (
-                    <span className="font-mono text-[3vw] sm:text-[2vw] text-foreground/10 mx-[0.1em] select-none">
-                      ·
-                    </span>
-                  )}
-                </span>
-                
-                {/* Inline terminal below selected skill */}
-                {activeSkill === skill && (
-                  <div className="w-screen relative left-1/2 -translate-x-1/2 px-4 sm:px-6 md:px-8">
-                    <TerminalOutput
-                      skill={activeSkill}
-                      isActive={true}
-                      onClose={() => setActiveSkill(null)}
-                    />
-                  </div>
+              <span key={skill} className="inline-flex items-baseline">
+                <SkillButton
+                  skill={skill}
+                  projectCount={skillsMap.get(skill)?.length || 0}
+                  isActive={activeSkill === skill}
+                  isAnyActive={activeSkill !== null}
+                  onClick={() => handleSkillClick(skill)}
+                />
+                {index < allSkills.length - 1 && (
+                  <span className="font-mono text-[3vw] sm:text-[2vw] text-foreground/10 mx-[0.1em] select-none">
+                    ·
+                  </span>
                 )}
               </span>
             ))}
           </div>
+          
+          {/* Terminal below skills - doesn't affect skill flow */}
+          {activeSkill && (
+            <div className="px-4 sm:px-6 md:px-8 mt-4">
+              <TerminalOutput
+                skill={activeSkill}
+                isActive={true}
+                onClose={() => setActiveSkill(null)}
+              />
+            </div>
+          )}
         </div>
 
         {/* Legend */}
