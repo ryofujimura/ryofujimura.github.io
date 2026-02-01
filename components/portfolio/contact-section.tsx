@@ -33,77 +33,55 @@ function VerticalWordRotator({
   className?: string
 }) {
   const [currentIndex, setCurrentIndex] = useState(0)
-  const [isAnimating, setIsAnimating] = useState(false)
   const containerRef = useRef<HTMLSpanElement>(null)
-  const currentWordRef = useRef<HTMLSpanElement>(null)
-  const nextWordRef = useRef<HTMLSpanElement>(null)
+  const wordRef = useRef<HTMLSpanElement>(null)
 
   useEffect(() => {
-    if (words.length <= 1) return
+    if (words.length <= 1 || !wordRef.current) return
 
-    const interval = setInterval(() => {
-      if (isAnimating) return
-      setIsAnimating(true)
+    const animateToNext = () => {
+      const wordEl = wordRef.current
+      if (!wordEl) return
 
-      const currentEl = currentWordRef.current
-      const nextEl = nextWordRef.current
-      if (!currentEl || !nextEl) {
-        setIsAnimating(false)
-        return
-      }
+      const chars = wordEl.querySelectorAll(".char")
 
-      const currentChars = currentEl.querySelectorAll(".char")
-      const nextChars = nextEl.querySelectorAll(".char")
-
-      // Animate current word out (letters slide up and fade)
-      gsap.to(currentChars, {
+      // Animate out current word
+      gsap.to(chars, {
         y: -20,
         opacity: 0,
-        duration: 0.3,
-        stagger: 0.02,
+        duration: 0.25,
+        stagger: 0.015,
         ease: "power2.in",
+        onComplete: () => {
+          // Update to next word
+          setCurrentIndex((prev) => (prev + 1) % words.length)
+        },
       })
+    }
 
-      // Animate next word in (letters slide up from below)
-      gsap.fromTo(
-        nextChars,
-        { y: 20, opacity: 0 },
-        {
-          y: 0,
-          opacity: 1,
-          duration: 0.3,
-          stagger: 0.02,
-          ease: "power2.out",
-          delay: 0.15,
-          onComplete: () => {
-            setCurrentIndex((prev) => (prev + 1) % words.length)
-            setIsAnimating(false)
-            // Reset current word position for next cycle
-            gsap.set(currentChars, { y: 0, opacity: 1 })
-          },
-        }
-      )
-    }, WORD_ROTATE_MS)
-
+    const interval = setInterval(animateToNext, WORD_ROTATE_MS)
     return () => clearInterval(interval)
-  }, [words.length, isAnimating])
+  }, [words.length])
+
+  // Animate in when word changes
+  useEffect(() => {
+    if (!wordRef.current) return
+    
+    const chars = wordRef.current.querySelectorAll(".char")
+    gsap.fromTo(
+      chars,
+      { y: 20, opacity: 0 },
+      {
+        y: 0,
+        opacity: 1,
+        duration: 0.25,
+        stagger: 0.015,
+        ease: "power2.out",
+      }
+    )
+  }, [currentIndex])
 
   const currentWord = words[currentIndex]
-  const nextWord = words[(currentIndex + 1) % words.length]
-
-  const renderWord = (word: string, ref: React.RefObject<HTMLSpanElement | null>) => (
-    <span ref={ref} className="absolute inset-0 flex items-center">
-      {word.split("").map((char, i) => (
-        <span
-          key={i}
-          className="char inline-block"
-          style={{ whiteSpace: char === " " ? "pre" : "normal" }}
-        >
-          {char === " " ? "\u00A0" : char}
-        </span>
-      ))}
-    </span>
-  )
 
   return (
     <span
@@ -114,8 +92,17 @@ function VerticalWordRotator({
         height: "1.2em",
       }}
     >
-      {renderWord(currentWord, currentWordRef)}
-      {renderWord(nextWord, nextWordRef)}
+      <span ref={wordRef} className="absolute inset-0 flex items-center">
+        {currentWord.split("").map((char, i) => (
+          <span
+            key={`${currentIndex}-${i}`}
+            className="char inline-block"
+            style={{ whiteSpace: char === " " ? "pre" : "normal" }}
+          >
+            {char === " " ? "\u00A0" : char}
+          </span>
+        ))}
+      </span>
     </span>
   )
 }
