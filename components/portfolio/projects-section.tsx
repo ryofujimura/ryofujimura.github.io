@@ -156,12 +156,12 @@ const projects = [
 
 // Link display config
 const linkConfig: Record<LinkType, { label: string; icon: string }> = {
-  appstore: { label: "App Store", icon: "" },
-  playstore: { label: "Play Store", icon: "▶" },
+  appstore: { label: "App Store", icon: "" },
+  playstore: { label: "Play Store", icon: "Å" },
   github: { label: "GitHub", icon: "" },
-  website: { label: "Website", icon: "◉" },
-  instagram: { label: "Instagram", icon: "◎" },
-  youtube: { label: "YouTube", icon: "▷" },
+  website: { label: "Website", icon: "➥" },
+  instagram: { label: "Instagram", icon: "♖" },
+  youtube: { label: "YouTube", icon: "▶" },
 }
 
 // Extract unique skills and map to projects
@@ -1010,13 +1010,12 @@ export function ProjectsSection() {
                 Projects
               </div>
               <h2 className="ascii-decoration font-mono text-2xl sm:text-3xl md:text-4xl font-black text-foreground tracking-tighter">
-                CONTINUOUS LEARNING
+                to Imagine the Unimaginable
               </h2>
             </div>
             <div className="ascii-decoration font-mono text-[10px] text-foreground/30 text-right">
               <div><span className="text-purple-400">const</span> skills = <span className="text-orange-400">{allSkills.length}</span>;</div>
               <div><span className="text-purple-400">const</span> projects = <span className="text-orange-400">{projects.length}</span>;</div>
-              <div className="text-foreground/20">// tap to query</div>
             </div>
           </div>
 
