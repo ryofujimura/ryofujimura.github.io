@@ -345,21 +345,24 @@ function CloudMessageForm({ onClose }: { onClose: () => void }) {
       if (result.success) {
         setSendStatus("success")
         
-        // Success animation - message floats away
+        // Success animation - shrink textarea height
         const textarea = textareaRef.current
         if (textarea) {
+          const currentHeight = textarea.offsetHeight
+          
+          // First, set explicit height so we can animate it
+          gsap.set(textarea, { height: currentHeight })
+          
+          // Animate shrinking
           gsap.to(textarea, {
-            y: -20,
+            height: 0,
+            paddingTop: 0,
+            paddingBottom: 0,
             opacity: 0,
             duration: 0.5,
-            ease: "power2.out",
+            ease: "power3.inOut",
             onComplete: () => {
               setMessage("")
-              gsap.to(textarea, {
-                y: 0,
-                opacity: 1,
-                duration: 0.3,
-              })
             }
           })
         }
@@ -367,7 +370,7 @@ function CloudMessageForm({ onClose }: { onClose: () => void }) {
         // Auto close after success
         setTimeout(() => {
           handleClose()
-        }, 2000)
+        }, 1500)
       } else {
         setSendStatus("error")
         // Reset error state after 3 seconds
