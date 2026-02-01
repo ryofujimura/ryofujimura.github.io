@@ -790,7 +790,7 @@ function SkillButton({
       className={cn(
         "skill-btn group relative inline-flex items-baseline gap-1 transition-all duration-300",
         "font-mono font-bold tracking-tight cursor-pointer touch-manipulation",
-        "text-[9vw] sm:text-[8vw] md:text-[6vw] lg:text-[5vw]",
+        "text-[11vw] sm:text-[8vw] md:text-[6vw] lg:text-[5vw]",
         "leading-[0.9]",
         isActive
           ? cn(colorClass, "scale-[1.02]")
@@ -1056,11 +1056,11 @@ export function ProjectsSection() {
         {/* Skills display with inline terminal */}
         <div
           ref={skillsContainerRef}
-          className="relative text-center py-6 sm:py-10"
+          className="relative text-center py-6 sm:py-10 max-w-6xl mx-auto"
           style={{ paddingBottom: activeSkill ? `${terminalHeight + 40}px` : undefined }}
         >
           {/* Skills flow - wrapped on all screen sizes */}
-          <div className="max-w-6xl mx-auto flex flex-row flex-wrap justify-center items-baseline gap-x-[0.15em] gap-y-1 sm:gap-x-[0.2em] sm:gap-y-3 px-2">
+          <div className="flex flex-row flex-wrap justify-center items-baseline gap-x-[0.15em] gap-y-1 sm:gap-x-[0.2em] sm:gap-y-3">
             {allSkills.map((skill, index) => (
               <span key={skill} className="inline-flex items-baseline">
                 <SkillButton
@@ -1072,7 +1072,7 @@ export function ProjectsSection() {
                   onRefChange={(el) => setSkillRef(skill, el)}
                 />
                 {index < allSkills.length - 1 && (
-                  <span className="font-mono text-[2.5vw] sm:text-[2vw] text-foreground/10 mx-[0.1em] select-none">
+                  <span className="font-mono text-[3vw] sm:text-[2vw] text-foreground/10 mx-[0.1em] select-none">
                     ·
                   </span>
                 )}
