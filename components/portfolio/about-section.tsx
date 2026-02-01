@@ -95,6 +95,12 @@ export function AboutSection() {
     return () => ctx.revert()
   }, [prefersReducedMotion])
 
+  const techStack = [
+    "Python", "Swift", "Kotlin", "TypeScript", "React", 
+    "Firebase", "PyTorch", "CoreML", "On-device LLMs", 
+    "CUDA", "Docker", "Node.js", "REST APIs"
+  ]
+
   return (
     <section id="about" ref={sectionRef} className="relative">
       <div className="relative w-full pt-8 sm:pt-12 pb-16 sm:pb-24">
@@ -103,19 +109,34 @@ export function AboutSection() {
           <BrutalistBackground variant="circuit" />
         </div>
 
+        {/* Full-width Background Tech Stack Ticker */}
+        <div 
+          ref={stackTickerRef}
+          className="absolute inset-0 overflow-hidden pointer-events-none select-none flex items-center"
+        >
+          <div className={`stack-ticker flex gap-12 sm:gap-16 md:gap-24 whitespace-nowrap ${prefersReducedMotion ? "" : "animate-ticker"}`}>
+            {techStack.map((tech, i) => (
+              <span 
+                key={i} 
+                className="font-mono text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black text-foreground/[0.04] uppercase tracking-wider"
+              >
+                {tech}
+              </span>
+            ))}
+            {/* Duplicate for seamless loop */}
+            {techStack.map((tech, i) => (
+              <span 
+                key={`dup-${i}`} 
+                className="font-mono text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black text-foreground/[0.04] uppercase tracking-wider"
+              >
+                {tech}
+              </span>
+            ))}
+          </div>
+        </div>
+
         {/* Content - max-w-6xl to match navbar */}
         <div className="relative z-10 w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Section label */}
-          <div className="flex items-center gap-3 mb-8 sm:mb-10">
-            <div className="relative">
-              <div className="w-2.5 h-2.5 bg-green-500 rounded-full animate-pulse" />
-              <div className="absolute inset-0 w-2.5 h-2.5 bg-green-500 rounded-full animate-ping opacity-75" />
-            </div>
-            <span className="font-mono text-[10px] sm:text-xs uppercase tracking-[0.2em] text-green-500">
-              Available for Opportunities
-            </span>
-          </div>
-
           {/* Stats Grid */}
           <div 
             ref={statsGridRef} 
@@ -123,7 +144,7 @@ export function AboutSection() {
           >
             {[
               { label: "Years Coding", value: "8+", link: null, hash: null },
-              { label: "Internships", value: "2", link: "experience", hash: null },
+              { label: "Internships", value: "2", link: "experience", hash: "#experience-bose" },
               { label: "Projects Shipped", value: "10+", link: "projects", hash: null },
               { label: "Publications", value: "2", link: null, hash: "#experience-cpx-lab" },
             ].map((stat) => {
@@ -176,47 +197,6 @@ export function AboutSection() {
             })}
           </div>
 
-          {/* Stack Ticker */}
-          <div 
-            ref={stackTickerRef} 
-            className="border border-foreground/20 bg-background/50 backdrop-blur-sm overflow-hidden mb-6 sm:mb-8"
-          >
-            <div className="px-3 py-2 border-b border-foreground/10">
-              <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-muted-foreground">
-                Tech Stack
-              </span>
-            </div>
-            <div className="relative overflow-hidden py-3">
-              <div className={`stack-ticker flex gap-8 whitespace-nowrap ${prefersReducedMotion ? "" : "animate-ticker"}`}>
-                {[
-                  "Python", "Swift", "Kotlin", "TypeScript", "React", 
-                  "Firebase", "PyTorch", "CoreML", "On-device LLMs", 
-                  "CUDA", "Docker", "Node.js", "REST APIs"
-                ].map((tech, i) => (
-                  <span 
-                    key={i} 
-                    className="font-mono text-sm sm:text-base text-foreground/80"
-                  >
-                    {tech}
-                  </span>
-                ))}
-                {/* Duplicate for seamless loop */}
-                {[
-                  "Python", "Swift", "Kotlin", "TypeScript", "React", 
-                  "Firebase", "PyTorch", "CoreML", "On-device LLMs", 
-                  "CUDA", "Docker", "Node.js", "REST APIs"
-                ].map((tech, i) => (
-                  <span 
-                    key={`dup-${i}`} 
-                    className="font-mono text-sm sm:text-base text-foreground/80"
-                  >
-                    {tech}
-                  </span>
-                ))}
-              </div>
-            </div>
-          </div>
-
           {/* Focus Areas */}
           <div className="flex flex-wrap gap-2 mb-8 sm:mb-10">
             {["AI / ML", "Mobile", "Backend", "Full-Stack"].map((area) => (
@@ -258,10 +238,7 @@ export function AboutSection() {
           100% { transform: translateX(-50%); }
         }
         .animate-ticker {
-          animation: ticker 30s linear infinite;
-        }
-        .animate-ticker:hover {
-          animation-play-state: paused;
+          animation: ticker 60s linear infinite;
         }
       `}</style>
     </section>
