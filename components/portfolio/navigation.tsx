@@ -7,127 +7,211 @@ import { Menu, X, MessageCircle, Mail } from "lucide-react"
 import { OPEN_CONTACT_FORM_EVENT } from "@/components/portfolio/contact-section"
 import { gsap } from "gsap"
 
-// Animated pill split button for desktop
+// SVG path generator for blob shapes
+function generateBlobPath(
+  cx: number,
+  cy: number,
+  rx: number,
+  ry: number,
+  pinch: number = 0,
+  split: number = 0
+): string {
+  // pinch: 0 = no pinch, 1 = fully pinched in middle
+  // split: 0 = no split, 1 = fully split into two
+  
+  const pinchAmount = pinch * ry * 0.9
+  const splitGap = split * 20
+  
+  if (split > 0.5) {
+    // Two separate blobs
+    const blobRx = rx * 0.45
+    const leftCx = cx - blobRx - splitGap / 2
+    const rightCx = cx + blobRx + splitGap / 2
+    const wobble = (1 - split) * 5
+    
+    // Left blob
+    const leftPath = `
+      M ${leftCx - blobRx} ${cy}
+      C ${leftCx - blobRx} ${cy - ry + wobble}, ${leftCx + blobRx} ${cy - ry - wobble}, ${leftCx + blobRx} ${cy}
+      C ${leftCx + blobRx} ${cy + ry - wobble}, ${leftCx - blobRx} ${cy + ry + wobble}, ${leftCx - blobRx} ${cy}
+      Z
+    `
+    // Right blob
+    const rightPath = `
+      M ${rightCx - blobRx} ${cy}
+      C ${rightCx - blobRx} ${cy - ry - wobble}, ${rightCx + blobRx} ${cy - ry + wobble}, ${rightCx + blobRx} ${cy}
+      C ${rightCx + blobRx} ${cy + ry + wobble}, ${rightCx - blobRx} ${cy + ry - wobble}, ${rightCx - blobRx} ${cy}
+      Z
+    `
+    return leftPath + " " + rightPath
+  }
+  
+  // Single blob with optional pinch
+  const topPinch = pinchAmount
+  const bottomPinch = pinchAmount
+  
+  return `
+    M ${cx - rx} ${cy}
+    C ${cx - rx} ${cy - ry}, ${cx - rx/3} ${cy - ry}, ${cx} ${cy - ry + topPinch}
+    C ${cx + rx/3} ${cy - ry}, ${cx + rx} ${cy - ry}, ${cx + rx} ${cy}
+    C ${cx + rx} ${cy + ry}, ${cx + rx/3} ${cy + ry}, ${cx} ${cy + ry - bottomPinch}
+    C ${cx - rx/3} ${cy + ry}, ${cx - rx} ${cy + ry}, ${cx - rx} ${cy}
+    Z
+  `
+}
+
+// Animated slime-split pill button for desktop
 function SplitContactButton() {
   const containerRef = useRef<HTMLDivElement>(null)
-  const mainPillRef = useRef<HTMLDivElement>(null)
+  const svgRef = useRef<SVGSVGElement>(null)
+  const blobPathRef = useRef<SVGPathElement>(null)
   const mainTextRef = useRef<HTMLSpanElement>(null)
-  const leftPillRef = useRef<HTMLButtonElement>(null)
-  const rightPillRef = useRef<HTMLAnchorElement>(null)
+  const leftButtonRef = useRef<HTMLButtonElement>(null)
+  const rightButtonRef = useRef<HTMLAnchorElement>(null)
   const leftContentRef = useRef<HTMLSpanElement>(null)
   const rightContentRef = useRef<HTMLSpanElement>(null)
   const timelineRef = useRef<gsap.core.Timeline | null>(null)
+  const animationRef = useRef<{ pinch: number; split: number }>({ pinch: 0, split: 0 })
   const [isHovered, setIsHovered] = useState(false)
 
-  // Initialize GSAP timeline
+  // SVG dimensions
+  const svgWidth = 260
+  const svgHeight = 44
+  const cx = svgWidth / 2
+  const cy = svgHeight / 2
+  const initialRx = 58
+  const ry = 18
+
+  // Update blob path based on animation state
+  const updateBlobPath = useCallback(() => {
+    if (!blobPathRef.current) return
+    const { pinch, split } = animationRef.current
+    const expandedRx = initialRx + split * 40
+    blobPathRef.current.setAttribute("d", generateBlobPath(cx, cy, expandedRx, ry, pinch, split))
+  }, [cx, cy, initialRx, ry])
+
+  // Initialize
   useEffect(() => {
     if (!containerRef.current) return
 
     const ctx = gsap.context(() => {
-      // Set initial states
-      gsap.set([leftPillRef.current, rightPillRef.current], {
-        scale: 0,
+      // Set initial path
+      updateBlobPath()
+      
+      // Hide split buttons initially
+      gsap.set([leftButtonRef.current, rightButtonRef.current], {
         opacity: 0,
+        scale: 0.8,
       })
       gsap.set([leftContentRef.current, rightContentRef.current], {
         opacity: 0,
-        y: 10,
       })
     }, containerRef)
 
     return () => ctx.revert()
-  }, [])
+  }, [updateBlobPath])
 
   const handleMouseEnter = useCallback(() => {
     if (!containerRef.current) return
     setIsHovered(true)
 
-    // Kill any existing animation
     timelineRef.current?.kill()
-
     const tl = gsap.timeline()
     timelineRef.current = tl
 
-    // Phase 1: Fade out main text and start morphing
+    // Phase 1: Fade out main text
     tl.to(mainTextRef.current, {
       opacity: 0,
-      scale: 0.8,
-      duration: 0.15,
+      scale: 0.9,
+      duration: 0.2,
       ease: "power2.in",
     })
 
-    // Phase 2: Main pill fades and splits
-    .to(mainPillRef.current, {
-      opacity: 0,
-      scaleX: 1.5,
-      duration: 0.2,
+    // Phase 2: Blob stretches and pinches (slime effect)
+    .to(animationRef.current, {
+      pinch: 1,
+      duration: 0.3,
       ease: "power2.inOut",
-    }, "-=0.05")
+      onUpdate: updateBlobPath,
+    }, "-=0.1")
 
-    // Phase 3: Two pills emerge from center with spring effect
-    .to([leftPillRef.current, rightPillRef.current], {
-      scale: 1,
+    // Phase 3: Blob splits into two with elastic bounce
+    .to(animationRef.current, {
+      split: 1,
+      pinch: 0,
+      duration: 0.5,
+      ease: "elastic.out(1, 0.5)",
+      onUpdate: updateBlobPath,
+    }, "-=0.1")
+
+    // Phase 4: Buttons appear
+    .to([leftButtonRef.current, rightButtonRef.current], {
       opacity: 1,
-      duration: 0.35,
-      ease: "back.out(1.7)",
+      scale: 1,
+      duration: 0.3,
+      ease: "back.out(2)",
       stagger: 0.05,
-    }, "-=0.15")
+    }, "-=0.4")
 
-    // Phase 4: Content fades in
+    // Phase 5: Content fades in
     .to([leftContentRef.current, rightContentRef.current], {
       opacity: 1,
-      y: 0,
-      duration: 0.25,
+      duration: 0.2,
       ease: "power2.out",
-      stagger: 0.05,
+      stagger: 0.03,
     }, "-=0.2")
-  }, [])
+  }, [updateBlobPath])
 
   const handleMouseLeave = useCallback(() => {
     if (!containerRef.current) return
     setIsHovered(false)
 
-    // Kill any existing animation
     timelineRef.current?.kill()
-
     const tl = gsap.timeline()
     timelineRef.current = tl
 
-    // Reverse: Fade out content
+    // Reverse: Hide content
     tl.to([leftContentRef.current, rightContentRef.current], {
       opacity: 0,
-      y: 10,
       duration: 0.15,
       ease: "power2.in",
     })
 
-    // Pills collapse back
-    .to([leftPillRef.current, rightPillRef.current], {
-      scale: 0,
+    // Hide buttons
+    .to([leftButtonRef.current, rightButtonRef.current], {
       opacity: 0,
-      duration: 0.25,
+      scale: 0.8,
+      duration: 0.2,
       ease: "power2.in",
     }, "-=0.1")
 
-    // Main pill returns
-    .to(mainPillRef.current, {
-      opacity: 1,
-      scaleX: 1,
-      duration: 0.25,
-      ease: "power2.out",
+    // Merge blobs back (slime rejoining)
+    .to(animationRef.current, {
+      split: 0,
+      pinch: 0.5,
+      duration: 0.35,
+      ease: "power3.inOut",
+      onUpdate: updateBlobPath,
     }, "-=0.15")
 
-    // Main text fades back in
+    // Settle back to pill shape
+    .to(animationRef.current, {
+      pinch: 0,
+      duration: 0.25,
+      ease: "elastic.out(1, 0.7)",
+      onUpdate: updateBlobPath,
+    })
+
+    // Fade in main text
     .to(mainTextRef.current, {
       opacity: 1,
       scale: 1,
-      duration: 0.2,
+      duration: 0.25,
       ease: "power2.out",
-    }, "-=0.15")
-  }, [])
+    }, "-=0.2")
+  }, [updateBlobPath])
 
   const handleMessageClick = useCallback(() => {
-    // Scroll to contact section and open form
     const contactSection = document.getElementById("contact")
     if (contactSection) {
       const offset = 80
@@ -137,7 +221,6 @@ function SplitContactButton() {
         behavior: "smooth",
       })
     }
-    // Dispatch custom event to open the form
     setTimeout(() => {
       window.dispatchEvent(new CustomEvent(OPEN_CONTACT_FORM_EVENT))
     }, 500)
@@ -146,57 +229,64 @@ function SplitContactButton() {
   return (
     <div
       ref={containerRef}
-      className="relative h-10 flex items-center"
+      className="relative flex items-center justify-center"
+      style={{ width: svgWidth, height: svgHeight }}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
-      {/* Main pill - visible by default */}
-      <div
-        ref={mainPillRef}
-        className="absolute inset-0 bg-primary rounded-full pointer-events-none"
-        style={{ transformOrigin: "center" }}
-      />
+      {/* SVG blob background */}
+      <svg
+        ref={svgRef}
+        className="absolute inset-0 pointer-events-none"
+        width={svgWidth}
+        height={svgHeight}
+        viewBox={`0 0 ${svgWidth} ${svgHeight}`}
+      >
+        <path
+          ref={blobPathRef}
+          className="fill-primary"
+          d={generateBlobPath(cx, cy, initialRx, ry, 0, 0)}
+        />
+      </svg>
 
-      {/* Main text overlay */}
+      {/* Main text - visible when not hovered */}
       <span
         ref={mainTextRef}
-        className="relative z-10 px-5 text-sm font-medium text-primary-foreground whitespace-nowrap pointer-events-none"
+        className="absolute inset-0 flex items-center justify-center text-sm font-medium text-primary-foreground whitespace-nowrap pointer-events-none z-10"
       >
         Get in Touch
       </span>
 
-      {/* Split pills container - positioned absolutely over the main pill */}
-      <div className="absolute inset-0 flex items-center justify-center gap-2 pointer-events-none">
-        {/* Left pill - Message */}
+      {/* Split buttons - positioned over the split blobs */}
+      <div className="absolute inset-0 flex items-center justify-center gap-6 z-10">
         <button
-          ref={leftPillRef}
+          ref={leftButtonRef}
           type="button"
           onClick={handleMessageClick}
           className={cn(
-            "flex items-center gap-2 px-4 py-2 bg-primary rounded-full text-primary-foreground text-sm font-medium",
-            "hover:shadow-lg hover:shadow-primary/30 transition-shadow duration-200",
+            "flex items-center justify-center px-4 py-2 text-primary-foreground text-sm font-medium rounded-full",
+            "hover:brightness-110 transition-all duration-150",
             isHovered ? "pointer-events-auto" : "pointer-events-none"
           )}
-          style={{ transformOrigin: "right center" }}
+          style={{ opacity: 0 }}
         >
-          <span ref={leftContentRef} className="flex items-center gap-2">
+          <span ref={leftContentRef} className="flex items-center gap-2" style={{ opacity: 0 }}>
             <MessageCircle className="w-4 h-4" />
             <span>Message</span>
           </span>
         </button>
 
-        {/* Right pill - Email */}
         <a
-          ref={rightPillRef}
+          ref={rightButtonRef}
           href="mailto:ryo.fujimura1@gmail.com"
           className={cn(
-            "flex items-center gap-2 px-4 py-2 bg-primary rounded-full text-primary-foreground text-sm font-medium",
-            "hover:shadow-lg hover:shadow-primary/30 transition-shadow duration-200",
+            "flex items-center justify-center px-4 py-2 text-primary-foreground text-sm font-medium rounded-full",
+            "hover:brightness-110 transition-all duration-150",
             isHovered ? "pointer-events-auto" : "pointer-events-none"
           )}
-          style={{ transformOrigin: "left center" }}
+          style={{ opacity: 0 }}
         >
-          <span ref={rightContentRef} className="flex items-center gap-2">
+          <span ref={rightContentRef} className="flex items-center gap-2" style={{ opacity: 0 }}>
             <Mail className="w-4 h-4" />
             <span>Email</span>
           </span>
