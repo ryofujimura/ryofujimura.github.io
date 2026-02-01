@@ -352,10 +352,8 @@ function ProjectCard({ project, index, isActive }: { project: Project; index: nu
       className={cn(
         "relative",
         "bg-background border-2 border-foreground",
-        "w-full",
-        // Mobile: full width vertical stack
-        // Desktop: fixed width for horizontal scroll
-        "lg:w-[380px] lg:flex-shrink-0"
+        // Fixed width for horizontal scroll on all screens
+        "w-[280px] sm:w-[320px] lg:w-[380px] flex-shrink-0"
       )}
     >
       <TechLines className="opacity-40" />
@@ -611,14 +609,18 @@ function SectionHeader({ count }: { count: number }) {
 }
 
 // ─────────────────────────────────────────────────────────────
-// HORIZONTAL SCROLL CONTAINER (DESKTOP)
+// DRAGGABLE HORIZONTAL TIMELINE (ALL SCREENS)
 // ─────────────────────────────────────────────────────────────
 
-function HorizontalTimeline({ projects }: { projects: Project[] }) {
+function DraggableTimeline({ projects }: { projects: Project[] }) {
   const containerRef = useRef<HTMLDivElement>(null)
   const scrollRef = useRef<HTMLDivElement>(null)
   const [scrollProgress, setScrollProgress] = useState(0)
+  const [isDragging, setIsDragging] = useState(false)
+  const [startX, setStartX] = useState(0)
+  const [scrollLeft, setScrollLeft] = useState(0)
 
+  // Handle scroll progress
   useEffect(() => {
     if (!scrollRef.current) return
     const scroll = scrollRef.current
@@ -633,24 +635,70 @@ function HorizontalTimeline({ projects }: { projects: Project[] }) {
     return () => scroll.removeEventListener("scroll", handleScroll)
   }, [])
 
+  // Drag to scroll handlers
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (!scrollRef.current) return
+    setIsDragging(true)
+    setStartX(e.pageX - scrollRef.current.offsetLeft)
+    setScrollLeft(scrollRef.current.scrollLeft)
+    scrollRef.current.style.cursor = "grabbing"
+  }
+
+  const handleMouseUp = () => {
+    setIsDragging(false)
+    if (scrollRef.current) scrollRef.current.style.cursor = "grab"
+  }
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging || !scrollRef.current) return
+    e.preventDefault()
+    const x = e.pageX - scrollRef.current.offsetLeft
+    const walk = (x - startX) * 1.5 // Scroll speed multiplier
+    scrollRef.current.scrollLeft = scrollLeft - walk
+  }
+
+  const handleMouseLeave = () => {
+    setIsDragging(false)
+    if (scrollRef.current) scrollRef.current.style.cursor = "grab"
+  }
+
+  // Touch handlers for mobile
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (!scrollRef.current) return
+    setIsDragging(true)
+    setStartX(e.touches[0].pageX - scrollRef.current.offsetLeft)
+    setScrollLeft(scrollRef.current.scrollLeft)
+  }
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!isDragging || !scrollRef.current) return
+    const x = e.touches[0].pageX - scrollRef.current.offsetLeft
+    const walk = (x - startX) * 1.5
+    scrollRef.current.scrollLeft = scrollLeft - walk
+  }
+
+  const handleTouchEnd = () => {
+    setIsDragging(false)
+  }
+
+  // GSAP animations
   useEffect(() => {
     if (!containerRef.current) return
     const ctx = gsap.context(() => {
-      // Animate cards on scroll into view
       const cards = containerRef.current?.querySelectorAll(".project-card")
       cards?.forEach((card, i) => {
         gsap.fromTo(
           card,
-          { opacity: 0, y: 30 },
+          { opacity: 0, y: 20 },
           {
             opacity: 1,
             y: 0,
-            duration: 0.6,
-            delay: i * 0.1,
+            duration: 0.5,
+            delay: i * 0.08,
             ease: "power3.out",
             scrollTrigger: {
               trigger: containerRef.current,
-              start: "top 85%",
+              start: "top 88%",
               toggleActions: "play none none none",
             },
           }
@@ -661,35 +709,46 @@ function HorizontalTimeline({ projects }: { projects: Project[] }) {
   }, [projects])
 
   return (
-    <div ref={containerRef} className="hidden lg:block relative">
+    <div ref={containerRef} className="relative">
       {/* Timeline progress bar */}
-      <div className="mb-4 flex items-center gap-3">
-        <span className="font-mono text-[9px] text-accent">NOW</span>
-        <div className="flex-1 h-1 bg-foreground/10 relative">
+      <div className="mb-3 sm:mb-4 flex items-center gap-2 sm:gap-3">
+        <span className="font-mono text-[8px] sm:text-[9px] text-accent">NOW</span>
+        <div className="flex-1 h-0.5 sm:h-1 bg-foreground/10 relative">
           <div
-            className="absolute inset-y-0 left-0 bg-foreground/40 transition-all duration-150"
+            className="absolute inset-y-0 left-0 bg-accent/60 transition-all duration-150"
             style={{ width: `${scrollProgress * 100}%` }}
           />
         </div>
-        <span className="font-mono text-[9px] text-foreground/50">2022</span>
+        <span className="font-mono text-[8px] sm:text-[9px] text-foreground/50">2022</span>
       </div>
 
-      {/* Horizontal scrollable container */}
+      {/* Horizontal scrollable container with drag support */}
       <div
         ref={scrollRef}
-        className="flex gap-6 overflow-x-auto pb-4 scrollbar-hide scroll-smooth"
-        style={{ scrollSnapType: "x mandatory" }}
+        className={cn(
+          "flex gap-4 sm:gap-6 overflow-x-auto pb-3 sm:pb-4 scrollbar-hide",
+          "cursor-grab select-none",
+          isDragging && "cursor-grabbing"
+        )}
+        style={{ scrollSnapType: isDragging ? "none" : "x mandatory" }}
+        onMouseDown={handleMouseDown}
+        onMouseUp={handleMouseUp}
+        onMouseMove={handleMouseMove}
+        onMouseLeave={handleMouseLeave}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
       >
         {/* Now marker */}
-        <div className="flex-shrink-0 flex flex-col items-center justify-center w-16 scroll-snap-align-start">
-          <pre className="font-mono text-[7px] text-foreground/30 select-none whitespace-pre leading-tight">{ASCII_GROWTH}</pre>
-          <span className="font-mono text-[9px] text-accent mt-1">▼</span>
+        <div className="flex-shrink-0 flex flex-col items-center justify-center w-10 sm:w-16">
+          <pre className="font-mono text-[6px] sm:text-[7px] text-foreground/30 select-none whitespace-pre leading-tight hidden sm:block">{ASCII_GROWTH}</pre>
+          <span className="font-mono text-[8px] sm:text-[9px] text-accent">▼</span>
         </div>
 
         {projects.map((project, index) => (
           <div
             key={project.id}
-            className="project-card flex-shrink-0 scroll-snap-align-start"
+            className="project-card flex-shrink-0"
             style={{ scrollSnapAlign: "start" }}
           >
             <ProjectCard project={project} index={index} />
@@ -697,79 +756,18 @@ function HorizontalTimeline({ projects }: { projects: Project[] }) {
         ))}
 
         {/* End marker */}
-        <div className="flex-shrink-0 flex flex-col items-center justify-center w-20 scroll-snap-align-start">
-          <span className="font-mono text-[9px] text-foreground/40">2022</span>
-          <pre className="font-mono text-[8px] text-foreground/30 select-none mt-1">{ASCII_ARROW}</pre>
+        <div className="flex-shrink-0 flex flex-col items-center justify-center w-12 sm:w-20">
+          <span className="font-mono text-[8px] sm:text-[9px] text-foreground/40">2022</span>
+          <pre className="font-mono text-[7px] sm:text-[8px] text-foreground/30 select-none mt-1">{ASCII_ARROW}</pre>
         </div>
       </div>
 
       {/* Scroll hint */}
-      <div className="mt-2 flex items-center justify-center gap-2 font-mono text-[9px] text-foreground/40">
+      <div className="mt-2 flex items-center justify-center gap-2 font-mono text-[8px] sm:text-[9px] text-foreground/40">
         <ChevronLeft className="w-3 h-3" />
-        <span>SCROLL HORIZONTALLY</span>
+        <span className="hidden sm:inline">DRAG OR SCROLL</span>
+        <span className="sm:hidden">SWIPE</span>
         <ChevronRight className="w-3 h-3" />
-      </div>
-    </div>
-  )
-}
-
-// ─────────────────────────────────────────────────────────────
-// VERTICAL TIMELINE (MOBILE)
-// ─────────────────────────────────────────────────────────────
-
-function VerticalTimeline({ projects }: { projects: Project[] }) {
-  const containerRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    if (!containerRef.current) return
-    const ctx = gsap.context(() => {
-      // Animate timeline line
-      const line = containerRef.current?.querySelector(".v-timeline-line")
-      if (line) {
-        gsap.fromTo(
-          line,
-          { scaleY: 0 },
-          {
-            scaleY: 1,
-            ease: "none",
-            scrollTrigger: {
-              trigger: containerRef.current,
-              start: "top 80%",
-              end: "bottom 20%",
-              scrub: 1,
-            },
-          }
-        )
-      }
-    }, containerRef.current)
-    return () => ctx.revert()
-  }, [projects])
-
-  return (
-    <div ref={containerRef} className="lg:hidden relative">
-      {/* Vertical timeline line */}
-      <div className="absolute left-4 sm:left-6 top-0 bottom-0 w-0.5 bg-foreground/10">
-        <div className="v-timeline-line absolute inset-0 bg-foreground/30 origin-top" />
-      </div>
-
-      {/* Projects */}
-      <div className="space-y-6 sm:space-y-8 pl-10 sm:pl-14">
-        {projects.map((project, index) => (
-          <div key={project.id} className="relative">
-            {/* Timeline node */}
-            <div className="absolute -left-10 sm:-left-14 top-6 w-4 h-4 border-2 border-foreground bg-background rotate-45 flex items-center justify-center">
-              <div className="w-1.5 h-1.5 bg-accent rotate-45" />
-            </div>
-
-            <ProjectCard project={project} index={index} />
-          </div>
-        ))}
-      </div>
-
-      {/* Start marker (oldest) */}
-      <div className="relative mt-6 pl-10 sm:pl-14">
-        <div className="absolute -left-10 sm:-left-14 top-0 w-4 h-4 border-2 border-foreground/40 bg-background rotate-45" />
-        <span className="font-mono text-xs text-muted-foreground">← 2022</span>
       </div>
     </div>
   )
@@ -780,7 +778,7 @@ function VerticalTimeline({ projects }: { projects: Project[] }) {
 // ─────────────────────────────────────────────────────────────
 
 export function ProjectsSection() {
-  const [selectedGroups, setSelectedGroups] = useState<SkillGroup[]>([])
+  const [selectedGroups, setSelectedGroups] = useState<SkillGroup[]>(["AI/ML"])
   const sectionRef = useRef<HTMLElement>(null)
 
   const toggleGroup = useCallback((group: SkillGroup) => {
@@ -863,11 +861,8 @@ export function ProjectsSection() {
           </div>
         ) : (
           <>
-            {/* Desktop: Horizontal timeline */}
-            <HorizontalTimeline projects={filteredProjects} />
-
-            {/* Mobile: Vertical timeline */}
-            <VerticalTimeline projects={filteredProjects} />
+            {/* Draggable horizontal timeline for all screens */}
+            <DraggableTimeline projects={filteredProjects} />
           </>
         )}
 
