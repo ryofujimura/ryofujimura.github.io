@@ -447,13 +447,13 @@ export function HeroPortrait({ className = "" }: HeroPortraitProps) {
         {/* Image wrapper with parallax - gaze tracking face */}
         <div
           ref={imageRef}
-          className="absolute inset-[-10%] w-[120%] h-[120%]"
+          className="absolute inset-0 w-full h-full"
         >
           {currentImage && (
             <img
               src={currentImage}
               alt="Portrait following gaze"
-              className="w-full h-full object-cover object-center"
+              className="w-full h-full object-contain object-center"
               style={{
                 transition: 'opacity 0.1s ease-out',
                 userSelect: 'none',

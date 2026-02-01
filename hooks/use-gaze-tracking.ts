@@ -59,7 +59,8 @@ export function useGazeTracking(
     
     // Clamp to [-1, 1] range
     const clampedX = Math.max(-1, Math.min(1, nx))
-    const clampedY = Math.max(-1, Math.min(1, ny))
+    // Invert Y: cursor above center = positive py (look up)
+    const clampedY = Math.max(-1, Math.min(1, -ny))
     
     // Convert to grid coordinates
     const px = quantizeToGrid(clampedX)
