@@ -3,330 +3,517 @@
 import { useState, useRef, useEffect, useCallback } from "react"
 import { gsap } from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
-import { cn } from "@/lib/utils"
 import Image from "next/image"
+import { cn } from "@/lib/utils"
 
 gsap.registerPlugin(ScrollTrigger)
 
-// ═══════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════
+// MOBILE DETECTION HOOK - matchMedia + resize listener
+// ═══════════════════════════════════════════════════════════════
+
+const MOBILE_BREAKPOINT = 768
+const TABLET_BREAKPOINT = 1024
+
+function useDeviceDetection() {
+  const [isMobile, setIsMobile] = useState(false)
+  const [isTablet, setIsTablet] = useState(false)
+  const [windowHeight, setWindowHeight] = useState(800)
+
+  useEffect(() => {
+    if (typeof window === "undefined") return
+
+    const mobileQuery = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT - 1}px)`)
+    const tabletQuery = window.matchMedia(`(max-width: ${TABLET_BREAKPOINT - 1}px)`)
+    
+    const updateDevice = () => {
+      setIsMobile(mobileQuery.matches)
+      setIsTablet(tabletQuery.matches && !mobileQuery.matches)
+      setWindowHeight(window.innerHeight)
+    }
+
+    updateDevice()
+
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < MOBILE_BREAKPOINT)
+      setIsTablet(window.innerWidth < TABLET_BREAKPOINT && window.innerWidth >= MOBILE_BREAKPOINT)
+      setWindowHeight(window.innerHeight)
+    }
+
+    mobileQuery.addEventListener("change", updateDevice)
+    tabletQuery.addEventListener("change", updateDevice)
+    window.addEventListener("resize", handleResize)
+
+    return () => {
+      mobileQuery.removeEventListener("change", updateDevice)
+      tabletQuery.removeEventListener("change", updateDevice)
+      window.removeEventListener("resize", handleResize)
+    }
+  }, [])
+
+  return { isMobile, isTablet, windowHeight }
+}
+
+// ═══════════════════════════════════════════════════════════════
 // PROJECT DATA
-// ═══════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════
 
 const projects = [
   {
     id: "01",
-    title: "POKER%",
+    title: "POKER %",
     subtitle: "WATCHOS",
     year: "2022",
-    description: "Real-time poker odds calculator for Apple Watch. Monte Carlo simulation with sub-10ms response.",
-    techStack: ["Swift", "WatchOS", "SwiftUI"],
-    images: ["/images/poker_1.jpg", "/images/poker_2.jpg", "/images/poker_3.jpg", "/images/poker_4.jpg"],
-    metric: "<10ms",
-    ascii: "♠♥♦♣",
+    tech: ["Swift", "WatchOS", "SwiftUI"],
+    images: ["/images/poker_1.jpg", "/images/poker_2.jpg", "/images/poker_3.jpg"],
+    description: "Real-time poker odds calculator for Apple Watch using Monte Carlo simulation",
+    ascii: `
+    ♠ ♥ ♦ ♣
+   ┌─────────┐
+   │ A   ♠   │
+   │    ♠    │
+   │   ♠   A │
+   └─────────┘`,
   },
   {
     id: "02",
-    title: "SHOHEI_HG",
+    title: "SHOHEI HG",
     subtitle: "AUTOMATION",
     year: "2023",
-    description: "Automated content pipeline for Instagram/YouTube. 11K followers through intelligent posting.",
-    techStack: ["Python", "Instagram API", "YouTube API"],
+    tech: ["Python", "Instagram API", "YouTube API"],
     images: ["/images/shoheihomeground_1.jpg", "/images/shoheihomeground_2.jpg", "/images/shoheihomeground_3.jpg"],
-    metric: "11K",
-    ascii: "▓▓▓░░",
+    description: "Automated content pipeline for Instagram and YouTube with 11K+ followers",
+    ascii: `
+   ╔══════════╗
+   ║ ▓▓▓▓▓▓░░ ║
+   ║ AUTOMATE ║
+   ║ ▓▓▓▓▓▓░░ ║
+   ╚══════════╝`,
   },
   {
     id: "03",
     title: "SCHEDULE",
-    subtitle: "FLASK",
+    subtitle: "FLASK API",
     year: "2023",
-    description: "Course scheduling system with conflict detection using graph coloring algorithms.",
-    techStack: ["Python", "Flask", "SQLite"],
+    tech: ["Python", "Flask", "SQLite"],
     images: ["/images/schedule.jpg"],
-    metric: "70%",
-    ascii: "█░█░█",
+    description: "Intelligent course scheduling with conflict detection using graph algorithms",
+    ascii: `
+   ┌─┬─┬─┬─┬─┐
+   │M│T│W│T│F│
+   ├─┼─┼─┼─┼─┤
+   │█│░│█│░│█│
+   └─┴─┴─┴─┴─┘`,
   },
   {
     id: "04",
     title: "MATCHA",
-    subtitle: "IOS",
+    subtitle: "IOS APP",
     year: "2024",
-    description: "Minimalist matcha timer app with Japanese aesthetic. Precision timers and ritual tracking.",
-    techStack: ["Swift", "SwiftUI", "CloudKit"],
+    tech: ["Swift", "SwiftUI", "CloudKit"],
     images: ["/images/matchatime_1.jpg", "/images/matchatime_2.jpg", "/images/matchatime_3.jpg"],
-    metric: "4wks",
-    ascii: "░▒▓█▓",
+    description: "Minimalist matcha timer with Japanese aesthetic and ritual tracking",
+    ascii: `
+      🍵
+   ╭───────╮
+   │ MATCHA│
+   │ ▓▓▓▓▓ │
+   ╰───────╯`,
   },
   {
     id: "05",
     title: "PORTFOLIO",
     subtitle: "NEXT.JS",
     year: "2024",
-    description: "This portfolio. Next.js 15 with scroll-driven animations and brutalist design system.",
-    techStack: ["React", "Next.js", "GSAP", "Tailwind"],
+    tech: ["React", "Next.js", "GSAP", "Tailwind"],
     images: ["/images/homepage.png", "/images/experiencepage.png"],
-    metric: "<1.5s",
-    ascii: "┌──┐",
+    description: "Brutalist portfolio with scroll-driven animations and performance optimization",
+    ascii: `
+   ┌──────────────┐
+   │ ████████░░░░ │
+   │ PORTFOLIO.JS │
+   └──────────────┘`,
   },
   {
     id: "06",
     title: "SABORIENDO",
     subtitle: "CROSS-PLAT",
     year: "2024",
-    description: "Food tracking with barcode scanning. Cross-platform sync between iOS and web.",
-    techStack: ["React 19", "SwiftUI", "Firebase"],
+    tech: ["React 19", "SwiftUI", "Firebase"],
     images: [],
-    metric: "<1s",
-    ascii: "║│║│║",
+    description: "Food tracking with barcode scanning and real-time cross-platform sync",
+    ascii: `
+   ┌───────────┐
+   │ ║│║ │║│║│ │
+   │ BARCODE   │
+   └───────────┘`,
   },
   {
     id: "07",
-    title: "WITH_LLM",
+    title: "WITH LLM",
     subtitle: "ON-DEVICE",
     year: "2024",
-    description: "Privacy-focused AI assistant. Local llama.cpp with quantized GGUF models.",
-    techStack: ["Swift", "llama.cpp", "GGUF"],
+    tech: ["Swift", "llama.cpp", "GGUF"],
     images: [],
-    metric: "<50ms",
-    ascii: "◉░▒▓█",
+    description: "Privacy-focused AI assistant running entirely on-device with llama.cpp",
+    ascii: `
+   ┌─────────────┐
+   │ ◉ LOCAL LLM │
+   │ ░▒▓█▓▒░▒▓█▓ │
+   └─────────────┘`,
   },
   {
     id: "08",
-    title: "HTIC_SHUTTLE",
-    subtitle: "REALTIME",
+    title: "HTIC BUS",
+    subtitle: "REAL-TIME",
     year: "2025",
-    description: "Campus shuttle tracking with real-time location. Firebase RTDB for sub-100ms latency.",
-    techStack: ["Swift", "Kotlin", "Firebase"],
+    tech: ["Swift", "Kotlin", "Firebase"],
     images: [],
-    metric: "<100ms",
-    ascii: "○──○",
+    description: "Campus shuttle tracking with real-time updates and sub-100ms latency",
+    ascii: `
+   ═══════════════
+       🚌
+   ──○────────○──
+   ═══════════════`,
   },
   {
     id: "09",
     title: "CYBEREDU",
     subtitle: "OFFLINE",
     year: "2025",
-    description: "Educational platform with offline-first architecture. SQLite cache with conflict resolution.",
-    techStack: ["Swift", "Kotlin", "Firebase"],
+    tech: ["Swift", "Kotlin", "Firebase"],
     images: ["/images/CyberEdu-1.PNG", "/images/CyberEdu-2.PNG", "/images/CyberEdu-3.PNG"],
-    metric: "99%",
-    ascii: "●SYNC",
+    description: "Educational platform with offline-first architecture and conflict resolution",
+    ascii: `
+   ╔═══════════════╗
+   ║ ● OFFLINE OK  ║
+   ║ SYNC: READY   ║
+   ╚═══════════════╝`,
   },
   {
     id: "10",
-    title: "LAB_PM",
+    title: "RESEARCH",
     subtitle: "SERVERLESS",
     year: "2025",
-    description: "Research lab PM with AI-powered task routing. Dynamic model selection based on complexity.",
-    techStack: ["Cloud Functions", "Firebase", "GPT-4"],
+    tech: ["Cloud Functions", "Firebase", "GPT-4"],
     images: [],
-    metric: "<200ms",
-    ascii: "◇◆◇",
+    description: "Project management for research labs with AI-powered task routing",
+    ascii: `
+   ┌─── LAB ───┐
+   │ ◇ PAPERS  │
+   │ ◆ TASKS   │
+   └───────────┘`,
   },
   {
     id: "11",
     title: "WHITEBOARD",
-    subtitle: "VISION_ML",
+    subtitle: "VISION ML",
     year: "2025",
-    description: "Collaborative whiteboard with real-time AI vision. PyTorch detection with CRDT sync.",
-    techStack: ["PyTorch", "WebSocket", "React"],
+    tech: ["PyTorch", "WebSocket", "React"],
     images: ["/images/whiteboardai-1.jpg", "/images/whiteboardai-2.jpg"],
-    metric: "60fps",
-    ascii: "○─□",
+    description: "Collaborative whiteboard with real-time AI vision and CRDT sync",
+    ascii: `
+   ┌───────────────┐
+   │ ○ ───── □    │
+   │  AI VISION   │
+   └───────────────┘`,
   },
   {
     id: "12",
-    title: "ZERO_INBOX",
-    subtitle: "PROD_AI",
+    title: "ZERO INBOX",
+    subtitle: "AI ENGINE",
     year: "2025",
-    description: "Email management with multi-stage AI reasoning. 95% accuracy categorization.",
-    techStack: ["Swift", "AI/ML", "Firebase"],
+    tech: ["Swift", "AI/ML", "Firebase"],
     images: [],
-    metric: "95%",
-    ascii: "█▓▒░",
+    description: "Email management with multi-stage AI reasoning and 95% accuracy",
+    ascii: `
+   ═══════════════
+   │ INBOX: 0    │
+   │ AI: ACTIVE  │
+   ═══════════════`,
   },
 ]
 
 type Project = (typeof projects)[0]
 
-// ═══════════════════════════════════════════════════════════════════
-// ASCII PATTERNS
-// ═══════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════
+// ASCII PATTERNS FOR DECORATION
+// ═══════════════════════════════════════════════════════════════
 
-const ASCII_LINES = {
-  horizontal: "═══════════════════════════════════════════════════════════════",
-  double: "────────────────────────────────────────────────────────────────",
-  dots: "░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░",
-  blocks: "▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓",
-  mixed: "░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░",
-}
+const ASCII_GRID = `
+░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+████████████████████████████████████████████████████
+▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+`.trim()
 
-const GLITCH_CHARS = "!@#$%^&*()_+-=[]{}|;':\",./<>?░▒▓█▄▀■□●○◆◇"
+const CORNER_MARK = `┌──────┐
+│      │
+│      │
+└──────┘`
 
-// ═══════════════════════════════════════════════════════════════════
-// LOADING ANIMATION - ASCII BOOT SEQUENCE
-// ═══════════════════════════════════════════════════════════════════
+const GLITCH_CHARS = "!@#$%^&*()_+-=[]{}|;':\",./<>?░▒▓█"
 
-function LoadingScreen({ onComplete }: { onComplete: () => void }) {
-  const [lines, setLines] = useState<string[]>([])
-  const [progress, setProgress] = useState(0)
+// ═══════════════════════════════════════════════════════════════
+// LOADING SCREEN
+// ═══════════════════════════════════════════════════════════════
+
+function LoadingScreen({ progress, isComplete }: { progress: number; isComplete: boolean }) {
   const containerRef = useRef<HTMLDivElement>(null)
+  const [glitchText, setGlitchText] = useState("INITIALIZING")
+  const [loadingChars, setLoadingChars] = useState("")
 
-  const bootSequence = [
-    "INITIALIZING PROJECTS MODULE...",
-    "LOADING TYPOGRAPHY ENGINE ████████░░ 80%",
-    "PARSING PROJECT DATA ██████████ 100%",
-    "MOUNTING SCROLL TRIGGERS...",
-    "COMPILING ASCII PATTERNS...",
-    "CALIBRATING GSAP TIMELINES...",
-    "READY.",
-  ]
-
+  // Glitch text animation
   useEffect(() => {
-    let lineIndex = 0
+    const texts = ["INITIALIZING", "LOADING_PROJECTS", "PARSING_DATA", "RENDERING_UI"]
+    let textIndex = 0
+    let charIndex = 0
+    
     const interval = setInterval(() => {
-      if (lineIndex < bootSequence.length) {
-        setLines(prev => [...prev, bootSequence[lineIndex]])
-        setProgress((lineIndex + 1) / bootSequence.length * 100)
-        lineIndex++
-      } else {
-        clearInterval(interval)
-        setTimeout(onComplete, 300)
+      const currentText = texts[textIndex]
+      const scrambled = currentText.split("").map((char, i) => {
+        if (i < charIndex) return char
+        return GLITCH_CHARS[Math.floor(Math.random() * GLITCH_CHARS.length)]
+      }).join("")
+      
+      setGlitchText(scrambled)
+      charIndex++
+      
+      if (charIndex > currentText.length + 5) {
+        charIndex = 0
+        textIndex = (textIndex + 1) % texts.length
       }
-    }, 150)
+    }, 50)
 
     return () => clearInterval(interval)
-  }, [onComplete])
-
-  useEffect(() => {
-    if (!containerRef.current) return
-    gsap.fromTo(
-      containerRef.current,
-      { opacity: 0 },
-      { opacity: 1, duration: 0.3 }
-    )
   }, [])
 
+  // Loading bar animation
+  useEffect(() => {
+    const chars = "░▒▓█"
+    const width = 30
+    const filled = Math.floor((progress / 100) * width)
+    const bar = chars[3].repeat(filled) + chars[0].repeat(width - filled)
+    setLoadingChars(bar)
+  }, [progress])
+
+  // Exit animation
+  useEffect(() => {
+    if (isComplete && containerRef.current) {
+      gsap.to(containerRef.current, {
+        opacity: 0,
+        scale: 1.1,
+        duration: 0.6,
+        ease: "power3.inOut"
+      })
+    }
+  }, [isComplete])
+
+  if (isComplete) return null
+
   return (
-    <div
+    <div 
       ref={containerRef}
       className="fixed inset-0 z-[100] bg-background flex items-center justify-center"
     >
-      <div className="w-full max-w-lg px-6 font-mono">
-        <div className="text-[8px] sm:text-[10px] text-foreground/40 mb-4">
-          ╔══════════════════════════════════════╗
+      <div className="text-center font-mono">
+        {/* ASCII header */}
+        <pre className="text-[6px] md:text-[8px] text-foreground/10 mb-8 leading-tight">
+{`
+╔═══════════════════════════════════════════════════════════╗
+║  ██████╗ ██████╗  ██████╗      ██╗███████╗ ██████╗████████╗║
+║  ██╔══██╗██╔══██╗██╔═══██╗     ██║██╔════╝██╔════╝╚══██╔══╝║
+║  ██████╔╝██████╔╝██║   ██║     ██║█████╗  ██║        ██║   ║
+║  ██╔═══╝ ██╔══██╗██║   ██║██   ██║██╔══╝  ██║        ██║   ║
+║  ██║     ██║  ██║╚██████╔╝╚█████╔╝███████╗╚██████╗   ██║   ║
+║  ╚═╝     ╚═╝  ╚═╝ ╚═════╝  ╚════╝ ╚══════╝ ╚═════╝   ╚═╝   ║
+╚═══════════════════════════════════════════════════════════╝
+`}
+        </pre>
+        
+        {/* Loading text */}
+        <div className="text-xs md:text-sm text-foreground/60 mb-4 tracking-[0.3em]">
+          {glitchText}
         </div>
         
-        <pre className="text-[8px] sm:text-[10px] text-foreground/60 leading-relaxed mb-4">
-          {lines.map((line, i) => (
-            <div key={i} className="animate-in fade-in slide-in-from-left-2">
-              {">"} {line}
-            </div>
-          ))}
-          <span className="animate-pulse">█</span>
-        </pre>
-
-        <div className="h-1 bg-foreground/10 overflow-hidden">
-          <div
-            className="h-full bg-foreground transition-all duration-150"
-            style={{ width: `${progress}%` }}
-          />
+        {/* Progress bar */}
+        <div className="text-foreground/40 text-[10px] md:text-xs tracking-widest mb-2">
+          [{loadingChars}]
         </div>
-
-        <div className="text-[8px] sm:text-[10px] text-foreground/40 mt-4">
-          ╚══════════════════════════════════════╝
+        
+        {/* Percentage */}
+        <div className="text-foreground text-2xl md:text-4xl font-black">
+          {progress.toFixed(0)}%
+        </div>
+        
+        {/* Technical footer */}
+        <div className="mt-8 text-[8px] text-foreground/20">
+          <div>SYS://PORTFOLIO_v3.0</div>
+          <div>MEM: {(Math.random() * 100 + 50).toFixed(0)}MB / 512MB</div>
         </div>
       </div>
     </div>
   )
 }
 
-// ═══════════════════════════════════════════════════════════════════
-// TECHNICAL SVG GRID
-// ═══════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════
+// TECHNICAL SVG PATTERNS
+// ═══════════════════════════════════════════════════════════════
 
-function TechnicalGrid() {
+function TechnicalGrid({ className }: { className?: string }) {
   const gridRef = useRef<SVGSVGElement>(null)
 
   useEffect(() => {
     if (!gridRef.current) return
-
-    const lines = gridRef.current.querySelectorAll("line")
-    gsap.fromTo(
-      lines,
+    
+    const lines = gridRef.current.querySelectorAll("line, path")
+    gsap.fromTo(lines, 
       { strokeDashoffset: 1000 },
-      {
-        strokeDashoffset: 0,
-        duration: 2,
-        stagger: 0.02,
-        ease: "power2.out",
-      }
+      { strokeDashoffset: 0, duration: 2, stagger: 0.02, ease: "power2.out" }
     )
   }, [])
 
   return (
     <svg
       ref={gridRef}
-      className="absolute inset-0 w-full h-full pointer-events-none"
+      className={cn("absolute inset-0 w-full h-full pointer-events-none", className)}
+      viewBox="0 0 1000 1000"
+      fill="none"
       preserveAspectRatio="none"
     >
-      <defs>
-        <pattern id="gridPattern" width="60" height="60" patternUnits="userSpaceOnUse">
-          <line x1="0" y1="0" x2="60" y2="0" stroke="currentColor" strokeWidth="0.5" strokeDasharray="4 4" className="text-foreground/5" />
-          <line x1="0" y1="0" x2="0" y2="60" stroke="currentColor" strokeWidth="0.5" strokeDasharray="4 4" className="text-foreground/5" />
-        </pattern>
-      </defs>
-      <rect width="100%" height="100%" fill="url(#gridPattern)" />
+      {/* Horizontal scan lines */}
+      {Array.from({ length: 50 }).map((_, i) => (
+        <line
+          key={`h-${i}`}
+          x1="0"
+          y1={i * 20}
+          x2="1000"
+          y2={i * 20}
+          stroke="currentColor"
+          strokeWidth="0.3"
+          strokeDasharray="5 15"
+          className="text-foreground/[0.03]"
+        />
+      ))}
       
-      {/* Corner marks */}
-      <line x1="0" y1="40" x2="0" y2="0" stroke="currentColor" strokeWidth="2" className="text-foreground/20" />
-      <line x1="0" y1="0" x2="40" y2="0" stroke="currentColor" strokeWidth="2" className="text-foreground/20" />
-      <line x1="100%" y1="0" x2="calc(100% - 40px)" y2="0" stroke="currentColor" strokeWidth="2" className="text-foreground/20" />
-      <line x1="100%" y1="0" x2="100%" y2="40" stroke="currentColor" strokeWidth="2" className="text-foreground/20" />
-      <line x1="100%" y1="100%" x2="100%" y2="calc(100% - 40px)" stroke="currentColor" strokeWidth="2" className="text-foreground/20" />
-      <line x1="100%" y1="100%" x2="calc(100% - 40px)" y2="100%" stroke="currentColor" strokeWidth="2" className="text-foreground/20" />
-      <line x1="0" y1="100%" x2="40" y2="100%" stroke="currentColor" strokeWidth="2" className="text-foreground/20" />
-      <line x1="0" y1="100%" x2="0" y2="calc(100% - 40px)" stroke="currentColor" strokeWidth="2" className="text-foreground/20" />
+      {/* Vertical scan lines */}
+      {Array.from({ length: 50 }).map((_, i) => (
+        <line
+          key={`v-${i}`}
+          x1={i * 20}
+          y1="0"
+          x2={i * 20}
+          y2="1000"
+          stroke="currentColor"
+          strokeWidth="0.3"
+          strokeDasharray="5 15"
+          className="text-foreground/[0.03]"
+        />
+      ))}
+      
+      {/* Corner brackets */}
+      <path d="M0 50 L0 0 L50 0" stroke="currentColor" strokeWidth="2" className="text-foreground/10" strokeDasharray="200" />
+      <path d="M950 0 L1000 0 L1000 50" stroke="currentColor" strokeWidth="2" className="text-foreground/10" strokeDasharray="200" />
+      <path d="M1000 950 L1000 1000 L950 1000" stroke="currentColor" strokeWidth="2" className="text-foreground/10" strokeDasharray="200" />
+      <path d="M50 1000 L0 1000 L0 950" stroke="currentColor" strokeWidth="2" className="text-foreground/10" strokeDasharray="200" />
+      
+      {/* Center crosshair */}
+      <circle cx="500" cy="500" r="100" stroke="currentColor" strokeWidth="0.5" strokeDasharray="10 5" className="text-foreground/5" />
+      <line x1="500" y1="350" x2="500" y2="450" stroke="currentColor" strokeWidth="1" className="text-foreground/10" />
+      <line x1="500" y1="550" x2="500" y2="650" stroke="currentColor" strokeWidth="1" className="text-foreground/10" />
+      <line x1="350" y1="500" x2="450" y2="500" stroke="currentColor" strokeWidth="1" className="text-foreground/10" />
+      <line x1="550" y1="500" x2="650" y2="500" stroke="currentColor" strokeWidth="1" className="text-foreground/10" />
+      
+      {/* Diagonal lines */}
+      <line x1="0" y1="0" x2="200" y2="200" stroke="currentColor" strokeWidth="0.5" strokeDasharray="8 8" className="text-foreground/5" />
+      <line x1="1000" y1="0" x2="800" y2="200" stroke="currentColor" strokeWidth="0.5" strokeDasharray="8 8" className="text-foreground/5" />
+      <line x1="0" y1="1000" x2="200" y2="800" stroke="currentColor" strokeWidth="0.5" strokeDasharray="8 8" className="text-foreground/5" />
+      <line x1="1000" y1="1000" x2="800" y2="800" stroke="currentColor" strokeWidth="0.5" strokeDasharray="8 8" className="text-foreground/5" />
     </svg>
   )
 }
 
-// ═══════════════════════════════════════════════════════════════════
-// PROJECT TITLE - MASSIVE TYPOGRAPHY
-// ═══════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════
+// ANIMATED ASCII BACKGROUND
+// ═══════════════════════════════════════════════════════════════
 
-function ProjectTitle({
-  project,
-  index,
-  isActive,
+function AsciiBackground({ isActive }: { isActive: boolean }) {
+  const [chars, setChars] = useState<string[]>([])
+  
+  useEffect(() => {
+    if (!isActive) return
+    
+    const charSet = "░▒▓█╳╱╲─│┼◆◇○●"
+    const newChars = Array.from({ length: 200 }, () => 
+      charSet[Math.floor(Math.random() * charSet.length)]
+    )
+    setChars(newChars)
+    
+    const interval = setInterval(() => {
+      setChars(prev => prev.map((_, i) => 
+        Math.random() > 0.95 
+          ? charSet[Math.floor(Math.random() * charSet.length)]
+          : prev[i]
+      ))
+    }, 100)
+    
+    return () => clearInterval(interval)
+  }, [isActive])
+  
+  if (!isActive) return null
+  
+  return (
+    <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-[0.03] font-mono text-[8px] md:text-[12px] leading-none">
+      <div className="whitespace-pre-wrap break-all">
+        {chars.join(" ")}
+      </div>
+    </div>
+  )
+}
+
+// ═══════════════════════════════════════════════════════════════
+// PROJECT TITLE COMPONENT - Large text with animations
+// ═══════════════════════════════════════════════════════════════
+
+function ProjectTitle({ 
+  project, 
+  index, 
+  isActive, 
   onClick,
-  progress,
-}: {
+  showImage,
+  isMobile
+}: { 
   project: Project
   index: number
   isActive: boolean
   onClick: () => void
-  progress: number
+  showImage: boolean
+  isMobile: boolean
 }) {
-  const titleRef = useRef<HTMLButtonElement>(null)
-  const [displayText, setDisplayText] = useState(project.title)
+  const titleRef = useRef<HTMLDivElement>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
+  const [scrambledTitle, setScrambledTitle] = useState(project.title)
   const [isHovered, setIsHovered] = useState(false)
 
-  // Glitch effect on mount
+  // Glitch effect on active/hover
   useEffect(() => {
-    if (!isActive) return
+    if (!isActive && !isHovered) {
+      setScrambledTitle(project.title)
+      return
+    }
 
     const targetText = project.title
     let iteration = 0
-    const maxIterations = targetText.length * 3
+    const maxIterations = targetText.length * 2
 
     const interval = setInterval(() => {
-      setDisplayText(
+      setScrambledTitle(
         targetText
           .split("")
           .map((char, i) => {
-            if (char === "_" || char === " ") return char
-            if (i < iteration / 3) return char
+            if (char === " ") return char
+            if (i < iteration / 2) return char
             return GLITCH_CHARS[Math.floor(Math.random() * GLITCH_CHARS.length)]
           })
           .join("")
@@ -334,586 +521,542 @@ function ProjectTitle({
 
       iteration++
       if (iteration >= maxIterations) {
-        setDisplayText(targetText)
+        setScrambledTitle(targetText)
         clearInterval(interval)
       }
-    }, 25)
+    }, 30)
 
     return () => clearInterval(interval)
-  }, [project.title, isActive])
+  }, [project.title, isActive, isHovered])
 
-  // GSAP animation
+  // GSAP animations on active state
   useEffect(() => {
-    if (!titleRef.current || !isActive) return
+    if (!containerRef.current) return
 
-    gsap.fromTo(
-      titleRef.current,
-      { 
-        y: 100, 
-        opacity: 0, 
-        skewY: 5,
-        scale: 0.9,
-      },
-      { 
-        y: 0, 
-        opacity: 1, 
-        skewY: 0,
+    if (isActive) {
+      gsap.to(containerRef.current, {
         scale: 1,
-        duration: 0.8, 
-        ease: "power4.out" 
-      }
-    )
-  }, [isActive])
-
-  // Calculate visual intensity based on scroll progress
-  const intensity = isActive ? 1 : Math.max(0, 1 - Math.abs(progress - index / projects.length) * 5)
-
-  return (
-    <button
-      ref={titleRef}
-      onClick={onClick}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      className={cn(
-        "w-full text-left transition-all duration-500 group relative",
-        "focus:outline-none focus-visible:ring-2 focus-visible:ring-foreground/50",
-        isActive ? "opacity-100" : "opacity-20 hover:opacity-40"
-      )}
-      style={{
-        transform: isActive ? "none" : `translateY(${(1 - intensity) * 20}px)`,
-      }}
-    >
-      {/* Main title */}
-      <div className="relative overflow-hidden">
-        <h2
-          className={cn(
-            "font-mono font-black tracking-tighter leading-[0.85] transition-all duration-300",
-            "text-[15vw] sm:text-[12vw] md:text-[10vw] lg:text-[8vw]",
-            isActive ? "text-foreground" : "text-foreground/30",
-            isHovered && !isActive && "text-foreground/50"
-          )}
-        >
-          {displayText}
-        </h2>
-
-        {/* Underline effect */}
-        <div
-          className={cn(
-            "absolute bottom-0 left-0 h-1 sm:h-2 bg-foreground transition-all duration-500",
-            isActive ? "w-full" : "w-0 group-hover:w-1/4"
-          )}
-        />
-
-        {/* ASCII decoration */}
-        <div
-          className={cn(
-            "absolute -right-2 top-0 font-mono text-[8px] sm:text-[10px] transition-opacity duration-300",
-            isActive ? "opacity-60" : "opacity-0"
-          )}
-        >
-          <div className="text-foreground/40">{project.ascii}</div>
-          <div className="text-foreground/20">{project.metric}</div>
-        </div>
-      </div>
-
-      {/* Subtitle line */}
-      <div
-        className={cn(
-          "flex items-center gap-2 sm:gap-4 mt-1 sm:mt-2 font-mono text-[8px] sm:text-[10px] md:text-xs transition-all duration-300",
-          isActive ? "opacity-100" : "opacity-0"
-        )}
-      >
-        <span className="text-foreground/40">[{project.id}]</span>
-        <span className="text-foreground/60">{project.subtitle}</span>
-        <span className="text-foreground/20">─────</span>
-        <span className="text-foreground/40">{project.year}</span>
-        <span className="text-foreground/20 hidden sm:inline">
-          {ASCII_LINES.mixed.slice(0, 20)}
-        </span>
-      </div>
-
-      {/* Hover indicator */}
-      {isActive && (
-        <div className="absolute -left-4 sm:-left-8 top-1/2 -translate-y-1/2 font-mono text-[10px] sm:text-xs text-foreground/40 animate-pulse">
-          {">>>"}
-        </div>
-      )}
-    </button>
-  )
-}
-
-// ═══════════════════════════════════════════════════════════════════
-// IMAGE OVERLAY
-// ═══════════════════════════════════════════════════════════════════
-
-function ImageOverlay({
-  project,
-  isOpen,
-  onClose,
-}: {
-  project: Project | null
-  isOpen: boolean
-  onClose: () => void
-}) {
-  const overlayRef = useRef<HTMLDivElement>(null)
-  const contentRef = useRef<HTMLDivElement>(null)
-  const [activeImageIndex, setActiveImageIndex] = useState(0)
-  const [loadedImages, setLoadedImages] = useState<Set<number>>(new Set())
-
-  // Reset state when project changes
-  useEffect(() => {
-    setActiveImageIndex(0)
-    setLoadedImages(new Set())
-  }, [project])
-
-  // GSAP animations
-  useEffect(() => {
-    if (!overlayRef.current || !contentRef.current) return
-
-    if (isOpen) {
-      gsap.fromTo(
-        overlayRef.current,
-        { opacity: 0 },
-        { opacity: 1, duration: 0.3, ease: "power2.out" }
-      )
-      gsap.fromTo(
-        contentRef.current,
-        { y: 50, opacity: 0, scale: 0.95 },
-        { y: 0, opacity: 1, scale: 1, duration: 0.5, delay: 0.1, ease: "power3.out" }
-      )
+        opacity: 1,
+        x: 0,
+        duration: 0.6,
+        ease: "power3.out"
+      })
+    } else {
+      gsap.to(containerRef.current, {
+        scale: 0.95,
+        opacity: 0.3,
+        x: isMobile ? 0 : -20,
+        duration: 0.4,
+        ease: "power2.inOut"
+      })
     }
-  }, [isOpen])
+  }, [isActive, isMobile])
 
-  // Handle close with animation
-  const handleClose = useCallback(() => {
-    if (!overlayRef.current || !contentRef.current) {
-      onClose()
-      return
-    }
-
-    gsap.to(contentRef.current, {
-      y: -30,
-      opacity: 0,
-      scale: 0.95,
-      duration: 0.3,
-      ease: "power2.in",
-    })
-    gsap.to(overlayRef.current, {
-      opacity: 0,
-      duration: 0.3,
-      delay: 0.1,
-      onComplete: onClose,
-    })
-  }, [onClose])
-
-  // Keyboard navigation
-  useEffect(() => {
-    if (!isOpen) return
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") handleClose()
-      if (e.key === "ArrowLeft" && project?.images.length) {
-        setActiveImageIndex(i => (i - 1 + project.images.length) % project.images.length)
-      }
-      if (e.key === "ArrowRight" && project?.images.length) {
-        setActiveImageIndex(i => (i + 1) % project.images.length)
-      }
-    }
-
-    window.addEventListener("keydown", handleKeyDown)
-    return () => window.removeEventListener("keydown", handleKeyDown)
-  }, [isOpen, project, handleClose])
-
-  if (!isOpen || !project) return null
-
-  const hasImages = project.images.length > 0
+  const fontSize = isMobile ? "text-[12vw]" : "text-[8vw]"
 
   return (
     <div
-      ref={overlayRef}
-      className="fixed inset-0 z-[90] bg-background/95 backdrop-blur-sm overflow-auto"
-      onClick={handleClose}
+      ref={containerRef}
+      className={cn(
+        "relative cursor-pointer select-none transition-all duration-300",
+        "snap-center snap-always",
+        "min-h-[100vh] flex flex-col justify-center items-center",
+        "px-4 md:px-8"
+      )}
+      onClick={onClick}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
     >
-      {/* Technical grid background */}
-      <TechnicalGrid />
-
-      {/* ASCII border decoration */}
-      <div className="fixed top-0 left-0 right-0 h-8 flex items-center justify-center font-mono text-[8px] sm:text-[10px] text-foreground/20 overflow-hidden">
-        {ASCII_LINES.mixed}
+      {/* Technical corner marks */}
+      <div className="absolute top-4 left-4 font-mono text-[8px] text-foreground/30">
+        ┌── {project.id}
       </div>
-      <div className="fixed bottom-0 left-0 right-0 h-8 flex items-center justify-center font-mono text-[8px] sm:text-[10px] text-foreground/20 overflow-hidden">
-        {ASCII_LINES.mixed}
+      <div className="absolute top-4 right-4 font-mono text-[8px] text-foreground/30">
+        {project.year} ──┐
+      </div>
+      <div className="absolute bottom-4 left-4 font-mono text-[8px] text-foreground/30">
+        └── {project.subtitle}
+      </div>
+      <div className="absolute bottom-4 right-4 font-mono text-[8px] text-foreground/30">
+        TAP ──┘
       </div>
 
-      {/* Content */}
-      <div
-        ref={contentRef}
-        className="min-h-screen flex items-center justify-center p-4 sm:p-8"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="w-full max-w-5xl">
-          {/* Header */}
-          <div className="mb-6 sm:mb-8">
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <div className="font-mono text-[8px] sm:text-[10px] text-foreground/40 mb-2">
-                  ┌── PROJECT_{project.id} ──────────────────────────
-                </div>
-                <h3 className="font-mono text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-tighter text-foreground">
-                  {project.title}
-                </h3>
-                <div className="flex items-center gap-3 mt-2 font-mono text-[10px] sm:text-xs text-foreground/60">
-                  <span>{project.subtitle}</span>
-                  <span className="text-foreground/20">│</span>
-                  <span>{project.year}</span>
-                  <span className="text-foreground/20">│</span>
-                  <span className="text-foreground">{project.metric}</span>
-                </div>
-              </div>
+      {/* Main title */}
+      <div ref={titleRef} className="relative">
+        <h2 
+          className={cn(
+            "font-mono font-black tracking-tighter leading-[0.85]",
+            fontSize,
+            "text-foreground transition-all duration-300",
+            isActive ? "opacity-100" : "opacity-30",
+            showImage ? "blur-[2px]" : ""
+          )}
+        >
+          {scrambledTitle}
+        </h2>
 
-              {/* Close button */}
-              <button
-                onClick={handleClose}
-                className="font-mono text-foreground/40 hover:text-foreground transition-colors p-2 border border-foreground/20 hover:border-foreground/40 hover:bg-foreground/5"
-              >
-                <span className="text-xs sm:text-sm">[ESC]</span>
-              </button>
-            </div>
-          </div>
-
-          {/* Image gallery or no preview */}
-          {hasImages ? (
-            <div className="mb-6 sm:mb-8">
-              {/* Main image */}
-              <div className="relative aspect-video bg-foreground/5 border border-foreground/20 overflow-hidden mb-4">
-                {/* Loading state */}
-                {!loadedImages.has(activeImageIndex) && (
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="font-mono text-[10px] sm:text-xs text-foreground/40 animate-pulse">
-                      ░▒▓ LOADING_IMAGE ▓▒░
-                    </div>
-                  </div>
-                )}
-
-                <Image
-                  src={project.images[activeImageIndex]}
-                  alt={`${project.title} preview`}
-                  fill
-                  className={cn(
-                    "object-contain transition-opacity duration-500",
-                    loadedImages.has(activeImageIndex) ? "opacity-100" : "opacity-0"
-                  )}
-                  onLoad={() => setLoadedImages(prev => new Set(prev).add(activeImageIndex))}
-                />
-
-                {/* Image counter */}
-                <div className="absolute bottom-3 right-3 font-mono text-[10px] sm:text-xs text-white/80 bg-black/60 px-2 py-1">
-                  [{String(activeImageIndex + 1).padStart(2, "0")}/{String(project.images.length).padStart(2, "0")}]
-                </div>
-
-                {/* Corner marks */}
-                <span className="absolute top-2 left-2 font-mono text-[8px] text-white/40">┌──</span>
-                <span className="absolute top-2 right-2 font-mono text-[8px] text-white/40">──┐</span>
-                <span className="absolute bottom-2 left-2 font-mono text-[8px] text-white/40">└──</span>
-                <span className="absolute bottom-10 right-2 font-mono text-[8px] text-white/40">──┘</span>
-              </div>
-
-              {/* Thumbnail navigation */}
-              {project.images.length > 1 && (
-                <div className="flex gap-2 overflow-x-auto pb-2 snap-x snap-mandatory scrollbar-hide">
-                  {project.images.map((img, idx) => (
-                    <button
-                      key={idx}
-                      onClick={() => setActiveImageIndex(idx)}
-                      className={cn(
-                        "flex-shrink-0 w-20 h-14 sm:w-24 sm:h-16 relative border transition-all snap-start",
-                        idx === activeImageIndex
-                          ? "border-foreground opacity-100"
-                          : "border-foreground/20 opacity-50 hover:opacity-80"
-                      )}
-                    >
-                      <Image
-                        src={img}
-                        alt={`Thumbnail ${idx + 1}`}
-                        fill
-                        className="object-cover"
-                      />
-                      <div className="absolute inset-0 bg-foreground/10" />
-                      <span className="absolute bottom-1 right-1 font-mono text-[6px] text-white/60">
-                        {String(idx + 1).padStart(2, "0")}
-                      </span>
-                    </button>
-                  ))}
-                </div>
+        {/* Glitch overlay */}
+        {(isActive || isHovered) && (
+          <>
+            <h2 
+              className={cn(
+                "absolute inset-0 font-mono font-black tracking-tighter leading-[0.85]",
+                fontSize,
+                "text-foreground/20 transform translate-x-1 -translate-y-1"
               )}
-            </div>
-          ) : (
-            <div className="mb-6 sm:mb-8 aspect-video border border-dashed border-foreground/20 flex items-center justify-center">
-              <div className="text-center font-mono">
-                <pre className="text-foreground/20 text-[8px] sm:text-[10px] leading-tight mb-2">
-{`┌─────────────────────┐
-│                     │
-│    NO_PREVIEW       │
-│    AVAILABLE        │
-│                     │
-└─────────────────────┘`}
-                </pre>
-                <div className="text-foreground/40 text-[10px] sm:text-xs">
-                  {project.ascii}
-                </div>
-              </div>
-            </div>
-          )}
+              aria-hidden
+            >
+              {scrambledTitle}
+            </h2>
+            <h2 
+              className={cn(
+                "absolute inset-0 font-mono font-black tracking-tighter leading-[0.85]",
+                fontSize,
+                "text-foreground/10 transform -translate-x-1 translate-y-1"
+              )}
+              aria-hidden
+            >
+              {scrambledTitle}
+            </h2>
+          </>
+        )}
+      </div>
 
-          {/* Project info */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Description */}
-            <div>
-              <div className="font-mono text-[8px] sm:text-[10px] text-foreground/30 mb-2">
-                ├── DESCRIPTION
-              </div>
-              <p className="font-mono text-xs sm:text-sm text-foreground/70 leading-relaxed">
-                {project.description}
-              </p>
-            </div>
+      {/* Subtitle line */}
+      <div className={cn(
+        "mt-4 md:mt-6 flex items-center gap-4 font-mono text-[10px] md:text-xs",
+        "text-foreground/50 transition-opacity duration-300",
+        isActive ? "opacity-100" : "opacity-0"
+      )}>
+        <span className="tracking-[0.3em]">{project.subtitle}</span>
+        <span className="text-foreground/20">│</span>
+        <span className="tracking-[0.2em]">{project.tech.join(" · ")}</span>
+      </div>
 
-            {/* Tech stack */}
-            <div>
-              <div className="font-mono text-[8px] sm:text-[10px] text-foreground/30 mb-2">
-                └── TECH_STACK
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {project.techStack.map((tech) => (
-                  <span
-                    key={tech}
-                    className="font-mono text-[10px] sm:text-xs px-2 py-1 border border-foreground/20 text-foreground/60 bg-foreground/5"
-                  >
-                    {tech}
-                  </span>
-                ))}
-              </div>
+      {/* ASCII decoration */}
+      {isActive && (
+        <pre className={cn(
+          "absolute bottom-20 left-1/2 -translate-x-1/2 font-mono text-[6px] md:text-[8px]",
+          "text-foreground/20 leading-tight transition-opacity duration-500",
+          showImage ? "opacity-0" : "opacity-100"
+        )}>
+          {project.ascii}
+        </pre>
+      )}
+
+      {/* Image overlay */}
+      {showImage && project.images.length > 0 && (
+        <div className="absolute inset-0 z-20 flex items-center justify-center bg-background/90 animate-in fade-in duration-300">
+          <div className="relative w-[80vw] h-[60vh] md:w-[60vw] md:h-[70vh] border-2 border-foreground/20">
+            {/* Technical frame */}
+            <div className="absolute -top-6 left-0 font-mono text-[8px] text-foreground/40">
+              ┌── IMG_PREVIEW_{project.id}
             </div>
+            <div className="absolute -bottom-6 right-0 font-mono text-[8px] text-foreground/40">
+              TAP_TO_CLOSE ──┘
+            </div>
+            
+            <Image
+              src={project.images[0]}
+              alt={project.title}
+              fill
+              className="object-cover"
+              priority
+            />
+            
+            {/* Scanlines */}
+            <div 
+              className="absolute inset-0 pointer-events-none opacity-20"
+              style={{
+                background: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.1) 2px, rgba(0,0,0,0.1) 4px)'
+              }}
+            />
+            
+            {/* Corner brackets */}
+            <span className="absolute top-2 left-2 font-mono text-[10px] text-white/80 drop-shadow-lg">┌──</span>
+            <span className="absolute top-2 right-2 font-mono text-[10px] text-white/80 drop-shadow-lg">──┐</span>
+            <span className="absolute bottom-2 left-2 font-mono text-[10px] text-white/80 drop-shadow-lg">└──</span>
+            <span className="absolute bottom-2 right-2 font-mono text-[10px] text-white/80 drop-shadow-lg">──┘</span>
           </div>
-
-          {/* Navigation hint */}
-          {hasImages && project.images.length > 1 && (
-            <div className="mt-8 text-center font-mono text-[8px] sm:text-[10px] text-foreground/30">
-              ← → ARROW_KEYS TO NAVIGATE │ ESC TO CLOSE
-            </div>
-          )}
         </div>
-      </div>
+      )}
     </div>
   )
 }
 
-// ═══════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════
 // SCROLL PROGRESS INDICATOR
-// ═══════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════
 
-function ScrollProgress({ progress, activeIndex }: { progress: number; activeIndex: number }) {
-  const chars = 30
-  const filled = Math.round(progress * chars)
-  const bar = "█".repeat(filled) + "░".repeat(chars - filled)
+function ScrollIndicator({ 
+  activeIndex, 
+  total, 
+  projects,
+  onProjectClick 
+}: { 
+  activeIndex: number
+  total: number
+  projects: Project[]
+  onProjectClick: (index: number) => void
+}) {
+  const progressChars = 20
+  const filled = Math.round(((activeIndex + 1) / total) * progressChars)
+  const progressBar = "█".repeat(filled) + "░".repeat(progressChars - filled)
 
   return (
-    <div className="fixed right-4 sm:right-8 top-1/2 -translate-y-1/2 z-50 hidden lg:block">
-      <div className="font-mono text-[8px] text-foreground/30 writing-mode-vertical transform rotate-180" style={{ writingMode: "vertical-rl" }}>
-        <div className="flex items-center gap-2">
-          <span>[{bar}]</span>
-          <span className="text-foreground/60">
-            {String(activeIndex + 1).padStart(2, "0")}/{String(projects.length).padStart(2, "0")}
-          </span>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-// ═══════════════════════════════════════════════════════════════════
-// MOBILE PROGRESS BAR
-// ═══════════════════════════════════════════════════════════════════
-
-function MobileProgress({ activeIndex }: { activeIndex: number }) {
-  return (
-    <div className="fixed bottom-4 left-4 right-4 z-50 lg:hidden">
-      <div className="flex items-center gap-1 justify-center">
-        {projects.map((_, idx) => (
-          <div
-            key={idx}
+    <div className="fixed right-4 md:right-8 top-1/2 -translate-y-1/2 z-50 font-mono">
+      {/* Vertical project list */}
+      <div className="hidden md:flex flex-col items-end gap-1 mb-4">
+        {projects.map((project, i) => (
+          <button
+            key={project.id}
+            onClick={() => onProjectClick(i)}
             className={cn(
-              "h-1 transition-all duration-300",
-              idx === activeIndex ? "w-6 bg-foreground" : "w-2 bg-foreground/20"
+              "text-[8px] tracking-wider transition-all duration-300",
+              "hover:translate-x-[-4px]",
+              i === activeIndex 
+                ? "text-foreground font-bold" 
+                : i < activeIndex 
+                  ? "text-foreground/40" 
+                  : "text-foreground/20"
             )}
-          />
+          >
+            {i === activeIndex ? "► " : "  "}{project.id}
+          </button>
         ))}
       </div>
-      <div className="text-center font-mono text-[8px] text-foreground/40 mt-2">
-        [{String(activeIndex + 1).padStart(2, "0")}/{String(projects.length).padStart(2, "0")}] TAP TO VIEW
+      
+      {/* Progress bar - vertical */}
+      <div className="flex flex-col items-center gap-2">
+        <div className="text-[8px] text-foreground/40 rotate-90 origin-center translate-y-10 whitespace-nowrap">
+          [{progressBar}]
+        </div>
+        <div className="mt-16 text-foreground font-bold text-sm">
+          {String(activeIndex + 1).padStart(2, "0")}
+        </div>
+        <div className="text-foreground/30 text-[8px]">
+          /{String(total).padStart(2, "0")}
+        </div>
       </div>
     </div>
   )
 }
 
-// ═══════════════════════════════════════════════════════════════════
-// MAIN SECTION
-// ═══════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════
+// SCROLL HINT
+// ═══════════════════════════════════════════════════════════════
+
+function ScrollHint({ show }: { show: boolean }) {
+  const [frame, setFrame] = useState(0)
+  const frames = ["▼", "▽", "▼", "▽"]
+
+  useEffect(() => {
+    if (!show) return
+    const interval = setInterval(() => {
+      setFrame(f => (f + 1) % frames.length)
+    }, 300)
+    return () => clearInterval(interval)
+  }, [show, frames.length])
+
+  if (!show) return null
+
+  return (
+    <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 font-mono animate-pulse">
+      <div className="flex flex-col items-center gap-2 text-foreground/40">
+        <span className="text-[8px] tracking-[0.3em]">SCROLL</span>
+        <span className="text-lg">{frames[frame]}</span>
+      </div>
+    </div>
+  )
+}
+
+// ═══════════════════════════════════════════════════════════════
+// HEADER BAR
+// ═══════════════════════════════════════════════════════════════
+
+function HeaderBar({ currentProject }: { currentProject: Project }) {
+  const [time, setTime] = useState("")
+
+  useEffect(() => {
+    const updateTime = () => {
+      const now = new Date()
+      setTime(now.toLocaleTimeString("en-US", { hour12: false }))
+    }
+    updateTime()
+    const interval = setInterval(updateTime, 1000)
+    return () => clearInterval(interval)
+  }, [])
+
+  return (
+    <div className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-sm border-b border-foreground/10">
+      <div className="flex items-center justify-between px-4 md:px-8 py-2 font-mono text-[8px] md:text-[10px]">
+        <div className="flex items-center gap-4 text-foreground/50">
+          <span className="text-foreground font-bold">PRJ://</span>
+          <span className="hidden md:inline">SECTION_03</span>
+          <span className="text-foreground/30">│</span>
+          <span className="tracking-[0.2em]">{currentProject.title}</span>
+        </div>
+        <div className="flex items-center gap-4 text-foreground/30">
+          <span className="hidden md:inline">{time}</span>
+          <span>SYS:OK</span>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ═══════════════════════════════════════════════════════════════
+// MAIN PROJECTS SECTION
+// ═══════════════════════════════════════════════════════════════
 
 export function ProjectsSection() {
   const [isLoading, setIsLoading] = useState(true)
+  const [loadProgress, setLoadProgress] = useState(0)
   const [activeIndex, setActiveIndex] = useState(0)
-  const [scrollProgress, setScrollProgress] = useState(0)
-  const [selectedProject, setSelectedProject] = useState<Project | null>(null)
-  const [isOverlayOpen, setIsOverlayOpen] = useState(false)
+  const [showImage, setShowImage] = useState<number | null>(null)
+  const [showScrollHint, setShowScrollHint] = useState(true)
 
   const sectionRef = useRef<HTMLElement>(null)
-  const containerRef = useRef<HTMLDivElement>(null)
-  const titlesRef = useRef<HTMLDivElement>(null)
+  const scrollContainerRef = useRef<HTMLDivElement>(null)
+  const scrollTriggerRef = useRef<ScrollTrigger | null>(null)
+  
+  const { isMobile, isTablet, windowHeight } = useDeviceDetection()
 
-  // Handle project click
-  const handleProjectClick = useCallback((project: Project) => {
-    setSelectedProject(project)
-    setIsOverlayOpen(true)
-  }, [])
+  const currentProject = projects[activeIndex]
 
-  // Close overlay
-  const handleCloseOverlay = useCallback(() => {
-    setIsOverlayOpen(false)
-    setTimeout(() => setSelectedProject(null), 300)
-  }, [])
-
-  // Setup scroll-driven animations
+  // Loading animation
   useEffect(() => {
-    if (isLoading || !sectionRef.current || !containerRef.current) return
+    const interval = setInterval(() => {
+      setLoadProgress(prev => {
+        if (prev >= 100) {
+          clearInterval(interval)
+          setTimeout(() => setIsLoading(false), 500)
+          return 100
+        }
+        return prev + Math.random() * 15 + 5
+      })
+    }, 100)
+
+    return () => clearInterval(interval)
+  }, [])
+
+  // Hide scroll hint after first scroll
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 100) {
+        setShowScrollHint(false)
+      }
+    }
+    window.addEventListener("scroll", handleScroll)
+    return () => window.removeEventListener("scroll", handleScroll)
+  }, [])
+
+  // Setup ScrollTrigger with mobile-optimized values
+  useEffect(() => {
+    if (isLoading || !sectionRef.current || !scrollContainerRef.current) return
+
+    // Kill previous ScrollTrigger
+    if (scrollTriggerRef.current) {
+      scrollTriggerRef.current.kill()
+      scrollTriggerRef.current = null
+    }
+
+    // Mobile-optimized scroll values
+    const scrollPerProject = isMobile ? 80 : isTablet ? 90 : 100
+    const totalScrollDistance = projects.length * scrollPerProject
+    const scrubValue = isMobile ? 0.3 : 0.5
+
+    // Pin spacing adjusted for mobile
+    const pinStart = isMobile ? "top top" : "top top"
+    const pinEnd = isMobile 
+      ? `+=${totalScrollDistance}vh` 
+      : `+=${totalScrollDistance}vh`
 
     const ctx = gsap.context(() => {
-      // Main scroll trigger for the entire section
-      ScrollTrigger.create({
+      scrollTriggerRef.current = ScrollTrigger.create({
         trigger: sectionRef.current,
-        start: "top top",
-        end: `+=${projects.length * 100}%`,
-        pin: containerRef.current,
+        start: pinStart,
+        end: pinEnd,
+        pin: scrollContainerRef.current,
         pinSpacing: true,
-        scrub: 0.5,
+        scrub: scrubValue,
         snap: {
           snapTo: 1 / (projects.length - 1),
           duration: { min: 0.2, max: 0.5 },
-          ease: "power2.inOut",
+          delay: 0,
+          ease: "power2.inOut"
         },
         onUpdate: (self) => {
-          const progress = self.progress
-          setScrollProgress(progress)
-          
           const newIndex = Math.min(
-            Math.round(progress * (projects.length - 1)),
+            Math.floor(self.progress * projects.length),
             projects.length - 1
           )
-          setActiveIndex(newIndex)
+          if (newIndex !== activeIndex) {
+            setActiveIndex(newIndex)
+            setShowImage(null) // Close image on scroll
+          }
         },
       })
     }, sectionRef.current)
 
-    return () => ctx.revert()
-  }, [isLoading])
+    return () => {
+      ctx.revert()
+      scrollTriggerRef.current = null
+    }
+  }, [isLoading, isMobile, isTablet, activeIndex])
 
-  // Handle loading complete
-  const handleLoadingComplete = useCallback(() => {
-    setIsLoading(false)
+  // Handle project click to show image
+  const handleProjectClick = useCallback((index: number) => {
+    if (index === activeIndex) {
+      // Toggle image if clicking active project
+      setShowImage(prev => prev === index ? null : index)
+    } else {
+      // Scroll to project
+      const trigger = scrollTriggerRef.current
+      if (!trigger) return
+
+      const start = trigger.start
+      const end = trigger.end
+      const totalDistance = end - start
+      const projectProgress = index / (projects.length - 1)
+      const targetScroll = start + (totalDistance * projectProgress)
+
+      window.scrollTo({
+        top: targetScroll,
+        behavior: "smooth"
+      })
+    }
+  }, [activeIndex])
+
+  // Navigate to specific project
+  const navigateToProject = useCallback((index: number) => {
+    const trigger = scrollTriggerRef.current
+    if (!trigger) return
+
+    const start = trigger.start
+    const end = trigger.end
+    const totalDistance = end - start
+    const projectProgress = index / (projects.length - 1)
+    const targetScroll = start + (totalDistance * projectProgress)
+
+    window.scrollTo({
+      top: targetScroll,
+      behavior: "smooth"
+    })
   }, [])
 
   return (
     <>
-      {isLoading && <LoadingScreen onComplete={handleLoadingComplete} />}
+      {/* Loading Screen */}
+      <LoadingScreen progress={loadProgress} isComplete={!isLoading} />
 
       <section
         id="projects"
         ref={sectionRef}
         className="relative bg-background"
       >
+        {/* Header */}
+        <HeaderBar currentProject={currentProject} />
+
+        {/* Scroll Progress */}
+        <ScrollIndicator 
+          activeIndex={activeIndex}
+          total={projects.length}
+          projects={projects}
+          onProjectClick={navigateToProject}
+        />
+
+        {/* Scroll Hint */}
+        <ScrollHint show={showScrollHint && !isLoading} />
+
+        {/* Main scroll container */}
         <div
-          ref={containerRef}
-          className="min-h-screen flex flex-col justify-center relative overflow-hidden"
+          ref={scrollContainerRef}
+          className="relative min-h-screen overflow-hidden"
         >
-          {/* Technical grid background */}
+          {/* Background elements */}
           <TechnicalGrid />
+          <AsciiBackground isActive={!isLoading} />
 
           {/* ASCII header decoration */}
-          <div className="absolute top-0 left-0 right-0 p-4 sm:p-6 font-mono text-[7px] sm:text-[9px] text-foreground/20">
-            <div className="flex items-center gap-2">
-              <span>╔══</span>
-              <span className="text-foreground/40">PROJECTS.MODULE</span>
-              <span className="flex-1 overflow-hidden whitespace-nowrap">{ASCII_LINES.horizontal}</span>
-              <span>══╗</span>
-            </div>
+          <div className="absolute top-20 left-4 md:left-8 font-mono text-[6px] md:text-[8px] text-foreground/10 z-10">
+            <pre className="leading-tight">
+{`╔════════════════════════╗
+║  PROJECTS_ARCHIVE      ║
+║  ░░░░░░░░░░░░░░░░░░░░  ║
+║  TOTAL: ${String(projects.length).padStart(2, "0")} ENTRIES    ║
+╚════════════════════════╝`}
+            </pre>
           </div>
 
-          {/* Main content */}
-          <div className="relative z-10 px-4 sm:px-8 md:px-12 lg:px-16 py-20">
-            {/* Section label */}
-            <div className="mb-8 sm:mb-12">
-              <div className="font-mono text-[8px] sm:text-[10px] text-foreground/30 mb-2">
-                ┌── INDEX ──────────────────────────────
-              </div>
-              <div className="font-mono text-[10px] sm:text-xs text-foreground/50">
-                SCROLL TO NAVIGATE │ CLICK TO EXPLORE
-              </div>
-            </div>
-
-            {/* Project titles */}
-            <div
-              ref={titlesRef}
-              className="space-y-4 sm:space-y-6 md:space-y-8"
-            >
-              {projects.map((project, index) => (
+          {/* Project titles stack */}
+          <div className="relative">
+            {projects.map((project, index) => (
+              <div
+                key={project.id}
+                className={cn(
+                  "absolute inset-0 transition-all duration-500",
+                  index === activeIndex 
+                    ? "opacity-100 pointer-events-auto z-10" 
+                    : "opacity-0 pointer-events-none z-0"
+                )}
+              >
                 <ProjectTitle
-                  key={project.id}
                   project={project}
                   index={index}
                   isActive={index === activeIndex}
-                  onClick={() => handleProjectClick(project)}
-                  progress={scrollProgress}
+                  onClick={() => handleProjectClick(index)}
+                  showImage={showImage === index}
+                  isMobile={isMobile}
                 />
-              ))}
-            </div>
-
-            {/* Active project indicator */}
-            <div className="mt-8 sm:mt-12 font-mono text-[8px] sm:text-[10px] text-foreground/20">
-              └── ACTIVE: [{projects[activeIndex].title}] ──────────
-            </div>
+              </div>
+            ))}
           </div>
 
-          {/* ASCII footer decoration */}
-          <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6 font-mono text-[7px] sm:text-[9px] text-foreground/20">
-            <div className="flex items-center gap-2">
-              <span>╚══</span>
-              <span className="flex-1 overflow-hidden whitespace-nowrap">{ASCII_LINES.horizontal}</span>
-              <span className="text-foreground/40">EOF</span>
-              <span>══╝</span>
-            </div>
-          </div>
+          {/* Technical lines */}
+          <svg className="absolute inset-0 w-full h-full pointer-events-none z-0" preserveAspectRatio="none">
+            <line 
+              x1="0" 
+              y1="50%" 
+              x2="100%" 
+              y2="50%" 
+              stroke="currentColor" 
+              strokeWidth="0.5" 
+              strokeDasharray="10 5"
+              className="text-foreground/5"
+            />
+            <line 
+              x1="50%" 
+              y1="0" 
+              x2="50%" 
+              y2="100%" 
+              stroke="currentColor" 
+              strokeWidth="0.5" 
+              strokeDasharray="10 5"
+              className="text-foreground/5"
+            />
+          </svg>
 
-          {/* Side decorations - desktop */}
-          <div className="hidden lg:block absolute left-4 top-1/2 -translate-y-1/2 font-mono text-[8px] text-foreground/10 writing-mode-vertical" style={{ writingMode: "vertical-rl" }}>
-            {ASCII_LINES.dots}
-          </div>
-          <div className="hidden lg:block absolute right-4 top-1/2 -translate-y-1/2 font-mono text-[8px] text-foreground/10 writing-mode-vertical transform rotate-180" style={{ writingMode: "vertical-rl" }}>
-            {ASCII_LINES.dots}
+          {/* Bottom tech bar */}
+          <div className="absolute bottom-0 left-0 right-0 px-4 md:px-8 py-4 font-mono text-[7px] md:text-[8px] text-foreground/30 border-t border-foreground/10 bg-background/50 backdrop-blur-sm z-20">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <span className="text-foreground/50">YEAR:</span>
+                <span className="text-foreground">{currentProject.year}</span>
+                <span className="text-foreground/20">│</span>
+                <span className="hidden md:inline">{currentProject.tech.join(" · ")}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span>MEM: 128MB</span>
+                <span className="text-foreground/20">│</span>
+                <span>FPS: 60</span>
+                <span className="text-foreground/20">│</span>
+                <span className="text-foreground">READY</span>
+              </div>
+            </div>
           </div>
         </div>
-
-        {/* Scroll progress indicator - desktop */}
-        <ScrollProgress progress={scrollProgress} activeIndex={activeIndex} />
       </section>
-
-      {/* Mobile progress */}
-      {!isOverlayOpen && <MobileProgress activeIndex={activeIndex} />}
-
-      {/* Image overlay */}
-      <ImageOverlay
-        project={selectedProject}
-        isOpen={isOverlayOpen}
-        onClose={handleCloseOverlay}
-      />
     </>
   )
 }
