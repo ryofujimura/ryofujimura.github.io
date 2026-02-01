@@ -52,7 +52,7 @@ const SCROLL_CONFIG = {
   mobile: {
     scrollPerProject: 35,
     scrubSpeed: 0.1,
-    slideHeight: 460,
+    slideHeight: 400,
   },
   desktop: {
     scrollPerProject: 40,
@@ -890,57 +890,6 @@ function ImageGallery({ images, title, isActive }: { images: string[]; title: st
 }
 
 // ─────────────────────────────────────────────────────────────
-// PROJECT ICON WITH ANIMATION
-// ─────────────────────────────────────────────────────────────
-
-function ProjectIcon({ icon, title, isActive }: { icon: string; title: string; isActive: boolean }) {
-  const iconRef = useRef<HTMLDivElement>(null)
-  const [isHovered, setIsHovered] = useState(false)
-
-  useEffect(() => {
-    if (!iconRef.current || !isActive) return
-
-    gsap.fromTo(
-      iconRef.current,
-      { scale: 0, rotation: -180 },
-      { scale: 1, rotation: 0, duration: 0.6, ease: "back.out(1.7)" }
-    )
-  }, [isActive, title])
-
-  return (
-    <div
-      ref={iconRef}
-      className={cn(
-        "relative w-12 h-12 md:w-16 md:h-16 border border-foreground/20",
-        "flex items-center justify-center bg-background",
-        "transition-all duration-300 cursor-pointer",
-        isHovered && "border-foreground/40 shadow-[4px_4px_0_0_var(--foreground)]"
-      )}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
-      <Image
-        src={icon}
-        alt={title}
-        width={40}
-        height={40}
-        className={cn(
-          "object-contain transition-all duration-300",
-          isHovered && "scale-110"
-        )}
-      />
-      
-      {/* Scanning effect */}
-      <div className={cn(
-        "absolute inset-0 bg-gradient-to-b from-transparent via-foreground/5 to-transparent",
-        "transition-transform duration-1000",
-        isActive && "animate-pulse"
-      )} />
-    </div>
-  )
-}
-
-// ─────────────────────────────────────────────────────────────
 // STATUS BADGE
 // ─────────────────────────────────────────────────────────────
 
@@ -1279,19 +1228,16 @@ function ProjectSlide({
         <div className="h-full flex flex-col p-4 md:p-6 relative z-10 overflow-y-auto">
           {/* Header Row */}
           <div className="slide-animate flex items-start justify-between gap-4 mb-3 md:mb-4">
-            <div className="flex items-center gap-3 md:gap-4">
-              <ProjectIcon icon={project.icon} title={project.title} isActive={isActive} />
-              <div>
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="font-mono text-[8px] text-foreground/40">{project.year}</span>
-                  <StatusBadge status={project.status} />
-                </div>
-                <h3 className="font-mono text-sm md:text-base font-bold text-foreground">
-                  {project.title}
-                </h3>
-                <div className="font-mono text-[8px] md:text-[9px] text-foreground/50">
-                  {project.subtitle}
-                </div>
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <span className="font-mono text-[8px] text-foreground/40">{project.year}</span>
+                <StatusBadge status={project.status} />
+              </div>
+              <h3 className="font-mono text-sm md:text-base font-bold text-foreground">
+                {project.title}
+              </h3>
+              <div className="font-mono text-[8px] md:text-[9px] text-foreground/50">
+                {project.subtitle}
               </div>
             </div>
 
