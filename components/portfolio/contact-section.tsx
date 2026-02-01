@@ -6,8 +6,9 @@ import { ScrollTrigger } from "gsap/ScrollTrigger"
 import { AnimatedSection } from "@/components/animated-section"
 import { MagneticButton } from "@/components/magnetic-button"
 import { RevealText } from "@/components/reveal-text"
-import { Mail, Github, Linkedin, MapPin, ArrowUpRight } from "lucide-react"
+import { Mail, Github, Linkedin, MapPin } from "lucide-react"
 import { LocationHoverText } from "@/components/portfolio/location-hover-text"
+import { ExpandableContactForm } from "@/components/portfolio/expandable-contact-form"
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -305,16 +306,7 @@ export function ContactSection() {
         </AnimatedSection>
 
         <AnimatedSection delay={300}>
-          <MagneticButton
-            as="a"
-            href="mailto:ryo.fujimura1@gmail.com"
-            cursorText="Send"
-            strength={0.2}
-            className="touch-target group inline-flex items-center justify-center gap-2 sm:gap-3 min-h-[48px] px-6 sm:px-10 py-4 sm:py-5 text-base sm:text-lg font-medium font-mono text-primary-foreground bg-primary rounded-full hover:shadow-2xl hover:shadow-primary/20 transition-all duration-500 w-full max-w-[320px] mx-auto sm:w-auto"
-          >
-            Say Hello
-            <ArrowUpRight className="w-5 h-5 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform shrink-0" />
-          </MagneticButton>
+          <ExpandableContactForm className="flex flex-col items-center" />
         </AnimatedSection>
 
         <AnimatedSection delay={400}>
