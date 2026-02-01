@@ -199,12 +199,12 @@ function Timeline({
   const progressHeight = `${progress * 100}%`
 
   return (
-    <div className="hidden md:flex flex-col w-[120px] lg:w-[140px] flex-shrink-0">
-      <div className="font-mono text-[7px] text-foreground/30 mb-2">
+    <div className="hidden md:flex flex-col w-[120px] lg:w-[140px] flex-shrink-0 h-full">
+      <div className="font-mono text-[7px] text-foreground/30 mb-1">
         ┌─ TIMELINE
       </div>
       
-      <div className="relative pl-3 flex-1">
+      <div className="relative pl-3 flex-1 flex flex-col">
         {/* Track */}
         <div className="absolute left-[5px] top-0 bottom-0 w-px bg-foreground/10" />
         {/* Progress */}
@@ -213,38 +213,32 @@ function Timeline({
           style={{ height: progressHeight }}
         />
 
-        <div className="space-y-0">
+        {/* Items distributed equally */}
+        <div className="flex flex-col justify-between h-full">
           {projects.map((project, index) => {
             const isActive = index === activeIndex
             const isPast = index < activeIndex
-            const showYear = index === 0 || projects[index - 1]?.year !== project.year
 
             return (
-              <div key={project.id}>
-                {showYear && (
-                  <div className="font-mono text-[7px] text-foreground/30 mb-0.5 mt-1.5 first:mt-0 -ml-3 pl-3 border-l border-foreground/20">
-                    {project.year}
-                  </div>
+              <button
+                key={project.id}
+                onClick={() => onNodeClick(index)}
+                className={cn(
+                  "w-full text-left font-mono text-[7px] transition-all -ml-3 pl-3 cursor-pointer hover:text-accent py-0.5",
+                  isActive ? "text-accent border-l-2 border-accent" : 
+                  isPast ? "text-foreground/40 border-l border-foreground/20 hover:border-l-2 hover:border-accent/50" : 
+                  "text-foreground/20 border-l border-transparent hover:border-l-2 hover:border-accent/50"
                 )}
-
-                <button
-                  onClick={() => onNodeClick(index)}
-                  className={cn(
-                    "w-full text-left py-0.5 font-mono text-[7px] transition-all -ml-3 pl-3 cursor-pointer hover:text-accent",
-                    isActive ? "text-accent border-l-2 border-accent" : 
-                    isPast ? "text-foreground/30 border-l border-foreground/10 hover:border-l-2 hover:border-accent/50" : 
-                    "text-foreground/15 border-l border-transparent hover:border-l-2 hover:border-accent/50"
-                  )}
-                >
-                  <span className="truncate block">{project.growth}</span>
-                </button>
-              </div>
+              >
+                <span className="text-[6px] text-foreground/30 block">{project.year}</span>
+                <span className="truncate block leading-tight">{project.growth}</span>
+              </button>
             )
           })}
         </div>
       </div>
       
-      <div className="font-mono text-[7px] text-foreground/30 mt-2">
+      <div className="font-mono text-[7px] text-foreground/30 mt-1">
         └─ NOW
       </div>
     </div>
