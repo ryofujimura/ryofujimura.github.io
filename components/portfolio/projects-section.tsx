@@ -168,119 +168,6 @@ function useIsMobile() {
 }
 
 // ─────────────────────────────────────────────────────────────
-// ASCII LOADING SCREEN
-// ─────────────────────────────────────────────────────────────
-
-function LoadingScreen({ onComplete }: { onComplete: () => void }) {
-  const [frame, setFrame] = useState(0)
-  const [progress, setProgress] = useState(0)
-  const containerRef = useRef<HTMLDivElement>(null)
-
-  const frames = [
-    `
-    ╔════════════════════════════════╗
-    ║  ░░░░░░░░░░░░░░░░░░░░░░░░░░░░  ║
-    ║  ░ LOADING PROJECTS...     ░  ║
-    ║  ░░░░░░░░░░░░░░░░░░░░░░░░░░░░  ║
-    ╚════════════════════════════════╝
-    `,
-    `
-    ╔════════════════════════════════╗
-    ║  ▒▒▒▒▒▒▒▒░░░░░░░░░░░░░░░░░░░░  ║
-    ║  ▒ LOADING PROJECTS...     ▒  ║
-    ║  ▒▒▒▒▒▒▒▒░░░░░░░░░░░░░░░░░░░░  ║
-    ╚════════════════════════════════╝
-    `,
-    `
-    ╔════════════════════════════════╗
-    ║  ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░░░░░░  ║
-    ║  ▓ LOADING PROJECTS...     ▓  ║
-    ║  ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░░░░░░  ║
-    ╚════════════════════════════════╝
-    `,
-    `
-    ╔════════════════════════════════╗
-    ║  ████████████████████████░░░░  ║
-    ║  █ LOADING PROJECTS...     █  ║
-    ║  ████████████████████████░░░░  ║
-    ╚════════════════════════════════╝
-    `,
-    `
-    ╔════════════════════════════════╗
-    ║  ████████████████████████████  ║
-    ║  █ PROJECTS LOADED ✓       █  ║
-    ║  ████████████████████████████  ║
-    ╚════════════════════════════════╝
-    `,
-  ]
-
-  useEffect(() => {
-    const progressInterval = setInterval(() => {
-      setProgress(p => {
-        if (p >= 100) {
-          clearInterval(progressInterval)
-          return 100
-        }
-        return p + 4
-      })
-    }, 30)
-
-    const frameInterval = setInterval(() => {
-      setFrame(f => (f + 1) % (frames.length - 1))
-    }, 150)
-
-    const completeTimer = setTimeout(() => {
-      clearInterval(frameInterval)
-      setFrame(frames.length - 1)
-      
-      if (containerRef.current) {
-        gsap.to(containerRef.current, {
-          opacity: 0,
-          scale: 0.95,
-          duration: 0.5,
-          delay: 0.3,
-          ease: "power2.inOut",
-          onComplete,
-        })
-      }
-    }, 800)
-
-    return () => {
-      clearInterval(progressInterval)
-      clearInterval(frameInterval)
-      clearTimeout(completeTimer)
-    }
-  }, [onComplete, frames.length])
-
-  return (
-    <div
-      ref={containerRef}
-      className="fixed inset-0 z-50 bg-background flex items-center justify-center"
-    >
-      <div className="text-center">
-        <pre className="font-mono text-[8px] sm:text-[10px] md:text-xs text-foreground/60 leading-tight whitespace-pre">
-          {frames[frame]}
-        </pre>
-        <div className="mt-4 font-mono text-[10px] text-foreground/40">
-          [{String(progress).padStart(3, "0")}%] INITIALIZING_PROJECT_DATA
-        </div>
-        <div className="mt-2 flex justify-center gap-1">
-          {Array.from({ length: 20 }).map((_, i) => (
-            <div
-              key={i}
-              className={cn(
-                "w-2 h-1 transition-all duration-100",
-                i < progress / 5 ? "bg-foreground" : "bg-foreground/10"
-              )}
-            />
-          ))}
-        </div>
-      </div>
-    </div>
-  )
-}
-
-// ─────────────────────────────────────────────────────────────
 // PROJECT MODAL
 // ─────────────────────────────────────────────────────────────
 
@@ -723,7 +610,7 @@ function AsciiBorderLine({ position, className }: { position: "top" | "bottom"; 
 // ─────────────────────────────────────────────────────────────
 
 export function ProjectsSection() {
-  const [isLoaded, setIsLoaded] = useState(false)
+  const [isLoaded, setIsLoaded] = useState(true)
   const [selectedProject, setSelectedProject] = useState<Project | null>(null)
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
   const sectionRef = useRef<HTMLElement>(null)
@@ -810,8 +697,6 @@ export function ProjectsSection() {
   return (
     <>
       {/* Loading screen */}
-      {!isLoaded && <LoadingScreen onComplete={() => setIsLoaded(true)} />}
-
       <section
         id="projects"
         ref={sectionRef}
