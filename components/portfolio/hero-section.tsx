@@ -151,7 +151,7 @@ function LocHoverReveal({
         </span>
         <span
           ref={hoverRef}
-          className="absolute left-0 top-0 w-full tabular-nums whitespace-pre text-green-500 leading-[1.25em]"
+          className="absolute left-0 top-0 w-full tabular-nums whitespace-pre text-black leading-[1.25em]"
           style={{ minWidth: `${slotWidthCh}ch` }}
         >
           {hov}
