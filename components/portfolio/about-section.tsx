@@ -184,7 +184,7 @@ export function AboutSection() {
 
         // Data flow animation (continuous)
         tl.to(dataFlows, {
-          opacity: 0.2,
+          opacity: 1,
           duration: 0.5,
           stagger: 0.1,
         }, "-=0.8")
@@ -231,7 +231,7 @@ export function AboutSection() {
       <div className="pointer-events-none absolute inset-0 bg-brutalist-grid opacity-[0.04]" aria-hidden />
 
       {/* Collision Background - AI / Mobile / Backend systems converging */}
-      <div className="pointer-events-none absolute inset-0 overflow-hidden opacity-30" aria-hidden>
+      <div className="pointer-events-none absolute inset-0 overflow-hidden opacity-10" aria-hidden>
         <svg
           ref={bgRef}
           viewBox="0 0 1200 800"
@@ -482,7 +482,7 @@ export function AboutSection() {
                     onClick={() => scrollToSection("hobbies")}
                     className="font-mono text-[8px] sm:text-[9px] text-muted-foreground uppercase tracking-widest mt-1.5 hover:text-foreground hover:underline transition-colors cursor-pointer focus:outline-none focus-visible:ring-1 focus-visible:ring-foreground"
                   >
-                    VR46
+                    33.67, -117.85
                   </button>
                 </div>
                 <div className="space-y-4 sm:space-y-6 min-w-0 flex-1">
