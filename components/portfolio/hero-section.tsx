@@ -1,7 +1,8 @@
 "use client"
 
-import { useRef, useState, useEffect } from "react"
+import { useRef, useState, useEffect, useCallback } from "react"
 import { gsap } from "gsap"
+import Image from "next/image"
 import { useReducedMotion } from "@/hooks/use-reduced-motion"
 import { GSAPText } from "@/components/gsap-text"
 import { BrutalistBackground } from "@/components/brutalist-background"
@@ -314,7 +315,7 @@ function SocialLinks({ className = "" }: { className?: string }) {
   )
 }
 
-/** Technical SVG frame element */
+/** Technical SVG frame element - full page version */
 function TechnicalFrame({ className = "" }: { className?: string }) {
   const frameRef = useRef<SVGSVGElement>(null)
 
@@ -364,8 +365,295 @@ function TechnicalFrame({ className = "" }: { className?: string }) {
   )
 }
 
+/** Technical SVG overlay for portrait - brutalist grid and measurement lines */
+function PortraitTechnicalOverlay({ className = "" }: { className?: string }) {
+  const svgRef = useRef<SVGSVGElement>(null)
+
+  useEffect(() => {
+    if (!svgRef.current) return
+    const elements = svgRef.current.querySelectorAll("[data-animate-line]")
+    
+    elements.forEach((el) => {
+      const geom = el as SVGGeometryElement
+      if (typeof geom.getTotalLength === "function") {
+        try {
+          const len = geom.getTotalLength()
+          gsap.set(geom, { strokeDasharray: len, strokeDashoffset: len })
+        } catch {
+          // Skip
+        }
+      }
+    })
+
+    gsap.to(elements, {
+      strokeDashoffset: 0,
+      duration: 1.8,
+      stagger: 0.08,
+      ease: "power2.out",
+      delay: 0.8,
+    })
+
+    // Animate circles
+    const circles = svgRef.current.querySelectorAll("[data-animate-circle]")
+    gsap.fromTo(
+      circles,
+      { scale: 0, transformOrigin: "center" },
+      { scale: 1, duration: 0.6, stagger: 0.1, ease: "back.out(1.7)", delay: 1.2 }
+    )
+
+    // Animate text elements
+    const texts = svgRef.current.querySelectorAll("[data-animate-text]")
+    gsap.fromTo(
+      texts,
+      { opacity: 0 },
+      { opacity: 1, duration: 0.8, stagger: 0.15, ease: "power2.out", delay: 1.5 }
+    )
+  }, [])
+
+  return (
+    <svg
+      ref={svgRef}
+      className={`absolute inset-0 w-full h-full pointer-events-none ${className}`}
+      viewBox="0 0 400 500"
+      preserveAspectRatio="xMidYMid slice"
+      fill="none"
+    >
+      {/* Technical grid pattern */}
+      <defs>
+        <pattern id="heroGridPattern" width="40" height="40" patternUnits="userSpaceOnUse">
+          <path d="M 40 0 L 0 0 0 40" fill="none" stroke="currentColor" strokeWidth="0.5" className="text-foreground/5" />
+        </pattern>
+        <pattern id="heroSubGrid" width="10" height="10" patternUnits="userSpaceOnUse">
+          <path d="M 10 0 L 0 0 0 10" fill="none" stroke="currentColor" strokeWidth="0.25" className="text-foreground/3" />
+        </pattern>
+      </defs>
+      
+      <rect width="400" height="500" fill="url(#heroSubGrid)" />
+      <rect width="400" height="500" fill="url(#heroGridPattern)" />
+
+      {/* Diagonal construction lines */}
+      <line data-animate-line x1="0" y1="0" x2="400" y2="500" stroke="currentColor" strokeWidth="0.5" className="text-foreground/8" />
+      <line data-animate-line x1="400" y1="0" x2="0" y2="500" stroke="currentColor" strokeWidth="0.5" className="text-foreground/8" />
+      
+      {/* Golden ratio guides */}
+      <line data-animate-line x1="0" y1="309" x2="400" y2="309" stroke="currentColor" strokeWidth="0.75" className="text-foreground/10" strokeDasharray="4 4" />
+      <line data-animate-line x1="247" y1="0" x2="247" y2="500" stroke="currentColor" strokeWidth="0.75" className="text-foreground/10" strokeDasharray="4 4" />
+      
+      {/* Corner technical brackets */}
+      <g className="text-foreground/30">
+        <path data-animate-line d="M 20 60 L 20 20 L 60 20" stroke="currentColor" strokeWidth="1.5" fill="none" />
+        <path data-animate-line d="M 340 20 L 380 20 L 380 60" stroke="currentColor" strokeWidth="1.5" fill="none" />
+        <path data-animate-line d="M 380 440 L 380 480 L 340 480" stroke="currentColor" strokeWidth="1.5" fill="none" />
+        <path data-animate-line d="M 60 480 L 20 480 L 20 440" stroke="currentColor" strokeWidth="1.5" fill="none" />
+      </g>
+
+      {/* Measurement tick marks along edges */}
+      <g className="text-foreground/15">
+        {[...Array(10)].map((_, i) => (
+          <line key={`top-${i}`} data-animate-line x1={40 + i * 40} y1="0" x2={40 + i * 40} y2="8" stroke="currentColor" strokeWidth="1" />
+        ))}
+        {[...Array(12)].map((_, i) => (
+          <line key={`left-${i}`} data-animate-line x1="0" y1={40 + i * 40} x2="8" y2={40 + i * 40} stroke="currentColor" strokeWidth="1" />
+        ))}
+      </g>
+
+      {/* Technical circles at key points */}
+      <g className="text-foreground/20">
+        <circle data-animate-circle cx="200" cy="180" r="8" stroke="currentColor" strokeWidth="1" fill="none" />
+        <circle data-animate-circle cx="200" cy="180" r="3" stroke="currentColor" strokeWidth="1" fill="none" />
+        <circle data-animate-circle cx="120" cy="300" r="5" stroke="currentColor" strokeWidth="0.75" fill="none" />
+        <circle data-animate-circle cx="280" cy="300" r="5" stroke="currentColor" strokeWidth="0.75" fill="none" />
+      </g>
+
+      {/* Construction arcs */}
+      <g className="text-foreground/10">
+        <path data-animate-line d="M 50 250 A 150 150 0 0 1 200 100" stroke="currentColor" strokeWidth="0.5" fill="none" />
+        <path data-animate-line d="M 350 250 A 150 150 0 0 0 200 100" stroke="currentColor" strokeWidth="0.5" fill="none" />
+      </g>
+
+      {/* Technical annotations */}
+      <g className="text-foreground/25 font-mono" style={{ fontSize: "8px" }}>
+        <text data-animate-text x="25" y="15" fill="currentColor">REF_001</text>
+        <text data-animate-text x="340" y="15" fill="currentColor">SYS.OK</text>
+        <text data-animate-text x="25" y="495" fill="currentColor">Φ 1.618</text>
+        <text data-animate-text x="330" y="495" fill="currentColor">400×500</text>
+      </g>
+
+      {/* Horizontal scan line effect */}
+      <line data-animate-line x1="0" y1="250" x2="400" y2="250" stroke="currentColor" strokeWidth="0.3" className="text-foreground/5" />
+      
+      {/* Vertical center axis */}
+      <line data-animate-line x1="200" y1="60" x2="200" y2="440" stroke="currentColor" strokeWidth="0.3" className="text-foreground/8" strokeDasharray="2 6" />
+    </svg>
+  )
+}
+
+/** Portrait image with brutalist frame and hover effects */
+function BrutalistPortrait({ className = "" }: { className?: string }) {
+  const containerRef = useRef<HTMLDivElement>(null)
+  const imageRef = useRef<HTMLDivElement>(null)
+  const frameRef = useRef<HTMLDivElement>(null)
+  const glitchRef = useRef<HTMLDivElement>(null)
+  const [isHovered, setIsHovered] = useState(false)
+
+  // Entrance animation
+  useEffect(() => {
+    if (!containerRef.current) return
+    
+    const ctx = gsap.context(() => {
+      // Image reveal animation
+      gsap.fromTo(
+        imageRef.current,
+        { clipPath: "inset(100% 0 0 0)", opacity: 0 },
+        { clipPath: "inset(0% 0 0 0)", opacity: 1, duration: 1.2, ease: "power3.out", delay: 0.6 }
+      )
+      
+      // Frame animation
+      gsap.fromTo(
+        frameRef.current,
+        { scaleY: 0, transformOrigin: "bottom" },
+        { scaleY: 1, duration: 0.8, ease: "power2.out", delay: 1 }
+      )
+    }, containerRef)
+
+    return () => ctx.revert()
+  }, [])
+
+  // Hover animation
+  const handleMouseEnter = useCallback(() => {
+    setIsHovered(true)
+    if (!imageRef.current || !glitchRef.current) return
+    
+    // Scale and contrast shift
+    gsap.to(imageRef.current, {
+      scale: 1.03,
+      duration: 0.4,
+      ease: "power2.out",
+    })
+    
+    // Glitch effect
+    gsap.fromTo(
+      glitchRef.current,
+      { opacity: 0, x: 0 },
+      {
+        opacity: 0.15,
+        x: 4,
+        duration: 0.1,
+        ease: "steps(3)",
+        yoyo: true,
+        repeat: 3,
+        onComplete: () => {
+          gsap.to(glitchRef.current, { opacity: 0, duration: 0.2 })
+        },
+      }
+    )
+  }, [])
+
+  const handleMouseLeave = useCallback(() => {
+    setIsHovered(false)
+    if (!imageRef.current) return
+    
+    gsap.to(imageRef.current, {
+      scale: 1,
+      duration: 0.4,
+      ease: "power2.out",
+    })
+  }, [])
+
+  return (
+    <div
+      ref={containerRef}
+      className={`relative group ${className}`}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
+      {/* Brutalist offset frame */}
+      <div
+        ref={frameRef}
+        className="absolute -inset-3 border-2 border-foreground/20 pointer-events-none"
+        style={{ transform: "translate(8px, 8px)" }}
+      />
+      
+      {/* Secondary offset frame */}
+      <div
+        className="absolute -inset-2 border border-foreground/10 pointer-events-none transition-all duration-300"
+        style={{ 
+          transform: isHovered ? "translate(12px, 12px)" : "translate(4px, 4px)",
+        }}
+      />
+
+      {/* Main image container */}
+      <div
+        ref={imageRef}
+        className="relative aspect-[4/5] overflow-hidden bg-muted"
+      >
+        {/* Image */}
+        <Image
+          src="/images/profile.jpg"
+          alt="Ryo Fujimura"
+          fill
+          className="object-cover object-center grayscale contrast-110 transition-all duration-500"
+          style={{
+            filter: isHovered 
+              ? "grayscale(0.7) contrast(1.15) brightness(1.05)" 
+              : "grayscale(1) contrast(1.1)",
+          }}
+          sizes="(max-width: 768px) 100vw, 400px"
+          priority
+        />
+        
+        {/* Technical overlay */}
+        <PortraitTechnicalOverlay className="z-10 mix-blend-overlay" />
+        
+        {/* Glitch layer */}
+        <div
+          ref={glitchRef}
+          className="absolute inset-0 opacity-0 pointer-events-none"
+          style={{ mixBlendMode: "difference" }}
+        >
+          <Image
+            src="/images/profile.jpg"
+            alt=""
+            fill
+            className="object-cover object-center"
+            style={{ filter: "hue-rotate(180deg) saturate(2)" }}
+            sizes="(max-width: 768px) 100vw, 400px"
+          />
+        </div>
+
+        {/* Scan line overlay */}
+        <div 
+          className="absolute inset-0 pointer-events-none opacity-30"
+          style={{
+            background: "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px)",
+          }}
+        />
+
+        {/* Vignette */}
+        <div 
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background: "radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.3) 100%)",
+          }}
+        />
+      </div>
+
+      {/* Corner markers */}
+      <div className="absolute top-0 left-0 w-4 h-4 border-l-2 border-t-2 border-foreground/40 pointer-events-none" />
+      <div className="absolute top-0 right-0 w-4 h-4 border-r-2 border-t-2 border-foreground/40 pointer-events-none" />
+      <div className="absolute bottom-0 left-0 w-4 h-4 border-l-2 border-b-2 border-foreground/40 pointer-events-none" />
+      <div className="absolute bottom-0 right-0 w-4 h-4 border-r-2 border-b-2 border-foreground/40 pointer-events-none" />
+
+      {/* Technical label */}
+      <div className="absolute -bottom-6 left-0 font-mono text-[9px] tracking-[0.2em] text-muted-foreground uppercase">
+        <span className="opacity-50">IMG_</span>PROFILE_001
+      </div>
+    </div>
+  )
+}
+
 /**
- * HeroSection - Brutalist hero with name, role, and social links
+ * HeroSection - Brutalist hero with portrait, name, role, and social links
  */
 export function HeroSection() {
   const heroRef = useRef<HTMLDivElement>(null)
@@ -400,7 +688,7 @@ export function HeroSection() {
     <section id="hero" className="relative">
       <div
         ref={heroRef}
-        className="relative w-full pt-40 sm:pt-48 pb-24 sm:pb-32"
+        className="relative w-full pt-32 sm:pt-40 pb-24 sm:pb-32"
       >
         {/* Brutalist background */}
         <div className="absolute inset-0 opacity-60">
@@ -410,66 +698,82 @@ export function HeroSection() {
         {/* Technical frame overlay */}
         <TechnicalFrame className="opacity-30" />
 
-        {/* Content */}
-        <div className="relative z-10 w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* System status bar */}
-          <div 
-            data-intro-animate
-            className="flex items-center gap-2 sm:gap-4 mb-6 sm:mb-8 font-mono text-[9px] sm:text-[10px] uppercase tracking-[0.2em] text-muted-foreground"
-          >
-            <span>REV: {rev}</span>
-            <span className="text-foreground/20">│</span>
-            <span className="hidden sm:inline">SYS: OPERATIONAL</span>
-          </div>
+        {/* Content - Split layout */}
+        <div className="relative z-10 w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+            {/* Portrait - Left side */}
+            <div 
+              data-intro-animate 
+              className="lg:col-span-5 flex justify-center lg:justify-start order-2 lg:order-1"
+            >
+              <div className="w-full max-w-[320px] sm:max-w-[360px] lg:max-w-none">
+                <BrutalistPortrait />
+              </div>
+            </div>
 
-          {/* Name - Large brutalist typography */}
-          <div data-intro-animate className="mb-4 sm:mb-6">
-            <h1 className="font-mono text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-tight leading-[0.9]">
-              <GSAPText immediate variant="chars" stagger={0.03} duration={0.6}>
-                RYO
-              </GSAPText>             
-              <span className="text-muted-foreground">
-                <GSAPText immediate variant="chars" stagger={0.03} duration={0.6} delay={0.3}>
-                  FUJIMURA
-                </GSAPText>
-              </span>
-            </h1>
-          </div>
+            {/* Text content - Right side */}
+            <div className="lg:col-span-7 order-1 lg:order-2">
+              {/* System status bar */}
+              <div 
+                data-intro-animate
+                className="flex items-center gap-2 sm:gap-4 mb-6 sm:mb-8 font-mono text-[9px] sm:text-[10px] uppercase tracking-[0.2em] text-muted-foreground"
+              >
+                <span>REV: {rev}</span>
+                <span className="text-foreground/20">│</span>
+                <span className="hidden sm:inline">SYS: OPERATIONAL</span>
+              </div>
 
-          {/* Role descriptor with rotating verb */}
-          <div 
-            data-intro-animate
-            className="font-mono text-sm sm:text-base md:text-lg uppercase tracking-[0.15em] text-foreground/80 mb-6 sm:mb-8"
-          >
-            <span className="text-muted-foreground">MODE: </span>
-            <ModeVerbRotator
-              verbs={MODE_VERBS}
-              slotWidthCh={isMobile ? VERB_SLOT_CH_MOBILE : VERB_SLOT_CH_DESKTOP}
-              className="text-foreground font-bold"
-            />
-            <br className="sm:hidden" />
-            <span className="hidden sm:inline text-foreground/20"> │ </span>
-            <span className="text-muted-foreground">LOC: </span>
-            <LocHoverReveal
-              defaultText={LOC_DEFAULT}
-              hoverText={LOC_HOVER}
-              slotWidthCh={isMobile ? LOC_SLOT_CH_MOBILE : LOC_SLOT_CH_DESKTOP}
-            />
-          </div>
+              {/* Name - Large brutalist typography */}
+              <div data-intro-animate className="mb-4 sm:mb-6">
+                <h1 className="font-mono text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black tracking-tight leading-[0.9]">
+                  <GSAPText immediate variant="chars" stagger={0.03} duration={0.6}>
+                    RYO
+                  </GSAPText>
+                  <br />
+                  <span className="text-muted-foreground">
+                    <GSAPText immediate variant="chars" stagger={0.03} duration={0.6} delay={0.3}>
+                      FUJIMURA
+                    </GSAPText>
+                  </span>
+                </h1>
+              </div>
 
-          {/* Tagline */}
-          <div data-intro-animate className="max-w-xl mb-8 sm:mb-10">
-            <p className="font-mono text-xs sm:text-sm text-muted-foreground leading-relaxed">
-              Software Engineer crafting intelligent systems at the intersection of{" "}
-              <span className="text-foreground font-medium">AI/ML</span>,{" "}
-              <span className="text-foreground font-medium">Mobile</span>, and{" "}
-              <span className="text-foreground font-medium">Full-Stack</span> development.
-            </p>
-          </div>
+              {/* Role descriptor with rotating verb */}
+              <div 
+                data-intro-animate
+                className="font-mono text-xs sm:text-sm md:text-base uppercase tracking-[0.15em] text-foreground/80 mb-6 sm:mb-8"
+              >
+                <span className="text-muted-foreground">MODE: </span>
+                <ModeVerbRotator
+                  verbs={MODE_VERBS}
+                  slotWidthCh={isMobile ? VERB_SLOT_CH_MOBILE : VERB_SLOT_CH_DESKTOP}
+                  className="text-foreground font-bold"
+                />
+                <br className="sm:hidden" />
+                <span className="hidden sm:inline text-foreground/20"> │ </span>
+                <span className="text-muted-foreground">LOC: </span>
+                <LocHoverReveal
+                  defaultText={LOC_DEFAULT}
+                  hoverText={LOC_HOVER}
+                  slotWidthCh={isMobile ? LOC_SLOT_CH_MOBILE : LOC_SLOT_CH_DESKTOP}
+                />
+              </div>
 
-          {/* Social links */}
-          <div data-intro-animate>
-            <SocialLinks />
+              {/* Tagline */}
+              <div data-intro-animate className="max-w-xl mb-8 sm:mb-10">
+                <p className="font-mono text-xs sm:text-sm text-muted-foreground leading-relaxed">
+                  Software Engineer crafting intelligent systems at the intersection of{" "}
+                  <span className="text-foreground font-medium">AI/ML</span>,{" "}
+                  <span className="text-foreground font-medium">Mobile</span>, and{" "}
+                  <span className="text-foreground font-medium">Full-Stack</span> development.
+                </p>
+              </div>
+
+              {/* Social links */}
+              <div data-intro-animate>
+                <SocialLinks />
+              </div>
+            </div>
           </div>
         </div>
       </div>
