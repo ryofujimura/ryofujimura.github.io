@@ -477,17 +477,167 @@ export function IntroSection() {
 
         {/* Page 2: Data + Action */}
         <div 
-          className="snap-page relative flex items-center justify-center px-4 sm:px-6"
+          className="snap-page relative flex items-center justify-center px-4 sm:px-6 py-12 sm:py-16"
           style={{
             scrollSnapAlign: "start",
             minHeight: "100dvh",
             height: "100vh",
           }}
         >
-          <div className="w-full max-w-5xl mx-auto">
-            {/* Placeholder for data content */}
-            <div className="font-mono text-foreground/30 text-xs uppercase tracking-widest">
-              [PAGE 2: DATA + ACTION]
+          {/* Subtle background for page 2 */}
+          <div className="hidden sm:block opacity-50">
+            <BrutalistBackground variant="circuit" />
+          </div>
+
+          <div className="relative z-10 w-full max-w-5xl mx-auto">
+            <div className="grid md:grid-cols-[1fr_auto] gap-8 lg:gap-12 items-start">
+              
+              {/* Left Column: Stats + Stack */}
+              <div className="space-y-8 sm:space-y-10">
+                
+                {/* Available Badge */}
+                <div className="flex items-center gap-3">
+                  <div className="relative">
+                    <div className="w-2.5 h-2.5 bg-green-500 rounded-full animate-pulse" />
+                    <div className="absolute inset-0 w-2.5 h-2.5 bg-green-500 rounded-full animate-ping opacity-75" />
+                  </div>
+                  <span className="font-mono text-xs sm:text-sm uppercase tracking-[0.2em] text-green-500">
+                    Available for Opportunities
+                  </span>
+                </div>
+
+                {/* Stats Grid */}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+                  {[
+                    { label: "Years Coding", value: "8+", link: null },
+                    { label: "Internships", value: "2", link: "experience" },
+                    { label: "Projects Shipped", value: "10+", link: "projects" },
+                    { label: "Publications", value: "2", link: "publications" },
+                  ].map((stat) => {
+                    const isLink = !!stat.link
+                    const handleClick = () => {
+                      if (stat.link) {
+                        document.getElementById(stat.link)?.scrollIntoView({ behavior: "smooth" })
+                      }
+                    }
+                    return (
+                      <button
+                        key={stat.label}
+                        type="button"
+                        onClick={isLink ? handleClick : undefined}
+                        disabled={!isLink}
+                        className={`
+                          relative border bg-background px-3 py-4 sm:px-4 sm:py-5 
+                          flex flex-col justify-between min-h-[5rem] sm:min-h-[5.5rem] text-left
+                          transition-all duration-300 group
+                          ${isLink 
+                            ? "border-foreground/25 cursor-pointer hover:border-foreground hover:shadow-[4px_4px_0_0_var(--foreground)]" 
+                            : "border-foreground/15 cursor-default"
+                          }
+                        `}
+                      >
+                        {/* Technical pattern overlay on hover */}
+                        {isLink && (
+                          <svg
+                            className="absolute inset-0 w-full h-full pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                            viewBox="0 0 48 48"
+                            fill="none"
+                            aria-hidden
+                          >
+                            <line x1="0" y1="0" x2="48" y2="48" stroke="currentColor" strokeWidth="0.3" className="text-foreground/10" />
+                            <line x1="48" y1="0" x2="0" y2="48" stroke="currentColor" strokeWidth="0.3" className="text-foreground/10" />
+                          </svg>
+                        )}
+                        <span className="font-mono text-[9px] sm:text-[10px] uppercase tracking-[0.15em] text-muted-foreground">
+                          {stat.label}
+                        </span>
+                        <span className="font-mono text-2xl sm:text-3xl md:text-4xl font-black text-foreground">
+                          {stat.value}
+                        </span>
+                      </button>
+                    )
+                  })}
+                </div>
+
+                {/* Stack Ticker */}
+                <div className="border border-foreground/20 bg-background/50 overflow-hidden">
+                  <div className="px-3 py-2 border-b border-foreground/10">
+                    <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-muted-foreground">
+                      Tech Stack
+                    </span>
+                  </div>
+                  <div className="relative overflow-hidden py-3">
+                    <div className="stack-ticker flex gap-8 animate-ticker whitespace-nowrap">
+                      {[
+                        "Python", "Swift", "Kotlin", "TypeScript", "React", 
+                        "Firebase", "PyTorch", "CoreML", "On-device LLMs", 
+                        "CUDA", "Docker", "Node.js", "REST APIs"
+                      ].map((tech, i) => (
+                        <span 
+                          key={i} 
+                          className="font-mono text-sm sm:text-base text-foreground/80"
+                        >
+                          {tech}
+                        </span>
+                      ))}
+                      {/* Duplicate for seamless loop */}
+                      {[
+                        "Python", "Swift", "Kotlin", "TypeScript", "React", 
+                        "Firebase", "PyTorch", "CoreML", "On-device LLMs", 
+                        "CUDA", "Docker", "Node.js", "REST APIs"
+                      ].map((tech, i) => (
+                        <span 
+                          key={`dup-${i}`} 
+                          className="font-mono text-sm sm:text-base text-foreground/80"
+                        >
+                          {tech}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Focus Areas */}
+                <div className="flex flex-wrap gap-2">
+                  {["AI / ML", "Mobile", "Backend", "Full-Stack"].map((area) => (
+                    <span 
+                      key={area}
+                      className="font-mono text-[10px] sm:text-xs uppercase tracking-wider px-3 py-1.5 border border-foreground/30 text-foreground/70"
+                    >
+                      {area}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              {/* Right Column: Profile Image */}
+              <div className="hidden md:block">
+                <div className="relative">
+                  {/* Brutalist frame */}
+                  <div className="absolute -inset-2 border-2 border-foreground/20" />
+                  <div className="absolute -inset-4 border border-foreground/10" />
+                  
+                  {/* Image */}
+                  <div className="w-32 h-32 lg:w-40 lg:h-40 border-[3px] border-foreground bg-background overflow-hidden">
+                    <img
+                      src="/images/profile.jpg"
+                      alt="Ryo Fujimura"
+                      className="w-full h-full object-cover object-top"
+                      width={160}
+                      height={160}
+                    />
+                  </div>
+                  
+                  {/* Coordinates */}
+                  <button
+                    type="button"
+                    onClick={() => document.getElementById("hobbies")?.scrollIntoView({ behavior: "smooth" })}
+                    className="font-mono text-[8px] text-muted-foreground uppercase tracking-widest mt-2 hover:text-foreground hover:underline transition-colors"
+                  >
+                    33.67°N, 117.85°W
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -505,6 +655,13 @@ export function IntroSection() {
           0% { transform: translateY(-100%); }
           50% { transform: translateY(200%); }
           100% { transform: translateY(200%); }
+        }
+        @keyframes ticker {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-50%); }
+        }
+        .animate-ticker {
+          animation: ticker 30s linear infinite;
         }
       `}</style>
     </section>
