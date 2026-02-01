@@ -381,6 +381,12 @@ function TerminalOutput({
   const [expandedProject, setExpandedProject] = useState<string | null>(null)
   const [allExpanded, setAllExpanded] = useState(false)
 
+  // Reset expand state when skill changes
+  useEffect(() => {
+    setAllExpanded(false)
+    setExpandedProject(null)
+  }, [skill])
+
   const relatedProjects = skill ? skillsMap.get(skill) || [] : []
 
   const loadingFrames = [
