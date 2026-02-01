@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect, useCallback } from "react"
 import { gsap } from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
-import { ExternalLink, Github } from "lucide-react"
+import { ExternalLink, Github, ChevronDown } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 gsap.registerPlugin(ScrollTrigger)
@@ -13,7 +13,6 @@ gsap.registerPlugin(ScrollTrigger)
 // ─────────────────────────────────────────────────────────────
 
 const allProjects = [
-  // 2025 - Most Recent
   {
     id: "01",
     year: "2025",
@@ -79,7 +78,6 @@ const allProjects = [
     skills: ["Swift", "Kotlin", "Firebase RTDB", "Real-time"],
     links: { github: "https://github.com/ryofujimura", appStore: "#", playStore: "#" },
   },
-  // 2024
   {
     id: "06",
     year: "2024",
@@ -132,7 +130,6 @@ const allProjects = [
     skills: ["Swift", "SwiftUI", "App Store"],
     links: { github: "https://github.com/ryofujimura", appStore: "#" },
   },
-  // 2023
   {
     id: "10",
     year: "2023",
@@ -159,7 +156,6 @@ const allProjects = [
     skills: ["Python", "automation", "Instagram"],
     links: { instagram: "#", youtube: "#" },
   },
-  // 2022 - Oldest
   {
     id: "12",
     year: "2022",
@@ -177,141 +173,91 @@ const allProjects = [
 
 type Project = (typeof allProjects)[0]
 
-// Group projects by year for timeline
-const projectsByYear = allProjects.reduce((acc, project) => {
-  if (!acc[project.year]) acc[project.year] = []
-  acc[project.year].push(project)
-  return acc
-}, {} as Record<string, Project[]>)
-
-const years = Object.keys(projectsByYear).sort((a, b) => Number(b) - Number(a))
-
 // ─────────────────────────────────────────────────────────────
-// TECHNICAL PATTERNS - SVG BACKGROUNDS
+// TECHNICAL PATTERNS - SVG BACKGROUNDS (CONTAINED)
 // ─────────────────────────────────────────────────────────────
 
 function TechnicalPatterns() {
   return (
     <div className="absolute inset-0 pointer-events-none overflow-hidden">
       {/* Diagonal grid lines */}
-      <svg className="absolute inset-0 w-full h-full opacity-[0.03]" preserveAspectRatio="none">
+      <svg className="absolute inset-0 w-full h-full opacity-[0.02]" preserveAspectRatio="none">
         <defs>
-          <pattern id="diagonal-grid" width="60" height="60" patternUnits="userSpaceOnUse">
+          <pattern id="diagonal-grid-projects" width="60" height="60" patternUnits="userSpaceOnUse">
             <path d="M 60 0 L 0 60" stroke="currentColor" strokeWidth="0.5" fill="none" />
             <path d="M 0 0 L 60 60" stroke="currentColor" strokeWidth="0.5" fill="none" />
           </pattern>
         </defs>
-        <rect width="100%" height="100%" fill="url(#diagonal-grid)" />
+        <rect width="100%" height="100%" fill="url(#diagonal-grid-projects)" />
       </svg>
 
-      {/* Technical measurement marks - top */}
-      <div className="absolute top-0 left-0 right-0 h-px bg-foreground/10" />
-      <div className="absolute top-0 left-0 right-0 flex justify-between px-8">
-        {[...Array(20)].map((_, i) => (
-          <div key={i} className="w-px h-2 bg-foreground/20" />
-        ))}
-      </div>
-
-      {/* Corner technical brackets */}
-      <svg className="absolute top-4 left-4 w-8 h-8 text-foreground/20">
-        <path d="M 0 8 L 0 0 L 8 0" stroke="currentColor" strokeWidth="1" fill="none" />
-      </svg>
-      <svg className="absolute top-4 right-4 w-8 h-8 text-foreground/20">
-        <path d="M 24 0 L 32 0 L 32 8" stroke="currentColor" strokeWidth="1" fill="none" />
-      </svg>
-      <svg className="absolute bottom-4 left-4 w-8 h-8 text-foreground/20">
-        <path d="M 0 24 L 0 32 L 8 32" stroke="currentColor" strokeWidth="1" fill="none" />
-      </svg>
-      <svg className="absolute bottom-4 right-4 w-8 h-8 text-foreground/20">
-        <path d="M 24 32 L 32 32 L 32 24" stroke="currentColor" strokeWidth="1" fill="none" />
-      </svg>
-
-      {/* Noise texture overlay */}
-      <div 
-        className="absolute inset-0 opacity-[0.015] mix-blend-overlay"
-        style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
-        }}
-      />
+      {/* Vertical technical lines */}
+      <div className="absolute left-8 top-0 bottom-0 w-px bg-foreground/5 hidden lg:block" />
+      <div className="absolute right-8 top-0 bottom-0 w-px bg-foreground/5 hidden lg:block" />
     </div>
   )
 }
 
 // ─────────────────────────────────────────────────────────────
-// CORNER BRACKETS - ANIMATED TECHNICAL DETAIL
+// SECTION HEADER
 // ─────────────────────────────────────────────────────────────
 
-function CornerBrackets({ isActive }: { isActive: boolean }) {
-  const bracketsRef = useRef<SVGSVGElement>(null)
+function SectionHeader({ count, activeIndex }: { count: number; activeIndex: number }) {
+  const titleRef = useRef<HTMLHeadingElement>(null)
 
   useEffect(() => {
-    if (!bracketsRef.current) return
-    const paths = bracketsRef.current.querySelectorAll("path")
-    
-    gsap.to(paths, {
-      strokeDashoffset: isActive ? 0 : 20,
-      opacity: isActive ? 1 : 0.3,
-      duration: 0.6,
-      ease: "power2.out",
-      stagger: 0.1
-    })
-  }, [isActive])
+    if (!titleRef.current) return
+    const ctx = gsap.context(() => {
+      const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ░▒▓█"
+      const originalText = "PROJECTS"
+      let iteration = 0
+
+      ScrollTrigger.create({
+        trigger: titleRef.current,
+        start: "top 95%",
+        onEnter: () => {
+          const interval = setInterval(() => {
+            if (!titleRef.current) return clearInterval(interval)
+            titleRef.current.textContent = originalText
+              .split("")
+              .map((char, i) => (i < iteration ? char : chars[Math.floor(Math.random() * chars.length)]))
+              .join("")
+            if (iteration >= originalText.length) clearInterval(interval)
+            iteration += 0.3
+          }, 35)
+        },
+      })
+    }, titleRef.current)
+    return () => ctx.revert()
+  }, [])
 
   return (
-    <svg 
-      ref={bracketsRef}
-      className="absolute inset-0 w-full h-full pointer-events-none"
-      preserveAspectRatio="none"
-    >
-      {/* Top-left */}
-      <path 
-        d="M 0 40 L 0 0 L 40 0" 
-        stroke="currentColor" 
-        strokeWidth="2" 
-        fill="none"
-        strokeDasharray="20"
-        strokeDashoffset="20"
-        className="text-foreground"
-      />
-      {/* Top-right */}
-      <path 
-        d="M calc(100% - 40) 0 L 100% 0 L 100% 40" 
-        stroke="currentColor" 
-        strokeWidth="2" 
-        fill="none"
-        strokeDasharray="20"
-        strokeDashoffset="20"
-        className="text-foreground"
-        style={{ transform: "translateX(-2px)" }}
-      />
-      {/* Bottom-left */}
-      <path 
-        d="M 0 calc(100% - 40) L 0 100% L 40 100%" 
-        stroke="currentColor" 
-        strokeWidth="2" 
-        fill="none"
-        strokeDasharray="20"
-        strokeDashoffset="20"
-        className="text-foreground"
-        style={{ transform: "translateY(-2px)" }}
-      />
-      {/* Bottom-right */}
-      <path 
-        d="M calc(100% - 40) 100% L 100% 100% L 100% calc(100% - 40)" 
-        stroke="currentColor" 
-        strokeWidth="2" 
-        fill="none"
-        strokeDasharray="20"
-        strokeDashoffset="20"
-        className="text-foreground"
-        style={{ transform: "translate(-2px, -2px)" }}
-      />
-    </svg>
+    <div className="mb-8 lg:mb-12">
+      <div className="flex items-end justify-between gap-4">
+        <div>
+          <p className="font-mono text-[10px] text-muted-foreground tracking-[0.15em] mb-1">— 04</p>
+          <h2
+            ref={titleRef}
+            className="font-mono text-3xl md:text-4xl lg:text-5xl font-black text-foreground tracking-tighter leading-none"
+          >
+            PROJECTS
+          </h2>
+        </div>
+        <div className="text-right">
+          <span className="font-mono text-4xl md:text-5xl lg:text-6xl font-black text-foreground/5 tabular-nums">
+            {String(activeIndex + 1).padStart(2, "0")}
+          </span>
+          <p className="font-mono text-[9px] text-muted-foreground">
+            OF {String(count).padStart(2, "0")}
+          </p>
+        </div>
+      </div>
+    </div>
   )
 }
 
 // ─────────────────────────────────────────────────────────────
-// TIMELINE SIDEBAR - FIXED LEFT NAVIGATION
+// TIMELINE SIDEBAR - STICKY WITHIN SECTION (DESKTOP)
 // ─────────────────────────────────────────────────────────────
 
 function TimelineSidebar({ 
@@ -323,151 +269,88 @@ function TimelineSidebar({
   projects: Project[]
   onNodeClick: (index: number) => void
 }) {
-  const timelineRef = useRef<HTMLDivElement>(null)
   const connectorRef = useRef<HTMLDivElement>(null)
-  const nodesRef = useRef<(HTMLButtonElement | null)[]>([])
 
-  // Animate connector line progress
   useEffect(() => {
     if (!connectorRef.current) return
     const progress = projects.length > 1 ? (activeIndex / (projects.length - 1)) * 100 : 0
     
     gsap.to(connectorRef.current, {
       height: `${progress}%`,
-      duration: 0.6,
+      duration: 0.5,
       ease: "power2.out"
     })
   }, [activeIndex, projects.length])
 
-  // Animate active node
-  useEffect(() => {
-    nodesRef.current.forEach((node, i) => {
-      if (!node) return
-      const isActive = i === activeIndex
-      const isPast = i < activeIndex
-      
-      gsap.to(node, {
-        scale: isActive ? 1.2 : 1,
-        duration: 0.3,
-        ease: "power2.out"
-      })
-
-      // Update node styling
-      const dot = node.querySelector(".node-dot")
-      if (dot) {
-        gsap.to(dot, {
-          backgroundColor: isActive ? "var(--accent)" : isPast ? "var(--foreground)" : "transparent",
-          borderColor: isActive || isPast ? "var(--foreground)" : "var(--foreground)",
-          duration: 0.3
-        })
-      }
-    })
-  }, [activeIndex])
-
   return (
-    <div 
-      ref={timelineRef}
-      className="hidden lg:flex flex-col fixed left-0 top-0 h-screen w-[280px] bg-background border-r border-foreground/10 z-40"
-    >
-      {/* Header */}
-      <div className="p-6 border-b border-foreground/10">
-        <p className="font-mono text-[10px] text-muted-foreground tracking-[0.2em] mb-1">SECTION 04</p>
-        <h2 className="font-mono text-xl font-black tracking-tight">PROJECTS</h2>
-        <div className="flex items-center gap-2 mt-2 font-mono text-[10px] text-muted-foreground">
-          <span className="text-foreground font-bold">{String(activeIndex + 1).padStart(2, "0")}</span>
-          <span>/</span>
-          <span>{String(projects.length).padStart(2, "0")}</span>
-        </div>
-      </div>
+    <div className="hidden lg:block w-[200px] xl:w-[240px] flex-shrink-0">
+      <div className="sticky top-24 max-h-[calc(100vh-8rem)] overflow-y-auto pr-4">
+        {/* Vertical track */}
+        <div className="relative pl-4">
+          <div className="absolute left-[7px] top-0 bottom-0 w-px bg-foreground/10" />
+          <div 
+            ref={connectorRef}
+            className="absolute left-[7px] top-0 w-px bg-accent"
+            style={{ height: "0%" }}
+          />
 
-      {/* Timeline */}
-      <div className="flex-1 overflow-y-auto p-6 relative">
-        {/* Vertical line track */}
-        <div className="absolute left-10 top-6 bottom-6 w-px bg-foreground/10" />
-        
-        {/* Animated progress line */}
-        <div 
-          ref={connectorRef}
-          className="absolute left-10 top-6 w-px bg-foreground"
-          style={{ height: "0%" }}
-        />
+          {/* Timeline nodes */}
+          <div className="space-y-1">
+            {projects.map((project, index) => {
+              const isActive = index === activeIndex
+              const isPast = index < activeIndex
+              const showYear = index === 0 || projects[index - 1]?.year !== project.year
 
-        {/* Timeline nodes */}
-        <div className="space-y-1 relative">
-          {projects.map((project, index) => {
-            const isActive = index === activeIndex
-            const isPast = index < activeIndex
-            const showYear = index === 0 || projects[index - 1]?.year !== project.year
-
-            return (
-              <div key={project.id}>
-                {/* Year marker */}
-                {showYear && (
-                  <div className="flex items-center gap-3 mb-3 mt-4 first:mt-0">
-                    <div className="w-8 h-px bg-foreground/30" />
-                    <span className="font-mono text-xs font-bold text-foreground/60 tracking-wider">
-                      {project.year}
-                    </span>
-                  </div>
-                )}
-
-                {/* Project node */}
-                <button
-                  ref={el => { nodesRef.current[index] = el }}
-                  onClick={() => onNodeClick(index)}
-                  className={cn(
-                    "w-full flex items-start gap-3 py-2 pl-2 text-left transition-all group",
-                    isActive && "translate-x-1"
+              return (
+                <div key={project.id}>
+                  {showYear && (
+                    <div className="flex items-center gap-2 mb-2 mt-4 first:mt-0">
+                      <div className="w-4 h-px bg-foreground/20" />
+                      <span className="font-mono text-[10px] font-bold text-foreground/50 tracking-wider">
+                        {project.year}
+                      </span>
+                    </div>
                   )}
-                >
-                  {/* Node dot */}
-                  <div 
+
+                  <button
+                    onClick={() => onNodeClick(index)}
                     className={cn(
-                      "node-dot w-3 h-3 rounded-full border-2 flex-shrink-0 mt-0.5 transition-all",
-                      isActive ? "bg-accent border-foreground" : 
-                      isPast ? "bg-foreground border-foreground" : 
-                      "bg-transparent border-foreground/40"
+                      "w-full flex items-start gap-2 py-1.5 text-left transition-all group"
                     )}
-                  />
-                  
-                  {/* Node content */}
-                  <div className="flex-1 min-w-0">
-                    <span 
+                  >
+                    <div 
                       className={cn(
-                        "font-mono text-[11px] block truncate transition-colors",
-                        isActive ? "text-foreground font-bold" : 
-                        isPast ? "text-foreground/70" : 
-                        "text-foreground/40"
+                        "w-3 h-3 rounded-full border-2 flex-shrink-0 mt-0.5 transition-all",
+                        isActive ? "bg-accent border-accent scale-125" : 
+                        isPast ? "bg-foreground/60 border-foreground/60" : 
+                        "bg-transparent border-foreground/30"
                       )}
-                    >
-                      {project.growth}
-                    </span>
-                    <span 
-                      className={cn(
-                        "font-mono text-[9px] block truncate transition-colors",
-                        isActive ? "text-muted-foreground" : "text-muted-foreground/50"
-                      )}
-                    >
-                      {project.title}
-                    </span>
-                  </div>
-
-                  {/* Active indicator */}
-                  {isActive && (
-                    <div className="w-1 h-full bg-accent absolute right-0 top-0" />
-                  )}
-                </button>
-              </div>
-            )
-          })}
+                    />
+                    
+                    <div className="flex-1 min-w-0">
+                      <span 
+                        className={cn(
+                          "font-mono text-[10px] block truncate transition-colors leading-tight",
+                          isActive ? "text-foreground font-bold" : 
+                          isPast ? "text-foreground/60" : 
+                          "text-foreground/30 group-hover:text-foreground/50"
+                        )}
+                      >
+                        {project.growth}
+                      </span>
+                    </div>
+                  </button>
+                </div>
+              )
+            })}
+          </div>
         </div>
-      </div>
 
-      {/* Technical footer */}
-      <div className="p-4 border-t border-foreground/10">
-        <div className="flex justify-between font-mono text-[8px] text-muted-foreground/50">
-          <span>SCROLL TO NAVIGATE</span>
-          <span>2022—2025</span>
+        {/* Footer */}
+        <div className="mt-6 pt-4 border-t border-foreground/10">
+          <p className="font-mono text-[8px] text-muted-foreground/50">
+            SCROLL TO NAVIGATE
+          </p>
         </div>
       </div>
     </div>
@@ -475,74 +358,35 @@ function TimelineSidebar({
 }
 
 // ─────────────────────────────────────────────────────────────
-// MOBILE TIMELINE - HORIZONTAL TOP BAR
+// MOBILE PROGRESS BAR - STICKY WITHIN SECTION
 // ─────────────────────────────────────────────────────────────
 
-function MobileTimeline({ 
+function MobileProgress({ 
   activeIndex, 
-  projects,
-  onNodeClick 
+  total,
+  currentProject 
 }: { 
   activeIndex: number
-  projects: Project[]
-  onNodeClick: (index: number) => void
+  total: number
+  currentProject: Project
 }) {
-  const scrollRef = useRef<HTMLDivElement>(null)
-
-  // Auto-scroll to active node
-  useEffect(() => {
-    if (!scrollRef.current) return
-    const activeNode = scrollRef.current.children[activeIndex] as HTMLElement
-    if (activeNode) {
-      activeNode.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" })
-    }
-  }, [activeIndex])
-
   return (
-    <div className="lg:hidden fixed top-0 left-0 right-0 z-40 bg-background/95 backdrop-blur-sm border-b border-foreground/10">
+    <div className="lg:hidden sticky top-0 z-20 bg-background/95 backdrop-blur-sm border-b border-foreground/10 -mx-4 px-4 py-3 mb-6">
       {/* Progress bar */}
-      <div className="h-0.5 bg-foreground/10">
+      <div className="h-0.5 bg-foreground/10 mb-2">
         <div 
-          className="h-full bg-foreground transition-all duration-300"
-          style={{ width: `${((activeIndex + 1) / projects.length) * 100}%` }}
+          className="h-full bg-accent transition-all duration-300"
+          style={{ width: `${((activeIndex + 1) / total) * 100}%` }}
         />
       </div>
-
-      {/* Scrollable nodes */}
-      <div 
-        ref={scrollRef}
-        className="flex gap-1 overflow-x-auto scrollbar-hide px-4 py-3"
-      >
-        {projects.map((project, index) => {
-          const isActive = index === activeIndex
-          const isPast = index < activeIndex
-
-          return (
-            <button
-              key={project.id}
-              onClick={() => onNodeClick(index)}
-              className={cn(
-                "flex-shrink-0 px-3 py-1.5 font-mono text-[10px] transition-all border",
-                isActive 
-                  ? "bg-foreground text-background border-foreground" 
-                  : isPast 
-                    ? "bg-transparent text-foreground border-foreground/30" 
-                    : "bg-transparent text-foreground/40 border-foreground/10"
-              )}
-            >
-              {String(index + 1).padStart(2, "0")}
-            </button>
-          )
-        })}
-      </div>
-
-      {/* Current project indicator */}
-      <div className="px-4 pb-2 flex items-center justify-between">
-        <span className="font-mono text-[10px] text-foreground font-bold truncate">
-          {projects[activeIndex]?.growth}
+      
+      {/* Current info */}
+      <div className="flex items-center justify-between">
+        <span className="font-mono text-[10px] text-foreground font-bold truncate max-w-[60%]">
+          {currentProject.growth}
         </span>
-        <span className="font-mono text-[9px] text-muted-foreground">
-          {projects[activeIndex]?.year}
+        <span className="font-mono text-[10px] text-muted-foreground">
+          {String(activeIndex + 1).padStart(2, "0")} / {String(total).padStart(2, "0")}
         </span>
       </div>
     </div>
@@ -550,7 +394,7 @@ function MobileTimeline({
 }
 
 // ─────────────────────────────────────────────────────────────
-// IMAGE GALLERY - ENHANCED FOR FULL VIEWPORT
+// IMAGE GALLERY - COMPACT
 // ─────────────────────────────────────────────────────────────
 
 function ImageGallery({ 
@@ -563,74 +407,65 @@ function ImageGallery({
   isActive: boolean 
 }) {
   const [activeImage, setActiveImage] = useState(0)
-  const galleryRef = useRef<HTMLDivElement>(null)
 
-  // Auto-cycle images when active
   useEffect(() => {
     if (!isActive || images.length <= 1) return
-    
     const interval = setInterval(() => {
       setActiveImage(prev => (prev + 1) % images.length)
-    }, 4000)
-
+    }, 3500)
     return () => clearInterval(interval)
   }, [isActive, images.length])
 
+  // Reset to first image when not active
+  useEffect(() => {
+    if (!isActive) setActiveImage(0)
+  }, [isActive])
+
   return (
-    <div ref={galleryRef} className="relative w-full h-full group">
-      {/* Main image */}
-      <div className="relative w-full h-full overflow-hidden">
-        {images.map((img, idx) => (
-          <img
-            key={idx}
-            src={img}
-            alt={`${projectTitle} - ${idx + 1}`}
-            className={cn(
-              "absolute inset-0 w-full h-full object-cover transition-all duration-700",
-              idx === activeImage 
-                ? "opacity-100 scale-100 grayscale-0" 
-                : "opacity-0 scale-105 grayscale"
-            )}
-            loading={idx === 0 ? "eager" : "lazy"}
-          />
-        ))}
+    <div className="relative w-full h-full bg-muted">
+      {images.map((img, idx) => (
+        <img
+          key={idx}
+          src={img}
+          alt={`${projectTitle} - ${idx + 1}`}
+          className={cn(
+            "absolute inset-0 w-full h-full object-cover transition-all duration-700",
+            idx === activeImage 
+              ? "opacity-100 scale-100" 
+              : "opacity-0 scale-105"
+          )}
+          style={{ filter: isActive ? "grayscale(0%)" : "grayscale(100%)" }}
+          loading={idx === 0 ? "eager" : "lazy"}
+        />
+      ))}
 
-        {/* Gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent opacity-60" />
-        <div className="absolute inset-0 bg-gradient-to-r from-background via-transparent to-transparent opacity-40" />
-      </div>
-
-      {/* Image indicators */}
+      {/* Gradient overlay */}
+      <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent" />
+      
+      {/* Image counter */}
       {images.length > 1 && (
-        <div className="absolute bottom-4 left-4 flex gap-2">
+        <div className="absolute bottom-3 right-3 flex gap-1">
           {images.map((_, idx) => (
             <button
               key={idx}
               onClick={() => setActiveImage(idx)}
               className={cn(
-                "w-8 h-1 transition-all",
+                "w-6 h-0.5 transition-all",
                 idx === activeImage ? "bg-foreground" : "bg-foreground/30"
               )}
             />
           ))}
         </div>
       )}
-
-      {/* Technical overlay */}
-      <div className="absolute top-4 right-4 font-mono text-[10px] text-foreground/60">
-        <span className="bg-background/80 px-2 py-1">
-          IMG_{String(activeImage + 1).padStart(2, "0")}/{String(images.length).padStart(2, "0")}
-        </span>
-      </div>
     </div>
   )
 }
 
 // ─────────────────────────────────────────────────────────────
-// PROJECT SNAP SECTION - FULL VIEWPORT DISPLAY
+// PROJECT CARD - FULL WIDTH, ONE AT A TIME
 // ─────────────────────────────────────────────────────────────
 
-function ProjectSnapSection({ 
+function ProjectCard({ 
   project, 
   index, 
   isActive,
@@ -641,12 +476,11 @@ function ProjectSnapSection({
   isActive: boolean
   totalProjects: number
 }) {
-  const sectionRef = useRef<HTMLElement>(null)
+  const cardRef = useRef<HTMLDivElement>(null)
   const titleRef = useRef<HTMLHeadingElement>(null)
-  const contentRef = useRef<HTMLDivElement>(null)
   const [hasAnimated, setHasAnimated] = useState(false)
 
-  // Text scramble animation for title
+  // Text scramble animation
   useEffect(() => {
     if (!isActive || hasAnimated || !titleRef.current) return
     
@@ -676,129 +510,126 @@ function ProjectSnapSection({
     return () => clearInterval(interval)
   }, [isActive, hasAnimated, project.growth])
 
-  // Content fade-in animation
+  // Fade animation on scroll
   useEffect(() => {
-    if (!isActive || !contentRef.current) return
+    if (!cardRef.current) return
 
-    const elements = contentRef.current.querySelectorAll(".animate-in")
-    
-    gsap.fromTo(elements, 
-      { opacity: 0, y: 20 },
-      { 
-        opacity: 1, 
-        y: 0, 
-        duration: 0.6, 
-        stagger: 0.1,
-        ease: "power3.out",
-        delay: 0.3
-      }
-    )
-  }, [isActive])
+    const ctx = gsap.context(() => {
+      gsap.fromTo(
+        cardRef.current,
+        { opacity: 0, y: 40 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.7,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: cardRef.current,
+            start: "top 85%",
+            toggleActions: "play none none none",
+          },
+        }
+      )
+    }, cardRef.current)
 
-  // Reset animation state when becoming inactive
-  useEffect(() => {
-    if (!isActive) {
-      setHasAnimated(false)
-    }
-  }, [isActive])
+    return () => ctx.revert()
+  }, [])
 
   const hasGithub = project.links.github
   const hasDemo = "demo" in project.links
   const hasAppStore = "appStore" in project.links
 
   return (
-    <section
-      ref={sectionRef}
+    <div
+      ref={cardRef}
       className={cn(
-        "relative min-h-screen w-full flex snap-start snap-always",
-        "lg:pl-[280px]" // Offset for timeline sidebar on desktop
+        "relative border-2 border-foreground bg-background transition-all duration-500",
+        isActive ? "opacity-100" : "opacity-60"
       )}
     >
-      {/* Background technical patterns */}
-      <TechnicalPatterns />
-
       {/* Corner brackets */}
-      <div className="absolute inset-8 pointer-events-none hidden lg:block">
-        <CornerBrackets isActive={isActive} />
-      </div>
+      <svg className="absolute -top-1 -left-1 w-4 h-4 text-foreground">
+        <path d="M 0 16 L 0 0 L 16 0" stroke="currentColor" strokeWidth="2" fill="none" />
+      </svg>
+      <svg className="absolute -top-1 -right-1 w-4 h-4 text-foreground">
+        <path d="M 0 0 L 16 0 L 16 16" stroke="currentColor" strokeWidth="2" fill="none" />
+      </svg>
+      <svg className="absolute -bottom-1 -left-1 w-4 h-4 text-foreground">
+        <path d="M 0 0 L 0 16 L 16 16" stroke="currentColor" strokeWidth="2" fill="none" />
+      </svg>
+      <svg className="absolute -bottom-1 -right-1 w-4 h-4 text-foreground">
+        <path d="M 0 16 L 16 16 L 16 0" stroke="currentColor" strokeWidth="2" fill="none" />
+      </svg>
 
-      {/* Main content grid */}
-      <div className="w-full h-screen flex flex-col lg:flex-row">
-        {/* Image section - larger on desktop */}
-        <div className="relative h-[40vh] lg:h-full lg:w-1/2 flex-shrink-0">
+      {/* Layout: Image + Content */}
+      <div className="flex flex-col lg:flex-row">
+        {/* Image */}
+        <div className="relative h-48 md:h-64 lg:h-80 lg:w-1/2 border-b lg:border-b-0 lg:border-r border-foreground/20">
           <ImageGallery 
             images={project.images} 
             projectTitle={project.title}
             isActive={isActive}
           />
+          
+          {/* Project number overlay */}
+          <div className="absolute top-3 left-3 font-mono text-6xl lg:text-7xl font-black text-foreground/10">
+            {project.id}
+          </div>
+          
+          {/* Year badge */}
+          <div className="absolute top-3 right-3 bg-foreground text-background px-2 py-1">
+            <span className="font-mono text-[10px] font-bold tracking-wider">{project.year}</span>
+          </div>
         </div>
 
-        {/* Content section */}
-        <div 
-          ref={contentRef}
-          className="flex-1 flex flex-col justify-center p-6 lg:p-12 xl:p-16 pt-20 lg:pt-12"
-        >
-          {/* Project number & year */}
-          <div className="animate-in flex items-center gap-4 mb-4">
-            <span className="font-mono text-6xl lg:text-8xl font-black text-foreground/5">
-              {project.id}
-            </span>
-            <div className="flex flex-col">
-              <span className="font-mono text-[10px] text-muted-foreground tracking-[0.2em]">
-                PROJECT
-              </span>
-              <span className="font-mono text-sm font-bold text-foreground/60">
-                {project.year}
-              </span>
-            </div>
-          </div>
-
-          {/* Title - scramble animated */}
-          <div className="animate-in mb-2">
+        {/* Content */}
+        <div className="flex-1 p-5 lg:p-8 flex flex-col">
+          {/* Title area */}
+          <div className="mb-4">
             <span className="font-mono text-[10px] text-muted-foreground tracking-[0.15em] block mb-1">
               {project.title}
             </span>
             <h3 
               ref={titleRef}
-              className="font-mono text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-black text-foreground tracking-tight leading-none"
+              className="font-mono text-xl md:text-2xl lg:text-3xl font-black text-foreground tracking-tight leading-none"
             >
               {project.growth.toUpperCase()}
             </h3>
           </div>
 
-          {/* Achievement badge */}
-          <div className="animate-in mb-6">
-            <span className="inline-block font-mono text-xs font-bold text-accent bg-accent/10 px-3 py-1.5 border border-accent/30">
+          {/* Achievement */}
+          <div className="mb-4">
+            <span className="inline-block font-mono text-[10px] font-bold text-accent bg-accent/10 px-2 py-1 border border-accent/30">
               {project.achievement}
             </span>
           </div>
 
           {/* Description */}
-          <p className="animate-in font-mono text-sm text-muted-foreground mb-6 max-w-md leading-relaxed">
+          <p className="font-mono text-xs text-muted-foreground mb-4 leading-relaxed">
             {project.description}
           </p>
 
           {/* Tech stack */}
-          <div className="animate-in flex flex-wrap gap-2 mb-8">
-            {project.techStack.map((tech, i) => (
+          <div className="flex flex-wrap gap-1.5 mb-4">
+            {project.techStack.map((tech) => (
               <span
                 key={tech}
-                className="font-mono text-[10px] px-2 py-1 border border-foreground/20 text-foreground/70 hover:border-foreground/50 transition-colors"
+                className="font-mono text-[9px] px-2 py-0.5 border border-foreground/20 text-foreground/60"
               >
                 {tech}
               </span>
             ))}
           </div>
 
-          {/* What I learned */}
-          <div className="animate-in mb-8">
-            <span className="font-mono text-[9px] text-muted-foreground tracking-[0.15em] block mb-2">
+          {/* Learnings */}
+          <div className="mb-4">
+            <span className="font-mono text-[8px] text-muted-foreground tracking-[0.15em] block mb-1.5">
               KEY LEARNINGS
             </span>
-            <ul className="space-y-1">
+            <ul className="space-y-0.5">
               {project.learned.map((item, i) => (
-                <li key={i} className="font-mono text-xs text-foreground/70 flex items-start gap-2">
-                  <span className="text-accent mt-0.5">▸</span>
+                <li key={i} className="font-mono text-[10px] text-foreground/60 flex items-start gap-1.5">
+                  <span className="text-accent">▸</span>
                   {item}
                 </li>
               ))}
@@ -806,16 +637,16 @@ function ProjectSnapSection({
           </div>
 
           {/* Links */}
-          <div className="animate-in flex items-center gap-4">
+          <div className="flex items-center gap-4 mt-auto pt-4 border-t border-foreground/10">
             {hasGithub && (
               <a
                 href={project.links.github}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 font-mono text-xs text-foreground hover:text-accent transition-colors group"
+                className="inline-flex items-center gap-1.5 font-mono text-[10px] text-foreground hover:text-accent transition-colors"
               >
-                <Github className="w-4 h-4" />
-                <span className="border-b border-transparent group-hover:border-accent">CODE</span>
+                <Github className="w-3.5 h-3.5" />
+                <span>CODE</span>
               </a>
             )}
             {hasDemo && (
@@ -823,112 +654,118 @@ function ProjectSnapSection({
                 href={(project.links as { demo?: string }).demo}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 font-mono text-xs text-foreground hover:text-accent transition-colors group"
+                className="inline-flex items-center gap-1.5 font-mono text-[10px] text-foreground hover:text-accent transition-colors"
               >
-                <ExternalLink className="w-4 h-4" />
-                <span className="border-b border-transparent group-hover:border-accent">DEMO</span>
+                <ExternalLink className="w-3.5 h-3.5" />
+                <span>DEMO</span>
               </a>
             )}
             {hasAppStore && (
-              <span className="font-mono text-xs text-muted-foreground">iOS App</span>
+              <span className="font-mono text-[10px] text-muted-foreground">iOS App</span>
             )}
-          </div>
-
-          {/* Progress indicator - bottom */}
-          <div className="animate-in mt-auto pt-8 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div className="w-16 h-px bg-foreground/20" />
-              <span className="font-mono text-[10px] text-muted-foreground">
-                {String(index + 1).padStart(2, "0")} of {String(totalProjects).padStart(2, "0")}
-              </span>
-            </div>
-            <span className="font-mono text-[9px] text-muted-foreground/50 tracking-wider">
-              SCROLL TO CONTINUE
-            </span>
           </div>
         </div>
       </div>
-    </section>
+    </div>
   )
 }
 
 // ─────────────────────────────────────────────────────────────
-// MAIN SECTION - SCROLL SNAP CONTAINER
+// MAIN SECTION
 // ─────────────────────────────────────────────────────────────
 
 export function ProjectsSection() {
   const [activeIndex, setActiveIndex] = useState(0)
-  const containerRef = useRef<HTMLDivElement>(null)
-  const sectionRefs = useRef<(HTMLElement | null)[]>([])
+  const sectionRef = useRef<HTMLElement>(null)
+  const projectRefs = useRef<(HTMLDivElement | null)[]>([])
 
-  // Setup ScrollTrigger for each project section
+  // Setup ScrollTrigger for each project
   useEffect(() => {
-    if (!containerRef.current) return
+    if (!sectionRef.current) return
 
     const ctx = gsap.context(() => {
       allProjects.forEach((_, index) => {
-        const section = sectionRefs.current[index]
-        if (!section) return
+        const projectEl = projectRefs.current[index]
+        if (!projectEl) return
 
         ScrollTrigger.create({
-          trigger: section,
-          start: "top center",
-          end: "bottom center",
+          trigger: projectEl,
+          start: "top 60%",
+          end: "bottom 40%",
           onEnter: () => setActiveIndex(index),
           onEnterBack: () => setActiveIndex(index),
         })
       })
-    }, containerRef.current)
+    }, sectionRef.current)
 
     return () => ctx.revert()
   }, [])
 
-  // Handle timeline node click - scroll to project
   const handleNodeClick = useCallback((index: number) => {
-    const section = sectionRefs.current[index]
-    if (section) {
-      section.scrollIntoView({ behavior: "smooth" })
+    const projectEl = projectRefs.current[index]
+    if (projectEl) {
+      projectEl.scrollIntoView({ behavior: "smooth", block: "center" })
     }
   }, [])
 
   return (
-    <div 
+    <section
       id="projects"
-      ref={containerRef} 
-      className="relative bg-background"
+      ref={sectionRef}
+      className="relative py-12 md:py-16 lg:py-20 px-4 md:px-6 bg-background overflow-hidden"
     >
-      {/* Fixed timeline sidebar - desktop */}
-      <TimelineSidebar 
-        activeIndex={activeIndex}
-        projects={allProjects}
-        onNodeClick={handleNodeClick}
-      />
+      {/* Background patterns */}
+      <TechnicalPatterns />
 
-      {/* Fixed timeline bar - mobile */}
-      <MobileTimeline 
-        activeIndex={activeIndex}
-        projects={allProjects}
-        onNodeClick={handleNodeClick}
-      />
+      <div className="max-w-7xl mx-auto relative">
+        {/* Section header */}
+        <SectionHeader count={allProjects.length} activeIndex={activeIndex} />
 
-      {/* Scroll snap container */}
-      <div className="snap-y snap-mandatory">
-        {allProjects.map((project, index) => (
-          <div
-            key={project.id}
-            ref={el => { 
-              sectionRefs.current[index] = el as HTMLElement 
-            }}
-          >
-            <ProjectSnapSection
-              project={project}
-              index={index}
-              isActive={index === activeIndex}
-              totalProjects={allProjects.length}
-            />
+        {/* Mobile progress */}
+        <MobileProgress 
+          activeIndex={activeIndex}
+          total={allProjects.length}
+          currentProject={allProjects[activeIndex]}
+        />
+
+        {/* Main layout: Timeline + Projects */}
+        <div className="flex gap-8 lg:gap-12">
+          {/* Timeline sidebar (desktop) */}
+          <TimelineSidebar 
+            activeIndex={activeIndex}
+            projects={allProjects}
+            onNodeClick={handleNodeClick}
+          />
+
+          {/* Projects list */}
+          <div className="flex-1 space-y-8 lg:space-y-12">
+            {allProjects.map((project, index) => (
+              <div
+                key={project.id}
+                ref={el => { projectRefs.current[index] = el }}
+              >
+                <ProjectCard
+                  project={project}
+                  index={index}
+                  isActive={index === activeIndex}
+                  totalProjects={allProjects.length}
+                />
+              </div>
+            ))}
           </div>
-        ))}
+        </div>
+
+        {/* Footer */}
+        <div className="mt-12 text-center">
+          <a
+            href="#contact"
+            className="inline-flex items-center justify-center gap-2 font-mono text-xs text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <ChevronDown className="w-4 h-4" />
+            <span>CONTINUE</span>
+          </a>
+        </div>
       </div>
-    </div>
+    </section>
   )
 }
