@@ -135,10 +135,10 @@ function CloudMessageForm({ onClose }: { onClose: () => void }) {
       // Main timeline
       const tl = gsap.timeline()
 
-      // Phase 1: Backdrop fades in with blur
+      // Phase 1: Backdrop fades in with subtle blur
       tl.to(backdropRef.current, {
         opacity: 1,
-        backdropFilter: "blur(8px)",
+        backdropFilter: "blur(3px)",
         duration: 0.5,
         ease: "power2.out",
       })
@@ -192,9 +192,9 @@ function CloudMessageForm({ onClose }: { onClose: () => void }) {
     .to(backdropRef.current, {
       opacity: 0,
       backdropFilter: "blur(0px)",
-      duration: 0.3,
+      duration: 0.25,
       ease: "power2.in",
-    }, "-=0.2")
+    }, "-=0.15")
   }, [onClose])
 
   const handleSend = useCallback(() => {
@@ -242,52 +242,67 @@ function CloudMessageForm({ onClose }: { onClose: () => void }) {
       {/* Backdrop */}
       <div 
         ref={backdropRef}
-        className="absolute inset-0 bg-background/80"
+        className="absolute inset-0 bg-background/60"
         onClick={handleClose}
       />
 
-      {/* Main form container */}
+      {/* Main form container - liquid glass effect */}
       <div 
         ref={formRef}
-        className="relative w-full max-w-lg bg-card border border-border/50 shadow-2xl"
+        className="relative w-full max-w-lg overflow-hidden"
         style={{ 
-          boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 100px rgba(var(--accent-rgb, 100, 180, 200), 0.1)",
+          background: "linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 50%, rgba(255,255,255,0.02) 100%)",
+          backdropFilter: "blur(20px) saturate(180%)",
+          WebkitBackdropFilter: "blur(20px) saturate(180%)",
+          border: "1px solid rgba(255,255,255,0.18)",
+          boxShadow: `
+            0 8px 32px rgba(0, 0, 0, 0.12),
+            inset 0 1px 0 rgba(255,255,255,0.2),
+            inset 0 -1px 0 rgba(0,0,0,0.05)
+          `,
         }}
       >
+        {/* Glass shine effect */}
+        <div 
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background: "linear-gradient(105deg, rgba(255,255,255,0.15) 0%, transparent 40%, transparent 60%, rgba(255,255,255,0.05) 100%)",
+          }}
+        />
         {/* Content */}
-        <div ref={contentRef} className="p-8">
-          {/* Textarea with vapor border effect */}
+        <div ref={contentRef} className="relative p-8">
+          {/* Textarea - glass inner panel */}
           <div className="relative">
-            {/* Animated border glow */}
-            <div 
-              className="absolute -inset-[2px] rounded-2xl opacity-50 transition-opacity duration-500"
-              style={{
-                background: "linear-gradient(135deg, transparent, rgba(var(--accent-rgb, 100, 180, 200), 0.3), transparent)",
-                filter: "blur(4px)",
-              }}
-            />
-            
             <textarea
               ref={textareaRef}
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               placeholder="Type your message here..."
               rows={4}
-              className="relative w-full px-5 py-4 bg-background/50 rounded-2xl border border-border/30 resize-none font-mono text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-accent/50 transition-colors"
+              className="relative w-full px-5 py-4 rounded-xl resize-none font-mono text-foreground placeholder:text-muted-foreground/50 focus:outline-none transition-all duration-300"
               style={{
-                backdropFilter: "blur(8px)",
+                background: "rgba(255,255,255,0.08)",
+                border: "1px solid rgba(255,255,255,0.12)",
+                boxShadow: "inset 0 2px 4px rgba(0,0,0,0.06)",
               }}
             />
           </div>
 
-          {/* Send button */}
+          {/* Send button - glass style */}
           <div className="mt-6 flex justify-end">
             <button
               onClick={handleSend}
               disabled={!message.trim() || isSending}
-              className="send-btn group flex items-center gap-2 px-6 py-3 bg-foreground text-background rounded-full font-mono text-sm font-medium disabled:opacity-40 disabled:cursor-not-allowed hover:shadow-lg transition-all duration-300"
+              className="send-btn group flex items-center gap-2 px-6 py-3 rounded-full font-mono text-sm font-medium disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-300"
               style={{
-                boxShadow: message.trim() ? "0 4px 20px rgba(var(--foreground-rgb, 0, 0, 0), 0.2)" : "none",
+                background: message.trim() 
+                  ? "linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.1) 100%)"
+                  : "rgba(255,255,255,0.08)",
+                border: "1px solid rgba(255,255,255,0.15)",
+                boxShadow: message.trim() 
+                  ? "0 4px 16px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.2)" 
+                  : "none",
+                color: "var(--foreground)",
               }}
             >
               <span>{isSending ? "Sending..." : "Send Message"}</span>
@@ -295,14 +310,6 @@ function CloudMessageForm({ onClose }: { onClose: () => void }) {
             </button>
           </div>
         </div>
-
-        {/* Decorative corner accents */}
-        <svg className="absolute top-3 left-3 w-4 h-4 text-accent/30" viewBox="0 0 16 16">
-          <path d="M 0 8 L 0 0 L 8 0" fill="none" stroke="currentColor" strokeWidth="1.5" />
-        </svg>
-        <svg className="absolute bottom-3 right-3 w-4 h-4 text-accent/30" viewBox="0 0 16 16">
-          <path d="M 16 8 L 16 16 L 8 16" fill="none" stroke="currentColor" strokeWidth="1.5" />
-        </svg>
       </div>
     </div>
   )
