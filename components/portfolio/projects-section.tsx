@@ -615,7 +615,7 @@ export function ProjectsSection() {
     // Mobile: pin later, shorter scroll distance per project
     // Desktop: pin at top, longer scroll distance
     const startValue = isMobile ? "top 15%" : "top top"
-    const scrollPerProject = isMobile ? 80 : 100
+    const scrollPerProject = isMobile ? 40 : 50
     const scrubValue = isMobile ? 0.3 : 0.5
 
     const ctx = gsap.context(() => {
