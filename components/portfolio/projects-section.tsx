@@ -409,7 +409,7 @@ function TerminalOutput({
         </div>
 
         {/* Terminal body */}
-        <div className="p-4 sm:p-6 font-mono text-[10px] sm:text-xs leading-relaxed min-h-[120px] relative">
+        <div className="p-4 sm:p-6 font-mono text-[10px] sm:text-xs leading-relaxed min-h-[120px] relative text-left">
           {/* Scanline effect */}
           <div 
             className="absolute inset-0 pointer-events-none opacity-[0.02]"
@@ -420,19 +420,17 @@ function TerminalOutput({
 
           {/* Loading state */}
           {isLoading ? (
-            <div className="flex flex-col items-center justify-center py-8">
-              <div className="text-2xl text-emerald-300/80 mb-3">
-                {loadingFrames[loadingFrame]}
+            <div className="py-4">
+              <div className="flex items-center gap-2 text-foreground/40">
+                <span className="text-emerald-300/80">{loadingFrames[loadingFrame]}</span>
+                <span><span className="text-emerald-300/60">$</span> Initializing query...</span>
               </div>
-              <div className="text-foreground/40">
-                <span className="text-emerald-300/60">$</span> Initializing query...
-              </div>
-              <div className="mt-3 flex gap-1">
-                {Array.from({ length: 12 }).map((_, i) => (
+              <div className="mt-2 flex gap-0.5">
+                {Array.from({ length: 16 }).map((_, i) => (
                   <div
                     key={i}
                     className={cn(
-                      "w-1.5 h-1 transition-all duration-100",
+                      "w-1 h-1 transition-all duration-100",
                       i <= loadingFrame ? "bg-emerald-400/60" : "bg-foreground/10"
                     )}
                   />
