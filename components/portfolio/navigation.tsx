@@ -3,7 +3,8 @@
 import { useState, useEffect, useRef } from "react"
 import { cn } from "@/lib/utils"
 import { MagneticButton } from "@/components/magnetic-button"
-import { Menu, X } from "lucide-react"
+import { Menu, X, MessageCircle, Mail } from "lucide-react"
+import { OPEN_CONTACT_FORM_EVENT } from "@/components/portfolio/contact-section"
 
 const navItems = [
   { label: "About", href: "#about" },
@@ -149,14 +150,50 @@ export function Navigation() {
             </div>
 
             <div className="flex items-center gap-3">
-              <MagneticButton
-                as="a"
-                href="mailto:ryo.fujimura1@gmail.com"
-                cursorText="Email"
-                className="hidden lg:inline-flex px-5 py-2.5 text-sm font-medium text-primary-foreground bg-primary rounded-full hover:shadow-lg hover:shadow-primary/20 transition-all duration-300"
-              >
-                Get in Touch
-              </MagneticButton>
+              {/* Desktop "Get in Touch" dropdown */}
+              <div className="hidden lg:block relative group">
+                <MagneticButton
+                  className="px-5 py-2.5 text-sm font-medium text-primary-foreground bg-primary rounded-full hover:shadow-lg hover:shadow-primary/20 transition-all duration-300"
+                >
+                  Get in Touch
+                </MagneticButton>
+                
+                {/* Dropdown menu */}
+                <div className="absolute right-0 top-full pt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
+                  <div className="bg-background/95 backdrop-blur-xl border border-border rounded-xl shadow-lg overflow-hidden min-w-[160px]">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        // Scroll to contact section and open form
+                        const contactSection = document.getElementById("contact")
+                        if (contactSection) {
+                          const offset = 80
+                          const elementPosition = contactSection.getBoundingClientRect().top + window.scrollY
+                          window.scrollTo({
+                            top: elementPosition - offset,
+                            behavior: "smooth",
+                          })
+                        }
+                        // Dispatch custom event to open the form
+                        setTimeout(() => {
+                          window.dispatchEvent(new CustomEvent(OPEN_CONTACT_FORM_EVENT))
+                        }, 500)
+                      }}
+                      className="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-foreground hover:bg-secondary/50 transition-colors"
+                    >
+                      <MessageCircle className="w-4 h-4" />
+                      Message
+                    </button>
+                    <a
+                      href="mailto:ryo.fujimura1@gmail.com"
+                      className="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-foreground hover:bg-secondary/50 transition-colors border-t border-border"
+                    >
+                      <Mail className="w-4 h-4" />
+                      Email
+                    </a>
+                  </div>
+                </div>
+              </div>
 
               {/* Mobile menu — 44px touch target */}
               <button
@@ -197,16 +234,46 @@ export function Navigation() {
               &gt; {item.label}
             </button>
           ))}
-          <a
-            href="mailto:ryo.fujimura1@gmail.com"
+          {/* Mobile contact options - both visible */}
+          <div
             className={cn(
-              "touch-target mt-2 sm:mt-4 min-h-[48px] flex items-center justify-center px-8 py-4 text-base sm:text-lg font-medium font-mono text-primary-foreground bg-primary rounded-full transition-all duration-300 w-full max-w-[280px]",
+              "mt-2 sm:mt-4 flex flex-col gap-3 w-full max-w-[280px] transition-all duration-300",
               isMobileMenuOpen ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"
             )}
             style={{ transitionDelay: "250ms" }}
           >
-            Get in Touch
-          </a>
+            <button
+              type="button"
+              onClick={() => {
+                setIsMobileMenuOpen(false)
+                // Scroll to contact section
+                const contactSection = document.getElementById("contact")
+                if (contactSection) {
+                  const offset = 80
+                  const elementPosition = contactSection.getBoundingClientRect().top + window.scrollY
+                  window.scrollTo({
+                    top: elementPosition - offset,
+                    behavior: "smooth",
+                  })
+                }
+                // Dispatch custom event to open the form
+                setTimeout(() => {
+                  window.dispatchEvent(new CustomEvent(OPEN_CONTACT_FORM_EVENT))
+                }, 500)
+              }}
+              className="touch-target min-h-[48px] flex items-center justify-center gap-3 px-8 py-4 text-base sm:text-lg font-medium font-mono text-primary-foreground bg-primary rounded-full w-full"
+            >
+              <MessageCircle className="w-5 h-5" />
+              Message
+            </button>
+            <a
+              href="mailto:ryo.fujimura1@gmail.com"
+              className="touch-target min-h-[48px] flex items-center justify-center gap-3 px-8 py-4 text-base sm:text-lg font-medium font-mono text-foreground bg-secondary/50 border border-border rounded-full w-full hover:bg-secondary transition-colors"
+            >
+              <Mail className="w-5 h-5" />
+              Email
+            </a>
+          </div>
         </div>
       </div>
     </>

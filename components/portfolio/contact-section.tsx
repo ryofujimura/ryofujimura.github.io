@@ -650,6 +650,9 @@ const socialLinks = [
   },
 ]
 
+// Custom event name for opening contact form from navigation
+export const OPEN_CONTACT_FORM_EVENT = "openContactForm"
+
 export function ContactSection() {
   const containerRef = useRef<HTMLDivElement>(null)
   const buttonWrapperRef = useRef<HTMLDivElement>(null)
@@ -669,6 +672,16 @@ export function ContactSection() {
     const container = containerRef.current
     container?.addEventListener("mousemove", handleMouseMove)
     return () => container?.removeEventListener("mousemove", handleMouseMove)
+  }, [])
+
+  // Listen for custom event to open form from navigation
+  useEffect(() => {
+    const handleOpenFromNav = () => {
+      setIsFormOpen(true)
+    }
+    
+    window.addEventListener(OPEN_CONTACT_FORM_EVENT, handleOpenFromNav)
+    return () => window.removeEventListener(OPEN_CONTACT_FORM_EVENT, handleOpenFromNav)
   }, [])
 
   const handleOpenForm = useCallback(() => {
