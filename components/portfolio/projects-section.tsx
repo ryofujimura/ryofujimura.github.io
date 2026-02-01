@@ -626,11 +626,14 @@ export function ProjectsSection() {
     // Desktop: longer scroll distance for more granular control
     const scrollMultiplier = isMobile ? 60 : 100
     const scrubValue = isMobile ? 0.3 : 0.5
+    // Mobile: pin later (when top reaches 80px from viewport top)
+    // Desktop: pin immediately when section hits top
+    const startValue = isMobile ? "top 80px" : "top top"
 
     const ctx = gsap.context(() => {
       scrollTriggerRef.current = ScrollTrigger.create({
         trigger: sectionRef.current,
-        start: isMobile ? "top top" : "top top",
+        start: startValue,
         end: `+=${TOTAL_PROJECTS * scrollMultiplier}%`,
         pin: pinContainerRef.current,
         pinSpacing: true,
