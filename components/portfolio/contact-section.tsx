@@ -4,7 +4,6 @@ import { useRef, useState, useEffect } from "react"
 import { AnimatedSection } from "@/components/animated-section"
 import { MagneticButton } from "@/components/magnetic-button"
 import { RevealText } from "@/components/reveal-text"
-import { AsciiSectionHeader } from "@/components/ascii-banner"
 import { Mail, Github, Linkedin, MapPin, ArrowUpRight } from "lucide-react"
 import { LocationHoverText } from "@/components/portfolio/location-hover-text"
 
@@ -64,7 +63,9 @@ export function ContactSection() {
       <div className="max-w-4xl mx-auto text-center relative z-10">
         <AnimatedSection>
           <div className="flex justify-center mb-6 sm:mb-8">
-            <AsciiSectionHeader number="05" title="What's Next?" />
+            <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-foreground font-mono">
+              What's Next?
+            </h2>
           </div>
         </AnimatedSection>
 
