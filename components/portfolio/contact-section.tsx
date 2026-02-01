@@ -8,6 +8,7 @@ import { MagneticButton } from "@/components/magnetic-button"
 import { RevealText } from "@/components/reveal-text"
 import { Mail, Github, Linkedin, MapPin, ArrowUpRight, Send, X } from "lucide-react"
 import { LocationHoverText } from "@/components/portfolio/location-hover-text"
+import { useIsMobile } from "@/hooks/use-mobile"
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -115,6 +116,19 @@ function CloudMessageForm({ onClose }: { onClose: () => void }) {
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const [message, setMessage] = useState("")
   const [isSending, setIsSending] = useState(false)
+  const isMobile = useIsMobile()
+
+  // Hide custom cursor on mobile when form is open
+  useEffect(() => {
+    if (!isMobile) return
+    
+    // Add class to hide cursor on mobile
+    document.body.classList.add("hide-cursor-mobile")
+    
+    return () => {
+      document.body.classList.remove("hide-cursor-mobile")
+    }
+  }, [isMobile])
 
   useEffect(() => {
     if (!formRef.current || !contentRef.current || !backdropRef.current) return
