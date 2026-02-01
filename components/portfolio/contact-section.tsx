@@ -109,7 +109,6 @@ function VerticalWordRotator({
 // Cloud-themed expandable message form
 function CloudMessageForm({ onClose }: { onClose: () => void }) {
   const formRef = useRef<HTMLDivElement>(null)
-  const cloudBlobsRef = useRef<(SVGPathElement | null)[]>([])
   const contentRef = useRef<HTMLDivElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const labelCharsRef = useRef<HTMLSpanElement>(null)
@@ -127,49 +126,27 @@ function CloudMessageForm({ onClose }: { onClose: () => void }) {
         borderRadius: "50%",
       })
       gsap.set(contentRef.current, { opacity: 0 })
-      
-      // Cloud blob morphing paths - organic vapor effect
-      cloudBlobsRef.current.forEach((blob, i) => {
-        if (!blob) return
-        gsap.set(blob, { 
-          scale: 0, 
-          transformOrigin: "center center",
-          opacity: 0,
-        })
-      })
 
       // Main timeline
       const tl = gsap.timeline()
 
-      // Phase 1: Cloud blobs appear with stagger, floating upward
-      tl.to(cloudBlobsRef.current, {
-        scale: 1,
-        opacity: 0.15,
-        duration: 0.8,
-        stagger: {
-          each: 0.08,
-          from: "center",
-        },
-        ease: "elastic.out(1, 0.5)",
-      })
-
-      // Phase 2: Main form expands
-      .to(formRef.current, {
+      // Phase 1: Main form expands
+      tl.to(formRef.current, {
         scale: 1,
         opacity: 1,
         borderRadius: "2rem",
         duration: 0.6,
         ease: "power4.out",
-      }, "-=0.5")
+      })
 
-      // Phase 3: Content fades in
+      // Phase 2: Content fades in
       .to(contentRef.current, {
         opacity: 1,
         duration: 0.4,
         ease: "power2.out",
       }, "-=0.2")
 
-      // Phase 4: Label text reveal character by character
+      // Phase 3: Label text reveal character by character
       if (labelCharsRef.current) {
         const chars = labelCharsRef.current.querySelectorAll(".label-char")
         gsap.set(chars, { opacity: 0, y: 10 })
@@ -181,21 +158,6 @@ function CloudMessageForm({ onClose }: { onClose: () => void }) {
           ease: "power2.out",
         }, "-=0.3")
       }
-
-      // Continuous cloud blob floating animation
-      cloudBlobsRef.current.forEach((blob, i) => {
-        if (!blob) return
-        gsap.to(blob, {
-          y: gsap.utils.random(-8, 8),
-          x: gsap.utils.random(-5, 5),
-          scale: gsap.utils.random(0.95, 1.05),
-          duration: gsap.utils.random(3, 5),
-          repeat: -1,
-          yoyo: true,
-          ease: "sine.inOut",
-          delay: i * 0.2,
-        })
-      })
 
       // Focus textarea after animation
       setTimeout(() => {
@@ -220,20 +182,13 @@ function CloudMessageForm({ onClose }: { onClose: () => void }) {
       duration: 0.2,
       ease: "power2.in",
     })
-    .to(cloudBlobsRef.current, {
-      scale: 0,
-      opacity: 0,
-      duration: 0.4,
-      stagger: 0.03,
-      ease: "power2.in",
-    }, "-=0.1")
     .to(formRef.current, {
       scale: 0,
       opacity: 0,
       borderRadius: "50%",
       duration: 0.4,
       ease: "power3.in",
-    }, "-=0.3")
+    }, "-=0.1")
   }, [onClose])
 
   const handleSend = useCallback(() => {
@@ -285,36 +240,6 @@ function CloudMessageForm({ onClose }: { onClose: () => void }) {
         className="absolute inset-0 bg-background/80 backdrop-blur-sm"
         onClick={handleClose}
       />
-      
-      {/* Floating cloud blobs - decorative SVG */}
-      <svg 
-        className="absolute inset-0 w-full h-full pointer-events-none overflow-visible"
-        viewBox="0 0 100 100"
-        preserveAspectRatio="xMidYMid slice"
-      >
-        <defs>
-          <filter id="cloud-blur" x="-50%" y="-50%" width="200%" height="200%">
-            <feGaussianBlur in="SourceGraphic" stdDeviation="2" />
-          </filter>
-        </defs>
-        
-        {/* Organic cloud blob shapes */}
-        {[
-          "M 30 40 Q 35 30, 45 35 Q 55 25, 60 38 Q 70 35, 68 45 Q 75 50, 65 58 Q 68 68, 55 65 Q 50 75, 40 68 Q 30 72, 32 60 Q 22 55, 30 48 Q 25 42, 30 40",
-          "M 60 30 Q 68 22, 75 28 Q 82 24, 85 35 Q 92 38, 88 48 Q 93 55, 82 58 Q 85 68, 72 65 Q 68 72, 58 66 Q 52 70, 52 60 Q 45 58, 50 48 Q 48 40, 55 38 Q 52 32, 60 30",
-          "M 20 55 Q 25 48, 32 52 Q 38 45, 45 52 Q 52 48, 52 58 Q 58 62, 50 68 Q 52 75, 42 74 Q 38 80, 30 75 Q 22 78, 22 68 Q 15 65, 18 58 Q 12 52, 20 55",
-          "M 70 60 Q 78 55, 82 62 Q 88 58, 90 68 Q 95 72, 88 78 Q 90 85, 80 84 Q 75 90, 68 85 Q 62 88, 62 78 Q 55 75, 60 68 Q 58 62, 65 62 Q 65 56, 70 60",
-        ].map((d, i) => (
-          <path
-            key={i}
-            ref={(el) => { cloudBlobsRef.current[i] = el }}
-            d={d}
-            fill="currentColor"
-            className="text-foreground"
-            filter="url(#cloud-blur)"
-          />
-        ))}
-      </svg>
 
       {/* Main form container */}
       <div 
