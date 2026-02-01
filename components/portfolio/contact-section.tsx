@@ -252,21 +252,20 @@ function CloudMessageForm({ onClose }: { onClose: () => void }) {
       {/* Main form container - Liquid Glass effect */}
       <div 
         ref={formRef}
-        className="relative w-full max-w-lg border border-white/20 dark:border-white/10 overflow-hidden"
+        className="relative w-full max-w-lg border border-white/15 dark:border-white/10 overflow-hidden"
         style={{ 
-          background: "linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.05) 100%)",
+          background: "rgba(255, 255, 255, 0.05)",
           boxShadow: `
-            0 8px 32px rgba(0, 0, 0, 0.12),
-            0 0 0 1px rgba(255, 255, 255, 0.1) inset,
-            0 32px 64px -12px rgba(0, 0, 0, 0.15)
+            0 8px 32px rgba(0, 0, 0, 0.08),
+            0 0 0 1px rgba(255, 255, 255, 0.08) inset
           `,
         }}
       >
-        {/* Inner glass highlight */}
+        {/* Subtle inner highlight for depth */}
         <div 
           className="absolute inset-0 pointer-events-none"
           style={{
-            background: "linear-gradient(135deg, rgba(255,255,255,0.2) 0%, transparent 50%)",
+            background: "linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 40%)",
             borderRadius: "inherit",
           }}
         />
@@ -461,44 +460,12 @@ export function ContactSection() {
   }, [])
 
   const handleOpenForm = useCallback(() => {
-    // Animate button wrapper before opening form
-    if (buttonWrapperRef.current) {
-      gsap.to(buttonWrapperRef.current, {
-        scale: 1.08,
-        duration: 0.15,
-        ease: "power2.out",
-        onComplete: () => {
-          gsap.to(buttonWrapperRef.current, {
-            scale: 0,
-            opacity: 0,
-            duration: 0.35,
-            ease: "power3.in",
-            onComplete: () => {
-              setIsFormOpen(true)
-            }
-          })
-        }
-      })
-    } else {
-      setIsFormOpen(true)
-    }
+    // Open form immediately without button animation flicker
+    setIsFormOpen(true)
   }, [])
 
   const handleCloseForm = useCallback(() => {
     setIsFormOpen(false)
-    // Restore button with elastic bounce
-    if (buttonWrapperRef.current) {
-      gsap.fromTo(buttonWrapperRef.current, 
-        { scale: 0, opacity: 0 },
-        { 
-          scale: 1, 
-          opacity: 1, 
-          duration: 0.6, 
-          ease: "elastic.out(1, 0.5)",
-          delay: 0.15,
-        }
-      )
-    }
   }, [])
 
   return (
