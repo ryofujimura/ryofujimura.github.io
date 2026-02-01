@@ -74,6 +74,110 @@ function useIsMobile() {
 }
 
 // ─────────────────────────────────────────────────────────────
+// EXPANDABLE PROJECT ROW
+// ─────────────────────────────────────────────────────────────
+
+function ProjectRow({ 
+  project, 
+  index,
+  isExpanded,
+  onToggle 
+}: { 
+  project: typeof projects[0]
+  index: number
+  isExpanded: boolean
+  onToggle: () => void
+}) {
+  const detailsRef = useRef<HTMLDivElement>(null)
+
+  // Animate expansion
+  useEffect(() => {
+    if (!detailsRef.current) return
+
+    if (isExpanded) {
+      gsap.fromTo(
+        detailsRef.current,
+        { height: 0, opacity: 0 },
+        { height: "auto", opacity: 1, duration: 0.3, ease: "power2.out" }
+      )
+    } else {
+      gsap.to(detailsRef.current, {
+        height: 0,
+        opacity: 0,
+        duration: 0.2,
+        ease: "power2.in"
+      })
+    }
+  }, [isExpanded])
+
+  return (
+    <div className="mb-1">
+      {/* Project name - clickable */}
+      <button
+        onClick={onToggle}
+        className="w-full text-left group flex items-center gap-2 hover:bg-foreground/5 -mx-2 px-2 py-0.5 transition-colors"
+      >
+        <span className="text-foreground/30">{String(index + 1).padStart(2, "0")}.</span>
+        <span className={cn(
+          "font-medium transition-colors",
+          isExpanded ? "text-sky-300" : "text-sky-300/80 group-hover:text-sky-300"
+        )}>
+          {project.title}
+        </span>
+        <span className={cn(
+          "text-[0.8em] transition-transform duration-200",
+          isExpanded ? "text-emerald-300/60 rotate-90" : "text-foreground/20"
+        )}>
+          ▶
+        </span>
+        {!isExpanded && (
+          <span className="text-foreground/20 text-[0.85em]">
+            // {project.year}
+          </span>
+        )}
+      </button>
+
+      {/* Tech stack */}
+      <div className="text-foreground/30 ml-6">
+        {"["}
+        {project.skills.map((tech, i) => (
+          <span key={tech}>
+            <span className="text-amber-200/60">{tech}</span>
+            {i < project.skills.length - 1 && <span className="text-foreground/20">, </span>}
+          </span>
+        ))}
+        {"]"}
+      </div>
+
+      {/* Expanded details */}
+      <div 
+        ref={detailsRef} 
+        className="overflow-hidden"
+        style={{ height: 0, opacity: 0 }}
+      >
+        <div className="ml-6 mt-2 mb-3 pl-3 border-l border-foreground/10">
+          {/* Description */}
+          <div className="mb-2">
+            <span className="text-foreground/30">desc: </span>
+            <span className="text-foreground/50">{project.description}</span>
+          </div>
+          {/* Year */}
+          <div className="mb-2">
+            <span className="text-foreground/30">year: </span>
+            <span className="text-lime-300/70">{project.year}</span>
+          </div>
+          {/* ID */}
+          <div>
+            <span className="text-foreground/30">id: </span>
+            <span className="text-violet-300/60">PRJ-{project.id}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ─────────────────────────────────────────────────────────────
 // TERMINAL OUTPUT - Typewriter effect with syntax highlighting
 // ─────────────────────────────────────────────────────────────
 
@@ -87,26 +191,21 @@ function TerminalOutput({
   onClose: () => void
 }) {
   const outputRef = useRef<HTMLDivElement>(null)
-  const [lines, setLines] = useState<string[]>([])
+  const [headerLines, setHeaderLines] = useState<string[]>([])
   const [currentLine, setCurrentLine] = useState(0)
   const [currentChar, setCurrentChar] = useState(0)
   const [showCursor, setShowCursor] = useState(true)
-  const [isComplete, setIsComplete] = useState(false)
+  const [isHeaderComplete, setIsHeaderComplete] = useState(false)
+  const [expandedProject, setExpandedProject] = useState<string | null>(null)
 
   const relatedProjects = skill ? skillsMap.get(skill) || [] : []
 
-  // Generate terminal output lines
-  const generateLines = useCallback(() => {
+  // Generate header lines (before projects)
+  const generateHeaderLines = useCallback(() => {
     if (!skill) return []
     
     const projectCount = relatedProjects.length
     const years = [...new Set(relatedProjects.map(p => p.year))].sort()
-    
-    const projectLines: string[] = []
-    relatedProjects.forEach((p, i) => {
-      projectLines.push(`${String(i + 1).padStart(2, "0")}. ${p.title}`)
-      projectLines.push(`    [${p.skills.join(", ")}]`)
-    })
     
     return [
       `$ skill --query "${skill}"`,
@@ -118,30 +217,28 @@ function TerminalOutput({
       `PROJECTS: ${projectCount}`,
       `YEARS: ${years.join(", ")}`,
       ``,
-      `// RELATED PROJECTS:`,
-      ``,
-      ...projectLines,
-      ``,
-      `[OK] Query complete. ${projectCount} result(s) found.`,
-      `$ _`
+      `// RELATED PROJECTS: (click to expand)`,
+      ``
     ]
   }, [skill, relatedProjects])
 
   // Reset and start typewriter effect
   useEffect(() => {
     if (!isActive || !skill) {
-      setLines([])
+      setHeaderLines([])
       setCurrentLine(0)
       setCurrentChar(0)
-      setIsComplete(false)
+      setIsHeaderComplete(false)
+      setExpandedProject(null)
       return
     }
 
-    const outputLines = generateLines()
-    setLines(outputLines)
+    const lines = generateHeaderLines()
+    setHeaderLines(lines)
     setCurrentLine(0)
     setCurrentChar(0)
-    setIsComplete(false)
+    setIsHeaderComplete(false)
+    setExpandedProject(null)
 
     // Cursor blink
     const cursorInterval = setInterval(() => {
@@ -149,15 +246,14 @@ function TerminalOutput({
     }, 530)
 
     return () => clearInterval(cursorInterval)
-  }, [isActive, skill, generateLines])
+  }, [isActive, skill, generateHeaderLines])
 
-  // Typewriter animation
+  // Typewriter animation for header
   useEffect(() => {
-    if (!isActive || lines.length === 0 || isComplete) return
+    if (!isActive || headerLines.length === 0 || isHeaderComplete) return
 
-    const line = lines[currentLine]
-    if (!line && currentLine < lines.length) {
-      // Empty line, move to next
+    const line = headerLines[currentLine]
+    if (!line && currentLine < headerLines.length) {
       setTimeout(() => {
         setCurrentLine(prev => prev + 1)
         setCurrentChar(0)
@@ -170,16 +266,16 @@ function TerminalOutput({
         setCurrentChar(prev => prev + 1)
       }, line?.startsWith("$") ? 40 : line?.startsWith("[") ? 15 : 8)
       return () => clearTimeout(timeout)
-    } else if (currentLine < lines.length - 1) {
+    } else if (currentLine < headerLines.length - 1) {
       const timeout = setTimeout(() => {
         setCurrentLine(prev => prev + 1)
         setCurrentChar(0)
-      }, line?.startsWith("┌") || line?.startsWith("└") ? 100 : 30)
+      }, 30)
       return () => clearTimeout(timeout)
     } else {
-      setIsComplete(true)
+      setIsHeaderComplete(true)
     }
-  }, [isActive, lines, currentLine, currentChar, isComplete])
+  }, [isActive, headerLines, currentLine, currentChar, isHeaderComplete])
 
   // GSAP entrance animation
   useEffect(() => {
@@ -194,9 +290,8 @@ function TerminalOutput({
 
   if (!isActive || !skill) return null
 
-  // Pastel syntax highlighting for terminal output
-  const highlightLine = (line: string, lineIndex: number) => {
-    // Command line
+  // Pastel syntax highlighting for header lines
+  const highlightLine = (line: string) => {
     if (line.startsWith("$")) {
       const parts = line.split(" ")
       return (
@@ -207,11 +302,9 @@ function TerminalOutput({
         </>
       )
     }
-    // Progress bar
     if (line.includes("████")) {
       return <span className="text-emerald-300/60">{line}</span>
     }
-    // Status messages
     if (line.startsWith("[EXEC]") || line.startsWith("[OK]")) {
       const bracket = line.match(/^\[([^\]]+)\]/)
       const rest = line.replace(/^\[[^\]]+\]\s*/, "")
@@ -222,7 +315,6 @@ function TerminalOutput({
         </>
       )
     }
-    // Key-value lines (SKILL:, PROJECTS:, YEARS:)
     if (line.startsWith("SKILL:")) {
       return (
         <>
@@ -248,37 +340,8 @@ function TerminalOutput({
         </>
       )
     }
-    // Comments
     if (line.startsWith("//")) {
       return <span className="text-foreground/25 italic">{line}</span>
-    }
-    // Project name line (e.g., "01. SIMULATE")
-    if (line.match(/^\d+\./)) {
-      const match = line.match(/^(\d+)\.\s+(.+)$/)
-      if (match) {
-        return (
-          <>
-            <span className="text-foreground/30">{match[1]}. </span>
-            <span className="text-sky-300/80 font-medium">{match[2]}</span>
-          </>
-        )
-      }
-    }
-    // Tech stack line (e.g., "    [Swift, SwiftUI, WatchOS]")
-    if (line.match(/^\s+\[.+\]$/)) {
-      const techs = line.trim().slice(1, -1).split(", ")
-      return (
-        <span className="text-foreground/30">
-          {"    ["}
-          {techs.map((tech, i) => (
-            <span key={tech}>
-              <span className="text-amber-200/60">{tech}</span>
-              {i < techs.length - 1 && <span className="text-foreground/20">, </span>}
-            </span>
-          ))}
-          {"]"}
-        </span>
-      )
     }
     return <span className="text-foreground/35">{line}</span>
   }
@@ -312,7 +375,7 @@ function TerminalOutput({
         </div>
 
         {/* Terminal body */}
-        <div className="p-4 sm:p-6 font-mono text-[10px] sm:text-xs leading-relaxed min-h-[200px]">
+        <div className="p-4 sm:p-6 font-mono text-[10px] sm:text-xs leading-relaxed min-h-[200px] relative">
           {/* Scanline effect */}
           <div 
             className="absolute inset-0 pointer-events-none opacity-[0.02]"
@@ -321,27 +384,57 @@ function TerminalOutput({
             }}
           />
 
-          {/* Output lines */}
-          {lines.slice(0, currentLine + 1).map((line, i) => (
+          {/* Header lines with typewriter */}
+          {headerLines.slice(0, currentLine + 1).map((line, i) => (
             <div key={i} className="min-h-[1.4em]">
               {i < currentLine ? (
-                highlightLine(line, i)
+                highlightLine(line)
               ) : i === currentLine ? (
                 <>
-                  {highlightLine(line.slice(0, currentChar), i)}
-                  {showCursor && !isComplete && (
-                    <span className="inline-block w-2 h-4 bg-green-400 ml-0.5 animate-pulse" />
+                  {highlightLine(line.slice(0, currentChar))}
+                  {showCursor && !isHeaderComplete && (
+                    <span className="inline-block w-2 h-4 bg-emerald-400 ml-0.5 animate-pulse" />
                   )}
                 </>
               ) : null}
             </div>
           ))}
+
+          {/* Project rows - shown after header complete */}
+          {isHeaderComplete && (
+            <div className="project-rows">
+              {relatedProjects.map((project, index) => (
+                <ProjectRow
+                  key={project.id}
+                  project={project}
+                  index={index}
+                  isExpanded={expandedProject === project.id}
+                  onToggle={() => setExpandedProject(
+                    expandedProject === project.id ? null : project.id
+                  )}
+                />
+              ))}
+              
+              {/* Footer line */}
+              <div className="mt-3 min-h-[1.4em]">
+                <span className="text-violet-300/70">[OK]</span>
+                <span className="text-foreground/50"> Query complete. {relatedProjects.length} result(s) found.</span>
+              </div>
+              <div className="min-h-[1.4em]">
+                <span className="text-emerald-300/80">$</span>
+                <span className="text-foreground/30"> _</span>
+                {showCursor && (
+                  <span className="inline-block w-2 h-4 bg-emerald-400 ml-0.5 animate-pulse" />
+                )}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Terminal footer */}
         <div className="px-4 py-2 border-t border-foreground/10 flex items-center justify-between">
           <div className="font-mono text-[8px] text-foreground/20">
-            {isComplete ? "READY" : "RUNNING..."}
+            {isHeaderComplete ? "READY" : "RUNNING..."}
           </div>
           <div className="font-mono text-[8px] text-foreground/20">
             {relatedProjects.length} project(s)
