@@ -1007,10 +1007,10 @@ export function ProjectsSection() {
           <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
             <div>
               <div className="ascii-decoration font-mono text-[9px] sm:text-[11px] text-foreground/40 tracking-[0.2em] mb-2">
-                <span className="text-green-400">$</span> skills <span className="text-yellow-400">--list</span>
+                Projects
               </div>
               <h2 className="ascii-decoration font-mono text-2xl sm:text-3xl md:text-4xl font-black text-foreground tracking-tighter">
-                STILL_LEARNING
+                CONTINUOUS LEARNING
               </h2>
             </div>
             <div className="ascii-decoration font-mono text-[10px] text-foreground/30 text-right">
