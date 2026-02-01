@@ -426,16 +426,16 @@ export function ProjectsSection() {
 
   // Scroll to specific project
   const scrollToProject = useCallback((index: number) => {
-    if (!scrollTriggerRef.current || !sectionRef.current) return
+    if (!sectionRef.current) return
     
     const totalProjects = allProjects.length
-    const targetProgress = index / totalProjects
-    const scrollTrigger = scrollTriggerRef.current
+    const section = sectionRef.current
+    const sectionTop = section.offsetTop
     
-    // Calculate target scroll position
-    const startScroll = scrollTrigger.start as number
-    const endScroll = scrollTrigger.end as number
-    const targetScroll = startScroll + (endScroll - startScroll) * targetProgress
+    // Each project takes 100vh of scroll distance
+    // Total scroll distance = totalProjects * window.innerHeight
+    const scrollPerProject = window.innerHeight
+    const targetScroll = sectionTop + (index * scrollPerProject)
     
     window.scrollTo({
       top: targetScroll,
