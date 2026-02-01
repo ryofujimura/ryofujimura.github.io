@@ -772,6 +772,23 @@ export function ProjectsSection() {
     return () => clearTimeout(timeout)
   }, [activeSkill])
 
+  // Scroll terminal into view on mobile
+  useEffect(() => {
+    if (!activeSkill || !terminalRef.current || !isMobile) return
+
+    // Wait for terminal to render and position
+    const timeout = setTimeout(() => {
+      if (terminalRef.current) {
+        terminalRef.current.scrollIntoView({
+          behavior: "smooth",
+          block: "center"
+        })
+      }
+    }, 100)
+
+    return () => clearTimeout(timeout)
+  }, [activeSkill, isMobile])
+
   // Scroll animation
   useEffect(() => {
     if (!sectionRef.current || !skillsContainerRef.current) return
