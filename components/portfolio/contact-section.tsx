@@ -110,7 +110,7 @@ function VerticalWordRotator({
 
 // Animated placeholder prompts
 const PLACEHOLDER_PROMPTS = [
-  "favorite coffee?",
+  "favorite coffee",
   "favorite language",
   "dream project",
   "go-to IDE",
