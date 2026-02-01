@@ -144,7 +144,7 @@ function SplitContactButton() {
   return (
     <div
       ref={containerRef}
-      className="relative flex items-center justify-center h-10"
+      className="relative flex items-center justify-center h-8"
       style={{ width: 240 }}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
@@ -153,7 +153,6 @@ function SplitContactButton() {
       <div 
         className="absolute inset-0 flex items-center justify-center"
         style={{ 
-          // filter: "blur(8px) contrast(20)",
           background: "transparent",
         }}
       >
@@ -163,7 +162,7 @@ function SplitContactButton() {
           className="absolute bg-primary rounded-full"
           style={{ 
             width: 100,
-            height: 36,
+            height: 32,
             willChange: "transform",
           }}
         />
@@ -173,7 +172,7 @@ function SplitContactButton() {
           className="absolute bg-primary rounded-full"
           style={{ 
             width: 100,
-            height: 36,
+            height: 32,
             willChange: "transform",
           }}
         />
@@ -191,7 +190,7 @@ function SplitContactButton() {
           )}
           style={{ 
             width: 100,
-            height: 36,
+            height: 32,
             left: "50%",
             transform: isHovered ? "translateX(calc(-50% - 52px))" : "translateX(-50%)",
             transition: isHovered ? "none" : "transform 0.25s ease-out",
@@ -216,7 +215,7 @@ function SplitContactButton() {
           )}
           style={{ 
             width: 100,
-            height: 36,
+            height: 32,
             left: "50%",
             transform: isHovered ? "translateX(calc(-50% + 52px))" : "translateX(-50%)",
             transition: isHovered ? "none" : "transform 0.25s ease-out",
