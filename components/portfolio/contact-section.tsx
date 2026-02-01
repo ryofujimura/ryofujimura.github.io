@@ -6,21 +6,12 @@ import { ScrollTrigger } from "gsap/ScrollTrigger"
 import { AnimatedSection } from "@/components/animated-section"
 import { MagneticButton } from "@/components/magnetic-button"
 import { RevealText } from "@/components/reveal-text"
-import { Mail, Github, Linkedin, MapPin, ArrowUpRight, Send, Check, AlertCircle } from "lucide-react"
+import { Mail, Github, Linkedin, MapPin, ArrowUpRight, Send, Check, AlertCircle, User } from "lucide-react"
 import { LocationHoverText } from "@/components/portfolio/location-hover-text"
 import { useIsMobile } from "@/hooks/use-mobile"
-import { collectVisitorData, BehaviorTracker, parseContactMessage } from "@/lib/visitor-data"
 import { submitContactForm } from "@/lib/firebase"
 
 gsap.registerPlugin(ScrollTrigger)
-
-// Global behavior tracker instance (created on page load)
-let globalBehaviorTracker: BehaviorTracker | null = null
-
-// Initialize behavior tracker on client side
-if (typeof window !== "undefined") {
-  globalBehaviorTracker = new BehaviorTracker()
-}
 
 // Rotating words for the tagline
 const ROTATING_WORDS = [
@@ -227,16 +218,13 @@ function CloudMessageForm({ onClose }: { onClose: () => void }) {
   const formRef = useRef<HTMLDivElement>(null)
   const contentRef = useRef<HTMLDivElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
+  const usernameRef = useRef<HTMLInputElement>(null)
   const [message, setMessage] = useState("")
+  const [username, setUsername] = useState("")
   const [sendStatus, setSendStatus] = useState<SendStatus>("idle")
   const isMobile = useIsMobile()
   
   const isSending = sendStatus === "sending"
-  
-  // Mark form as opened for behavioral tracking
-  useEffect(() => {
-    globalBehaviorTracker?.markFormOpened()
-  }, [])
 
   // Hide custom cursor on mobile when form is open
   useEffect(() => {
@@ -334,19 +322,8 @@ function CloudMessageForm({ onClose }: { onClose: () => void }) {
     }, "-=0.2")
   }, [onClose])
 
-  // Track keystrokes for behavioral analysis
-  const handleMessageChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setMessage(e.target.value)
-    globalBehaviorTracker?.recordKeystroke()
-  }, [])
-  
-  // Track field focus
-  const handleFieldFocus = useCallback(() => {
-    globalBehaviorTracker?.recordFieldFocus()
-  }, [])
-
   const handleSend = useCallback(async () => {
-    if (!message.trim() || isSending) return
+    if (!message.trim() || !username.trim() || isSending) return
     
     setSendStatus("sending")
     
@@ -362,22 +339,11 @@ function CloudMessageForm({ onClose }: { onClose: () => void }) {
     }
 
     try {
-      // Collect comprehensive visitor data with behavioral signals
-      const visitorData = await collectVisitorData(globalBehaviorTracker || undefined)
-      
-      // Parse the message to extract contact info
-      const parsedContact = parseContactMessage(message.trim())
-      
-      // Submit to Firebase Firestore with parsed contact
-      const result = await submitContactForm(message.trim(), visitorData, parsedContact)
+      // Submit to Firebase Firestore with username and message
+      const result = await submitContactForm(username.trim(), message.trim())
       
       if (result.success) {
         setSendStatus("success")
-        
-        // Log for debugging (remove in production)
-        if (result.isReturningVisitor) {
-          console.log("Welcome back! Returning visitor detected.")
-        }
         
         // Success animation - message floats away
         const textarea = textareaRef.current
@@ -413,7 +379,7 @@ function CloudMessageForm({ onClose }: { onClose: () => void }) {
       // Reset error state after 3 seconds
       setTimeout(() => setSendStatus("idle"), 3000)
     }
-  }, [message, isSending, handleClose])
+  }, [message, username, isSending, handleClose])
 
   return (
     <div ref={containerRef} className="fixed inset-0 z-50 flex items-center justify-center px-4">
@@ -464,10 +430,26 @@ function CloudMessageForm({ onClose }: { onClose: () => void }) {
             <textarea
               ref={textareaRef}
               value={message}
-              onChange={handleMessageChange}
-              onFocus={handleFieldFocus}
+              onChange={(e) => setMessage(e.target.value)}
               rows={4}
               className="relative w-full px-5 py-4 rounded-2xl border border-white/20 dark:border-white/10 resize-none font-mono text-foreground focus:outline-none focus:border-white/40 transition-all duration-300"
+              style={{
+                background: "rgba(255, 255, 255, 0.08)",
+                backdropFilter: "blur(4px)",
+              }}
+            />
+          </div>
+          
+          {/* Username input - bottom left */}
+          <div className="mt-4 flex items-center gap-2">
+            <User className="w-4 h-4 text-muted-foreground/60 shrink-0" />
+            <input
+              ref={usernameRef}
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder="Enter username"
+              className="flex-1 max-w-[200px] px-3 py-2 rounded-xl border border-white/20 dark:border-white/10 font-mono text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:border-white/40 transition-all duration-300"
               style={{
                 background: "rgba(255, 255, 255, 0.08)",
                 backdropFilter: "blur(4px)",
@@ -493,20 +475,20 @@ function CloudMessageForm({ onClose }: { onClose: () => void }) {
           <div className="mt-6 flex justify-end">
             <button
               onClick={handleSend}
-              disabled={!message.trim() || isSending || sendStatus === "success"}
+              disabled={!message.trim() || !username.trim() || isSending || sendStatus === "success"}
               className="send-btn group flex items-center gap-2 px-6 py-3 rounded-full font-mono text-sm font-medium disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-300 border border-white/20"
               style={{
                 background: sendStatus === "success"
                   ? "rgba(34, 197, 94, 0.9)"
                   : sendStatus === "error"
                   ? "rgba(239, 68, 68, 0.9)"
-                  : message.trim() 
+                  : (message.trim() && username.trim())
                   ? "rgba(var(--foreground-rgb, 0, 0, 0), 0.9)" 
                   : "rgba(255, 255, 255, 0.1)",
-                color: (sendStatus === "success" || sendStatus === "error" || message.trim()) 
+                color: (sendStatus === "success" || sendStatus === "error" || (message.trim() && username.trim())) 
                   ? "var(--background)" 
                   : "var(--foreground)",
-                boxShadow: message.trim() ? "0 4px 20px rgba(0, 0, 0, 0.15)" : "none",
+                boxShadow: (message.trim() && username.trim()) ? "0 4px 20px rgba(0, 0, 0, 0.15)" : "none",
               }}
             >
               <span>
