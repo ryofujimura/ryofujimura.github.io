@@ -82,7 +82,7 @@ const allProjects = [
     metricLabel: "CALC TIME",
     icon: "/images/poker.png",
     images: ["/images/poker_1.jpg", "/images/poker_2.jpg", "/images/poker_3.jpg"],
-    links: { github: "https://github.com/ryofujimura", appStore: "#" },
+    links: { github: "https://github.com/ryofujimura", appStore: "https://apps.apple.com/us/app/poker-pocket-odds/id6499280318" },
     ascii: `
     ♠ ♥ ♦ ♣
    ┌─────────┐
@@ -545,23 +545,153 @@ function TechnicalPattern({ className }: { className?: string }) {
 }
 
 // ─────────────────────────────────────────────────────────────
-// IMAGE GALLERY WITH HOVER EFFECTS
+// STACKED IMAGE CAROUSEL WITH BOUNCY ANIMATIONS
 // ─────────────────────────────────────────────────────────────
 
-function ImageGallery({ images, title }: { images: string[]; title: string }) {
-  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
+function ImageGallery({ images, title, isActive }: { images: string[]; title: string; isActive?: boolean }) {
+  const [activeIndex, setActiveIndex] = useState(0)
   const [loadedImages, setLoadedImages] = useState<Set<number>>(new Set())
-  const galleryRef = useRef<HTMLDivElement>(null)
+  const [isAnimating, setIsAnimating] = useState(false)
+  const [isDragging, setIsDragging] = useState(false)
+  const [dragStart, setDragStart] = useState(0)
+  const containerRef = useRef<HTMLDivElement>(null)
+  const cardsRef = useRef<(HTMLDivElement | null)[]>([])
 
+  // Reset to first image when project changes
   useEffect(() => {
-    if (!galleryRef.current) return
+    setActiveIndex(0)
+  }, [title])
 
-    gsap.fromTo(
-      galleryRef.current.querySelectorAll(".gallery-item"),
-      { opacity: 0, y: 20, scale: 0.95 },
-      { opacity: 1, y: 0, scale: 1, duration: 0.5, stagger: 0.1, delay: 0.3, ease: "power2.out" }
-    )
-  }, [images])
+  // Initial bouncy entrance animation
+  useEffect(() => {
+    if (!containerRef.current || !isActive || images.length === 0) return
+
+    const cards = cardsRef.current.filter(Boolean)
+    
+    // Kill any existing animations
+    gsap.killTweensOf(cards)
+
+    // Entrance animation with bounce
+    cards.forEach((card, idx) => {
+      if (!card) return
+      
+      const offset = idx - activeIndex
+      const isMain = offset === 0
+      
+      gsap.fromTo(
+        card,
+        {
+          y: 100,
+          x: offset * 20,
+          rotation: offset * 5,
+          scale: 0.7,
+          opacity: 0,
+        },
+        {
+          y: 0,
+          x: offset * 25,
+          rotation: offset * 3,
+          scale: isMain ? 1 : 0.9 - Math.abs(offset) * 0.05,
+          opacity: isMain ? 1 : 0.6 - Math.abs(offset) * 0.15,
+          duration: 0.8,
+          delay: 0.2 + idx * 0.1,
+          ease: "elastic.out(1, 0.5)",
+        }
+      )
+    })
+  }, [isActive, images.length, title])
+
+  // Animate cards when activeIndex changes
+  const animateCards = useCallback((newIndex: number, direction: 'left' | 'right') => {
+    if (isAnimating || images.length <= 1) return
+    
+    setIsAnimating(true)
+    const cards = cardsRef.current.filter(Boolean)
+
+    // Wavy stagger animation
+    cards.forEach((card, idx) => {
+      if (!card) return
+      
+      const offset = idx - newIndex
+      const isMain = offset === 0
+      const isLeaving = (direction === 'right' && idx === activeIndex) || 
+                        (direction === 'left' && idx === activeIndex)
+      
+      // Create wavy motion path
+      const wavyY = isLeaving ? [0, -15, 10, -5, 0] : [0, 10, -5, 3, 0]
+      
+      gsap.to(card, {
+        keyframes: {
+          y: wavyY,
+          ease: "sine.inOut",
+        },
+        x: offset * 25,
+        rotation: offset * 3,
+        scale: isMain ? 1 : 0.9 - Math.abs(offset) * 0.05,
+        opacity: isMain ? 1 : Math.max(0.2, 0.6 - Math.abs(offset) * 0.15),
+        zIndex: images.length - Math.abs(offset),
+        duration: 0.6,
+        ease: "back.out(1.4)",
+        onComplete: idx === 0 ? () => setIsAnimating(false) : undefined,
+      })
+    })
+
+    setActiveIndex(newIndex)
+  }, [activeIndex, isAnimating, images.length])
+
+  // Navigate to next/prev image
+  const goToNext = useCallback(() => {
+    if (images.length <= 1) return
+    const newIndex = (activeIndex + 1) % images.length
+    animateCards(newIndex, 'right')
+  }, [activeIndex, images.length, animateCards])
+
+  const goToPrev = useCallback(() => {
+    if (images.length <= 1) return
+    const newIndex = (activeIndex - 1 + images.length) % images.length
+    animateCards(newIndex, 'left')
+  }, [activeIndex, images.length, animateCards])
+
+  // Click on card to select it
+  const selectCard = useCallback((idx: number) => {
+    if (idx === activeIndex || isAnimating) return
+    const direction = idx > activeIndex ? 'right' : 'left'
+    animateCards(idx, direction)
+  }, [activeIndex, isAnimating, animateCards])
+
+  // Drag/swipe handling
+  const handleDragStart = (e: React.MouseEvent | React.TouchEvent) => {
+    if (images.length <= 1) return
+    setIsDragging(true)
+    const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX
+    setDragStart(clientX)
+  }
+
+  const handleDragEnd = (e: React.MouseEvent | React.TouchEvent) => {
+    if (!isDragging || images.length <= 1) return
+    setIsDragging(false)
+    
+    const clientX = 'changedTouches' in e ? e.changedTouches[0].clientX : e.clientX
+    const diff = dragStart - clientX
+    
+    if (Math.abs(diff) > 50) {
+      if (diff > 0) goToNext()
+      else goToPrev()
+    }
+  }
+
+  // Hover bounce effect on main card
+  const handleHover = (idx: number, isEntering: boolean) => {
+    const card = cardsRef.current[idx]
+    if (!card || idx !== activeIndex) return
+
+    gsap.to(card, {
+      scale: isEntering ? 1.02 : 1,
+      y: isEntering ? -5 : 0,
+      duration: 0.3,
+      ease: isEntering ? "back.out(2)" : "power2.out",
+    })
+  }
 
   if (images.length === 0) {
     return (
@@ -581,62 +711,164 @@ function ImageGallery({ images, title }: { images: string[]; title: string }) {
   }
 
   return (
-    <div ref={galleryRef} className="h-full flex gap-2">
-      {images.slice(0, 3).map((img, idx) => (
-        <div
-          key={idx}
-          className={cn(
-            "gallery-item relative flex-1 border border-foreground/10 overflow-hidden cursor-pointer",
-            "transition-all duration-300",
-            hoveredIndex === idx ? "flex-[2] border-foreground/30" : "hover:border-foreground/20"
-          )}
-          onMouseEnter={() => setHoveredIndex(idx)}
-          onMouseLeave={() => setHoveredIndex(null)}
-        >
-          {/* Loading state */}
-          {!loadedImages.has(idx) && (
-            <div className="absolute inset-0 bg-foreground/5 flex items-center justify-center z-10">
-              <span className="font-mono text-[8px] text-foreground/30 animate-pulse">
-                LOADING...
-              </span>
-            </div>
-          )}
-          
-          {/* Image */}
-          <div className="relative w-full h-full">
-            <Image
-              src={img}
-              alt={`${title} preview ${idx + 1}`}
-              fill
-              className={cn(
-                "object-cover transition-all duration-500",
-                hoveredIndex === idx ? "scale-105 grayscale-0" : "grayscale-[0.3]",
-                loadedImages.has(idx) ? "opacity-100" : "opacity-0"
-              )}
-              onLoad={() => setLoadedImages(prev => new Set(prev).add(idx))}
-            />
-          </div>
+    <div className="h-full flex flex-col">
+      {/* Main stacked card area */}
+      <div 
+        ref={containerRef}
+        className="flex-1 relative flex items-center justify-center overflow-visible cursor-grab active:cursor-grabbing"
+        onMouseDown={handleDragStart}
+        onMouseUp={handleDragEnd}
+        onMouseLeave={() => isDragging && setIsDragging(false)}
+        onTouchStart={handleDragStart}
+        onTouchEnd={handleDragEnd}
+      >
+        {/* Stacked cards */}
+        <div className="relative w-[85%] h-[90%]">
+          {images.slice(0, 5).map((img, idx) => {
+            const offset = idx - activeIndex
+            const isMain = idx === activeIndex
+            
+            return (
+              <div
+                key={`${title}-${idx}`}
+                ref={el => { cardsRef.current[idx] = el }}
+                onClick={() => selectCard(idx)}
+                onMouseEnter={() => handleHover(idx, true)}
+                onMouseLeave={() => handleHover(idx, false)}
+                className={cn(
+                  "absolute inset-0 border bg-background overflow-hidden",
+                  "transition-shadow duration-300",
+                  isMain 
+                    ? "border-foreground/30 shadow-[6px_6px_0_0_var(--foreground)] cursor-default z-10" 
+                    : "border-foreground/10 cursor-pointer hover:border-foreground/20"
+                )}
+                style={{
+                  transform: `translateX(${offset * 25}px) rotate(${offset * 3}deg) scale(${isMain ? 1 : 0.9 - Math.abs(offset) * 0.05})`,
+                  opacity: isMain ? 1 : Math.max(0.2, 0.6 - Math.abs(offset) * 0.15),
+                  zIndex: images.length - Math.abs(offset),
+                }}
+              >
+                {/* Loading state */}
+                {!loadedImages.has(idx) && (
+                  <div className="absolute inset-0 bg-foreground/5 flex items-center justify-center z-20">
+                    <div className="font-mono text-center">
+                      <div className="text-[8px] text-foreground/30 animate-pulse mb-1">
+                        ░▒▓ LOADING ▓▒░
+                      </div>
+                      <div className="text-[6px] text-foreground/20">
+                        {String(idx + 1).padStart(2, "0")}/{String(images.length).padStart(2, "0")}
+                      </div>
+                    </div>
+                  </div>
+                )}
+                
+                {/* Image */}
+                <div className="relative w-full h-full">
+                  <Image
+                    src={img}
+                    alt={`${title} preview ${idx + 1}`}
+                    fill
+                    className={cn(
+                      "object-cover transition-all duration-500",
+                      isMain ? "grayscale-0" : "grayscale-[0.5]",
+                      loadedImages.has(idx) ? "opacity-100" : "opacity-0"
+                    )}
+                    onLoad={() => setLoadedImages(prev => new Set(prev).add(idx))}
+                    draggable={false}
+                  />
+                </div>
 
-          {/* Hover overlay */}
-          <div className={cn(
-            "absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent",
-            "transition-opacity duration-300",
-            hoveredIndex === idx ? "opacity-100" : "opacity-0"
-          )}>
-            <div className="absolute bottom-2 left-2 right-2">
-              <div className="font-mono text-[8px] text-foreground/60">
-                IMG_{String(idx + 1).padStart(2, "0")}.jpg
+                {/* Corner ASCII marks */}
+                <span className="absolute top-2 left-2 font-mono text-[7px] text-white/60 drop-shadow-lg">┌──</span>
+                <span className="absolute top-2 right-2 font-mono text-[7px] text-white/60 drop-shadow-lg">──┐</span>
+                <span className="absolute bottom-2 left-2 font-mono text-[7px] text-white/60 drop-shadow-lg">└──</span>
+                <span className="absolute bottom-2 right-2 font-mono text-[7px] text-white/60 drop-shadow-lg">──┘</span>
+
+                {/* Main card overlay info */}
+                {isMain && (
+                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent p-3">
+                    <div className="font-mono text-white/90 text-[9px] md:text-[10px] font-bold">
+                      {title}
+                    </div>
+                    <div className="font-mono text-white/60 text-[7px] md:text-[8px]">
+                      IMG_{String(idx + 1).padStart(2, "0")}.jpg — {images.length} total
+                    </div>
+                  </div>
+                )}
+
+                {/* Scanline effect for main card */}
+                {isMain && (
+                  <div 
+                    className="absolute inset-0 pointer-events-none opacity-20"
+                    style={{
+                      background: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.03) 2px, rgba(255,255,255,0.03) 4px)'
+                    }}
+                  />
+                )}
               </div>
-            </div>
-          </div>
-
-          {/* Corner marks */}
-          <span className="absolute top-1 left-1 font-mono text-[6px] text-foreground/20">┌</span>
-          <span className="absolute top-1 right-1 font-mono text-[6px] text-foreground/20">┐</span>
-          <span className="absolute bottom-1 left-1 font-mono text-[6px] text-foreground/20">└</span>
-          <span className="absolute bottom-1 right-1 font-mono text-[6px] text-foreground/20">┘</span>
+            )
+          })}
         </div>
-      ))}
+
+        {/* Navigation arrows */}
+        {images.length > 1 && (
+          <>
+            <button
+              onClick={(e) => { e.stopPropagation(); goToPrev(); }}
+              className={cn(
+                "absolute left-0 top-1/2 -translate-y-1/2 z-20",
+                "w-8 h-8 md:w-10 md:h-10 flex items-center justify-center",
+                "border border-foreground/20 bg-background/80 backdrop-blur-sm",
+                "font-mono text-foreground/60 text-sm",
+                "transition-all duration-200",
+                "hover:bg-foreground hover:text-background hover:border-foreground hover:scale-110",
+                "active:scale-95"
+              )}
+            >
+              ◄
+            </button>
+            <button
+              onClick={(e) => { e.stopPropagation(); goToNext(); }}
+              className={cn(
+                "absolute right-0 top-1/2 -translate-y-1/2 z-20",
+                "w-8 h-8 md:w-10 md:h-10 flex items-center justify-center",
+                "border border-foreground/20 bg-background/80 backdrop-blur-sm",
+                "font-mono text-foreground/60 text-sm",
+                "transition-all duration-200",
+                "hover:bg-foreground hover:text-background hover:border-foreground hover:scale-110",
+                "active:scale-95"
+              )}
+            >
+              ►
+            </button>
+          </>
+        )}
+      </div>
+
+      {/* Dot indicators */}
+      {images.length > 1 && (
+        <div className="flex items-center justify-center gap-2 mt-2">
+          <span className="font-mono text-[7px] text-foreground/30">[</span>
+          {images.slice(0, 5).map((_, idx) => (
+            <button
+              key={idx}
+              onClick={() => selectCard(idx)}
+              className={cn(
+                "w-6 h-1.5 transition-all duration-300",
+                "hover:scale-110 active:scale-95",
+                idx === activeIndex 
+                  ? "bg-foreground" 
+                  : "bg-foreground/20 hover:bg-foreground/40"
+              )}
+              aria-label={`View image ${idx + 1}`}
+            />
+          ))}
+          <span className="font-mono text-[7px] text-foreground/30">]</span>
+          <span className="font-mono text-[7px] text-foreground/40 ml-2">
+            {String(activeIndex + 1).padStart(2, "0")}/{String(images.length).padStart(2, "0")}
+          </span>
+        </div>
+      )}
     </div>
   )
 }
@@ -1046,7 +1278,7 @@ function ProjectSlide({
                   ├── PREVIEW
                 </div>
                 <div className="h-[calc(100%-20px)]">
-                  <ImageGallery images={project.images} title={project.title} />
+                  <ImageGallery images={project.images} title={project.title} isActive={isActive} />
                 </div>
               </div>
 
