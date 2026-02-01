@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useCallback } from "react"
 import { cn } from "@/lib/utils"
 import { MagneticButton } from "@/components/magnetic-button"
 import { Menu, X, MessageCircle, Mail } from "lucide-react"
-import { OPEN_CONTACT_FORM_EVENT } from "@/components/portfolio/contact-section"
+import { OPEN_CONTACT_FORM_EVENT, CLOSE_CONTACT_FORM_EVENT } from "@/components/portfolio/contact-section"
 import { gsap } from "gsap"
 
 // SVG path generator for blob shapes
@@ -361,6 +361,9 @@ export function Navigation() {
   }, [activeSection])
 
   const scrollToSection = (href: string) => {
+    // Close message form if open when navigating
+    window.dispatchEvent(new CustomEvent(CLOSE_CONTACT_FORM_EVENT))
+    
     const element = document.querySelector(href)
     if (element) {
       // For projects section, scroll to exact top to trigger GSAP pin and show first project

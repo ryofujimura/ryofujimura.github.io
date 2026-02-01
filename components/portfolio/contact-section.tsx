@@ -654,8 +654,9 @@ const socialLinks = [
   },
 ]
 
-// Custom event name for opening contact form from navigation
+// Custom event names for controlling contact form from navigation
 export const OPEN_CONTACT_FORM_EVENT = "openContactForm"
+export const CLOSE_CONTACT_FORM_EVENT = "closeContactForm"
 
 export function ContactSection() {
   const containerRef = useRef<HTMLDivElement>(null)
@@ -678,14 +679,21 @@ export function ContactSection() {
     return () => container?.removeEventListener("mousemove", handleMouseMove)
   }, [])
 
-  // Listen for custom event to open form from navigation
+  // Listen for custom events to open/close form from navigation
   useEffect(() => {
     const handleOpenFromNav = () => {
       setIsFormOpen(true)
     }
+    const handleCloseFromNav = () => {
+      setIsFormOpen(false)
+    }
     
     window.addEventListener(OPEN_CONTACT_FORM_EVENT, handleOpenFromNav)
-    return () => window.removeEventListener(OPEN_CONTACT_FORM_EVENT, handleOpenFromNav)
+    window.addEventListener(CLOSE_CONTACT_FORM_EVENT, handleCloseFromNav)
+    return () => {
+      window.removeEventListener(OPEN_CONTACT_FORM_EVENT, handleOpenFromNav)
+      window.removeEventListener(CLOSE_CONTACT_FORM_EVENT, handleCloseFromNav)
+    }
   }, [])
 
   const handleOpenForm = useCallback(() => {
