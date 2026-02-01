@@ -3,10 +3,11 @@
 import { useState, useRef, useEffect } from "react"
 import { gsap } from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
+import { ScrollToPlugin } from "gsap/ScrollToPlugin"
 import { ExternalLink, Github } from "lucide-react"
 import { cn } from "@/lib/utils"
 
-gsap.registerPlugin(ScrollTrigger)
+gsap.registerPlugin(ScrollTrigger, ScrollToPlugin)
 
 // ─────────────────────────────────────────────────────────────
 // PROJECT DATA - GROWTH FOCUSED (Oldest to Newest)
@@ -424,16 +425,20 @@ export function ProjectsSection() {
   const projectNameRef = useRef<HTMLSpanElement>(null)
   const prevIndexRef = useRef<number>(0)
 
-  // Scroll to specific project - uses regular function to always get latest ref
+  // Scroll to specific project - uses GSAP to avoid conflicts with ScrollTrigger
   const scrollToProject = (index: number) => {
     const st = scrollTriggerRef.current
     if (!st) {
-      // Fallback: scroll to section and add index * 100vh
+      // Fallback if ScrollTrigger not ready
       if (sectionRef.current) {
         const rect = sectionRef.current.getBoundingClientRect()
         const sectionTop = window.scrollY + rect.top
         const targetScroll = sectionTop + (index * window.innerHeight)
-        window.scrollTo({ top: targetScroll, behavior: "smooth" })
+        gsap.to(window, {
+          scrollTo: { y: targetScroll, autoKill: false },
+          duration: 0.8,
+          ease: "power2.inOut"
+        })
       }
       return
     }
@@ -447,11 +452,13 @@ export function ProjectsSection() {
     
     // Calculate target: each project gets equal portion of scroll distance
     const scrollPerProject = totalScrollDistance / totalProjects
-    const targetScroll = startPos + (index * scrollPerProject) + 10 // small offset to ensure trigger
+    const targetScroll = startPos + (index * scrollPerProject) + (scrollPerProject * 0.1)
     
-    window.scrollTo({
-      top: targetScroll,
-      behavior: "smooth"
+    // Use GSAP to scroll - this works properly with ScrollTrigger
+    gsap.to(window, {
+      scrollTo: { y: targetScroll, autoKill: false },
+      duration: 0.8,
+      ease: "power2.inOut"
     })
   }
 
