@@ -5,8 +5,8 @@ import { gsap } from "gsap"
 import { useReducedMotion } from "@/hooks/use-reduced-motion"
 import { GSAPText } from "@/components/gsap-text"
 import { BrutalistBackground } from "@/components/brutalist-background"
-import { BrutalistPortrait } from "@/components/brutalist-portrait"
 import { MagneticButton } from "@/components/magnetic-button"
+import { HeroPortrait } from "@/components/portfolio/hero-portrait"
 import { useToast } from "@/hooks/use-toast"
 import { Check, Github, Globe, Linkedin, Mail } from "lucide-react"
 
@@ -413,7 +413,7 @@ export function HeroSection() {
 
         {/* Content */}
         <div className="relative z-10 w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-8 lg:gap-12 xl:gap-16 items-start">
+          <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-8 lg:gap-16 items-center">
             {/* Left column - Text content */}
             <div className="order-2 lg:order-1">
               {/* System status bar */}
@@ -478,15 +478,13 @@ export function HeroSection() {
             </div>
 
             {/* Right column - Portrait */}
-            <div 
-              data-intro-animate 
-              className="order-1 lg:order-2 w-full max-w-[280px] sm:max-w-[320px] lg:max-w-[340px] xl:max-w-[380px] mx-auto lg:mx-0 lg:mt-8"
-            >
-              <BrutalistPortrait
-                src="/images/profile.jpg"
-                alt="Ryo Fujimura - Software Engineer"
-                className="w-full"
-              />
+            <div className="order-1 lg:order-2 flex justify-center lg:justify-end">
+              <div data-intro-animate className="w-[280px] sm:w-[320px] lg:w-[340px]">
+                <HeroPortrait
+                  src="/images/profile.jpg"
+                  alt="Ryo Fujimura - Software Engineer"
+                />
+              </div>
             </div>
           </div>
         </div>
