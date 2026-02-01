@@ -1330,7 +1330,7 @@ export function ProjectsSection() {
         </div>
 
         {/* Main content container */}
-        <div className="w-full max-w-5xl mx-auto relative">
+        <div className="w-full max-w-6xl mx-auto relative">
           {/* ═══════════════════════════════════════════════════════════
               HEADER SECTION - BRUTALIST TYPOGRAPHY
               ═══════════════════════════════════════════════════════════ */}
