@@ -1,16 +1,15 @@
 "use client"
 
-import { useState, useRef, useEffect } from "react"
+import { useState, useRef, useEffect, useCallback } from "react"
 import { gsap } from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
-import { ScrollToPlugin } from "gsap/ScrollToPlugin"
 import { ExternalLink, Github } from "lucide-react"
 import { cn } from "@/lib/utils"
 
-gsap.registerPlugin(ScrollTrigger, ScrollToPlugin)
+gsap.registerPlugin(ScrollTrigger)
 
 // ─────────────────────────────────────────────────────────────
-// PROJECT DATA - GROWTH FOCUSED (Oldest to Newest)
+// PROJECT DATA - CHRONOLOGICAL ORDER (oldest first)
 // ─────────────────────────────────────────────────────────────
 
 const allProjects = [
@@ -29,18 +28,6 @@ const allProjects = [
   {
     id: "02",
     year: "2023",
-    title: "Shohei HG",
-    growth: "Python Automation",
-    before: "Manual content posting",
-    after: "Automated pipeline",
-    techStack: ["Python", "Instagram API"],
-    achievement: "11K followers",
-    metric: "685 posts",
-    links: { instagram: "#", youtube: "#" },
-  },
-  {
-    id: "03",
-    year: "2023",
     title: "Schedule Master",
     growth: "Backend Architecture",
     before: "Frontend-only apps",
@@ -49,6 +36,18 @@ const allProjects = [
     achievement: "500+ courses",
     metric: "70% fewer errors",
     links: { github: "https://github.com/ryofujimura", demo: "https://ryofujimura.github.io" },
+  },
+  {
+    id: "03",
+    year: "2023",
+    title: "Shohei HG",
+    growth: "Python Automation",
+    before: "Manual content posting",
+    after: "Automated pipeline",
+    techStack: ["Python", "Instagram API"],
+    achievement: "11K followers",
+    metric: "685 posts",
+    links: { instagram: "#", youtube: "#" },
   },
   {
     id: "04",
@@ -166,80 +165,171 @@ type Project = (typeof allProjects)[0]
 // ASCII ELEMENTS
 // ─────────────────────────────────────────────────────────────
 
-const ASCII_CORNER_TL = `┌──`
-const ASCII_CORNER_TR = `──┐`
-const ASCII_CORNER_BL = `└──`
-const ASCII_CORNER_BR = `──┘`
-
 function GrowthArrow({ isActive }: { isActive: boolean }) {
   return (
     <span className={cn(
-      "font-mono text-[9px] md:text-[10px] transition-all duration-300 flex-shrink-0",
-      isActive ? "text-accent" : "text-foreground/20"
+      "font-mono text-[10px] transition-all duration-300",
+      isActive ? "text-accent" : "text-foreground/30"
     )}>
-      {"──►"}
+      {"─────►"}
     </span>
   )
 }
 
 // ─────────────────────────────────────────────────────────────
-// TIMELINE SIDEBAR - CLICKABLE
+// SECTION HEADER WITH PROJECT NAME
+// ─────────────────────────────────────────────────────────────
+
+function SectionHeader({ 
+  count, 
+  activeIndex, 
+  projectName 
+}: { 
+  count: number
+  activeIndex: number
+  projectName: string 
+}) {
+  const headerRef = useRef<HTMLDivElement>(null)
+  const titleRef = useRef<HTMLSpanElement>(null)
+  const [hasAnimated, setHasAnimated] = useState(false)
+
+  useEffect(() => {
+    if (!headerRef.current || hasAnimated) return
+    
+    const ctx = gsap.context(() => {
+      ScrollTrigger.create({
+        trigger: headerRef.current,
+        start: "top 90%",
+        onEnter: () => {
+          if (!titleRef.current) return
+          setHasAnimated(true)
+          const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ░▒▓█"
+          const originalText = "PROJECT"
+          let iteration = 0
+
+          const interval = setInterval(() => {
+            if (!titleRef.current) return clearInterval(interval)
+            titleRef.current.textContent = originalText
+              .split("")
+              .map((char, i) => (i < iteration ? char : chars[Math.floor(Math.random() * chars.length)]))
+              .join("")
+            if (iteration >= originalText.length) clearInterval(interval)
+            iteration += 0.4
+          }, 30)
+        },
+      })
+    }, headerRef.current)
+
+    return () => ctx.revert()
+  }, [hasAnimated])
+
+  return (
+    <div ref={headerRef} className="mb-6 md:mb-8">
+      {/* ASCII border */}
+      <div className="font-mono text-[8px] md:text-[10px] text-foreground/20 mb-3">
+        ╔════════════════════════════════════════════════════════════════════════╗
+      </div>
+      
+      <div className="flex items-end justify-between gap-4">
+        <div className="min-w-0 flex-1">
+          <p className="font-mono text-[8px] md:text-[10px] text-muted-foreground tracking-[0.2em] mb-1">
+            {">>>"} SECTION_04
+          </p>
+          <h2 className="font-mono text-xl md:text-2xl lg:text-3xl font-black text-foreground tracking-tight">
+            <span ref={titleRef}>PROJECT</span>
+            <span className="text-foreground/30"> — </span>
+            <span className="text-accent truncate">"{projectName}"</span>
+          </h2>
+        </div>
+        
+        <div className="text-right font-mono flex-shrink-0">
+          <div className="text-3xl md:text-4xl font-black text-foreground/5">
+            {String(activeIndex + 1).padStart(2, "0")}
+          </div>
+          <div className="text-[8px] text-muted-foreground">
+            /{String(count).padStart(2, "0")}
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ─────────────────────────────────────────────────────────────
+// TIMELINE - REVERSED (2022 → 2025)
 // ─────────────────────────────────────────────────────────────
 
 function Timeline({ 
   activeIndex, 
   projects,
-  progress,
-  onNodeClick
+  onNodeClick 
 }: { 
   activeIndex: number
   projects: Project[]
-  progress: number
   onNodeClick: (index: number) => void
 }) {
-  const progressHeight = `${progress * 100}%`
+  const connectorRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!connectorRef.current) return
+    const progress = projects.length > 1 ? (activeIndex / (projects.length - 1)) * 100 : 0
+    
+    gsap.to(connectorRef.current, {
+      height: `${progress}%`,
+      duration: 0.4,
+      ease: "power2.out"
+    })
+  }, [activeIndex, projects.length])
 
   return (
-    <div className="hidden md:flex flex-col w-[120px] lg:w-[140px] flex-shrink-0 h-full">
-      <div className="font-mono text-[7px] text-foreground/30 mb-1">
-        ┌─ TIMELINE
+    <div className="hidden lg:flex flex-col w-[160px] xl:w-[180px] flex-shrink-0">
+      <div className="font-mono text-[8px] text-foreground/30 mb-2">
+        ┌─ TIMELINE [2022→NOW]
       </div>
       
-      <div className="relative pl-3 flex-1 flex flex-col">
+      <div className="relative pl-3 flex-1">
         {/* Track */}
-        <div className="absolute left-[5px] top-0 bottom-0 w-px bg-foreground/10" />
-        {/* Progress */}
+        <div className="absolute left-0 top-0 bottom-0 w-px bg-foreground/10" />
         <div 
-          className="absolute left-[5px] top-0 w-px bg-accent transition-all duration-100"
-          style={{ height: progressHeight }}
+          ref={connectorRef}
+          className="absolute left-0 top-0 w-px bg-accent"
+          style={{ height: "0%" }}
         />
 
-        {/* Items distributed equally */}
-        <div className="flex flex-col justify-between h-full">
+        {/* Nodes */}
+        <div className="space-y-0.5">
           {projects.map((project, index) => {
             const isActive = index === activeIndex
             const isPast = index < activeIndex
+            const showYear = index === 0 || projects[index - 1]?.year !== project.year
 
             return (
-              <button
-                key={project.id}
-                onClick={() => onNodeClick(index)}
-                className={cn(
-                  "w-full text-left font-mono text-[7px] transition-all -ml-3 pl-3 cursor-pointer hover:text-accent py-0.5",
-                  isActive ? "text-accent border-l-2 border-accent" : 
-                  isPast ? "text-foreground/40 border-l border-foreground/20 hover:border-l-2 hover:border-accent/50" : 
-                  "text-foreground/20 border-l border-transparent hover:border-l-2 hover:border-accent/50"
+              <div key={project.id}>
+                {showYear && (
+                  <div className="font-mono text-[8px] text-foreground/40 mb-1 mt-3 first:mt-0 -ml-1.5 border-l-2 border-foreground/20 pl-2">
+                    [{project.year}]
+                  </div>
                 )}
-              >
-                <span className="text-[6px] text-foreground/30 block">{project.year}</span>
-                <span className="truncate block leading-tight">{project.growth}</span>
-              </button>
+
+                <button
+                  onClick={() => onNodeClick(index)}
+                  className={cn(
+                    "w-full text-left py-0.5 font-mono text-[8px] transition-all relative group",
+                    "-ml-1.5 pl-2",
+                    isActive ? "text-accent border-l-2 border-accent font-bold" : 
+                    isPast ? "text-foreground/50 border-l border-foreground/30 hover:text-foreground/70" : 
+                    "text-foreground/20 border-l border-transparent hover:text-foreground/40 hover:border-foreground/20"
+                  )}
+                >
+                  <span className="truncate block">{project.title}</span>
+                </button>
+              </div>
             )
           })}
         </div>
       </div>
       
-      <div className="font-mono text-[7px] text-foreground/30 mt-1">
+      <div className="font-mono text-[8px] text-foreground/30 mt-2">
         └─ NOW
       </div>
     </div>
@@ -247,33 +337,33 @@ function Timeline({
 }
 
 // ─────────────────────────────────────────────────────────────
-// PROJECT SLIDE
+// PROJECT CARD - CENTERED, COMPACT
 // ─────────────────────────────────────────────────────────────
 
-function ProjectSlide({ 
+function ProjectCard({ 
   project, 
   index,
-  isActive,
-  total
+  total,
+  isActive 
 }: { 
   project: Project
   index: number
-  isActive: boolean
   total: number
+  isActive: boolean
 }) {
-  const slideRef = useRef<HTMLDivElement>(null)
+  const cardRef = useRef<HTMLDivElement>(null)
 
-  // Animate on active
+  // Animate content when active
   useEffect(() => {
-    if (!isActive || !slideRef.current) return
+    if (!isActive || !cardRef.current) return
 
     const ctx = gsap.context(() => {
       gsap.fromTo(
-        ".slide-animate",
-        { opacity: 0, y: 8 },
-        { opacity: 1, y: 0, duration: 0.3, stagger: 0.04, ease: "power2.out" }
+        ".card-animate",
+        { opacity: 0, y: 10 },
+        { opacity: 1, y: 0, duration: 0.4, stagger: 0.05, ease: "power2.out" }
       )
-    }, slideRef.current)
+    }, cardRef.current)
 
     return () => ctx.revert()
   }, [isActive])
@@ -284,106 +374,112 @@ function ProjectSlide({
 
   return (
     <div 
-      ref={slideRef}
+      ref={cardRef}
       className={cn(
-        "absolute inset-0 transition-all duration-300",
-        isActive ? "opacity-100 z-10" : "opacity-0 z-0 pointer-events-none"
+        "absolute inset-0 flex items-center justify-center transition-all duration-500 p-4",
+        isActive ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
       )}
     >
-      <div className="h-full border border-foreground/20 bg-background relative">
+      <div className="w-full max-w-2xl border border-foreground/30 bg-background relative">
         {/* ASCII corners */}
-        <span className="absolute top-0 left-0 font-mono text-[7px] text-foreground/30 p-0.5">{ASCII_CORNER_TL}</span>
-        <span className="absolute top-0 right-0 font-mono text-[7px] text-foreground/30 p-0.5">{ASCII_CORNER_TR}</span>
-        <span className="absolute bottom-0 left-0 font-mono text-[7px] text-foreground/30 p-0.5">{ASCII_CORNER_BL}</span>
-        <span className="absolute bottom-0 right-0 font-mono text-[7px] text-foreground/30 p-0.5">{ASCII_CORNER_BR}</span>
+        <span className="absolute -top-px -left-px font-mono text-[8px] text-foreground/40">┌──</span>
+        <span className="absolute -top-px -right-px font-mono text-[8px] text-foreground/40">──┐</span>
+        <span className="absolute -bottom-px -left-px font-mono text-[8px] text-foreground/40">└──</span>
+        <span className="absolute -bottom-px -right-px font-mono text-[8px] text-foreground/40">──┘</span>
 
-        <div className="h-full flex flex-col p-3 md:p-4">
+        <div className="p-4 md:p-6">
           {/* Header */}
-          <div className="slide-animate flex items-start justify-between gap-2 mb-2">
-            <div className="flex items-center gap-2">
-              <span className="font-mono text-xl md:text-2xl font-black text-foreground/10">
+          <div className="card-animate flex items-start justify-between gap-3 mb-4">
+            <div className="flex items-center gap-3">
+              <span className="font-mono text-2xl md:text-3xl font-black text-foreground/10">
                 {project.id}
               </span>
               <div>
-                <span className="font-mono text-[7px] text-muted-foreground block">{project.year}</span>
-                <span className="font-mono text-[9px] md:text-[10px] text-foreground/50">{project.title}</span>
+                <span className="font-mono text-[8px] text-muted-foreground block">{project.year}</span>
+                <span className="font-mono text-xs text-foreground/60">{project.title}</span>
               </div>
             </div>
-
+            
             <div className="text-right">
-              <div className="font-mono text-base md:text-lg font-black text-accent">
+              <div className="font-mono text-lg md:text-xl font-black text-accent">
                 {project.metric}
               </div>
-              <div className="font-mono text-[6px] md:text-[7px] text-muted-foreground">
+              <div className="font-mono text-[8px] text-muted-foreground">
                 {project.achievement}
               </div>
             </div>
           </div>
 
           {/* Growth Focus */}
-          <div className="flex-1 flex flex-col justify-center">
-            <div className="slide-animate font-mono text-[7px] text-foreground/30 mb-1">
-              ├─ GROWTH
-            </div>
-            
-            <h4 className="slide-animate font-mono text-sm md:text-base lg:text-lg font-black text-foreground tracking-tight mb-2">
+          <div className="card-animate mb-4">
+            <div className="font-mono text-[8px] text-foreground/40 mb-1">├─ GROWTH_FOCUS</div>
+            <h3 className="font-mono text-lg md:text-xl lg:text-2xl font-black text-foreground tracking-tight">
               {project.growth.toUpperCase()}
-            </h4>
+            </h3>
+          </div>
 
-            {/* Before → After */}
-            <div className="slide-animate bg-foreground/5 border border-foreground/10 p-2 mb-2">
-              <div className="flex items-center gap-2">
-                <div className="flex-1 min-w-0">
-                  <div className="font-mono text-[6px] text-foreground/30 mb-0.5">BEFORE</div>
-                  <div className="font-mono text-[8px] md:text-[9px] text-foreground/50 truncate">
-                    {project.before}
-                  </div>
+          {/* Before → After */}
+          <div className="card-animate bg-foreground/5 border border-foreground/10 p-3 md:p-4 mb-4">
+            <div className="flex items-center gap-3 md:gap-4">
+              <div className="flex-1 min-w-0">
+                <div className="font-mono text-[7px] text-foreground/40 mb-0.5">BEFORE</div>
+                <div className="font-mono text-[10px] md:text-xs text-foreground/60">
+                  {project.before}
                 </div>
-                <GrowthArrow isActive={isActive} />
-                <div className="flex-1 min-w-0">
-                  <div className="font-mono text-[6px] text-accent mb-0.5">AFTER</div>
-                  <div className="font-mono text-[8px] md:text-[9px] text-foreground truncate font-medium">
-                    {project.after}
-                  </div>
+              </div>
+              <GrowthArrow isActive={isActive} />
+              <div className="flex-1 min-w-0">
+                <div className="font-mono text-[7px] text-accent mb-0.5">AFTER</div>
+                <div className="font-mono text-[10px] md:text-xs text-foreground font-medium">
+                  {project.after}
                 </div>
               </div>
             </div>
+          </div>
 
-            {/* Tech */}
-            <div className="slide-animate flex flex-wrap gap-1">
-              {project.techStack.map((tech) => (
-                <span
-                  key={tech}
-                  className="font-mono text-[6px] md:text-[7px] px-1 py-0.5 border border-foreground/15 text-foreground/40"
-                >
-                  {tech}
-                </span>
-              ))}
-            </div>
+          {/* Tech stack */}
+          <div className="card-animate flex flex-wrap gap-1.5 mb-4">
+            {project.techStack.map((tech) => (
+              <span
+                key={tech}
+                className="font-mono text-[8px] px-2 py-0.5 border border-foreground/20 text-foreground/50 bg-foreground/5"
+              >
+                {tech}
+              </span>
+            ))}
           </div>
 
           {/* Footer */}
-          <div className="slide-animate flex items-center justify-between pt-2 border-t border-foreground/10">
-            <div className="flex items-center gap-2">
+          <div className="card-animate flex items-center justify-between pt-3 border-t border-foreground/10">
+            <div className="flex items-center gap-3">
               {hasGithub && (
-                <a href={project.links.github} target="_blank" rel="noopener noreferrer"
-                  className="font-mono text-[7px] text-foreground/40 hover:text-accent transition-colors flex items-center gap-0.5">
-                  <Github className="w-2.5 h-2.5" />
-                  <span className="hidden sm:inline">CODE</span>
+                <a
+                  href={project.links.github}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-mono text-[9px] text-foreground/50 hover:text-accent transition-colors flex items-center gap-1"
+                >
+                  <Github className="w-3.5 h-3.5" />
+                  <span>CODE</span>
                 </a>
               )}
               {hasDemo && (
-                <a href={(project.links as { demo?: string }).demo} target="_blank" rel="noopener noreferrer"
-                  className="font-mono text-[7px] text-foreground/40 hover:text-accent transition-colors flex items-center gap-0.5">
-                  <ExternalLink className="w-2.5 h-2.5" />
-                  <span className="hidden sm:inline">DEMO</span>
+                <a
+                  href={(project.links as { demo?: string }).demo}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-mono text-[9px] text-foreground/50 hover:text-accent transition-colors flex items-center gap-1"
+                >
+                  <ExternalLink className="w-3.5 h-3.5" />
+                  <span>DEMO</span>
                 </a>
               )}
               {hasAppStore && (
-                <span className="font-mono text-[7px] text-foreground/20">iOS</span>
+                <span className="font-mono text-[9px] text-foreground/30">iOS</span>
               )}
             </div>
-            <div className="font-mono text-[6px] text-foreground/20">
+
+            <div className="font-mono text-[8px] text-foreground/30">
               [{String(index + 1).padStart(2, "0")}/{String(total).padStart(2, "0")}]
             </div>
           </div>
@@ -394,125 +490,122 @@ function ProjectSlide({
 }
 
 // ─────────────────────────────────────────────────────────────
-// SCROLL INDICATOR
+// MOBILE DOTS
 // ─────────────────────────────────────────────────────────────
 
-function ScrollIndicator({ progress, activeIndex, total }: { progress: number; activeIndex: number; total: number }) {
-  const filled = Math.round(progress * 20)
-  const bar = "█".repeat(filled) + "░".repeat(20 - filled)
-
+function MobileDots({
+  activeIndex,
+  total,
+  onSelect
+}: {
+  activeIndex: number
+  total: number
+  onSelect: (index: number) => void
+}) {
   return (
-    <div className="flex items-center justify-between font-mono text-[8px] md:text-[9px] py-2">
-      <span className="text-foreground/30">[{bar}]</span>
-      <span className="text-foreground/50">
-        {String(activeIndex + 1).padStart(2, "0")}/{String(total).padStart(2, "0")}
-      </span>
-      <span className="text-foreground/30 text-[7px]">SCROLL ↓</span>
+    <div className="lg:hidden flex justify-center gap-1 py-3">
+      {Array.from({ length: total }).map((_, i) => (
+        <button
+          key={i}
+          onClick={() => onSelect(i)}
+          className={cn(
+            "w-6 h-1 transition-all",
+            i === activeIndex ? "bg-accent" : 
+            i < activeIndex ? "bg-foreground/30" : "bg-foreground/10"
+          )}
+        />
+      ))}
     </div>
   )
 }
 
 // ─────────────────────────────────────────────────────────────
-// MAIN SECTION - PINNED SCROLL
+// NAVIGATION
+// ─────────────────────────────────────────────────────────────
+
+function Navigation({
+  activeIndex,
+  total,
+  onPrev,
+  onNext,
+}: {
+  activeIndex: number
+  total: number
+  onPrev: () => void
+  onNext: () => void
+}) {
+  const progressChars = 12
+  const filled = Math.round((activeIndex / (total - 1)) * progressChars)
+  const progressBar = "▓".repeat(filled) + "░".repeat(progressChars - filled)
+
+  return (
+    <div className="flex items-center justify-center gap-4 py-4 font-mono">
+      <button
+        onClick={onPrev}
+        disabled={activeIndex === 0}
+        className={cn(
+          "text-[10px] md:text-xs px-3 py-1.5 border border-foreground/20 transition-all",
+          activeIndex === 0 
+            ? "opacity-20 cursor-not-allowed" 
+            : "hover:bg-foreground hover:text-background active:scale-95"
+        )}
+      >
+        {"<"} PREV
+      </button>
+
+      <div className="flex items-center gap-2">
+        <span className="text-[8px] text-foreground/30 hidden md:inline">
+          [{progressBar}]
+        </span>
+        <span className="text-[10px] text-foreground/60">
+          {String(activeIndex + 1).padStart(2, "0")}/{String(total).padStart(2, "0")}
+        </span>
+      </div>
+
+      <button
+        onClick={onNext}
+        disabled={activeIndex === total - 1}
+        className={cn(
+          "text-[10px] md:text-xs px-3 py-1.5 border border-foreground/20 transition-all",
+          activeIndex === total - 1 
+            ? "opacity-20 cursor-not-allowed" 
+            : "hover:bg-foreground hover:text-background active:scale-95"
+        )}
+      >
+        NEXT {">"}
+      </button>
+    </div>
+  )
+}
+
+// ─────────────────────────────────────────────────────────────
+// MAIN SECTION - GSAP PINNED
 // ─────────────────────────────────────────────────────────────
 
 export function ProjectsSection() {
   const [activeIndex, setActiveIndex] = useState(0)
-  const [progress, setProgress] = useState(0)
   const sectionRef = useRef<HTMLElement>(null)
   const pinContainerRef = useRef<HTMLDivElement>(null)
-  const scrollTriggerRef = useRef<ScrollTrigger | null>(null)
-  const projectNameRef = useRef<HTMLSpanElement>(null)
-  const prevIndexRef = useRef<number>(0)
-
-  // Scroll to specific project - uses GSAP to avoid conflicts with ScrollTrigger
-  const scrollToProject = (index: number) => {
-    const st = scrollTriggerRef.current
-    if (!st) {
-      // Fallback if ScrollTrigger not ready
-      if (sectionRef.current) {
-        const rect = sectionRef.current.getBoundingClientRect()
-        const sectionTop = window.scrollY + rect.top
-        const targetScroll = sectionTop + (index * window.innerHeight)
-        gsap.to(window, {
-          scrollTo: { y: targetScroll, autoKill: false },
-          duration: 0.8,
-          ease: "power2.inOut"
-        })
-      }
-      return
-    }
-    
-    const totalProjects = allProjects.length
-    
-    // Get the actual start and end scroll positions from ScrollTrigger
-    const startPos = st.start as number
-    const endPos = st.end as number
-    const totalScrollDistance = endPos - startPos
-    
-    // Calculate target: each project gets equal portion of scroll distance
-    const scrollPerProject = totalScrollDistance / totalProjects
-    const targetScroll = startPos + (index * scrollPerProject) + (scrollPerProject * 0.1)
-    
-    // Use GSAP to scroll - this works properly with ScrollTrigger
-    gsap.to(window, {
-      scrollTo: { y: targetScroll, autoKill: false },
-      duration: 0.8,
-      ease: "power2.inOut"
-    })
-  }
-
-  // ASCII scramble animation for project name
-  useEffect(() => {
-    if (!projectNameRef.current || prevIndexRef.current === activeIndex) return
-    
-    prevIndexRef.current = activeIndex
-    const targetText = allProjects[activeIndex]?.title || "..."
-    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ░▒▓█@#$%&*"
-    let iteration = 0
-
-    const interval = setInterval(() => {
-      if (!projectNameRef.current) return clearInterval(interval)
-      
-      projectNameRef.current.textContent = targetText
-        .split("")
-        .map((char, i) => {
-          if (char === " ") return " "
-          if (i < iteration) return char
-          return chars[Math.floor(Math.random() * chars.length)]
-        })
-        .join("")
-
-      if (iteration >= targetText.length) {
-        clearInterval(interval)
-      }
-      iteration += 0.5
-    }, 20)
-
-    return () => clearInterval(interval)
-  }, [activeIndex])
+  const triggerRef = useRef<HTMLDivElement>(null)
 
   // GSAP ScrollTrigger pin
   useEffect(() => {
-    if (!sectionRef.current || !pinContainerRef.current) return
+    if (!sectionRef.current || !pinContainerRef.current || !triggerRef.current) return
 
-    const totalProjects = allProjects.length
     const ctx = gsap.context(() => {
-      // Pin the section and scrub through projects
-      scrollTriggerRef.current = ScrollTrigger.create({
-        trigger: sectionRef.current,
+      const totalProjects = allProjects.length
+      
+      ScrollTrigger.create({
+        trigger: triggerRef.current,
         start: "top top",
         end: `+=${totalProjects * 100}%`,
         pin: pinContainerRef.current,
         pinSpacing: true,
         scrub: 0.5,
         onUpdate: (self) => {
-          const prog = self.progress
-          setProgress(prog)
-          
-          // Calculate active index based on progress
+          const progress = self.progress
           const newIndex = Math.min(
-            Math.floor(prog * totalProjects),
+            Math.floor(progress * totalProjects),
             totalProjects - 1
           )
           if (newIndex !== activeIndex) {
@@ -525,107 +618,113 @@ export function ProjectsSection() {
     return () => ctx.revert()
   }, [activeIndex])
 
-  const currentProject = allProjects[activeIndex]
+  // Click to scroll to project
+  const scrollToProject = useCallback((index: number) => {
+    if (!triggerRef.current) return
+    
+    const triggerTop = triggerRef.current.getBoundingClientRect().top + window.scrollY
+    const scrollDistance = allProjects.length * window.innerHeight
+    const targetScroll = triggerTop + (index / allProjects.length) * scrollDistance
+    
+    window.scrollTo({
+      top: targetScroll,
+      behavior: "smooth"
+    })
+  }, [])
+
+  const handlePrev = useCallback(() => {
+    if (activeIndex > 0) scrollToProject(activeIndex - 1)
+  }, [activeIndex, scrollToProject])
+
+  const handleNext = useCallback(() => {
+    if (activeIndex < allProjects.length - 1) scrollToProject(activeIndex + 1)
+  }, [activeIndex, scrollToProject])
 
   return (
     <section
       id="projects"
       ref={sectionRef}
-      className="relative bg-background mt-16 md:mt-24 lg:mt-32 mb-16 md:mb-24 lg:mb-32"
+      className="relative bg-background"
     >
-      {/* Pinned container */}
-      <div 
-        ref={pinContainerRef}
-        className="min-h-screen flex flex-col py-16 md:py-24 lg:py-32 px-4 md:px-6"
-      >
-        {/* Background grid */}
-        <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-[0.02]">
-          <div className="absolute inset-0" style={{
-            backgroundImage: `repeating-linear-gradient(0deg,transparent,transparent 30px,currentColor 30px,currentColor 31px),
-              repeating-linear-gradient(90deg,transparent,transparent 30px,currentColor 30px,currentColor 31px)`
-          }} />
-        </div>
-
-        <div className="max-w-5xl mx-auto w-full relative flex flex-col flex-1">
-          {/* Header */}
-          <div className="mb-4 md:mb-6">
-            <div className="font-mono text-[7px] md:text-[8px] text-foreground/20 mb-1 overflow-hidden">
-              ╔════════════════════════════════════════════════════════════╗
-            </div>
-            
-            <div className="flex items-end justify-between gap-2">
-              <div>
-                <p className="font-mono text-[7px] md:text-[8px] text-muted-foreground tracking-[0.2em]">
-                  {">>>"} SECTION_04
-                </p>
-                <h2 className="font-mono text-xl md:text-2xl lg:text-3xl font-black text-foreground tracking-tighter">
-                  PROJECT - <span ref={projectNameRef} className="text-foreground">{currentProject?.title || "..."}</span>
-                </h2>
-              </div>
-              
-              <div className="text-right font-mono">
-                <div className="text-2xl md:text-3xl font-black text-foreground/5">
-                  {String(activeIndex + 1).padStart(2, "0")}
-                </div>
-                <div className="text-[7px] text-muted-foreground">
-                  /{String(allProjects.length).padStart(2, "0")}
-                </div>
-              </div>
-            </div>
+      {/* Trigger element for scroll distance */}
+      <div ref={triggerRef}>
+        {/* Pinned container */}
+        <div 
+          ref={pinContainerRef}
+          className="min-h-screen flex flex-col"
+        >
+          {/* Background pattern */}
+          <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-[0.015]">
+            <div className="absolute inset-0" style={{
+              backgroundImage: `repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 30px,
+                currentColor 30px,
+                currentColor 31px
+              ),
+              repeating-linear-gradient(
+                90deg,
+                transparent,
+                transparent 30px,
+                currentColor 30px,
+                currentColor 31px
+              )`
+            }} />
           </div>
 
-          {/* Mobile progress dots - clickable */}
-          <div className="md:hidden flex gap-0.5 mb-3 overflow-x-auto scrollbar-hide">
-            {allProjects.map((_, i) => (
-              <button
-                key={i}
-                onClick={() => scrollToProject(i)}
-                className={cn(
-                  "flex-shrink-0 w-5 h-1.5 transition-all",
-                  i === activeIndex ? "bg-accent" : 
-                  i < activeIndex ? "bg-foreground/30 hover:bg-foreground/50" : "bg-foreground/10 hover:bg-foreground/20"
-                )}
+          <div className="flex-1 flex flex-col px-4 md:px-6 py-8 md:py-12">
+            <div className="max-w-6xl mx-auto w-full flex-1 flex flex-col">
+              {/* Header with project name */}
+              <SectionHeader 
+                count={allProjects.length} 
+                activeIndex={activeIndex}
+                projectName={allProjects[activeIndex].title}
               />
-            ))}
-          </div>
 
-          {/* Main content */}
-          <div className="flex gap-4 md:gap-6 flex-1 min-h-0">
-            {/* Timeline (desktop) - clickable */}
-            <Timeline 
-              activeIndex={activeIndex}
-              projects={allProjects}
-              progress={progress}
-              onNodeClick={scrollToProject}
-            />
-
-            {/* Project display */}
-            <div className="flex-1 flex flex-col min-w-0">
-              {/* Projects container */}
-              <div className="relative flex-1 h-[200px] md:h-[220px] lg:h-[240px]">
-                {allProjects.map((project, index) => (
-                  <ProjectSlide
-                    key={project.id}
-                    project={project}
-                    index={index}
-                    isActive={index === activeIndex}
-                    total={allProjects.length}
-                  />
-                ))}
-              </div>
-
-              {/* Scroll indicator */}
-              <ScrollIndicator 
-                progress={progress}
+              {/* Mobile dots */}
+              <MobileDots 
                 activeIndex={activeIndex}
                 total={allProjects.length}
+                onSelect={scrollToProject}
               />
-            </div>
-          </div>
 
-          {/* Footer */}
-          <div className="font-mono text-[7px] md:text-[8px] text-foreground/20 mt-4 overflow-hidden">
-            ╚════════════════════════════════════════════════════════════╝
+              {/* Main content - centered */}
+              <div className="flex-1 flex gap-6 lg:gap-8">
+                {/* Timeline (desktop) */}
+                <Timeline 
+                  activeIndex={activeIndex}
+                  projects={allProjects}
+                  onNodeClick={scrollToProject}
+                />
+
+                {/* Project cards container - centered */}
+                <div className="flex-1 relative min-h-[280px] md:min-h-[320px]">
+                  {allProjects.map((project, index) => (
+                    <ProjectCard
+                      key={project.id}
+                      project={project}
+                      index={index}
+                      total={allProjects.length}
+                      isActive={index === activeIndex}
+                    />
+                  ))}
+                </div>
+              </div>
+
+              {/* Navigation */}
+              <Navigation
+                activeIndex={activeIndex}
+                total={allProjects.length}
+                onPrev={handlePrev}
+                onNext={handleNext}
+              />
+
+              {/* ASCII footer */}
+              <div className="font-mono text-[8px] md:text-[10px] text-foreground/20 text-center">
+                ╚════════════════════════════════════════════════════════════════════════╝
+              </div>
+            </div>
           </div>
         </div>
       </div>
