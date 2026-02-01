@@ -2,12 +2,18 @@
 
 import { useRef, useState, useEffect, useMemo } from "react"
 import { gsap } from "gsap"
+import { ScrollTrigger } from "gsap/ScrollTrigger"
 import { useIsMobile } from "@/hooks/use-mobile"
 import { GSAPText } from "@/components/gsap-text"
 import { BrutalistBackground } from "@/components/brutalist-background"
 import { MagneticButton } from "@/components/magnetic-button"
 import { useToast } from "@/hooks/use-toast"
 import { ArrowDown, ArrowRight, Check, Github, Globe, Linkedin, Mail } from "lucide-react"
+
+// Register GSAP plugins
+if (typeof window !== "undefined") {
+  gsap.registerPlugin(ScrollTrigger)
+}
 
 const SITE_URL = "https://ryofujimura.github.io/"
 
@@ -293,9 +299,83 @@ function SocialLinks() {
  */
 export function IntroSection() {
   const containerRef = useRef<HTMLDivElement>(null)
+  const page2Ref = useRef<HTMLDivElement>(null)
+  const statsGridRef = useRef<HTMLDivElement>(null)
+  const stackTickerRef = useRef<HTMLDivElement>(null)
+  const ctaRef = useRef<HTMLDivElement>(null)
   const isMobile = useIsMobile()
 
   const rev = revLabel()
+
+  // Page 2 GSAP entrance animations with ScrollTrigger
+  useEffect(() => {
+    if (!page2Ref.current) return
+
+    const ctx = gsap.context(() => {
+      // Stats cards stagger animation
+      if (statsGridRef.current) {
+        const cards = statsGridRef.current.querySelectorAll("button")
+        gsap.set(cards, { opacity: 0, y: isMobile ? 20 : 30 })
+        
+        ScrollTrigger.create({
+          trigger: statsGridRef.current,
+          start: () => isMobile ? "top 90%" : "top 85%",
+          once: true,
+          onEnter: () => {
+            gsap.to(cards, {
+              opacity: 1,
+              y: 0,
+              duration: isMobile ? 0.4 : 0.6,
+              stagger: isMobile ? 0.08 : 0.1,
+              ease: "power3.out",
+            })
+          },
+        })
+      }
+
+      // Stack ticker fade in
+      if (stackTickerRef.current) {
+        gsap.set(stackTickerRef.current, { opacity: 0, x: isMobile ? -20 : -30 })
+        
+        ScrollTrigger.create({
+          trigger: stackTickerRef.current,
+          start: () => isMobile ? "top 95%" : "top 90%",
+          once: true,
+          onEnter: () => {
+            gsap.to(stackTickerRef.current, {
+              opacity: 1,
+              x: 0,
+              duration: isMobile ? 0.5 : 0.7,
+              ease: "power2.out",
+            })
+          },
+        })
+      }
+
+      // CTA buttons entrance
+      if (ctaRef.current) {
+        const buttons = ctaRef.current.querySelectorAll("a")
+        gsap.set(buttons, { opacity: 0, y: 15 })
+        
+        ScrollTrigger.create({
+          trigger: ctaRef.current,
+          start: () => isMobile ? "top 95%" : "top 90%",
+          once: true,
+          onEnter: () => {
+            gsap.to(buttons, {
+              opacity: 1,
+              y: 0,
+              duration: 0.5,
+              stagger: 0.1,
+              ease: "power3.out",
+            })
+          },
+        })
+      }
+    }, page2Ref)
+
+    return () => ctx.revert()
+  }, [isMobile])
 
   // ASCII terminal lines
   const asciiHeaderLines = useMemo(() => {
@@ -557,6 +637,7 @@ export function IntroSection() {
 
         {/* Page 2: Data + Action */}
         <div 
+          ref={page2Ref}
           className="snap-page relative flex items-center justify-center px-4 sm:px-6 py-12 sm:py-16"
           style={{
             scrollSnapAlign: "start",
@@ -587,7 +668,7 @@ export function IntroSection() {
                 </div>
 
                 {/* Stats Grid */}
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+                <div ref={statsGridRef} className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
                   {[
                     { label: "Years Coding", value: "8+", link: null },
                     { label: "Internships", value: "2", link: "experience" },
@@ -640,7 +721,7 @@ export function IntroSection() {
                 </div>
 
                 {/* Stack Ticker */}
-                <div className="border border-foreground/20 bg-background/50 overflow-hidden">
+                <div ref={stackTickerRef} className="border border-foreground/20 bg-background/50 overflow-hidden">
                   <div className="px-3 py-2 border-b border-foreground/10">
                     <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-muted-foreground">
                       Tech Stack
@@ -690,7 +771,7 @@ export function IntroSection() {
                 </div>
 
                 {/* CTA Buttons */}
-                <div className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4 pt-4">
+                <div ref={ctaRef} className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4 pt-4">
                   <MagneticButton
                     as="a"
                     href="#experience"
