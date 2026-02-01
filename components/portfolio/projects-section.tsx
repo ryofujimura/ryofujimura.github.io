@@ -755,23 +755,6 @@ export function ProjectsSection() {
         }
       )
 
-      // Corner brackets animation
-      gsap.fromTo(
-        ".corner-bracket",
-        { scale: 0, opacity: 0 },
-        {
-          scale: 1,
-          opacity: 1,
-          duration: 0.6,
-          stagger: 0.1,
-          ease: "back.out(1.5)",
-          scrollTrigger: {
-            trigger: sectionRef.current,
-            start: "top 60%",
-            toggleActions: "play none none reverse",
-          },
-        }
-      )
     }, sectionRef.current)
 
     return () => ctx.revert()
@@ -806,20 +789,6 @@ export function ProjectsSection() {
         {/* Background grid */}
         <GridPattern />
 
-        {/* Corner brackets */}
-        <span className="corner-bracket absolute top-4 left-4 font-mono text-foreground/20 text-xs sm:text-sm">
-          ┌────────────
-        </span>
-        <span className="corner-bracket absolute top-4 right-4 font-mono text-foreground/20 text-xs sm:text-sm text-right">
-          ────────────┐
-        </span>
-        <span className="corner-bracket absolute bottom-4 left-4 font-mono text-foreground/20 text-xs sm:text-sm">
-          └────────────
-        </span>
-        <span className="corner-bracket absolute bottom-4 right-4 font-mono text-foreground/20 text-xs sm:text-sm text-right">
-          ────────────┘
-        </span>
-
         <div ref={containerRef} className="relative z-10 px-4 sm:px-6 md:px-8">
           {/* Section header */}
           <div className="max-w-6xl mx-auto mb-8 sm:mb-12">
@@ -830,10 +799,10 @@ export function ProjectsSection() {
             <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
               <div>
                 <div className="ascii-decoration font-mono text-[9px] sm:text-[11px] text-foreground/40 tracking-[0.2em] mb-2">
-                  SECTION://PROJECTS
+                  PROJECTS // SELECTED_WORK
                 </div>
                 <h2 className="ascii-decoration font-mono text-2xl sm:text-3xl md:text-4xl font-black text-foreground tracking-tighter">
-                  SELECTED_WORK
+                  STILL_LEARNING
                 </h2>
               </div>
               <div className="ascii-decoration font-mono text-[10px] text-foreground/30 text-right">
