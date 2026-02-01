@@ -790,7 +790,8 @@ export function ProjectsSection() {
 
   const toggleGroup = useCallback((group: SkillGroup) => {
     setSelectedGroups((prev) =>
-      prev.includes(group) ? prev.filter((g) => g !== group) : [...prev, group]
+      // Single selection: toggle off if same, otherwise select only this one
+      prev.includes(group) ? [] : [group]
     )
   }, [])
 
