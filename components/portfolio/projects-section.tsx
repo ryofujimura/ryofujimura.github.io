@@ -566,9 +566,10 @@ function ProjectTitle({
 }) {
   const titleRef = useRef<HTMLButtonElement>(null)
   const [displayText, setDisplayText] = useState(project.title)
-  const glitchChars = "░▒▓█▄▀■□●○◆◇╳╱╲─│"
+  // Use only standard ASCII characters with consistent monospace width
+  const glitchChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#@$%&*!?+-=<>"
 
-  // Glitch effect on hover
+  // Glitch effect on hover - maintains exact character count
   useEffect(() => {
     if (!isHovered) {
       setDisplayText(project.title)
@@ -576,19 +577,25 @@ function ProjectTitle({
     }
 
     let iteration = 0
+    const maxIterations = project.title.length * 2
+    
     const interval = setInterval(() => {
-      setDisplayText(
-        project.title
-          .split("")
-          .map((char, i) => {
-            if (char === "_" || char === " ") return char
-            if (i < iteration / 2) return project.title[i]
-            return glitchChars[Math.floor(Math.random() * glitchChars.length)]
-          })
-          .join("")
-      )
+      const newText = project.title
+        .split("")
+        .map((char, i) => {
+          // Preserve underscores and spaces exactly
+          if (char === "_" || char === " ") return char
+          // Progressively reveal original characters
+          if (i < iteration / 2) return project.title[i]
+          // Replace with random glitch char of same type (letter stays letter)
+          return glitchChars[Math.floor(Math.random() * glitchChars.length)]
+        })
+        .join("")
+      
+      setDisplayText(newText)
       iteration++
-      if (iteration > project.title.length * 2) {
+      
+      if (iteration > maxIterations) {
         setDisplayText(project.title)
         clearInterval(interval)
       }
