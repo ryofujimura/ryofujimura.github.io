@@ -396,14 +396,15 @@ function CloudMessageForm({ onClose }: { onClose: () => void }) {
 
   return (
     <div ref={containerRef} className="fixed inset-0 z-50 flex items-center justify-center px-3 sm:px-4">
-      {/* Backdrop */}
+      {/* Backdrop - start hidden to prevent flash */}
       <div 
         ref={backdropRef}
         className="absolute inset-0 bg-background/40"
         onClick={handleClose}
+        style={{ opacity: 0 }}
       />
 
-      {/* Main form container - Liquid Glass effect */}
+      {/* Main form container - Liquid Glass effect - start hidden to prevent flash */}
       <div 
         ref={formRef}
         className="relative w-full max-w-lg border border-white/15 dark:border-white/10 overflow-hidden"
@@ -413,6 +414,9 @@ function CloudMessageForm({ onClose }: { onClose: () => void }) {
             0 8px 32px rgba(0, 0, 0, 0.08),
             0 0 0 1px rgba(255, 255, 255, 0.08) inset
           `,
+          opacity: 0,
+          transform: "scale(0)",
+          borderRadius: "50%",
         }}
       >
         {/* Subtle inner highlight for depth */}
@@ -423,8 +427,8 @@ function CloudMessageForm({ onClose }: { onClose: () => void }) {
             borderRadius: "inherit",
           }}
         />
-        {/* Content - responsive padding */}
-        <div ref={contentRef} className="relative z-10 p-5 sm:p-8">
+        {/* Content - responsive padding - start hidden */}
+        <div ref={contentRef} className="relative z-10 p-5 sm:p-8" style={{ opacity: 0 }}>
           {/* Textarea with glass effect */}
           <div ref={textareaContainerRef} className="relative">
             {/* Animated placeholder overlay - hidden during send animation */}
