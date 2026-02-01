@@ -484,12 +484,12 @@ export function ProjectsSection() {
     <section
       id="projects"
       ref={sectionRef}
-      className="relative bg-background"
+      className="relative bg-background mt-16 md:mt-24 lg:mt-32 mb-16 md:mb-24 lg:mb-32"
     >
       {/* Pinned container */}
       <div 
         ref={pinContainerRef}
-        className="min-h-screen flex flex-col py-8 md:py-12 px-4 md:px-6"
+        className="min-h-screen flex flex-col py-16 md:py-24 lg:py-32 px-4 md:px-6"
       >
         {/* Background grid */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-[0.02]">
