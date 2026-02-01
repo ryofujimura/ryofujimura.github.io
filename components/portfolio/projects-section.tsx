@@ -3,36 +3,24 @@
 import { useState, useRef, useEffect, useMemo, useCallback } from "react"
 import { gsap } from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
-import { ExternalLink, Github, X, ChevronDown } from "lucide-react"
+import { ExternalLink, Github, X, ChevronDown, ChevronLeft, ChevronRight } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 gsap.registerPlugin(ScrollTrigger)
 
 // ─────────────────────────────────────────────────────────────
-// ASCII NEURAL PATTERNS
+// ASCII PATTERNS
 // ─────────────────────────────────────────────────────────────
 
-const ASCII_NEURON = `
-    ╭───╮
-   ╱     ╲
-──●       ●──
-   ╲     ╱
-    ╰───╯
-`.trim()
-
 const ASCII_SYNAPSE = `──●──○──●──`
-
-const ASCII_BRAIN_SCAN = `
-┌─────────────────────────────────────┐
-│  ▓▓░░▓▓░░▓▓░░▓▓░░▓▓░░▓▓░░▓▓░░▓▓░░  │
-│  ░░▓▓░░▓▓░░▓▓░░▓▓░░▓▓░░▓▓░░▓▓░░▓▓  │
-│  ▓▓░░▓▓░░▓▓░░▓▓░░▓▓░░▓▓░░▓▓░░▓▓░░  │
-└─────────────────────────────────────┘
-`.trim()
-
-const ASCII_PULSE = `─╮╭─╮╭─╮╭─╮╭─╮╭─`
-
+const ASCII_PULSE = `─╮╭─╮╭─╮╭─╮╭─`
 const ASCII_NODE = `◉`
+
+const ASCII_NEURON_SMALL = `
+  ╭─╮
+ ─●─●─
+  ╰─╯
+`.trim()
 
 // ─────────────────────────────────────────────────────────────
 // SKILL GROUPS
@@ -49,7 +37,7 @@ const SKILL_GROUPS = {
 type SkillGroup = keyof typeof SKILL_GROUPS
 
 // ─────────────────────────────────────────────────────────────
-// PROJECT DATA - Focus on Growth & Learning
+// PROJECT DATA
 // ─────────────────────────────────────────────────────────────
 
 const allProjects = [
@@ -250,499 +238,462 @@ const allProjects = [
 type Project = (typeof allProjects)[0]
 
 // ─────────────────────────────────────────────────────────────
-// NEURAL CONNECTION SVG
+// ANIMATED NEURAL BACKGROUND
 // ─────────────────────────────────────────────────────────────
 
-function NeuralConnections({ className }: { className?: string }) {
+function AnimatedNeuralBackground() {
   const svgRef = useRef<SVGSVGElement>(null)
 
   useEffect(() => {
     if (!svgRef.current) return
-    const paths = svgRef.current.querySelectorAll("path, circle, line")
+    const paths = svgRef.current.querySelectorAll(".neural-path")
+    const nodes = svgRef.current.querySelectorAll(".neural-node")
+
     const ctx = gsap.context(() => {
-      gsap.fromTo(
-        paths,
-        { strokeDasharray: "0 1000", opacity: 0 },
-        {
-          strokeDasharray: "1000 0",
-          opacity: 1,
-          duration: 2,
-          stagger: 0.05,
-          ease: "power2.out",
-          scrollTrigger: {
-            trigger: svgRef.current,
-            start: "top 95%",
-            toggleActions: "play none none none",
-          },
-        }
-      )
+      // Animate paths with flowing effect
+      paths.forEach((path, i) => {
+        gsap.to(path, {
+          strokeDashoffset: -200,
+          duration: 8 + i * 2,
+          ease: "none",
+          repeat: -1,
+        })
+      })
+
+      // Pulse nodes
+      nodes.forEach((node, i) => {
+        gsap.to(node, {
+          opacity: 0.15,
+          scale: 1.5,
+          duration: 2 + i * 0.5,
+          ease: "power1.inOut",
+          repeat: -1,
+          yoyo: true,
+          delay: i * 0.3,
+        })
+      })
     }, svgRef.current)
+
     return () => ctx.revert()
   }, [])
 
   return (
     <svg
       ref={svgRef}
-      className={cn("absolute inset-0 w-full h-full pointer-events-none", className)}
+      className="absolute inset-0 w-full h-full pointer-events-none"
       viewBox="0 0 100 100"
-      preserveAspectRatio="none"
+      preserveAspectRatio="xMidYMid slice"
     >
-      {/* Neural dendrites */}
-      <path d="M0 50 Q25 30 50 50 T100 50" fill="none" stroke="currentColor" strokeWidth="0.3" opacity="0.15" />
-      <path d="M0 30 Q30 50 60 30 T100 40" fill="none" stroke="currentColor" strokeWidth="0.2" opacity="0.1" />
-      <path d="M0 70 Q40 50 70 70 T100 60" fill="none" stroke="currentColor" strokeWidth="0.2" opacity="0.1" />
-      
-      {/* Synaptic nodes */}
-      <circle cx="25" cy="40" r="1" fill="currentColor" opacity="0.2" />
-      <circle cx="50" cy="50" r="1.5" fill="currentColor" opacity="0.25" />
-      <circle cx="75" cy="45" r="1" fill="currentColor" opacity="0.2" />
-      <circle cx="15" cy="60" r="0.8" fill="currentColor" opacity="0.15" />
-      <circle cx="85" cy="55" r="0.8" fill="currentColor" opacity="0.15" />
+      {/* Neural paths */}
+      <path
+        className="neural-path"
+        d="M-10 20 Q20 10 40 25 T80 20 T120 30"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="0.15"
+        strokeDasharray="4 8"
+        opacity="0.06"
+      />
+      <path
+        className="neural-path"
+        d="M-10 50 Q30 35 50 50 T90 45 T120 55"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="0.2"
+        strokeDasharray="6 10"
+        opacity="0.05"
+      />
+      <path
+        className="neural-path"
+        d="M-10 80 Q25 70 45 80 T85 75 T120 85"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="0.15"
+        strokeDasharray="4 8"
+        opacity="0.06"
+      />
+      <path
+        className="neural-path"
+        d="M20 -10 Q15 30 25 50 T20 90 T30 120"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="0.1"
+        strokeDasharray="3 6"
+        opacity="0.04"
+      />
+      <path
+        className="neural-path"
+        d="M70 -10 Q75 25 65 50 T75 85 T70 120"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="0.1"
+        strokeDasharray="3 6"
+        opacity="0.04"
+      />
+
+      {/* Neural nodes */}
+      <circle className="neural-node" cx="25" cy="25" r="0.8" fill="currentColor" opacity="0.08" />
+      <circle className="neural-node" cx="50" cy="50" r="1" fill="currentColor" opacity="0.1" />
+      <circle className="neural-node" cx="75" cy="30" r="0.6" fill="currentColor" opacity="0.06" />
+      <circle className="neural-node" cx="40" cy="75" r="0.7" fill="currentColor" opacity="0.07" />
+      <circle className="neural-node" cx="80" cy="70" r="0.5" fill="currentColor" opacity="0.05" />
+      <circle className="neural-node" cx="15" cy="60" r="0.6" fill="currentColor" opacity="0.06" />
+      <circle className="neural-node" cx="60" cy="15" r="0.5" fill="currentColor" opacity="0.05" />
+      <circle className="neural-node" cx="85" cy="50" r="0.4" fill="currentColor" opacity="0.04" />
     </svg>
   )
 }
 
 // ─────────────────────────────────────────────────────────────
-// NODE MARKER COMPONENT
+// SINGLE PROJECT VIEW - Full Focus
 // ─────────────────────────────────────────────────────────────
 
-function NodeMarker({ id, active = false }: { id: string; active?: boolean }) {
-  return (
-    <div className={cn(
-      "flex items-center gap-1.5 sm:gap-2",
-      active ? "text-accent" : "text-foreground/40"
-    )}>
-      <span className="text-lg sm:text-xl">{ASCII_NODE}</span>
-      <span className="font-mono text-[10px] sm:text-xs tracking-wider">{id}</span>
-    </div>
-  )
-}
-
-// ─────────────────────────────────────────────────────────────
-// PROJECT NODE CARD - Mobile First
-// ─────────────────────────────────────────────────────────────
-
-function ProjectNode({ project, index }: { project: Project; index: number }) {
-  const nodeRef = useRef<HTMLDivElement>(null)
+function ProjectView({ project, isActive }: { project: Project; isActive: boolean }) {
+  const viewRef = useRef<HTMLDivElement>(null)
+  const contentRef = useRef<HTMLDivElement>(null)
   const learnedRef = useRef<HTMLSpanElement>(null)
+  const hasAnimated = useRef(false)
 
   useEffect(() => {
-    if (!nodeRef.current) return
-    const el = nodeRef.current
+    if (!viewRef.current || !isActive || hasAnimated.current) return
+    hasAnimated.current = true
 
     const ctx = gsap.context(() => {
-      // Card entrance
-      gsap.fromTo(
-        el,
-        { opacity: 0, y: 30, scale: 0.98 },
-        {
-          opacity: 1,
-          y: 0,
-          scale: 1,
-          duration: 0.6,
-          ease: "power3.out",
-          scrollTrigger: {
-            trigger: el,
-            start: "top 92%",
-            toggleActions: "play none none none",
-          },
-        }
-      )
+      // Stagger reveal all content
+      const items = viewRef.current?.querySelectorAll(".reveal")
+      if (items) {
+        gsap.fromTo(
+          items,
+          { opacity: 0, y: 20 },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.5,
+            stagger: 0.08,
+            ease: "power2.out",
+          }
+        )
+      }
 
-      // Learned text scramble
+      // Scramble learned text
       if (learnedRef.current) {
         const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ░▒▓"
         const originalText = project.growth.learned
         let iteration = 0
 
-        ScrollTrigger.create({
-          trigger: learnedRef.current,
-          start: "top 90%",
-          onEnter: () => {
-            const interval = setInterval(() => {
-              if (!learnedRef.current) return clearInterval(interval)
-              learnedRef.current.textContent = originalText
-                .split("")
-                .map((char, i) => {
-                  if (char === " " || char === "-") return char
-                  if (i < iteration) return char
-                  return chars[Math.floor(Math.random() * chars.length)]
-                })
-                .join("")
-              if (iteration >= originalText.length) clearInterval(interval)
-              iteration += 0.5
-            }, 25)
-          },
-        })
+        const interval = setInterval(() => {
+          if (!learnedRef.current) return clearInterval(interval)
+          learnedRef.current.textContent = originalText
+            .split("")
+            .map((char, i) => {
+              if (char === " " || char === "-" || char === "&") return char
+              if (i < iteration) return char
+              return chars[Math.floor(Math.random() * chars.length)]
+            })
+            .join("")
+          if (iteration >= originalText.length) clearInterval(interval)
+          iteration += 0.6
+        }, 25)
       }
-
-      // Stagger reveals
-      const items = el.querySelectorAll(".reveal")
-      gsap.fromTo(
-        items,
-        { opacity: 0, y: 10 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 0.4,
-          stagger: 0.05,
-          ease: "power2.out",
-          scrollTrigger: {
-            trigger: el,
-            start: "top 88%",
-            toggleActions: "play none none none",
-          },
-        }
-      )
-    }, el)
+    }, viewRef.current)
 
     return () => ctx.revert()
-  }, [project.growth.learned])
+  }, [isActive, project.growth.learned])
+
+  // Reset animation flag when becoming inactive
+  useEffect(() => {
+    if (!isActive) {
+      hasAnimated.current = false
+    }
+  }, [isActive])
 
   const hasGithub = project.links.github
   const hasDemo = "demo" in project.links && (project.links as { demo?: string }).demo
 
   return (
-    <article
-      ref={nodeRef}
+    <div
+      ref={viewRef}
       className={cn(
-        "relative",
-        "bg-background border border-foreground",
-        "shadow-[2px_2px_0_0_var(--foreground)] sm:shadow-[3px_3px_0_0_var(--foreground)]",
-        "active:shadow-[1px_1px_0_0_var(--foreground)]",
-        "transition-shadow duration-150"
+        "w-full flex-shrink-0 snap-center",
+        "px-3 sm:px-4 md:px-6"
       )}
     >
-      <NeuralConnections className="opacity-40" />
-
-      {/* Mobile-first stacked layout */}
-      <div className="flex flex-col">
-        
-        {/* Header: Node ID + Domain + Year */}
-        <div className="flex items-center justify-between p-3 sm:p-4 border-b border-dashed border-foreground/20">
+      <div
+        ref={contentRef}
+        className={cn(
+          "max-w-3xl mx-auto",
+          "border border-foreground/60",
+          "bg-background/95 backdrop-blur-sm",
+          "shadow-[3px_3px_0_0_var(--foreground)]"
+        )}
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between p-3 sm:p-4 border-b border-foreground/20">
           <div className="flex items-center gap-2 sm:gap-3">
-            <NodeMarker id={project.code} active />
-            <span className="font-mono text-[9px] sm:text-[10px] text-accent tracking-[0.15em] font-medium">
+            <span className="text-base sm:text-lg text-accent">{ASCII_NODE}</span>
+            <span className="reveal font-mono text-[10px] sm:text-xs text-foreground/60 tracking-wider">
+              {project.code}
+            </span>
+            <span className="reveal font-mono text-[10px] sm:text-xs text-accent tracking-[0.15em] font-medium">
               {project.domain}
             </span>
           </div>
-          <span className="font-mono text-[10px] sm:text-xs text-muted-foreground">
+          <span className="reveal font-mono text-[10px] sm:text-xs text-foreground/40">
             {project.year}
           </span>
         </div>
 
-        {/* Image + Title block */}
-        <div className="flex gap-3 sm:gap-4 p-3 sm:p-4 border-b border-dashed border-foreground/20">
-          {/* Image placeholder */}
-          <div className="w-16 h-16 sm:w-20 sm:h-20 flex-shrink-0 border border-foreground/30 bg-foreground/5 overflow-hidden">
-            <img 
-              src={project.image} 
-              alt={project.title}
-              className="w-full h-full object-cover"
-              loading="lazy"
-            />
-          </div>
-          
-          {/* Title + Primary metric */}
-          <div className="flex-1 min-w-0">
-            <h3 className="reveal font-mono text-base sm:text-lg md:text-xl font-black text-foreground leading-tight mb-1 truncate">
-              {project.title}
-            </h3>
-            <div className="reveal flex items-baseline gap-1.5">
-              <span className="font-mono text-2xl sm:text-3xl font-black text-accent leading-none">
-                {project.metrics.primary}
-              </span>
-              <span className="font-mono text-[10px] sm:text-xs text-muted-foreground">
-                {project.metrics.label}
-              </span>
+        {/* Main content */}
+        <div className="p-4 sm:p-6 md:p-8">
+          {/* Title + Image row */}
+          <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 mb-6 sm:mb-8">
+            {/* Image */}
+            <div className="reveal w-full sm:w-32 md:w-40 h-32 sm:h-32 md:h-40 flex-shrink-0 border border-foreground/30 bg-foreground/5 overflow-hidden">
+              <img
+                src={project.image}
+                alt={project.title}
+                className="w-full h-full object-cover"
+                loading="lazy"
+              />
             </div>
-            <p className="reveal font-mono text-[9px] sm:text-[10px] text-foreground/50 mt-1">
-              {project.metrics.secondary}
-            </p>
-          </div>
-        </div>
 
-        {/* Growth section - THE CORE FOCUS */}
-        <div className="p-3 sm:p-4 space-y-3 sm:space-y-4 border-b border-dashed border-foreground/20">
-          {/* Learned */}
-          <div className="reveal">
-            <div className="flex items-center gap-2 mb-1">
-              <span className="font-mono text-[8px] sm:text-[9px] text-foreground/40 tracking-[0.2em]">
-                LEARNED
-              </span>
-              <div className="flex-1 h-px bg-foreground/10" />
+            {/* Title + Metric */}
+            <div className="flex-1">
+              <h3 className="reveal font-mono text-xl sm:text-2xl md:text-3xl font-black text-foreground leading-tight mb-3">
+                {project.title}
+              </h3>
+              <div className="reveal flex items-baseline gap-2">
+                <span className="font-mono text-4xl sm:text-5xl md:text-6xl font-black text-accent leading-none">
+                  {project.metrics.primary}
+                </span>
+                <span className="font-mono text-sm sm:text-base text-foreground/60">
+                  {project.metrics.label}
+                </span>
+              </div>
+              <p className="reveal font-mono text-[10px] sm:text-xs text-foreground/40 mt-2">
+                {project.metrics.secondary}
+              </p>
             </div>
-            <p className="font-mono text-xs sm:text-sm text-foreground font-medium leading-relaxed">
-              <span ref={learnedRef}>{project.growth.learned}</span>
-            </p>
           </div>
 
-          {/* Improved */}
-          <div className="reveal">
-            <div className="flex items-center gap-2 mb-1">
-              <span className="font-mono text-[8px] sm:text-[9px] text-foreground/40 tracking-[0.2em]">
-                IMPROVED
-              </span>
-              <div className="flex-1 h-px bg-foreground/10" />
+          {/* Growth sections */}
+          <div className="space-y-4 sm:space-y-6 mb-6 sm:mb-8">
+            {/* Learned - Main focus */}
+            <div className="reveal">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="font-mono text-[9px] sm:text-[10px] text-foreground/50 tracking-[0.2em]">
+                  LEARNED
+                </span>
+                <div className="flex-1 h-px bg-foreground/10" />
+              </div>
+              <p className="font-mono text-base sm:text-lg md:text-xl text-foreground font-medium leading-relaxed">
+                <span ref={learnedRef}>{project.growth.learned}</span>
+              </p>
             </div>
-            <p className="font-mono text-[11px] sm:text-xs text-foreground/70 leading-relaxed">
-              {project.growth.improved}
-            </p>
-          </div>
 
-          {/* Unlocked */}
-          <div className="reveal">
-            <div className="flex items-center gap-2 mb-1">
-              <span className="font-mono text-[8px] sm:text-[9px] text-accent/70 tracking-[0.2em]">
-                UNLOCKED
-              </span>
-              <div className="flex-1 h-px bg-accent/20" />
+            {/* Improved */}
+            <div className="reveal">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="font-mono text-[9px] sm:text-[10px] text-foreground/50 tracking-[0.2em]">
+                  IMPROVED
+                </span>
+                <div className="flex-1 h-px bg-foreground/10" />
+              </div>
+              <p className="font-mono text-sm sm:text-base text-foreground/70 leading-relaxed">
+                {project.growth.improved}
+              </p>
             </div>
-            <p className="font-mono text-[11px] sm:text-xs text-accent/90 leading-relaxed">
-              {project.growth.unlocked}
-            </p>
-          </div>
-        </div>
 
-        {/* Skills + Links */}
-        <div className="p-3 sm:p-4 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
-          {/* Skills */}
-          <div className="reveal flex flex-wrap gap-1.5">
-            {project.skills.map((skill) => (
-              <span
-                key={skill}
-                className="font-mono text-[8px] sm:text-[9px] text-muted-foreground px-1.5 py-0.5 border border-foreground/20"
-              >
-                {skill}
-              </span>
-            ))}
+            {/* Unlocked */}
+            <div className="reveal">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="font-mono text-[9px] sm:text-[10px] text-accent/80 tracking-[0.2em]">
+                  UNLOCKED
+                </span>
+                <div className="flex-1 h-px bg-accent/20" />
+              </div>
+              <p className="font-mono text-sm sm:text-base text-accent leading-relaxed">
+                {project.growth.unlocked}
+              </p>
+            </div>
           </div>
 
-          {/* Links */}
-          <div className="reveal flex items-center gap-3 sm:gap-4">
-            {hasGithub && (
-              <a
-                href={project.links.github}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="touch-target inline-flex items-center gap-1.5 font-mono text-[10px] sm:text-xs text-foreground/70 hover:text-foreground transition-colors"
-              >
-                <Github className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                <span className="hidden sm:inline">SOURCE</span>
-              </a>
-            )}
-            {hasDemo && (
-              <a
-                href={(project.links as { demo?: string }).demo}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="touch-target inline-flex items-center gap-1.5 font-mono text-[10px] sm:text-xs text-foreground/70 hover:text-foreground transition-colors"
-              >
-                <ExternalLink className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                <span className="hidden sm:inline">DEMO</span>
-              </a>
-            )}
+          {/* Skills + Links */}
+          <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 pt-4 border-t border-foreground/10">
+            <div className="reveal flex flex-wrap gap-1.5 sm:gap-2">
+              {project.skills.map((skill) => (
+                <span
+                  key={skill}
+                  className="font-mono text-[9px] sm:text-[10px] text-foreground/60 px-2 py-1 border border-foreground/20"
+                >
+                  {skill}
+                </span>
+              ))}
+            </div>
+
+            <div className="reveal flex items-center gap-4">
+              {hasGithub && (
+                <a
+                  href={project.links.github}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="touch-target inline-flex items-center gap-2 font-mono text-[10px] sm:text-xs text-foreground/60 hover:text-foreground transition-colors"
+                >
+                  <Github className="w-4 h-4" />
+                  <span>SOURCE</span>
+                </a>
+              )}
+              {hasDemo && (
+                <a
+                  href={(project.links as { demo?: string }).demo}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="touch-target inline-flex items-center gap-2 font-mono text-[10px] sm:text-xs text-foreground/60 hover:text-foreground transition-colors"
+                >
+                  <ExternalLink className="w-4 h-4" />
+                  <span>DEMO</span>
+                </a>
+              )}
+            </div>
           </div>
         </div>
       </div>
-    </article>
+    </div>
   )
 }
 
 // ─────────────────────────────────────────────────────────────
-// FILTER COMPONENT - Mobile Optimized
+// NAVIGATION DOTS
+// ─────────────────────────────────────────────────────────────
+
+function NavigationDots({
+  total,
+  current,
+  onSelect,
+}: {
+  total: number
+  current: number
+  onSelect: (index: number) => void
+}) {
+  return (
+    <div className="flex items-center gap-1.5 sm:gap-2">
+      {Array.from({ length: total }).map((_, i) => (
+        <button
+          key={i}
+          onClick={() => onSelect(i)}
+          className={cn(
+            "touch-target w-2 h-2 sm:w-2.5 sm:h-2.5 transition-all duration-200",
+            i === current
+              ? "bg-foreground scale-125"
+              : "bg-foreground/20 hover:bg-foreground/40"
+          )}
+          aria-label={`Go to project ${i + 1}`}
+        />
+      ))}
+    </div>
+  )
+}
+
+// ─────────────────────────────────────────────────────────────
+// FILTER COMPONENT
 // ─────────────────────────────────────────────────────────────
 
 function FilterPanel({
   selectedGroups,
   onToggleGroup,
   onClearFilters,
-  resultCount,
-  totalCount,
 }: {
   selectedGroups: SkillGroup[]
   onToggleGroup: (group: SkillGroup) => void
   onClearFilters: () => void
-  resultCount: number
-  totalCount: number
 }) {
-  const ref = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    if (!ref.current) return
-    const ctx = gsap.context(() => {
-      gsap.fromTo(
-        ref.current,
-        { opacity: 0, y: -15 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 0.4,
-          ease: "power2.out",
-          scrollTrigger: {
-            trigger: ref.current,
-            start: "top 98%",
-            toggleActions: "play none none none",
-          },
-        }
-      )
-    }, ref.current)
-    return () => ctx.revert()
-  }, [])
-
   const groups = Object.keys(SKILL_GROUPS) as SkillGroup[]
 
   return (
-    <div ref={ref} className="mb-4 sm:mb-6">
-      {/* Scrollable filter row on mobile */}
-      <div className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto pb-2 scrollbar-hide -mx-1 px-1">
-        {groups.map((group) => {
-          const isSelected = selectedGroups.includes(group)
-          return (
-            <button
-              key={group}
-              onClick={() => onToggleGroup(group)}
-              className={cn(
-                "touch-target flex-shrink-0 font-mono text-[10px] sm:text-xs px-2.5 sm:px-3 py-1.5 border transition-all duration-150",
-                isSelected
-                  ? "border-foreground bg-foreground text-background"
-                  : "border-foreground/30 text-foreground/60 active:bg-foreground/10"
-              )}
-            >
-              {group}
-            </button>
-          )
-        })}
-
-        {selectedGroups.length > 0 && (
+    <div className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto pb-2 scrollbar-hide">
+      {groups.map((group) => {
+        const isSelected = selectedGroups.includes(group)
+        return (
           <button
-            onClick={onClearFilters}
-            className="touch-target flex-shrink-0 flex items-center gap-1 font-mono text-[10px] sm:text-xs text-muted-foreground px-2 py-1"
+            key={group}
+            onClick={() => onToggleGroup(group)}
+            className={cn(
+              "touch-target flex-shrink-0 font-mono text-[9px] sm:text-[10px] px-2 sm:px-2.5 py-1 border transition-all duration-150",
+              isSelected
+                ? "border-foreground bg-foreground text-background"
+                : "border-foreground/30 text-foreground/50 active:bg-foreground/10"
+            )}
           >
-            <X className="w-3 h-3" />
+            {group}
           </button>
-        )}
-      </div>
-
-      {/* Result count */}
-      <div className="flex items-center gap-1.5 mt-2 font-mono text-[9px] sm:text-[10px] text-foreground/40">
-        <span className="font-medium text-foreground/60">{resultCount}</span>
-        <span>/</span>
-        <span>{totalCount}</span>
-        <span className="ml-1">nodes</span>
-        {selectedGroups.length > 0 && <span className="text-accent ml-1">●</span>}
-      </div>
+        )
+      })}
+      {selectedGroups.length > 0 && (
+        <button
+          onClick={onClearFilters}
+          className="touch-target flex-shrink-0 p-1 text-foreground/40"
+        >
+          <X className="w-3 h-3" />
+        </button>
+      )}
     </div>
   )
 }
 
 // ─────────────────────────────────────────────────────────────
-// SECTION HEADER - Mobile Optimized
+// SECTION HEADER
 // ─────────────────────────────────────────────────────────────
 
-function SectionHeader({ count }: { count: number }) {
-  const headerRef = useRef<HTMLDivElement>(null)
+function SectionHeader({ current, total }: { current: number; total: number }) {
   const titleRef = useRef<HTMLHeadingElement>(null)
-  const asciiRef = useRef<HTMLPreElement>(null)
+  const hasAnimated = useRef(false)
 
   useEffect(() => {
-    if (!headerRef.current) return
-    const ctx = gsap.context(() => {
-      // ASCII scan animation
-      if (asciiRef.current) {
-        gsap.fromTo(
-          asciiRef.current,
-          { opacity: 0 },
-          {
-            opacity: 1,
-            duration: 1,
-            ease: "power2.out",
-            scrollTrigger: {
-              trigger: asciiRef.current,
-              start: "top 95%",
-              toggleActions: "play none none none",
-            },
-          }
-        )
-      }
+    if (!titleRef.current || hasAnimated.current) return
+    hasAnimated.current = true
 
-      // Title scramble
-      if (titleRef.current) {
-        const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ░▒▓█"
-        const originalText = "NEURAL MAP"
-        let iteration = 0
+    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ░▒▓█"
+    const originalText = "NEURAL MAP"
+    let iteration = 0
 
-        ScrollTrigger.create({
-          trigger: titleRef.current,
-          start: "top 92%",
-          onEnter: () => {
-            const interval = setInterval(() => {
-              if (!titleRef.current) return clearInterval(interval)
-              titleRef.current.textContent = originalText
-                .split("")
-                .map((char, i) => {
-                  if (char === " ") return " "
-                  if (i < iteration) return char
-                  return chars[Math.floor(Math.random() * chars.length)]
-                })
-                .join("")
-              if (iteration >= originalText.length) clearInterval(interval)
-              iteration += 0.35
-            }, 35)
-          },
+    const interval = setInterval(() => {
+      if (!titleRef.current) return clearInterval(interval)
+      titleRef.current.textContent = originalText
+        .split("")
+        .map((char, i) => {
+          if (char === " ") return " "
+          if (i < iteration) return char
+          return chars[Math.floor(Math.random() * chars.length)]
         })
-      }
-    }, headerRef.current)
-    return () => ctx.revert()
+        .join("")
+      if (iteration >= originalText.length) clearInterval(interval)
+      iteration += 0.4
+    }, 35)
+
+    return () => clearInterval(interval)
   }, [])
 
   return (
-    <div ref={headerRef} className="mb-5 sm:mb-8">
-      {/* ASCII brain scan */}
-      <pre
-        ref={asciiRef}
-        className="font-mono text-[6px] sm:text-[8px] text-foreground/15 overflow-hidden whitespace-pre select-none mb-3 sm:mb-4 leading-tight"
-      >
-        {ASCII_BRAIN_SCAN}
-      </pre>
-
-      {/* Header row */}
-      <div className="flex items-end justify-between gap-3">
-        <div className="min-w-0">
-          <div className="flex items-center gap-2 mb-1">
-            <span className="font-mono text-[8px] sm:text-[9px] text-muted-foreground tracking-[0.2em]">
-              — PROJECTS
-            </span>
-            <span className="font-mono text-[10px] sm:text-xs text-foreground/20">
-              {ASCII_SYNAPSE}
-            </span>
-          </div>
-          <h2
-            ref={titleRef}
-            className="font-mono text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-foreground tracking-tight leading-none"
-          >
-            NEURAL MAP
-          </h2>
-        </div>
-        
-        {/* Node count */}
-        <div className="flex flex-col items-end flex-shrink-0">
-          <span className="font-mono text-2xl sm:text-3xl md:text-4xl font-black text-foreground/15 tabular-nums leading-none">
-            {String(count).padStart(2, "0")}
-          </span>
-          <span className="font-mono text-[8px] sm:text-[9px] text-foreground/30 tracking-wider mt-0.5">
-            NODES
-          </span>
-        </div>
+    <div className="flex items-end justify-between gap-3 mb-4 sm:mb-6">
+      <div>
+        <p className="font-mono text-[8px] sm:text-[9px] text-foreground/40 tracking-[0.2em] mb-1">
+          — PROJECTS
+        </p>
+        <h2
+          ref={titleRef}
+          className="font-mono text-xl sm:text-2xl md:text-3xl font-black text-foreground tracking-tight leading-none"
+        >
+          NEURAL MAP
+        </h2>
       </div>
-
-      {/* Pulse line */}
-      <div className="mt-3 sm:mt-4 flex items-center gap-2">
-        <div className="h-0.5 sm:h-1 w-8 sm:w-12 bg-foreground" />
-        <span className="font-mono text-[8px] sm:text-[10px] text-foreground/20 tracking-widest overflow-hidden">
-          {ASCII_PULSE}
+      <div className="flex items-baseline gap-1 font-mono">
+        <span className="text-lg sm:text-xl md:text-2xl font-black text-foreground tabular-nums">
+          {String(current + 1).padStart(2, "0")}
         </span>
-        <div className="h-px flex-1 bg-foreground/15" />
+        <span className="text-xs sm:text-sm text-foreground/30">/</span>
+        <span className="text-xs sm:text-sm text-foreground/30 tabular-nums">
+          {String(total).padStart(2, "0")}
+        </span>
       </div>
     </div>
   )
@@ -754,17 +705,20 @@ function SectionHeader({ count }: { count: number }) {
 
 export function ProjectsSection() {
   const [selectedGroups, setSelectedGroups] = useState<SkillGroup[]>([])
-  const [showAll, setShowAll] = useState(false)
+  const [currentIndex, setCurrentIndex] = useState(0)
+  const scrollRef = useRef<HTMLDivElement>(null)
   const sectionRef = useRef<HTMLElement>(null)
 
   const toggleGroup = useCallback((group: SkillGroup) => {
     setSelectedGroups((prev) =>
       prev.includes(group) ? prev.filter((g) => g !== group) : [...prev, group]
     )
+    setCurrentIndex(0) // Reset to first when filtering
   }, [])
 
   const clearFilters = useCallback(() => {
     setSelectedGroups([])
+    setCurrentIndex(0)
   }, [])
 
   const selectedSkills = useMemo(() => {
@@ -779,110 +733,195 @@ export function ProjectsSection() {
     )
   }, [selectedSkills])
 
-  const INITIAL_VISIBLE = 3
-  const displayedProjects = showAll ? filteredProjects : filteredProjects.slice(0, INITIAL_VISIBLE)
-  const remaining = filteredProjects.length - INITIAL_VISIBLE
+  // Navigate to specific project
+  const goToProject = useCallback((index: number) => {
+    if (index < 0 || index >= filteredProjects.length) return
+    setCurrentIndex(index)
+    
+    if (scrollRef.current) {
+      const scrollContainer = scrollRef.current
+      const projectWidth = scrollContainer.scrollWidth / filteredProjects.length
+      scrollContainer.scrollTo({
+        left: projectWidth * index,
+        behavior: "smooth",
+      })
+    }
+  }, [filteredProjects.length])
+
+  const goNext = useCallback(() => {
+    goToProject(currentIndex + 1)
+  }, [currentIndex, goToProject])
+
+  const goPrev = useCallback(() => {
+    goToProject(currentIndex - 1)
+  }, [currentIndex, goToProject])
+
+  // Handle scroll snap end
+  useEffect(() => {
+    const scrollContainer = scrollRef.current
+    if (!scrollContainer) return
+
+    let scrollTimeout: NodeJS.Timeout
+
+    const handleScroll = () => {
+      clearTimeout(scrollTimeout)
+      scrollTimeout = setTimeout(() => {
+        const projectWidth = scrollContainer.scrollWidth / filteredProjects.length
+        const newIndex = Math.round(scrollContainer.scrollLeft / projectWidth)
+        if (newIndex !== currentIndex && newIndex >= 0 && newIndex < filteredProjects.length) {
+          setCurrentIndex(newIndex)
+        }
+      }, 100)
+    }
+
+    scrollContainer.addEventListener("scroll", handleScroll)
+    return () => {
+      scrollContainer.removeEventListener("scroll", handleScroll)
+      clearTimeout(scrollTimeout)
+    }
+  }, [filteredProjects.length, currentIndex])
+
+  // Keyboard navigation
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "ArrowRight") goNext()
+      if (e.key === "ArrowLeft") goPrev()
+    }
+    window.addEventListener("keydown", handleKeyDown)
+    return () => window.removeEventListener("keydown", handleKeyDown)
+  }, [goNext, goPrev])
 
   return (
     <section
       id="projects"
       ref={sectionRef}
       className={cn(
-        "relative py-8 sm:py-12 md:py-16 lg:py-20 px-3 sm:px-4 md:px-6",
-        "bg-background"
+        "relative py-8 sm:py-12 md:py-16 lg:py-20",
+        "bg-background overflow-hidden"
       )}
     >
-      {/* Subtle neural background */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <svg className="w-full h-full opacity-[0.015]" preserveAspectRatio="none">
-          {/* Neural web pattern */}
-          {[...Array(8)].map((_, i) => (
-            <path
-              key={i}
-              d={`M0 ${12 + i * 12} Q${25 + i * 5} ${8 + i * 8} 50 ${12 + i * 12} T100 ${10 + i * 10}`}
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1"
+      {/* Animated neural background */}
+      <AnimatedNeuralBackground />
+
+      {/* Content */}
+      <div className="relative">
+        {/* Header area with padding */}
+        <div className="px-3 sm:px-4 md:px-6 max-w-3xl mx-auto">
+          <SectionHeader current={currentIndex} total={filteredProjects.length} />
+
+          {/* Filter */}
+          <div className="mb-4 sm:mb-6">
+            <FilterPanel
+              selectedGroups={selectedGroups}
+              onToggleGroup={toggleGroup}
+              onClearFilters={clearFilters}
             />
-          ))}
-        </svg>
-      </div>
+          </div>
 
-      <div className="max-w-4xl mx-auto relative">
-        <SectionHeader count={allProjects.length} />
-
-        <FilterPanel
-          selectedGroups={selectedGroups}
-          onToggleGroup={toggleGroup}
-          onClearFilters={clearFilters}
-          resultCount={filteredProjects.length}
-          totalCount={allProjects.length}
-        />
-
-        {/* ASCII connection indicator */}
-        <div className="font-mono text-[8px] sm:text-[10px] text-foreground/15 mb-4 sm:mb-6 overflow-hidden select-none">
-          {ASCII_SYNAPSE}{ASCII_SYNAPSE}{ASCII_SYNAPSE}
+          {/* Pulse line */}
+          <div className="flex items-center gap-2 mb-4 sm:mb-6">
+            <span className="font-mono text-[8px] sm:text-[10px] text-foreground/15 tracking-widest overflow-hidden">
+              {ASCII_PULSE}{ASCII_PULSE}
+            </span>
+          </div>
         </div>
 
-        {/* Projects grid */}
+        {/* Projects carousel */}
         {filteredProjects.length === 0 ? (
-          <div className="text-center py-10 sm:py-12 border border-dashed border-foreground/15">
-            <pre className="font-mono text-[9px] sm:text-[10px] text-foreground/25 mb-3">
-              {ASCII_NEURON}
-            </pre>
-            <p className="font-mono text-[10px] sm:text-xs text-muted-foreground mb-3">
-              No matching nodes
-            </p>
-            <button
-              onClick={clearFilters}
-              className="font-mono text-[10px] sm:text-xs border border-foreground/40 px-3 py-1.5 active:bg-foreground active:text-background transition-colors"
-            >
-              RESET
-            </button>
+          <div className="px-3 sm:px-4 md:px-6 max-w-3xl mx-auto">
+            <div className="text-center py-10 sm:py-12 border border-dashed border-foreground/15">
+              <pre className="font-mono text-[8px] sm:text-[10px] text-foreground/20 mb-3">
+                {ASCII_NEURON_SMALL}
+              </pre>
+              <p className="font-mono text-[10px] sm:text-xs text-muted-foreground mb-3">
+                No matching nodes
+              </p>
+              <button
+                onClick={clearFilters}
+                className="font-mono text-[10px] sm:text-xs border border-foreground/40 px-3 py-1.5"
+              >
+                RESET
+              </button>
+            </div>
           </div>
         ) : (
-          <div className="space-y-3 sm:space-y-4">
-            {displayedProjects.map((project, index) => (
-              <ProjectNode key={project.id} project={project} index={index} />
-            ))}
-          </div>
+          <>
+            {/* Scroll container */}
+            <div
+              ref={scrollRef}
+              className="flex overflow-x-auto snap-x snap-mandatory scrollbar-hide"
+              style={{ scrollSnapType: "x mandatory" }}
+            >
+              {filteredProjects.map((project, index) => (
+                <ProjectView
+                  key={project.id}
+                  project={project}
+                  isActive={index === currentIndex}
+                />
+              ))}
+            </div>
+
+            {/* Navigation */}
+            <div className="px-3 sm:px-4 md:px-6 max-w-3xl mx-auto mt-4 sm:mt-6">
+              <div className="flex items-center justify-between">
+                {/* Prev/Next buttons */}
+                <button
+                  onClick={goPrev}
+                  disabled={currentIndex === 0}
+                  className={cn(
+                    "touch-target p-2 border border-foreground/30 transition-all",
+                    currentIndex === 0
+                      ? "opacity-30 cursor-not-allowed"
+                      : "hover:bg-foreground hover:text-background active:bg-foreground active:text-background"
+                  )}
+                  aria-label="Previous project"
+                >
+                  <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5" />
+                </button>
+
+                {/* Dots */}
+                <NavigationDots
+                  total={filteredProjects.length}
+                  current={currentIndex}
+                  onSelect={goToProject}
+                />
+
+                {/* Next button */}
+                <button
+                  onClick={goNext}
+                  disabled={currentIndex === filteredProjects.length - 1}
+                  className={cn(
+                    "touch-target p-2 border border-foreground/30 transition-all",
+                    currentIndex === filteredProjects.length - 1
+                      ? "opacity-30 cursor-not-allowed"
+                      : "hover:bg-foreground hover:text-background active:bg-foreground active:text-background"
+                  )}
+                  aria-label="Next project"
+                >
+                  <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
+                </button>
+              </div>
+
+              {/* Synapse decoration */}
+              <div className="mt-4 sm:mt-6 text-center">
+                <span className="font-mono text-[8px] sm:text-[10px] text-foreground/15">
+                  {ASCII_SYNAPSE}{ASCII_SYNAPSE}{ASCII_SYNAPSE}
+                </span>
+              </div>
+            </div>
+          </>
         )}
 
-        {/* Load more */}
-        {!showAll && remaining > 0 && (
-          <div className="mt-6 sm:mt-8 flex justify-center">
-            <button
-              onClick={() => setShowAll(true)}
-              className={cn(
-                "touch-target flex items-center gap-2",
-                "px-4 sm:px-6 py-2.5 sm:py-3",
-                "font-mono text-[10px] sm:text-xs tracking-wider",
-                "border border-foreground bg-foreground text-background",
-                "active:bg-background active:text-foreground transition-colors",
-                "shadow-[2px_2px_0_0_var(--foreground)]"
-              )}
-            >
-              <span>+{remaining} NODES</span>
-              <ChevronDown className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-            </button>
-          </div>
-        )}
-
-        {/* End marker */}
-        {showAll && (
-          <div className="mt-8 sm:mt-10 text-center">
-            <pre className="font-mono text-[7px] sm:text-[8px] text-foreground/15 select-none mb-3">
-              {ASCII_NEURON}
-            </pre>
-            <a
-              href="#contact"
-              className="touch-target inline-flex items-center gap-1.5 font-mono text-[10px] sm:text-xs text-muted-foreground"
-            >
-              <span>↓</span>
-              <span>NEXT</span>
-            </a>
-          </div>
-        )}
+        {/* Next section link */}
+        <div className="mt-8 sm:mt-10 text-center">
+          <a
+            href="#contact"
+            className="touch-target inline-flex items-center gap-1.5 font-mono text-[10px] sm:text-xs text-foreground/40 hover:text-foreground transition-colors"
+          >
+            <span>↓</span>
+            <span>NEXT</span>
+          </a>
+        </div>
       </div>
     </section>
   )
