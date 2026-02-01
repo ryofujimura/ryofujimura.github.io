@@ -594,7 +594,7 @@ export function IntroSection() {
               { label: "Years Coding", value: "8+", link: null },
               { label: "Internships", value: "2", link: "experience" },
               { label: "Projects Shipped", value: "10+", link: "projects" },
-              { label: "Publications", value: "2", link: "publications" },
+              { label: "Side Projects", value: "5+", link: "projects" },
             ].map((stat) => {
               const isLink = !!stat.link
               const handleClick = () => {
