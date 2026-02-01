@@ -1233,11 +1233,13 @@ function ProjectSlide({
                 <span className="font-mono text-[8px] text-foreground/40">{project.year}</span>
                 <StatusBadge status={project.status} />
               </div>
-              <h3 className="font-mono text-sm md:text-base font-bold text-foreground">
-                {project.title}
-              </h3>
-              <div className="font-mono text-[8px] md:text-[9px] text-foreground/50">
-                {project.subtitle}
+              <div className="flex items-baseline gap-2">
+                <h3 className="font-mono text-sm md:text-base font-bold text-foreground">
+                  {project.title}
+                </h3>
+                <span className="font-mono text-[8px] md:text-[9px] text-foreground/40">
+                  {project.subtitle}
+                </span>
               </div>
             </div>
 
