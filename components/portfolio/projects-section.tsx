@@ -371,6 +371,7 @@ function TerminalOutput({
   onSkillClick?: (skill: string) => void
 }) {
   const outputRef = useRef<HTMLDivElement>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [loadingFrame, setLoadingFrame] = useState(0)
   const [headerLines, setHeaderLines] = useState<string[]>([])
@@ -380,12 +381,93 @@ function TerminalOutput({
   const [isHeaderComplete, setIsHeaderComplete] = useState(false)
   const [expandedProject, setExpandedProject] = useState<string | null>(null)
   const [allExpanded, setAllExpanded] = useState(false)
+  const [inputValue, setInputValue] = useState("")
+  const [commandHistory, setCommandHistory] = useState<string[]>([])
+  const [historyIndex, setHistoryIndex] = useState(-1)
 
   // Reset expand state when skill changes
   useEffect(() => {
     setAllExpanded(false)
     setExpandedProject(null)
+    setInputValue("")
+    setHistoryIndex(-1)
   }, [skill])
+
+  // Focus input when header animation completes
+  useEffect(() => {
+    if (isHeaderComplete && inputRef.current) {
+      inputRef.current.focus()
+    }
+  }, [isHeaderComplete])
+
+  // Handle command input
+  const handleCommand = useCallback((command: string) => {
+    const trimmedCommand = command.trim().toLowerCase()
+    if (!trimmedCommand) return
+
+    // Add to history
+    setCommandHistory(prev => [...prev, command])
+    setHistoryIndex(-1)
+    setInputValue("")
+
+    // Check for help command
+    if (trimmedCommand === "help" || trimmedCommand === "--help" || trimmedCommand === "-h") {
+      return // Could show help in future
+    }
+
+    // Check for clear/exit commands
+    if (trimmedCommand === "clear" || trimmedCommand === "exit" || trimmedCommand === "q") {
+      onClose()
+      return
+    }
+
+    // Find matching skill (case-insensitive)
+    const matchedSkill = allSkills.find(s => 
+      s.toLowerCase() === trimmedCommand || 
+      s.toLowerCase().includes(trimmedCommand)
+    )
+
+    if (matchedSkill) {
+      onSkillClick?.(matchedSkill)
+    }
+  }, [onClose, onSkillClick])
+
+  // Handle key events for history navigation
+  const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      handleCommand(inputValue)
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault()
+      if (commandHistory.length > 0) {
+        const newIndex = historyIndex < commandHistory.length - 1 ? historyIndex + 1 : historyIndex
+        setHistoryIndex(newIndex)
+        setInputValue(commandHistory[commandHistory.length - 1 - newIndex] || "")
+      }
+    } else if (e.key === "ArrowDown") {
+      e.preventDefault()
+      if (historyIndex > 0) {
+        const newIndex = historyIndex - 1
+        setHistoryIndex(newIndex)
+        setInputValue(commandHistory[commandHistory.length - 1 - newIndex] || "")
+      } else if (historyIndex === 0) {
+        setHistoryIndex(-1)
+        setInputValue("")
+      }
+    } else if (e.key === "Escape") {
+      onClose()
+    } else if (e.key === "Tab") {
+      e.preventDefault()
+      // Tab completion - find skills that start with current input
+      if (inputValue.trim()) {
+        const matches = allSkills.filter(s => 
+          s.toLowerCase().startsWith(inputValue.trim().toLowerCase())
+        )
+        if (matches.length === 1) {
+          setInputValue(matches[0])
+        }
+      }
+    }
+  }, [inputValue, commandHistory, historyIndex, handleCommand, onClose])
 
   const relatedProjects = skill ? skillsMap.get(skill) || [] : []
 
@@ -618,8 +700,11 @@ function TerminalOutput({
           </button>
         </div>
 
-        {/* Terminal body */}
-        <div className="p-4 sm:p-6 font-mono text-[10px] sm:text-xs leading-relaxed min-h-[120px] relative text-left">
+        {/* Terminal body - click to focus input */}
+        <div 
+          className="p-4 sm:p-6 font-mono text-[10px] sm:text-xs leading-relaxed min-h-[120px] relative text-left cursor-text"
+          onClick={() => isHeaderComplete && inputRef.current?.focus()}
+        >
           {/* Scanline effect */}
           <div 
             className="absolute inset-0 pointer-events-none opacity-[0.02]"
@@ -690,18 +775,36 @@ function TerminalOutput({
                   ))}
                   
                   {/* Footer line */}
-                  <div className="mt-3 min-h-[1.4em]">
-                    <span className="text-violet-300">[OK]</span>
-                    <span className="text-white/70"> Query complete. {relatedProjects.length} result(s) found.</span>
-                  </div>
-                  <div className="min-h-[1.4em]">
-                    <span className="text-emerald-300">$</span>
-                    <span className="text-white/50"> _</span>
-                    {showCursor && (
-                      <span className="inline-block w-2 h-4 bg-emerald-300 ml-0.5 animate-pulse" />
-                    )}
-                  </div>
-                </div>
+                                  <div className="mt-3 min-h-[1.4em]">
+                                    <span className="text-violet-300">[OK]</span>
+                                    <span className="text-white/70"> Query complete. {relatedProjects.length} result(s) found.</span>
+                                  </div>
+                                  {/* Interactive command input */}
+                                  <div className="min-h-[1.4em] flex items-center">
+                                    <span className="text-emerald-300">$</span>
+                                    <span className="text-white/50 ml-1">skill --query &quot;</span>
+                                    <input
+                                      ref={inputRef}
+                                      type="text"
+                                      value={inputValue}
+                                      onChange={(e) => setInputValue(e.target.value)}
+                                      onKeyDown={handleKeyDown}
+                                      className="bg-transparent border-none outline-none text-amber-200 font-mono text-inherit w-24 sm:w-32 caret-emerald-300"
+                                      placeholder=""
+                                      autoComplete="off"
+                                      autoCorrect="off"
+                                      autoCapitalize="off"
+                                      spellCheck={false}
+                                    />
+                                    <span className="text-white/50">&quot;</span>
+                                    {showCursor && !inputValue && (
+                                      <span className="inline-block w-2 h-4 bg-emerald-300 ml-0.5 animate-pulse" />
+                                    )}
+                                  </div>
+                                  <div className="mt-1 text-[8px] text-white/30">
+                                    type skill name + enter · tab to autocomplete · esc/q to close
+                                  </div>
+                                </div>
               )}
             </>
           )}
