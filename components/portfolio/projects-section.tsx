@@ -421,6 +421,8 @@ export function ProjectsSection() {
   const sectionRef = useRef<HTMLElement>(null)
   const pinContainerRef = useRef<HTMLDivElement>(null)
   const scrollTriggerRef = useRef<ScrollTrigger | null>(null)
+  const projectNameRef = useRef<HTMLSpanElement>(null)
+  const prevIndexRef = useRef<number>(0)
 
   // Scroll to specific project
   const scrollToProject = useCallback((index: number) => {
@@ -440,6 +442,36 @@ export function ProjectsSection() {
       behavior: "smooth"
     })
   }, [])
+
+  // ASCII scramble animation for project name
+  useEffect(() => {
+    if (!projectNameRef.current || prevIndexRef.current === activeIndex) return
+    
+    prevIndexRef.current = activeIndex
+    const targetText = allProjects[activeIndex]?.title || "..."
+    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ░▒▓█@#$%&*"
+    let iteration = 0
+
+    const interval = setInterval(() => {
+      if (!projectNameRef.current) return clearInterval(interval)
+      
+      projectNameRef.current.textContent = targetText
+        .split("")
+        .map((char, i) => {
+          if (char === " ") return " "
+          if (i < iteration) return char
+          return chars[Math.floor(Math.random() * chars.length)]
+        })
+        .join("")
+
+      if (iteration >= targetText.length) {
+        clearInterval(interval)
+      }
+      iteration += 0.5
+    }, 20)
+
+    return () => clearInterval(interval)
+  }, [activeIndex])
 
   // GSAP ScrollTrigger pin
   useEffect(() => {
@@ -508,7 +540,7 @@ export function ProjectsSection() {
                   {">>>"} SECTION_04
                 </p>
                 <h2 className="font-mono text-xl md:text-2xl lg:text-3xl font-black text-foreground tracking-tighter">
-                  PROJECT - <span className="text-accent">{currentProject?.title || "..."}</span>
+                  PROJECT - <span ref={projectNameRef} className="text-foreground">{currentProject?.title || "..."}</span>
                 </h2>
               </div>
               
