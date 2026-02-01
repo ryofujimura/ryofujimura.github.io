@@ -309,7 +309,7 @@ export function ExperienceSection() {
   const entryBgRef = useRef<HTMLDivElement | null>(null)
   const entryScanRef = useRef<HTMLDivElement | null>(null)
   const entrySvgRef = useRef<SVGSVGElement | null>(null)
-  const entryLabelRef = useRef<HTMLDivElement | null>(null)
+  const entryLabelRef = useRef<HTMLButtonElement | null>(null)
   const moreItemsContainerRef = useRef<HTMLDivElement | null>(null)
   const moreItemsRowRefs = useRef<(HTMLButtonElement | null)[]>([])
   const loadMoreButtonRef = useRef<HTMLButtonElement | null>(null)
@@ -321,6 +321,18 @@ export function ExperienceSection() {
   const isMobile = useIsMobile()
   const indexListRef = useRef<HTMLDivElement | null>(null)
   const [hasIndexOverflow, setHasIndexOverflow] = useState(false)
+  const [linkCopied, setLinkCopied] = useState(false)
+
+  // Copy direct link to current experience
+  const copyExperienceLink = () => {
+    const exp = experiences[activeIndex]
+    if (!exp) return
+    const url = `${window.location.origin}${window.location.pathname}#experience-${exp.id}`
+    navigator.clipboard.writeText(url).then(() => {
+      setLinkCopied(true)
+      setTimeout(() => setLinkCopied(false), 2000)
+    })
+  }
 
   // Handle URL hash navigation to specific experience (e.g., #experience-cpx-lab)
   useEffect(() => {
@@ -827,13 +839,18 @@ export function ExperienceSection() {
                 <path d="M 320 0 L 320 48 L 0 48" className="text-foreground/50" />
                 <line x1="0" y1="24" x2="320" y2="24" className="text-foreground/40" /> */}
               </svg>
-              <div
+              <button
                 ref={entryLabelRef}
-                className="relative z-10 font-mono text-[10px] sm:text-[11px] uppercase tracking-[0.2em] text-muted-foreground opacity-0"
-                aria-hidden
+                type="button"
+                onClick={copyExperienceLink}
+                className="relative z-10 font-mono text-[10px] sm:text-[11px] uppercase tracking-[0.2em] text-muted-foreground opacity-0 cursor-pointer hover:text-foreground transition-colors text-left"
+                title="Click to copy direct link"
               >
-                &gt; ENTRY {(experiences.length - activeIndex).toString().padStart(2, "0")} // {experiences[activeIndex]?.companyFull ?? "—"}
-              </div>
+                {linkCopied 
+                  ? "&gt; LINK COPIED TO CLIPBOARD"
+                  : `> ENTRY ${(experiences.length - activeIndex).toString().padStart(2, "0")} // ${experiences[activeIndex]?.companyFull ?? "—"}`
+                }
+              </button>
             </div>
 
             <div className="relative p-3 sm:p-4 md:p-5 ">
