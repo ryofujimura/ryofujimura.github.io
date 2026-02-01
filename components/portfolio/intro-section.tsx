@@ -4,6 +4,7 @@ import { useRef, useState, useEffect, useMemo } from "react"
 import { gsap } from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
 import { useIsMobile } from "@/hooks/use-mobile"
+import { useReducedMotion } from "@/hooks/use-reduced-motion"
 import { GSAPText } from "@/components/gsap-text"
 import { BrutalistBackground } from "@/components/brutalist-background"
 import { MagneticButton } from "@/components/magnetic-button"
@@ -304,12 +305,14 @@ export function IntroSection() {
   const stackTickerRef = useRef<HTMLDivElement>(null)
   const ctaRef = useRef<HTMLDivElement>(null)
   const isMobile = useIsMobile()
+  const prefersReducedMotion = useReducedMotion()
 
   const rev = revLabel()
 
   // Page 2 GSAP entrance animations with ScrollTrigger
+  // Respects prefers-reduced-motion
   useEffect(() => {
-    if (!page2Ref.current) return
+    if (!page2Ref.current || prefersReducedMotion) return
 
     const ctx = gsap.context(() => {
       // Stats cards stagger animation
@@ -375,7 +378,7 @@ export function IntroSection() {
     }, page2Ref)
 
     return () => ctx.revert()
-  }, [isMobile])
+  }, [isMobile, prefersReducedMotion])
 
   // ASCII terminal lines
   const asciiHeaderLines = useMemo(() => {
@@ -434,6 +437,13 @@ export function IntroSection() {
       className="relative"
       aria-label="Introduction"
     >
+      {/* Skip to main content link for keyboard users */}
+      <a 
+        href="#experience" 
+        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-primary focus:text-primary-foreground focus:font-mono focus:text-sm focus:outline-none focus:ring-2 focus:ring-primary-foreground"
+      >
+        Skip to main content
+      </a>
       {/* Scroll Snap Container */}
       <div 
         className="snap-container"
@@ -728,7 +738,7 @@ export function IntroSection() {
                     </span>
                   </div>
                   <div className="relative overflow-hidden py-3">
-                    <div className="stack-ticker flex gap-8 animate-ticker whitespace-nowrap">
+                    <div className={`stack-ticker flex gap-8 whitespace-nowrap ${prefersReducedMotion ? "" : "animate-ticker"}`}>
                       {[
                         "Python", "Swift", "Kotlin", "TypeScript", "React", 
                         "Firebase", "PyTorch", "CoreML", "On-device LLMs", 
