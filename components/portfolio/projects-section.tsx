@@ -429,16 +429,16 @@ function TerminalOutput({
                 {allExpanded ? "−" : "+"}
               </span>
             </button>
-            <span className="hidden md:inline font-mono text-[9px] text-foreground/40 ml-2">
+            <span className="hidden md:inline font-mono text-[9px] text-white/60 ml-2">
               ryofujimura@MacBookPro
             </span>
           </div>
-          <div className="font-mono text-[9px] text-foreground/30">
+          <div className="font-mono text-[9px] text-white/50">
             <span className="hidden sm:inline">skill_query.sh — </span>{skill}
           </div>
           <button 
             onClick={onClose}
-            className="font-mono text-[9px] text-foreground/40 hover:text-foreground transition-colors"
+            className="font-mono text-[9px] text-white/60 hover:text-white transition-colors"
           >
             [×]
           </button>
