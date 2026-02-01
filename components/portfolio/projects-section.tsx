@@ -224,7 +224,7 @@ function AnimatedTitle({ projectName, projectId }: { projectName: string; projec
   return (
     <h2
       ref={titleRef}
-      className="font-mono text-lg md:text-xl lg:text-2xl font-black text-black tracking-tighter"
+      className="font-mono text-lg md:text-xl lg:text-2xl font-black text-foreground tracking-tighter"
     >
       {displayText}
     </h2>
@@ -239,7 +239,7 @@ function GrowthArrow({ isActive }: { isActive: boolean }) {
   return (
     <span className={cn(
       "font-mono text-[9px] md:text-[10px] transition-all duration-300 flex-shrink-0",
-      isActive ? "text-black" : "text-black/20"
+      isActive ? "text-foreground" : "text-foreground/20"
     )}>
       {"──►"}
     </span>
@@ -277,11 +277,11 @@ function Timeline({
 
   return (
     <div className="hidden md:flex flex-col w-[120px] lg:w-[140px] flex-shrink-0">
-      <div className="font-mono text-[7px] text-black/30 mb-2">
+      <div className="font-mono text-[7px] text-foreground/30 mb-2">
         ┌─ GROWTH_TIMELINE
       </div>
       
-      <div className="relative pl-3 border-l border-black/10 flex-1">
+      <div className="relative pl-3 border-l border-foreground/10 flex-1">
         {projects.map((project, index) => {
           const isActive = index === activeIndex
           const isPast = index < activeIndex
@@ -290,7 +290,7 @@ function Timeline({
           return (
             <div key={project.id}>
               {showYear && (
-                <div className="font-mono text-[7px] text-black/40 mb-0.5 mt-2 first:mt-0 -ml-3 pl-3 border-l-2 border-black/20">
+                <div className="font-mono text-[7px] text-foreground/40 mb-0.5 mt-2 first:mt-0 -ml-3 pl-3 border-l-2 border-foreground/20">
                   [{project.year}]
                 </div>
               )}
@@ -300,9 +300,9 @@ function Timeline({
                 className={cn(
                   "w-full text-left py-0.5 font-mono text-[7px] lg:text-[8px] transition-all relative cursor-pointer",
                   "-ml-3 pl-3 hover:pl-4",
-                  isActive ? "text-black border-l-2 border-black font-bold" : 
-                  isPast ? "text-black/50 border-l border-black/30" : 
-                  "text-black/20 border-l border-transparent hover:text-black/40 hover:border-black/20"
+                  isActive ? "text-foreground border-l-2 border-foreground font-bold" : 
+                  isPast ? "text-foreground/50 border-l border-foreground/30" : 
+                  "text-foreground/20 border-l border-transparent hover:text-foreground/40 hover:border-foreground/20"
                 )}
               >
                 <span className="truncate block">{project.growth}</span>
@@ -312,7 +312,7 @@ function Timeline({
         })}
       </div>
       
-      <div className="font-mono text-[7px] text-black/30 mt-2">
+      <div className="font-mono text-[7px] text-foreground/30 mt-2">
         └─ NOW
       </div>
     </div>
@@ -393,35 +393,35 @@ function ProjectSlide({
         isActive ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
       )}
     >
-      <div className="h-full border border-black/30 bg-white relative">
+      <div className="h-full border border-foreground/30 bg-background relative">
         {/* ASCII corners with animation */}
-        <span className="ascii-border absolute top-0 left-0 font-mono text-[7px] text-black/40 p-1">{asciiFrame}</span>
-        <span className="ascii-border absolute top-0 right-0 font-mono text-[7px] text-black/40 p-1">──┐</span>
-        <span className="ascii-border absolute bottom-0 left-0 font-mono text-[7px] text-black/40 p-1">└──</span>
-        <span className="ascii-border absolute bottom-0 right-0 font-mono text-[7px] text-black/40 p-1">──┘</span>
+        <span className="ascii-border absolute top-0 left-0 font-mono text-[7px] text-foreground/40 p-1">{asciiFrame}</span>
+        <span className="ascii-border absolute top-0 right-0 font-mono text-[7px] text-foreground/40 p-1">──┐</span>
+        <span className="ascii-border absolute bottom-0 left-0 font-mono text-[7px] text-foreground/40 p-1">└──</span>
+        <span className="ascii-border absolute bottom-0 right-0 font-mono text-[7px] text-foreground/40 p-1">──┘</span>
 
         <div className="h-full flex flex-col p-3 md:p-4">
           {/* Header */}
           <div className="flex items-start justify-between gap-2 mb-2">
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-0.5">
-                <span className="font-mono text-base md:text-lg font-black text-black/10">
+                <span className="font-mono text-base md:text-lg font-black text-foreground/10">
                   {project.id}
                 </span>
-                <span className="font-mono text-[7px] text-black/50">
+                <span className="font-mono text-[7px] text-foreground/50">
                   {project.year}
                 </span>
               </div>
-              <h3 className="font-mono text-[9px] md:text-[10px] text-black/60 truncate">
+              <h3 className="font-mono text-[9px] md:text-[10px] text-foreground/60 truncate">
                 {project.title}
               </h3>
             </div>
 
             <div className="flex-shrink-0 text-right">
-              <div className="font-mono text-sm md:text-base font-black text-black">
+              <div className="font-mono text-sm md:text-base font-black text-foreground">
                 {project.metric}
               </div>
-              <div className="font-mono text-[6px] md:text-[7px] text-black/50">
+              <div className="font-mono text-[6px] md:text-[7px] text-foreground/50">
                 {project.achievement}
               </div>
             </div>
@@ -429,27 +429,27 @@ function ProjectSlide({
 
           {/* Growth Focus */}
           <div className="flex-1 flex flex-col justify-center">
-            <div className="growth-animate font-mono text-[7px] text-black/30 mb-1">
+            <div className="growth-animate font-mono text-[7px] text-foreground/30 mb-1">
               ├─ GROWTH_FOCUS
             </div>
             
-            <h4 className="growth-animate font-mono text-sm md:text-base lg:text-lg font-black text-black tracking-tight mb-2">
+            <h4 className="growth-animate font-mono text-sm md:text-base lg:text-lg font-black text-foreground tracking-tight mb-2">
               {project.growth.toUpperCase()}
             </h4>
 
             {/* Before → After */}
-            <div className="growth-animate bg-black/5 border border-black/10 p-2 mb-2">
+            <div className="growth-animate bg-foreground/5 border border-foreground/10 p-2 mb-2">
               <div className="flex items-center gap-2">
                 <div className="flex-1 min-w-0">
-                  <div className="font-mono text-[6px] text-black/30 mb-0.5">BEFORE</div>
-                  <div className="font-mono text-[8px] md:text-[9px] text-black/50 truncate">
+                  <div className="font-mono text-[6px] text-foreground/30 mb-0.5">BEFORE</div>
+                  <div className="font-mono text-[8px] md:text-[9px] text-foreground/50 truncate">
                     {project.before}
                   </div>
                 </div>
                 <GrowthArrow isActive={isActive} />
                 <div className="flex-1 min-w-0">
-                  <div className="font-mono text-[6px] text-black mb-0.5">AFTER</div>
-                  <div className="font-mono text-[8px] md:text-[9px] text-black truncate font-medium">
+                  <div className="font-mono text-[6px] text-foreground mb-0.5">AFTER</div>
+                  <div className="font-mono text-[8px] md:text-[9px] text-foreground truncate font-medium">
                     {project.after}
                   </div>
                 </div>
@@ -461,7 +461,7 @@ function ProjectSlide({
               {project.techStack.map((tech) => (
                 <span
                   key={tech}
-                  className="tech-animate font-mono text-[6px] md:text-[7px] px-1 py-0.5 border border-black/15 text-black/50 bg-black/5"
+                  className="tech-animate font-mono text-[6px] md:text-[7px] px-1 py-0.5 border border-foreground/15 text-foreground/50 bg-foreground/5"
                 >
                   {tech}
                 </span>
@@ -470,27 +470,27 @@ function ProjectSlide({
           </div>
 
           {/* Footer */}
-          <div className="flex items-center justify-between pt-2 border-t border-black/10 mt-2">
+          <div className="flex items-center justify-between pt-2 border-t border-foreground/10 mt-2">
             <div className="flex items-center gap-2">
               {hasGithub && (
                 <a href={project.links.github} target="_blank" rel="noopener noreferrer"
-                  className="font-mono text-[7px] text-black/40 hover:text-black transition-colors flex items-center gap-1">
+                  className="font-mono text-[7px] text-foreground/40 hover:text-foreground transition-colors flex items-center gap-1">
                   <Github className="w-2.5 h-2.5" />
                   <span className="hidden sm:inline">CODE</span>
                 </a>
               )}
               {hasDemo && (
                 <a href={(project.links as { demo?: string }).demo} target="_blank" rel="noopener noreferrer"
-                  className="font-mono text-[7px] text-black/40 hover:text-black transition-colors flex items-center gap-1">
+                  className="font-mono text-[7px] text-foreground/40 hover:text-foreground transition-colors flex items-center gap-1">
                   <ExternalLink className="w-2.5 h-2.5" />
                   <span className="hidden sm:inline">DEMO</span>
                 </a>
               )}
               {hasAppStore && (
-                <span className="font-mono text-[7px] text-black/20">iOS</span>
+                <span className="font-mono text-[7px] text-foreground/20">iOS</span>
               )}
             </div>
-            <div className="font-mono text-[6px] text-black/20">
+            <div className="font-mono text-[6px] text-foreground/20">
               [{String(index + 1).padStart(2, "0")}/{String(total).padStart(2, "0")}]
             </div>
           </div>
@@ -510,19 +510,19 @@ function ProgressIndicator({ activeIndex, total }: { activeIndex: number; total:
   const progressBar = "█".repeat(filled) + "░".repeat(progressChars - filled)
 
   return (
-    <div className="flex items-center justify-between py-2 font-mono border-t border-black/10">
-      <div className="text-[7px] text-black/30">
+    <div className="flex items-center justify-between py-2 font-mono border-t border-foreground/10">
+      <div className="text-[7px] text-foreground/30">
         2022
       </div>
       <div className="flex items-center gap-2">
-        <span className="text-[7px] md:text-[8px] text-black/30 hidden sm:inline">
+        <span className="text-[7px] md:text-[8px] text-foreground/30 hidden sm:inline">
           [{progressBar}]
         </span>
-        <span className="text-[9px] text-black/60">
+        <span className="text-[9px] text-foreground/60">
           {String(activeIndex + 1).padStart(2, "0")}/{String(total).padStart(2, "0")}
         </span>
       </div>
-      <div className="text-[7px] text-black font-bold">
+      <div className="text-[7px] text-foreground font-bold">
         NOW
       </div>
     </div>
@@ -566,8 +566,8 @@ function MobileQuickNav({
           onClick={() => handleClick(i)}
           className={cn(
             "flex-shrink-0 w-5 h-1 transition-all",
-            i === activeIndex ? "bg-black" : 
-            i < activeIndex ? "bg-black/30" : "bg-black/10"
+            i === activeIndex ? "bg-foreground" : 
+            i < activeIndex ? "bg-foreground/30" : "bg-foreground/10"
           )}
         />
       ))}
@@ -620,7 +620,7 @@ export function ProjectsSection() {
     <section
       id="projects"
       ref={sectionRef}
-      className="relative bg-white"
+      className="relative bg-background"
     >
       {/* Pinned container - centered on page */}
       <div 
@@ -628,10 +628,10 @@ export function ProjectsSection() {
         className="min-h-screen flex items-center justify-center px-4 md:px-6"
       >
         {/* Background pattern */}
-        <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-[0.03]">
+        <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-[0.02]">
           <div className="absolute inset-0" style={{
-            backgroundImage: `repeating-linear-gradient(0deg, transparent, transparent 24px, black 24px, black 25px),
-              repeating-linear-gradient(90deg, transparent, transparent 24px, black 24px, black 25px)`
+            backgroundImage: `repeating-linear-gradient(0deg, transparent, transparent 24px, currentColor 24px, currentColor 25px),
+              repeating-linear-gradient(90deg, transparent, transparent 24px, currentColor 24px, currentColor 25px)`
           }} />
         </div>
 
@@ -639,13 +639,13 @@ export function ProjectsSection() {
         <div className="w-full max-w-4xl mx-auto relative">
           {/* Header */}
           <div className="mb-3 md:mb-4">
-            <div className="font-mono text-[7px] md:text-[8px] text-black/20 mb-2 overflow-hidden">
+            <div className="font-mono text-[7px] md:text-[8px] text-foreground/20 mb-2 overflow-hidden">
               ╔══════════════════════════════════════════════════════════════════════════════╗
             </div>
             
             <div className="flex items-end justify-between gap-2">
               <div>
-                <p className="font-mono text-[7px] md:text-[8px] text-black/40 tracking-[0.2em]">
+                <p className="font-mono text-[7px] md:text-[8px] text-foreground/40 tracking-[0.2em]">
                   {">>>"} SECTION_04 / GROWTH_JOURNEY
                 </p>
                 <AnimatedTitle 
@@ -655,10 +655,10 @@ export function ProjectsSection() {
               </div>
               
               <div className="text-right font-mono">
-                <div className="text-2xl md:text-3xl font-black text-black/10">
+                <div className="text-2xl md:text-3xl font-black text-foreground/10">
                   {String(activeIndex + 1).padStart(2, "0")}
                 </div>
-                <div className="text-[7px] text-black/40">
+                <div className="text-[7px] text-foreground/40">
                   /{String(TOTAL_PROJECTS).padStart(2, "0")}
                 </div>
               </div>
@@ -702,13 +702,13 @@ export function ProjectsSection() {
           </div>
 
           {/* Footer */}
-          <div className="font-mono text-[7px] md:text-[8px] text-black/20 mt-3 overflow-hidden">
+          <div className="font-mono text-[7px] md:text-[8px] text-foreground/20 mt-3 overflow-hidden">
             ╚══════════════════════════════════════════════════════════════════════════════╝
           </div>
 
           {/* Scroll hint */}
           <div className="text-center mt-3">
-            <span className="font-mono text-[7px] text-black/20 animate-pulse">
+            <span className="font-mono text-[7px] text-foreground/20 animate-pulse">
               ↓ SCROLL TO EXPLORE GROWTH ↓
             </span>
           </div>
