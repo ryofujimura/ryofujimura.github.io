@@ -782,21 +782,23 @@ function TerminalOutput({
                                   {/* Interactive command input */}
                                   <div className="min-h-[1.4em] flex items-center">
                                     <span className="text-emerald-300">$</span>
-                                    <span className="text-white/50 ml-1">skill --query &quot;</span>
+                                    <span className="text-sky-300 ml-1">skill</span>
+                                    <span className="text-amber-200 ml-1">--query</span>
+                                    <span className="text-white ml-1">&quot;</span>
                                     <input
                                       ref={inputRef}
                                       type="text"
                                       value={inputValue}
                                       onChange={(e) => setInputValue(e.target.value)}
                                       onKeyDown={handleKeyDown}
-                                      className="bg-transparent border-none outline-none text-amber-200 font-mono text-inherit w-24 sm:w-32 caret-emerald-300"
+                                      className="bg-transparent border-none outline-none text-white font-mono text-inherit w-24 sm:w-32 caret-emerald-300"
                                       placeholder=""
                                       autoComplete="off"
                                       autoCorrect="off"
                                       autoCapitalize="off"
                                       spellCheck={false}
                                     />
-                                    <span className="text-white/50">&quot;</span>
+                                    <span className="text-white">&quot;</span>
                                     {showCursor && !inputValue && (
                                       <span className="inline-block w-2 h-4 bg-emerald-300 ml-0.5 animate-pulse" />
                                     )}
