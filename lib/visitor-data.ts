@@ -129,6 +129,30 @@ function simpleHash(str: string): string {
   return Math.abs(hash).toString(36)
 }
 
+// Remove undefined values from object (Firestore doesn't accept undefined)
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function removeUndefined<T>(obj: T): T {
+  if (obj === null || obj === undefined) {
+    return obj
+  }
+  
+  if (Array.isArray(obj)) {
+    return obj.map(removeUndefined) as T
+  }
+  
+  if (typeof obj === 'object') {
+    const cleaned: Record<string, unknown> = {}
+    for (const [key, value] of Object.entries(obj as Record<string, unknown>)) {
+      if (value !== undefined) {
+        cleaned[key] = removeUndefined(value)
+      }
+    }
+    return cleaned as T
+  }
+  
+  return obj
+}
+
 // Generate canvas fingerprint
 function getCanvasFingerprint(): string | undefined {
   try {
@@ -224,24 +248,38 @@ async function getAudioFingerprint(): Promise<string | undefined> {
     
     oscillator.start(0)
     
+    let resolved = false
+    
+    const cleanup = () => {
+      if (resolved) return
+      resolved = true
+      try {
+        oscillator.disconnect()
+        scriptProcessor.disconnect()
+        if (context.state !== 'closed') {
+          context.close()
+        }
+      } catch {
+        // Ignore cleanup errors
+      }
+    }
+    
     return new Promise((resolve) => {
       scriptProcessor.onaudioprocess = (e) => {
+        if (resolved) return
         const data = e.inputBuffer.getChannelData(0)
         let sum = 0
         for (let i = 0; i < data.length; i++) {
           sum += Math.abs(data[i])
         }
-        oscillator.disconnect()
-        scriptProcessor.disconnect()
-        context.close()
+        cleanup()
         resolve(simpleHash(sum.toString()))
       }
       
       // Timeout fallback
       setTimeout(() => {
-        oscillator.disconnect()
-        scriptProcessor.disconnect()
-        context.close()
+        if (resolved) return
+        cleanup()
         resolve(undefined)
       }, 1000)
     })
@@ -536,7 +574,8 @@ export async function collectVisitorData(): Promise<VisitorData> {
   const fingerprint = generateFingerprint(partialData)
   const sessionId = generateSessionId()
   
-  return {
+  // Build visitor data object
+  const visitorData: VisitorData = {
     fingerprint,
     sessionId,
     visitTimestamp: new Date().toISOString(),
@@ -561,6 +600,9 @@ export async function collectVisitorData(): Promise<VisitorData> {
     plugins,
     historyLength: window.history.length,
   }
+  
+  // Remove undefined values (Firestore doesn't accept undefined)
+  return removeUndefined(visitorData)
 }
 
 /**
@@ -568,7 +610,7 @@ export async function collectVisitorData(): Promise<VisitorData> {
  * Use this for initial page load tracking
  */
 export function collectBasicVisitorData(): Partial<VisitorData> {
-  return {
+  const data: Partial<VisitorData> = {
     visitTimestamp: new Date().toISOString(),
     browser: getBrowserInfo(),
     screen: getScreenInfo(),
@@ -584,4 +626,7 @@ export function collectBasicVisitorData(): Partial<VisitorData> {
     },
     historyLength: window.history.length,
   }
+  
+  // Remove undefined values (Firestore doesn't accept undefined)
+  return removeUndefined(data)
 }
