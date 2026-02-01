@@ -22,12 +22,13 @@ service cloud.firestore {
     // Read: Only authenticated admins (you)
     match /messages/{messageId} {
       // Allow anyone to create a new message
-      // Validate that required fields exist
-      allow create: if request.resource.data.keys().hasAll(['message', 'visitorId', 'sentAt', 'status'])
+      // Validate that required fields exist (including visitorUUID for matching)
+      allow create: if request.resource.data.keys().hasAll(['message', 'visitorId', 'visitorUUID', 'sentAt', 'status'])
                     && request.resource.data.message is string
                     && request.resource.data.message.size() > 0
                     && request.resource.data.message.size() <= 5000
                     && request.resource.data.visitorId is string
+                    && request.resource.data.visitorUUID is string
                     && request.resource.data.status == 'new';
       
       // Only allow reading by authenticated users (for admin dashboard)
@@ -37,6 +38,28 @@ service cloud.firestore {
       allow update: if request.auth != null
                     && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status'])
                     && request.resource.data.status in ['new', 'read', 'replied'];
+      
+      // Only authenticated users can delete
+      allow delete: if request.auth != null;
+    }
+    
+    // Contacts collection - stores parsed contact information
+    // Write: Anyone can create (when submitting contact form)
+    // Read: Only authenticated admins (you)
+    match /contacts/{contactId} {
+      // Allow anyone to create a new contact document
+      allow create: if request.resource.data.keys().hasAll(['visitorUUIDs', 'messageIds', 'firstContact', 'lastContact', 'messageCount', 'isVerified'])
+                    && request.resource.data.visitorUUIDs is list
+                    && request.resource.data.messageIds is list
+                    && request.resource.data.messageCount is int
+                    && request.resource.data.isVerified is bool;
+      
+      // Only allow reading by authenticated users (for admin dashboard)
+      // Also allow reading for matching existing contacts (by email or visitorUUID)
+      allow read: if request.auth != null;
+      
+      // Allow authenticated users to update (verify, merge contacts, etc.)
+      allow update: if request.auth != null;
       
       // Only authenticated users can delete
       allow delete: if request.auth != null;

@@ -1,7 +1,75 @@
 /**
  * Visitor Data Collection Utility
  * Collects comprehensive browser and device information for analytics
+ * Includes persistent visitor identification and behavioral tracking
  */
+
+// Storage keys for persistent identification
+const STORAGE_KEYS = {
+  VISITOR_UUID: 'rf_visitor_uuid',
+  FIRST_SEEN: 'rf_first_seen',
+  VISIT_COUNT: 'rf_visit_count',
+  LAST_SEEN: 'rf_last_seen',
+} as const
+
+// ========== PERSISTENT VISITOR IDENTITY ==========
+
+export interface PersistentIdentity {
+  visitorUUID: string           // UUID v4, stored in localStorage
+  firstSeen: string             // ISO timestamp of first visit
+  visitCount: number            // Total visits
+  lastSeen: string              // Last visit timestamp
+  isReturning: boolean          // True if not first visit
+  storageType: 'localStorage' | 'sessionStorage' | 'none'
+}
+
+// ========== BEHAVIORAL SIGNALS ==========
+
+export interface BehavioralSignals {
+  // Time metrics
+  pageLoadTime: string          // When page loaded (ISO)
+  formOpenTime?: string         // When form was opened (ISO)
+  formSubmitTime?: string       // When form was submitted (ISO)
+  timeOnPageMs: number          // Total time on page in ms
+  timeInFormMs?: number         // Time spent in form in ms
+  
+  // Scroll behavior
+  scrollDepthMax: number        // 0-100 percentage
+  scrollEvents: number          // Number of scroll events
+  
+  // Interaction metrics
+  clickCount: number            // Total clicks on page
+  keystrokes: number            // Total keystrokes in form
+  fieldFocusCount: number       // How many times fields were focused
+  
+  // Typing patterns (aggregated, not raw)
+  typingSpeedCpm?: number       // Characters per minute (if enough data)
+  hesitationTimeMs?: number     // Time before first keystroke in form
+  
+  // Mouse/touch
+  mouseMovements: number        // Movement event count
+  touchEvents: number           // Touch event count
+  
+  // Navigation
+  pagesInSession: string[]      // Pathnames visited this session
+}
+
+// ========== PARSED CONTACT INFO ==========
+
+export interface ParsedContactInfo {
+  // Extracted from freeform message
+  name?: string
+  email?: string
+  phone?: string
+  social?: {                    // Social media handles
+    platform: string
+    handle: string
+  }[]
+  // The raw message
+  rawMessage: string
+  // Detected topics/interests
+  topics?: string[]
+}
 
 export interface NetworkInfo {
   effectiveType?: string       // 4g, 3g, 2g, slow-2g
@@ -79,6 +147,12 @@ export interface VisitorData {
   sessionId: string
   visitTimestamp: string
   
+  // Persistent identity (for visitor continuity)
+  identity: PersistentIdentity
+  
+  // Behavioral signals (for visitor recognition)
+  behavior?: BehavioralSignals
+  
   // Browser & Device
   browser: BrowserInfo
   screen: ScreenInfo
@@ -116,6 +190,18 @@ export interface VisitorData {
   
   // History length (indicates browsing depth)
   historyLength: number
+  
+  // Confidence score for visitor matching (calculated server-side or on query)
+  confidenceScore?: {
+    total: number               // 0-100
+    breakdown: {
+      identityMatch: number     // 0-40 (persistent UUID match)
+      behavioralMatch: number   // 0-25 (similar behavior patterns)
+      fingerprintMatch: number  // 0-15 (soft fingerprint)
+      contextMatch: number      // 0-20 (IP/location context - server-side)
+    }
+    verdict: 'same' | 'likely' | 'uncertain' | 'different'
+  }
 }
 
 // Simple hash function for fingerprinting
@@ -516,6 +602,336 @@ function generateSessionId(): string {
   return `${Date.now()}-${Math.random().toString(36).substring(2, 15)}`
 }
 
+// Generate UUID v4
+function generateUUID(): string {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+    const r = Math.random() * 16 | 0
+    const v = c === 'x' ? r : (r & 0x3 | 0x8)
+    return v.toString(16)
+  })
+}
+
+// ========== PERSISTENT IDENTITY FUNCTIONS ==========
+
+/**
+ * Get or create persistent visitor identity
+ * Uses localStorage primarily, sessionStorage as fallback
+ */
+export function getPersistentIdentity(): PersistentIdentity {
+  const now = new Date().toISOString()
+  
+  // Try localStorage first
+  try {
+    const existingUUID = localStorage.getItem(STORAGE_KEYS.VISITOR_UUID)
+    const firstSeen = localStorage.getItem(STORAGE_KEYS.FIRST_SEEN)
+    const visitCount = parseInt(localStorage.getItem(STORAGE_KEYS.VISIT_COUNT) || '0', 10)
+    
+    if (existingUUID && firstSeen) {
+      // Returning visitor
+      const newCount = visitCount + 1
+      localStorage.setItem(STORAGE_KEYS.VISIT_COUNT, newCount.toString())
+      localStorage.setItem(STORAGE_KEYS.LAST_SEEN, now)
+      
+      return {
+        visitorUUID: existingUUID,
+        firstSeen,
+        visitCount: newCount,
+        lastSeen: now,
+        isReturning: true,
+        storageType: 'localStorage',
+      }
+    }
+    
+    // New visitor - create identity
+    const newUUID = generateUUID()
+    localStorage.setItem(STORAGE_KEYS.VISITOR_UUID, newUUID)
+    localStorage.setItem(STORAGE_KEYS.FIRST_SEEN, now)
+    localStorage.setItem(STORAGE_KEYS.VISIT_COUNT, '1')
+    localStorage.setItem(STORAGE_KEYS.LAST_SEEN, now)
+    
+    return {
+      visitorUUID: newUUID,
+      firstSeen: now,
+      visitCount: 1,
+      lastSeen: now,
+      isReturning: false,
+      storageType: 'localStorage',
+    }
+  } catch {
+    // localStorage blocked, try sessionStorage
+    try {
+      const existingUUID = sessionStorage.getItem(STORAGE_KEYS.VISITOR_UUID)
+      
+      if (existingUUID) {
+        return {
+          visitorUUID: existingUUID,
+          firstSeen: sessionStorage.getItem(STORAGE_KEYS.FIRST_SEEN) || now,
+          visitCount: 1,
+          lastSeen: now,
+          isReturning: false, // Can't know in sessionStorage
+          storageType: 'sessionStorage',
+        }
+      }
+      
+      const newUUID = generateUUID()
+      sessionStorage.setItem(STORAGE_KEYS.VISITOR_UUID, newUUID)
+      sessionStorage.setItem(STORAGE_KEYS.FIRST_SEEN, now)
+      
+      return {
+        visitorUUID: newUUID,
+        firstSeen: now,
+        visitCount: 1,
+        lastSeen: now,
+        isReturning: false,
+        storageType: 'sessionStorage',
+      }
+    } catch {
+      // Both storage types blocked
+      return {
+        visitorUUID: generateUUID(),
+        firstSeen: now,
+        visitCount: 1,
+        lastSeen: now,
+        isReturning: false,
+        storageType: 'none',
+      }
+    }
+  }
+}
+
+// ========== BEHAVIORAL TRACKING ==========
+
+/**
+ * Behavioral tracker class - instantiate on page load
+ * Call getBehavioralSignals() when ready to collect
+ */
+export class BehaviorTracker {
+  private pageLoadTime: Date
+  private formOpenTime?: Date
+  private scrollDepthMax = 0
+  private scrollEvents = 0
+  private clickCount = 0
+  private keystrokes = 0
+  private fieldFocusCount = 0
+  private firstKeystrokeTime?: Date
+  private mouseMovements = 0
+  private touchEvents = 0
+  private pagesInSession: string[] = []
+  private listeners: Array<() => void> = []
+  
+  constructor() {
+    this.pageLoadTime = new Date()
+    this.pagesInSession = [window.location.pathname]
+    this.setupListeners()
+  }
+  
+  private setupListeners() {
+    // Scroll tracking
+    const scrollHandler = () => {
+      this.scrollEvents++
+      const scrollTop = window.scrollY || document.documentElement.scrollTop
+      const scrollHeight = document.documentElement.scrollHeight - window.innerHeight
+      if (scrollHeight > 0) {
+        const depth = Math.round((scrollTop / scrollHeight) * 100)
+        if (depth > this.scrollDepthMax) {
+          this.scrollDepthMax = depth
+        }
+      }
+    }
+    window.addEventListener('scroll', scrollHandler, { passive: true })
+    this.listeners.push(() => window.removeEventListener('scroll', scrollHandler))
+    
+    // Click tracking
+    const clickHandler = () => { this.clickCount++ }
+    document.addEventListener('click', clickHandler)
+    this.listeners.push(() => document.removeEventListener('click', clickHandler))
+    
+    // Mouse movement tracking (throttled)
+    let lastMouseMove = 0
+    const mouseMoveHandler = () => {
+      const now = Date.now()
+      if (now - lastMouseMove > 100) {
+        this.mouseMovements++
+        lastMouseMove = now
+      }
+    }
+    document.addEventListener('mousemove', mouseMoveHandler, { passive: true })
+    this.listeners.push(() => document.removeEventListener('mousemove', mouseMoveHandler))
+    
+    // Touch tracking
+    const touchHandler = () => { this.touchEvents++ }
+    document.addEventListener('touchstart', touchHandler, { passive: true })
+    this.listeners.push(() => document.removeEventListener('touchstart', touchHandler))
+  }
+  
+  /**
+   * Call when form is opened
+   */
+  markFormOpened() {
+    this.formOpenTime = new Date()
+  }
+  
+  /**
+   * Call on each keystroke in the form
+   */
+  recordKeystroke() {
+    this.keystrokes++
+    if (!this.firstKeystrokeTime) {
+      this.firstKeystrokeTime = new Date()
+    }
+  }
+  
+  /**
+   * Call when a field is focused
+   */
+  recordFieldFocus() {
+    this.fieldFocusCount++
+  }
+  
+  /**
+   * Get collected behavioral signals
+   */
+  getBehavioralSignals(): BehavioralSignals {
+    const now = new Date()
+    const timeOnPageMs = now.getTime() - this.pageLoadTime.getTime()
+    const timeInFormMs = this.formOpenTime 
+      ? now.getTime() - this.formOpenTime.getTime() 
+      : undefined
+    
+    // Calculate typing speed if enough data
+    let typingSpeedCpm: number | undefined
+    if (this.keystrokes > 10 && this.firstKeystrokeTime) {
+      const typingDurationMs = now.getTime() - this.firstKeystrokeTime.getTime()
+      if (typingDurationMs > 1000) {
+        typingSpeedCpm = Math.round((this.keystrokes / typingDurationMs) * 60000)
+      }
+    }
+    
+    // Calculate hesitation time
+    let hesitationTimeMs: number | undefined
+    if (this.formOpenTime && this.firstKeystrokeTime) {
+      hesitationTimeMs = this.firstKeystrokeTime.getTime() - this.formOpenTime.getTime()
+    }
+    
+    return {
+      pageLoadTime: this.pageLoadTime.toISOString(),
+      formOpenTime: this.formOpenTime?.toISOString(),
+      formSubmitTime: now.toISOString(),
+      timeOnPageMs,
+      timeInFormMs,
+      scrollDepthMax: this.scrollDepthMax,
+      scrollEvents: this.scrollEvents,
+      clickCount: this.clickCount,
+      keystrokes: this.keystrokes,
+      fieldFocusCount: this.fieldFocusCount,
+      typingSpeedCpm,
+      hesitationTimeMs,
+      mouseMovements: this.mouseMovements,
+      touchEvents: this.touchEvents,
+      pagesInSession: this.pagesInSession,
+    }
+  }
+  
+  /**
+   * Cleanup listeners
+   */
+  destroy() {
+    this.listeners.forEach(cleanup => cleanup())
+    this.listeners = []
+  }
+}
+
+// ========== MESSAGE PARSING ==========
+
+/**
+ * Parse freeform message to extract structured contact info
+ */
+export function parseContactMessage(message: string): ParsedContactInfo {
+  const result: ParsedContactInfo = {
+    rawMessage: message,
+  }
+  
+  // Email regex
+  const emailRegex = /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/gi
+  const emails = message.match(emailRegex)
+  if (emails && emails.length > 0) {
+    result.email = emails[0]
+  }
+  
+  // Phone regex (various formats)
+  const phoneRegex = /(?:\+?1[-.\s]?)?(?:\(?[0-9]{3}\)?[-.\s]?)?[0-9]{3}[-.\s]?[0-9]{4}/g
+  const phones = message.match(phoneRegex)
+  if (phones && phones.length > 0) {
+    result.phone = phones[0].replace(/[^\d+]/g, '') // Normalize
+  }
+  
+  // Social media handles
+  const socialPatterns = [
+    { platform: 'twitter', regex: /@([A-Za-z0-9_]{1,15})\b/g },
+    { platform: 'instagram', regex: /(?:instagram|ig)[:\s]*@?([A-Za-z0-9._]{1,30})/gi },
+    { platform: 'linkedin', regex: /linkedin\.com\/in\/([A-Za-z0-9-]+)/gi },
+    { platform: 'github', regex: /github\.com\/([A-Za-z0-9-]+)/gi },
+    { platform: 'discord', regex: /([A-Za-z0-9_]{2,32}#[0-9]{4})/g },
+  ]
+  
+  const socials: { platform: string; handle: string }[] = []
+  for (const { platform, regex } of socialPatterns) {
+    const matches = message.matchAll(regex)
+    for (const match of matches) {
+      if (match[1] && !socials.some(s => s.handle === match[1])) {
+        socials.push({ platform, handle: match[1] })
+      }
+    }
+  }
+  if (socials.length > 0) {
+    result.social = socials
+  }
+  
+  // Name extraction (heuristic: "I'm X", "My name is X", "This is X", or first capitalized words)
+  const namePatterns = [
+    /(?:I'm|I am|my name is|this is|hi,?\s*I'm)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)/i,
+    /^([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)\s+here/i,
+    /(?:^|\n)([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)\s*$/m, // Name at end
+  ]
+  
+  for (const pattern of namePatterns) {
+    const match = message.match(pattern)
+    if (match && match[1]) {
+      // Avoid common false positives
+      const falsePositives = ['Hello', 'Hi', 'Hey', 'Thanks', 'Thank', 'Please', 'Just', 'Really', 'Great']
+      if (!falsePositives.includes(match[1].split(' ')[0])) {
+        result.name = match[1]
+        break
+      }
+    }
+  }
+  
+  // Topic/interest detection
+  const topicKeywords: Record<string, string[]> = {
+    'job_opportunity': ['job', 'position', 'hiring', 'opportunity', 'role', 'work with', 'join'],
+    'collaboration': ['collaborate', 'partner', 'work together', 'project together'],
+    'consulting': ['consult', 'advice', 'help with', 'guidance'],
+    'research': ['research', 'academic', 'paper', 'publication', 'study'],
+    'freelance': ['freelance', 'contract', 'gig', 'project-based'],
+    'networking': ['connect', 'coffee', 'chat', 'meet', 'network'],
+    'feedback': ['feedback', 'review', 'thoughts on', 'opinion'],
+    'general_inquiry': ['question', 'wondering', 'curious', 'interested'],
+  }
+  
+  const detectedTopics: string[] = []
+  const lowerMessage = message.toLowerCase()
+  for (const [topic, keywords] of Object.entries(topicKeywords)) {
+    if (keywords.some(kw => lowerMessage.includes(kw))) {
+      detectedTopics.push(topic)
+    }
+  }
+  if (detectedTopics.length > 0) {
+    result.topics = detectedTopics
+  }
+  
+  return result
+}
+
 // Generate unique fingerprint from collected data
 function generateFingerprint(data: Partial<VisitorData>): string {
   const components = [
@@ -542,8 +958,11 @@ function generateFingerprint(data: Partial<VisitorData>): string {
 /**
  * Collect all visitor data
  * Call this when the user interacts with the contact form
+ * @param behaviorTracker Optional behavior tracker for behavioral signals
  */
-export async function collectVisitorData(): Promise<VisitorData> {
+export async function collectVisitorData(
+  behaviorTracker?: BehaviorTracker
+): Promise<VisitorData> {
   const browser = getBrowserInfo()
   const screenInfo = getScreenInfo()
   const network = getNetworkInfo()
@@ -552,6 +971,7 @@ export async function collectVisitorData(): Promise<VisitorData> {
   const media = getMediaInfo()
   const plugins = getPlugins()
   const webGLInfo = getWebGLInfo()
+  const identity = getPersistentIdentity()
   
   // Async operations
   const [audioFingerprint] = await Promise.all([
@@ -574,11 +994,16 @@ export async function collectVisitorData(): Promise<VisitorData> {
   const fingerprint = generateFingerprint(partialData)
   const sessionId = generateSessionId()
   
+  // Get behavioral signals if tracker provided
+  const behavior = behaviorTracker?.getBehavioralSignals()
+  
   // Build visitor data object
   const visitorData: VisitorData = {
     fingerprint,
     sessionId,
     visitTimestamp: new Date().toISOString(),
+    identity,
+    behavior,
     browser,
     screen: screenInfo,
     network,

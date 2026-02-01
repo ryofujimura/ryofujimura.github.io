@@ -9,10 +9,18 @@ import { RevealText } from "@/components/reveal-text"
 import { Mail, Github, Linkedin, MapPin, ArrowUpRight, Send, Check, AlertCircle } from "lucide-react"
 import { LocationHoverText } from "@/components/portfolio/location-hover-text"
 import { useIsMobile } from "@/hooks/use-mobile"
-import { collectVisitorData } from "@/lib/visitor-data"
+import { collectVisitorData, BehaviorTracker, parseContactMessage } from "@/lib/visitor-data"
 import { submitContactForm } from "@/lib/firebase"
 
 gsap.registerPlugin(ScrollTrigger)
+
+// Global behavior tracker instance (created on page load)
+let globalBehaviorTracker: BehaviorTracker | null = null
+
+// Initialize behavior tracker on client side
+if (typeof window !== "undefined") {
+  globalBehaviorTracker = new BehaviorTracker()
+}
 
 // Rotating words for the tagline
 const ROTATING_WORDS = [
@@ -124,6 +132,11 @@ function CloudMessageForm({ onClose }: { onClose: () => void }) {
   const isMobile = useIsMobile()
   
   const isSending = sendStatus === "sending"
+  
+  // Mark form as opened for behavioral tracking
+  useEffect(() => {
+    globalBehaviorTracker?.markFormOpened()
+  }, [])
 
   // Hide custom cursor on mobile when form is open
   useEffect(() => {
@@ -221,6 +234,17 @@ function CloudMessageForm({ onClose }: { onClose: () => void }) {
     }, "-=0.2")
   }, [onClose])
 
+  // Track keystrokes for behavioral analysis
+  const handleMessageChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setMessage(e.target.value)
+    globalBehaviorTracker?.recordKeystroke()
+  }, [])
+  
+  // Track field focus
+  const handleFieldFocus = useCallback(() => {
+    globalBehaviorTracker?.recordFieldFocus()
+  }, [])
+
   const handleSend = useCallback(async () => {
     if (!message.trim() || isSending) return
     
@@ -238,14 +262,22 @@ function CloudMessageForm({ onClose }: { onClose: () => void }) {
     }
 
     try {
-      // Collect comprehensive visitor data
-      const visitorData = await collectVisitorData()
+      // Collect comprehensive visitor data with behavioral signals
+      const visitorData = await collectVisitorData(globalBehaviorTracker || undefined)
       
-      // Submit to Firebase Firestore
-      const result = await submitContactForm(message.trim(), visitorData)
+      // Parse the message to extract contact info
+      const parsedContact = parseContactMessage(message.trim())
+      
+      // Submit to Firebase Firestore with parsed contact
+      const result = await submitContactForm(message.trim(), visitorData, parsedContact)
       
       if (result.success) {
         setSendStatus("success")
+        
+        // Log for debugging (remove in production)
+        if (result.isReturningVisitor) {
+          console.log("Welcome back! Returning visitor detected.")
+        }
         
         // Success animation - message floats away
         const textarea = textareaRef.current
@@ -319,8 +351,9 @@ function CloudMessageForm({ onClose }: { onClose: () => void }) {
             <textarea
               ref={textareaRef}
               value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              placeholder="Type your message here..."
+              onChange={handleMessageChange}
+              onFocus={handleFieldFocus}
+              placeholder="Hi, I'm [Name]. Reach me at [email/phone]. [Your message here...]"
               rows={4}
               className="relative w-full px-5 py-4 rounded-2xl border border-white/20 dark:border-white/10 resize-none font-mono text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:border-white/40 transition-all duration-300"
               style={{
