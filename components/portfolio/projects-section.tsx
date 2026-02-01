@@ -1060,7 +1060,7 @@ export function ProjectsSection() {
           style={{ paddingBottom: activeSkill ? `${terminalHeight + 40}px` : undefined }}
         >
           {/* Skills flow - wrapped on all screen sizes */}
-          <div className="flex flex-row flex-wrap justify-center items-baseline gap-x-[0.15em] gap-y-1 sm:gap-x-[0.2em] sm:gap-y-3 px-2">
+          <div className="max-w-6xl mx-auto flex flex-row flex-wrap justify-center items-baseline gap-x-[0.15em] gap-y-1 sm:gap-x-[0.2em] sm:gap-y-3 px-2">
             {allSkills.map((skill, index) => (
               <span key={skill} className="inline-flex items-baseline">
                 <SkillButton
