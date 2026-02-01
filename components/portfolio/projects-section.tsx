@@ -277,7 +277,7 @@ function Timeline({
   return (
     <div className="hidden md:flex flex-col w-[120px] lg:w-[140px] flex-shrink-0">
       <div className="font-mono text-[7px] text-foreground/30 mb-2">
-        ┌─ GROWTH_TIMELINE
+        ┌─ GROWTH TIMELINE
       </div>
       
       <div className="relative pl-3 border-l border-foreground/10 flex-1">
@@ -580,24 +580,49 @@ function MobileQuickNav({
 
 export function ProjectsSection() {
   const [activeIndex, setActiveIndex] = useState(0)
+  const [isMobile, setIsMobile] = useState(false)
   const sectionRef = useRef<HTMLElement>(null)
   const pinContainerRef = useRef<HTMLDivElement>(null)
   const scrollTriggerRef = useRef<ScrollTrigger | null>(null)
 
   const currentProject = allProjects[activeIndex]
 
+  // Mobile detection using matchMedia
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(max-width: 767px)")
+    
+    const handleChange = (e: MediaQueryListEvent | MediaQueryList) => {
+      setIsMobile(e.matches)
+    }
+    
+    // Set initial value
+    handleChange(mediaQuery)
+    
+    // Listen for changes
+    mediaQuery.addEventListener("change", handleChange)
+    
+    return () => {
+      mediaQuery.removeEventListener("change", handleChange)
+    }
+  }, [])
+
   // GSAP ScrollTrigger pin setup
   useEffect(() => {
     if (!sectionRef.current || !pinContainerRef.current) return
 
+    // Mobile: shorter scroll distance for faster navigation
+    // Desktop: longer scroll distance for more granular control
+    const scrollMultiplier = isMobile ? 60 : 100
+    const scrubValue = isMobile ? 0.3 : 0.5
+
     const ctx = gsap.context(() => {
       scrollTriggerRef.current = ScrollTrigger.create({
         trigger: sectionRef.current,
-        start: "top top",
-        end: `+=${TOTAL_PROJECTS * 100}%`,
+        start: isMobile ? "top top" : "top top",
+        end: `+=${TOTAL_PROJECTS * scrollMultiplier}%`,
         pin: pinContainerRef.current,
         pinSpacing: true,
-        scrub: 0.5,
+        scrub: scrubValue,
         onUpdate: (self) => {
           const progress = self.progress
           const newIndex = Math.min(
@@ -613,7 +638,7 @@ export function ProjectsSection() {
       ctx.revert()
       scrollTriggerRef.current = null
     }
-  }, [])
+  }, [isMobile])
 
   return (
     <section
