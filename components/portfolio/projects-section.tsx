@@ -122,13 +122,13 @@ function ProjectRow({
         <span className="text-foreground/30">{String(index + 1).padStart(2, "0")}.</span>
         <span className={cn(
           "font-medium transition-colors",
-          isExpanded ? "text-sky-300" : "text-sky-300/80 group-hover:text-sky-300"
+          isExpanded ? "text-sky-400" : "text-sky-400/80 group-hover:text-sky-400"
         )}>
           {project.title}
         </span>
         <span className={cn(
           "text-[0.8em] transition-transform duration-200",
-          isExpanded ? "text-emerald-300/60 rotate-90" : "text-foreground/20"
+          isExpanded ? "text-emerald-400/60 rotate-90" : "text-foreground/20"
         )}>
           ▶
         </span>
@@ -149,7 +149,7 @@ function ProjectRow({
                 e.stopPropagation()
                 onSkillClick?.(tech)
               }}
-              className="text-amber-200/60 hover:text-amber-200 hover:underline transition-colors"
+              className="text-amber-400/60 hover:text-amber-400 hover:underline transition-colors"
             >
               {tech}
             </button>
@@ -174,12 +174,12 @@ function ProjectRow({
           {/* Year */}
           <div className="mb-2">
             <span className="text-foreground/30">year: </span>
-            <span className="text-lime-300/70">{project.year}</span>
+            <span className="text-lime-400/70">{project.year}</span>
           </div>
           {/* ID */}
           <div>
             <span className="text-foreground/30">id: </span>
-            <span className="text-violet-300/60">PRJ-{project.id}</span>
+            <span className="text-violet-400/60">PRJ-{project.id}</span>
           </div>
         </div>
       </div>
@@ -337,27 +337,27 @@ function TerminalOutput({
 
   if (!isActive || !skill) return null
 
-  // Pastel syntax highlighting for header lines
+  // Darker pastel syntax highlighting for header lines
   const highlightLine = (line: string) => {
     if (line.startsWith("$")) {
       const parts = line.split(" ")
       return (
         <>
-          <span className="text-emerald-300/80">$</span>
-          <span className="text-sky-300/80"> {parts[1]}</span>
-          <span className="text-amber-200/70"> {parts.slice(2).join(" ")}</span>
+          <span className="text-emerald-400/80">$</span>
+          <span className="text-sky-400/80"> {parts[1]}</span>
+          <span className="text-amber-400/70"> {parts.slice(2).join(" ")}</span>
         </>
       )
     }
     if (line.includes("████")) {
-      return <span className="text-emerald-300/60">{line}</span>
+      return <span className="text-emerald-400/60">{line}</span>
     }
     if (line.startsWith("[EXEC]") || line.startsWith("[OK]")) {
       const bracket = line.match(/^\[([^\]]+)\]/)
       const rest = line.replace(/^\[[^\]]+\]\s*/, "")
       return (
         <>
-          <span className="text-violet-300/70">[{bracket?.[1]}]</span>
+          <span className="text-violet-400/70">[{bracket?.[1]}]</span>
           <span className="text-foreground/50"> {rest}</span>
         </>
       )
@@ -366,7 +366,7 @@ function TerminalOutput({
       return (
         <>
           <span className="text-foreground/40">SKILL: </span>
-          <span className="text-rose-300/80 font-medium">{skill}</span>
+          <span className="text-rose-400/80 font-medium">{skill}</span>
         </>
       )
     }
@@ -374,7 +374,7 @@ function TerminalOutput({
       return (
         <>
           <span className="text-foreground/40">PROJECTS: </span>
-          <span className="text-amber-200/80 font-medium">{relatedProjects.length}</span>
+          <span className="text-amber-400/80 font-medium">{relatedProjects.length}</span>
         </>
       )
     }
@@ -383,7 +383,7 @@ function TerminalOutput({
       return (
         <>
           <span className="text-foreground/40">YEARS: </span>
-          <span className="text-lime-300/70">{years.join(", ")}</span>
+          <span className="text-lime-400/70">{years.join(", ")}</span>
         </>
       )
     }
@@ -458,8 +458,8 @@ function TerminalOutput({
           {isLoading ? (
             <div className="py-4">
               <div className="flex items-center gap-2 text-foreground/40">
-                <span className="text-emerald-300/80">{loadingFrames[loadingFrame]}</span>
-                <span><span className="text-emerald-300/60">$</span> Initializing query...</span>
+                <span className="text-emerald-400/80">{loadingFrames[loadingFrame]}</span>
+                <span><span className="text-emerald-400/60">$</span> Initializing query...</span>
               </div>
               <div className="mt-2 flex gap-0.5">
                 {Array.from({ length: 16 }).map((_, i) => (
@@ -467,7 +467,7 @@ function TerminalOutput({
                     key={i}
                     className={cn(
                       "w-1 h-1 transition-all duration-100",
-                      i <= loadingFrame ? "bg-emerald-400/60" : "bg-foreground/10"
+                      i <= loadingFrame ? "bg-emerald-500/60" : "bg-foreground/10"
                     )}
                   />
                 ))}
@@ -484,7 +484,7 @@ function TerminalOutput({
                     <>
                       {highlightLine(line.slice(0, currentChar))}
                       {showCursor && !isHeaderComplete && (
-                        <span className="inline-block w-2 h-4 bg-emerald-400 ml-0.5 animate-pulse" />
+                        <span className="inline-block w-2 h-4 bg-emerald-500 ml-0.5 animate-pulse" />
                       )}
                     </>
                   ) : null}
@@ -517,14 +517,14 @@ function TerminalOutput({
                   
                   {/* Footer line */}
                   <div className="mt-3 min-h-[1.4em]">
-                    <span className="text-violet-300/70">[OK]</span>
+                    <span className="text-violet-400/70">[OK]</span>
                     <span className="text-foreground/50"> Query complete. {relatedProjects.length} result(s) found.</span>
                   </div>
                   <div className="min-h-[1.4em]">
-                    <span className="text-emerald-300/80">$</span>
+                    <span className="text-emerald-400/80">$</span>
                     <span className="text-foreground/30"> _</span>
                     {showCursor && (
-                      <span className="inline-block w-2 h-4 bg-emerald-400 ml-0.5 animate-pulse" />
+                      <span className="inline-block w-2 h-4 bg-emerald-500 ml-0.5 animate-pulse" />
                     )}
                   </div>
                 </div>
