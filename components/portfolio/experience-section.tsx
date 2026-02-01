@@ -130,6 +130,7 @@ function IndexRowButton({
 // icon = index list (left rail); panelImage = ENTRY header background (optional, falls back to icon)
 const experiences = [
   {
+    id: "bose",
     title: "Android / iOS Developer",
     shortTitle: "Internship",
     company: "Bose Corp.",
@@ -149,6 +150,7 @@ const experiences = [
     skills: [ "iOS (SwiftUI)", "Kotlin (Android)", "App Architecture", "BLE", "WebSocket", "APIs", "Debugging", "Environment Validation", "Configuration Management"] 
     },
   {
+    id: "honda",
     title: "Software Engineer",
     shortTitle: "Internship",
     company: "Honda Motor",
@@ -168,6 +170,7 @@ const experiences = [
     skills: ["On-Device AI","NVIDIA Jetson","Embedded GPU","LLM Deployment","Optimization","Quantization","Latency","Memory Management","Benchmarking" ] 
   },
   {
+    id: "cpx-lab",
     title: "Undergraduate Researcher",
     shortTitle: "Research",
     company: "CPX Lab",
@@ -187,6 +190,7 @@ const experiences = [
     skills: [ "Human-Computer Interaction", "Human-Robot Interaction", "Robotic Actuation", "Safety-Critical Systems", "Embedded Systems", "3D Printing", "CAD Design", "Servo Motor", "Raspberry Pi", "Signal Temporal Logic", "Machine Learning Classification" ]
   },
   {
+    "id": "htic",
     "title": "Software Engineer",
     "shortTitle": "Freelance",
     "company": "HTIC",
@@ -220,6 +224,7 @@ const experiences = [
     ]
   },
   {
+    id: "cusco",
     title: "Data Engineer",
     shortTitle: "Freelance",
     company: "CUSCO USA",
@@ -239,6 +244,7 @@ const experiences = [
     skills: [ "Data Engineering", "Python", "Data Extraction", "Data Normalization", "API Development", "Automation", "Batch Processing", "Information Retrieval", "Workflow Optimization"]
   },
   {
+    id: "apple",
     title: "Seasonal Specialist",
     shortTitle: "Part-Time",
     company: "Apple Inc.",
@@ -266,6 +272,7 @@ const experiences = [
     ]
   },
   {
+    id: "nespresso",
     title: "Retail Sales Associate",
     shortTitle: "Part-Time",
     company: "Nespresso ",
@@ -314,6 +321,40 @@ export function ExperienceSection() {
   const isMobile = useIsMobile()
   const indexListRef = useRef<HTMLDivElement | null>(null)
   const [hasIndexOverflow, setHasIndexOverflow] = useState(false)
+
+  // Handle URL hash navigation to specific experience (e.g., #experience-cpx-lab)
+  useEffect(() => {
+    const handleHashNavigation = () => {
+      const hash = window.location.hash
+      if (!hash.startsWith("#experience-")) return
+      
+      const targetId = hash.replace("#experience-", "")
+      const targetIndex = experiences.findIndex((exp) => exp.id === targetId)
+      
+      if (targetIndex === -1) return
+      
+      // If target is in the "load more" section, expand first
+      if (targetIndex >= INITIAL_INDEX_VISIBLE && !listExpanded) {
+        setListExpanded(true)
+        setExpandAnimationDone(true) // Skip animation for direct navigation
+      }
+      
+      // Set active index and scroll to section
+      setActiveIndex(targetIndex)
+      
+      // Small delay to ensure DOM is ready
+      setTimeout(() => {
+        document.getElementById("experience")?.scrollIntoView({ behavior: "smooth" })
+      }, 100)
+    }
+    
+    // Run on mount
+    handleHashNavigation()
+    
+    // Listen for hash changes
+    window.addEventListener("hashchange", handleHashNavigation)
+    return () => window.removeEventListener("hashchange", handleHashNavigation)
+  }, [listExpanded])
 
   // GSAP: ENTRY bg + ASCII frame draw → content blocks stagger
   useEffect(() => {

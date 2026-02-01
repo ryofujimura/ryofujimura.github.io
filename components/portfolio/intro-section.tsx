@@ -591,14 +591,17 @@ export function IntroSection() {
             className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-8 sm:mb-10"
           >
             {[
-              { label: "Years Coding", value: "8+", link: null },
-              { label: "Internships", value: "2", link: "experience" },
-              { label: "Projects Shipped", value: "10+", link: "projects" },
-              { label: "Side Projects", value: "5+", link: "projects" },
+              { label: "Years Coding", value: "8+", link: null, hash: null },
+              { label: "Internships", value: "2", link: "experience", hash: null },
+              { label: "Projects Shipped", value: "10+", link: "projects", hash: null },
+              { label: "Publications", value: "2", link: null, hash: "#experience-cpx-lab" },
             ].map((stat) => {
-              const isLink = !!stat.link
+              const isLink = !!stat.link || !!stat.hash
               const handleClick = () => {
-                if (stat.link) {
+                if (stat.hash) {
+                  // Use hash navigation for specific experience
+                  window.location.hash = stat.hash
+                } else if (stat.link) {
                   document.getElementById(stat.link)?.scrollIntoView({ behavior: "smooth" })
                 }
               }
