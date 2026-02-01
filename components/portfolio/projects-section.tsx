@@ -587,49 +587,45 @@ export function ProjectsSection() {
 
   const currentProject = allProjects[activeIndex]
 
-  // Mobile detection using matchMedia
+  // Detect mobile with matchMedia and resize listener
   useEffect(() => {
-    const mediaQuery = window.matchMedia("(max-width: 767px)")
+    if (typeof window === "undefined") return
+
+    const mediaQuery = window.matchMedia("(max-width: 768px)")
     
-    // Set initial value
-    setIsMobile(mediaQuery.matches)
-    
-    // Handler for media query changes
-    const handleMediaChange = (e: MediaQueryListEvent) => {
+    const handleChange = (e: MediaQueryListEvent | MediaQueryList) => {
       setIsMobile(e.matches)
     }
-    
-    // Handler for resize events (backup for older browsers)
-    const handleResize = () => {
-      setIsMobile(mediaQuery.matches)
-    }
-    
-    // Add listeners
-    mediaQuery.addEventListener("change", handleMediaChange)
-    window.addEventListener("resize", handleResize)
-    
+
+    // Set initial value
+    handleChange(mediaQuery)
+
+    // Add listener for changes
+    mediaQuery.addEventListener("change", handleChange)
+
     return () => {
-      mediaQuery.removeEventListener("change", handleMediaChange)
-      window.removeEventListener("resize", handleResize)
+      mediaQuery.removeEventListener("change", handleChange)
     }
   }, [])
 
-  // GSAP ScrollTrigger pin setup
+  // GSAP ScrollTrigger pin setup - recreate on mobile/desktop change
   useEffect(() => {
     if (!sectionRef.current || !pinContainerRef.current) return
 
-    // Pin later on mobile (higher value = pins later as you scroll down more)
-    const startOffset = isMobile ? 150 : 0
-    const scrollMultiplier = isMobile ? 80 : 100
+    // Mobile: pin later, shorter scroll distance per project
+    // Desktop: pin at top, longer scroll distance
+    const startValue = isMobile ? "top 15%" : "top top"
+    const scrollPerProject = isMobile ? 80 : 100
+    const scrubValue = isMobile ? 0.3 : 0.5
 
     const ctx = gsap.context(() => {
       scrollTriggerRef.current = ScrollTrigger.create({
         trigger: sectionRef.current,
-        start: `top ${startOffset}px`,
-        end: `+=${TOTAL_PROJECTS * scrollMultiplier}%`,
+        start: startValue,
+        end: `+=${TOTAL_PROJECTS * scrollPerProject}%`,
         pin: pinContainerRef.current,
         pinSpacing: true,
-        scrub: 0.5,
+        scrub: scrubValue,
         onUpdate: (self) => {
           const progress = self.progress
           const newIndex = Math.min(
