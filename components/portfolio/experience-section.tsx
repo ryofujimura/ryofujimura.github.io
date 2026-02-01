@@ -322,6 +322,61 @@ export function ExperienceSection() {
   const indexListRef = useRef<HTMLDivElement | null>(null)
   const [hasIndexOverflow, setHasIndexOverflow] = useState(false)
   const [linkCopied, setLinkCopied] = useState(false)
+  const entryTextRef = useRef<HTMLSpanElement | null>(null)
+  const scrambleRef = useRef<number | null>(null)
+
+  // GSAP scramble text animation
+  const scrambleText = (targetText: string, onComplete?: () => void) => {
+    const el = entryTextRef.current
+    if (!el) {
+      if (onComplete) onComplete()
+      return
+    }
+    
+    const chars = "!<>-_\\/[]{}—=+*^?#ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+    const originalText = targetText
+    let iteration = 0
+    
+    // Clear any existing animation
+    if (scrambleRef.current) {
+      clearInterval(scrambleRef.current)
+    }
+    
+    scrambleRef.current = window.setInterval(() => {
+      el.textContent = originalText
+        .split("")
+        .map((char, index) => {
+          if (index < iteration) return char
+          if (char === " ") return " "
+          return chars[Math.floor(Math.random() * chars.length)]
+        })
+        .join("")
+      
+      if (iteration >= originalText.length) {
+        if (scrambleRef.current) clearInterval(scrambleRef.current)
+        scrambleRef.current = null
+        if (onComplete) onComplete()
+      }
+      iteration += 1
+    }, 25)
+  }
+
+  // Animate text when linkCopied changes
+  useEffect(() => {
+    const exp = experiences[activeIndex]
+    const targetText = linkCopied 
+      ? "LINK COPIED TO CLIPBOARD"
+      : `ENTRY ${(experiences.length - activeIndex).toString().padStart(2, "0")} // ${exp?.companyFull ?? "—"}`
+    
+    scrambleText(targetText)
+    
+    return () => {
+      if (scrambleRef.current) {
+        clearInterval(scrambleRef.current)
+        scrambleRef.current = null
+      }
+    }
+  }, [linkCopied, activeIndex])
 
   // Copy direct link to current experience
   const copyExperienceLink = () => {
@@ -860,10 +915,10 @@ export function ExperienceSection() {
                 className="relative z-10 font-mono text-[10px] sm:text-[11px] uppercase tracking-[0.2em] text-muted-foreground opacity-0 cursor-pointer hover:text-foreground transition-colors text-left"
                 title="Click to copy direct link"
               >
-                {linkCopied 
-                  ? "&gt; LINK COPIED TO CLIPBOARD"
-                  : `> ENTRY ${(experiences.length - activeIndex).toString().padStart(2, "0")} // ${experiences[activeIndex]?.companyFull ?? "—"}`
-                }
+                <span className="select-none">&gt; </span>
+                <span ref={entryTextRef}>
+                  {`ENTRY ${(experiences.length - activeIndex).toString().padStart(2, "0")} // ${experiences[activeIndex]?.companyFull ?? "—"}`}
+                </span>
               </button>
             </div>
 
