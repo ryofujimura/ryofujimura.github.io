@@ -5,6 +5,11 @@ import { gsap } from "gsap"
 import { useIsMobile } from "@/hooks/use-mobile"
 import { GSAPText } from "@/components/gsap-text"
 import { BrutalistBackground } from "@/components/brutalist-background"
+import { MagneticButton } from "@/components/magnetic-button"
+import { useToast } from "@/hooks/use-toast"
+import { ArrowDown, ArrowRight, Check, Github, Globe, Linkedin, Mail } from "lucide-react"
+
+const SITE_URL = "https://ryofujimura.github.io/"
 
 // ASCII terminal dimensions
 const ASCII_W = 70
@@ -204,6 +209,81 @@ function ModeVerbRotator({
         </span>
       </span>
     </span>
+  )
+}
+
+/** Social links with globe copy functionality */
+function SocialLinks() {
+  const { toast } = useToast()
+  const [copied, setCopied] = useState(false)
+  const socialIconsRef = useRef<HTMLDivElement>(null)
+
+  // GSAP stagger-in animation
+  useEffect(() => {
+    if (!socialIconsRef.current) return
+    const icons = socialIconsRef.current.querySelectorAll("[data-social-icon]")
+    if (icons.length === 0) return
+    gsap.fromTo(
+      icons,
+      { opacity: 0, y: 10 },
+      { opacity: 1, y: 0, duration: 0.45, delay: 0.3, stagger: 0.07, ease: "power3.out" }
+    )
+  }, [])
+
+  const copySiteUrl = () => {
+    if (typeof navigator !== "undefined" && navigator.clipboard?.writeText) {
+      navigator.clipboard.writeText(SITE_URL)
+      setCopied(true)
+      toast({ title: "Copied!", description: SITE_URL })
+      window.setTimeout(() => setCopied(false), 1200)
+    }
+  }
+
+  return (
+    <div ref={socialIconsRef} className="flex flex-wrap items-center gap-1 pt-2">
+      {[
+        { href: "https://github.com/ryofujimura", Icon: Github, label: "GitHub", external: true },
+        { href: "https://linkedin.com/in/ryofujimura", Icon: Linkedin, label: "LinkedIn", external: true },
+        { href: "mailto:ryo.fujimura1@gmail.com", Icon: Mail, label: "Email", external: false },
+      ].map(({ href, Icon, label, external }) => (
+        <span key={label} data-social-icon className="inline-flex">
+          <MagneticButton
+            as="a"
+            href={href}
+            target={external ? "_blank" : undefined}
+            rel={external ? "noopener noreferrer" : undefined}
+            className="touch-target p-3 min-h-[44px] min-w-[44px] flex items-center justify-center text-muted-foreground hover:text-foreground border border-transparent hover:border-border transition-all [&_svg]:stroke-current"
+          >
+            <Icon className="w-5 h-5 shrink-0" strokeWidth={1.5} />
+            <span className="sr-only">{label}</span>
+          </MagneticButton>
+        </span>
+      ))}
+      <span data-social-icon className="inline-flex">
+        <MagneticButton
+          as="button"
+          onClick={copySiteUrl}
+          cursorText="COPY"
+          className="touch-target p-3 min-h-[44px] min-w-[44px] flex items-center justify-center text-muted-foreground hover:text-foreground border border-transparent hover:border-border transition-all [&_svg]:stroke-current"
+          aria-label={copied ? "Site URL copied" : "Copy site URL"}
+        >
+          <span className="relative w-5 h-5 shrink-0">
+            <Globe
+              className={`absolute inset-0 w-5 h-5 transition-all duration-200 ${
+                copied ? "opacity-0 scale-75" : "opacity-100 scale-100"
+              }`}
+              strokeWidth={1.5}
+            />
+            <Check
+              className={`absolute inset-0 w-5 h-5 transition-all duration-200 ${
+                copied ? "opacity-100 scale-100" : "opacity-0 scale-75"
+              }`}
+              strokeWidth={1.8}
+            />
+          </span>
+        </MagneticButton>
+      </span>
+    </div>
   )
 }
 
@@ -608,6 +688,29 @@ export function IntroSection() {
                     </span>
                   ))}
                 </div>
+
+                {/* CTA Buttons */}
+                <div className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4 pt-4">
+                  <MagneticButton
+                    as="a"
+                    href="#experience"
+                    className="touch-target group relative inline-flex items-center justify-center gap-2 sm:gap-3 px-6 sm:px-8 py-3 sm:py-4 min-h-[48px] text-xs sm:text-sm font-mono uppercase tracking-wider text-primary-foreground bg-primary border-2 border-primary hover:bg-transparent hover:text-primary transition-all duration-300"
+                  >
+                    View Work
+                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform shrink-0" />
+                  </MagneticButton>
+                  <MagneticButton
+                    as="a"
+                    href="#contact"
+                    className="touch-target group inline-flex items-center justify-center gap-2 sm:gap-3 px-6 sm:px-8 py-3 sm:py-4 min-h-[48px] text-xs sm:text-sm font-mono uppercase tracking-wider text-foreground bg-transparent border-2 border-foreground hover:bg-foreground hover:text-background transition-all duration-300"
+                  >
+                    Contact
+                    <ArrowDown className="w-4 h-4 group-hover:translate-y-1 transition-transform shrink-0" />
+                  </MagneticButton>
+                </div>
+
+                {/* Social Links */}
+                <SocialLinks />
               </div>
 
               {/* Right Column: Profile Image */}
