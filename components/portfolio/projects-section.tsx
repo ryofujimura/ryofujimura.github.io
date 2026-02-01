@@ -3,13 +3,13 @@
 import { useState, useRef, useEffect, useCallback } from "react"
 import { gsap } from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
-import { ExternalLink, Github, ChevronDown } from "lucide-react"
+import { ExternalLink, Github, ChevronUp, ChevronDown } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 gsap.registerPlugin(ScrollTrigger)
 
 // ─────────────────────────────────────────────────────────────
-// PROJECT DATA - GROWTH FOCUSED
+// PROJECT DATA
 // ─────────────────────────────────────────────────────────────
 
 const allProjects = [
@@ -23,7 +23,6 @@ const allProjects = [
     techStack: ["Swift", "AI/ML", "Firebase"],
     achievement: "95% accuracy, 200ms",
     description: "Multi-stage reasoning with production-grade performance.",
-    skills: ["Swift", "SwiftUI", "Firebase", "AI/ML", "Google APIs"],
     links: { github: "https://github.com/ryofujimura", demo: "#" },
   },
   {
@@ -36,7 +35,6 @@ const allProjects = [
     techStack: ["PyTorch", "WebSocket", "React"],
     achievement: "150ms inference",
     description: "Computer vision with real-time collaboration.",
-    skills: ["PyTorch", "Vision", "WebSocket", "React"],
     links: { github: "https://github.com/ryofujimura", demo: "https://ryofujimura.github.io" },
   },
   {
@@ -49,7 +47,6 @@ const allProjects = [
     techStack: ["Cloud Functions", "Firebase"],
     achievement: "<200ms response",
     description: "Serverless orchestration for 30+ researchers.",
-    skills: ["Cloud Functions", "Firebase", "AI routing", "Node.js"],
     links: { github: "https://github.com/ryofujimura", demo: "https://ryofujimura.github.io" },
   },
   {
@@ -62,7 +59,6 @@ const allProjects = [
     techStack: ["Swift", "Kotlin", "Firebase"],
     achievement: "99%+ sync reliability",
     description: "Cross-device sync across unstable networks.",
-    skills: ["Swift", "Kotlin", "Firebase", "Real-time"],
     links: { github: "https://github.com/ryofujimura", appStore: "#", playStore: "#" },
   },
   {
@@ -75,7 +71,6 @@ const allProjects = [
     techStack: ["Swift", "Kotlin", "Firebase"],
     achievement: "70% fewer conflicts",
     description: "Cross-platform native with real-time sync.",
-    skills: ["Swift", "Kotlin", "Firebase RTDB", "Real-time"],
     links: { github: "https://github.com/ryofujimura", appStore: "#", playStore: "#" },
   },
   {
@@ -88,7 +83,6 @@ const allProjects = [
     techStack: ["Swift", "llama.cpp", "GGUF"],
     achievement: "<50ms/token, 2GB saved",
     description: "Local AI with efficient inference.",
-    skills: ["Swift", "llama.cpp", "GGUF", "SwiftUI"],
     links: { github: "https://github.com/ryofujimura" },
   },
   {
@@ -101,7 +95,6 @@ const allProjects = [
     techStack: ["React 19", "SwiftUI", "Firebase"],
     achievement: "50% faster lookup",
     description: "Full-stack with real-time sync.",
-    skills: ["React 19", "SwiftUI", "Firebase", "Firestore", "AVFoundation"],
     links: { github: "https://github.com/ryofujimura", demo: "https://ryofujimura.github.io" },
   },
   {
@@ -114,7 +107,6 @@ const allProjects = [
     techStack: ["React", "Next.js", "GSAP"],
     achievement: "40-60% faster load",
     description: "React with advanced animations.",
-    skills: ["React", "Next.js", "Tailwind", "Vercel"],
     links: { github: "https://github.com/ryofujimura", demo: "https://ryofujimura.github.io" },
   },
   {
@@ -127,7 +119,6 @@ const allProjects = [
     techStack: ["Swift", "SwiftUI"],
     achievement: "50 users at launch",
     description: "First iOS app on App Store.",
-    skills: ["Swift", "SwiftUI", "App Store"],
     links: { github: "https://github.com/ryofujimura", appStore: "#" },
   },
   {
@@ -140,7 +131,6 @@ const allProjects = [
     techStack: ["Python", "Flask"],
     achievement: "500+ courses, 70% fewer errors",
     description: "Backend for university scheduling.",
-    skills: ["Python", "Flask", "scheduling"],
     links: { github: "https://github.com/ryofujimura", demo: "https://ryofujimura.github.io" },
   },
   {
@@ -153,7 +143,6 @@ const allProjects = [
     techStack: ["Python", "Instagram API"],
     achievement: "11K followers, 685 posts",
     description: "Automated content pipeline.",
-    skills: ["Python", "automation", "Instagram"],
     links: { instagram: "#", youtube: "#" },
   },
   {
@@ -166,7 +155,6 @@ const allProjects = [
     techStack: ["Swift", "WatchOS"],
     achievement: "<10ms lookup speed",
     description: "WatchOS with precomputed probability tables.",
-    skills: ["Swift", "WatchOS", "probability"],
     links: { github: "https://github.com/ryofujimura", appStore: "#" },
   },
 ]
@@ -174,13 +162,12 @@ const allProjects = [
 type Project = (typeof allProjects)[0]
 
 // ─────────────────────────────────────────────────────────────
-// TECHNICAL PATTERNS - SVG BACKGROUNDS (CONTAINED)
+// TECHNICAL PATTERNS
 // ─────────────────────────────────────────────────────────────
 
 function TechnicalPatterns() {
   return (
     <div className="absolute inset-0 pointer-events-none overflow-hidden">
-      {/* Diagonal grid lines */}
       <svg className="absolute inset-0 w-full h-full opacity-[0.02]" preserveAspectRatio="none">
         <defs>
           <pattern id="diagonal-grid-projects" width="60" height="60" patternUnits="userSpaceOnUse">
@@ -190,10 +177,6 @@ function TechnicalPatterns() {
         </defs>
         <rect width="100%" height="100%" fill="url(#diagonal-grid-projects)" />
       </svg>
-
-      {/* Vertical technical lines */}
-      <div className="absolute left-8 top-0 bottom-0 w-px bg-foreground/5 hidden lg:block" />
-      <div className="absolute right-8 top-0 bottom-0 w-px bg-foreground/5 hidden lg:block" />
     </div>
   )
 }
@@ -204,9 +187,10 @@ function TechnicalPatterns() {
 
 function SectionHeader({ count, activeIndex }: { count: number; activeIndex: number }) {
   const titleRef = useRef<HTMLHeadingElement>(null)
+  const [hasAnimated, setHasAnimated] = useState(false)
 
   useEffect(() => {
-    if (!titleRef.current) return
+    if (!titleRef.current || hasAnimated) return
     const ctx = gsap.context(() => {
       const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ░▒▓█"
       const originalText = "PROJECTS"
@@ -216,6 +200,7 @@ function SectionHeader({ count, activeIndex }: { count: number; activeIndex: num
         trigger: titleRef.current,
         start: "top 95%",
         onEnter: () => {
+          setHasAnimated(true)
           const interval = setInterval(() => {
             if (!titleRef.current) return clearInterval(interval)
             titleRef.current.textContent = originalText
@@ -229,10 +214,10 @@ function SectionHeader({ count, activeIndex }: { count: number; activeIndex: num
       })
     }, titleRef.current)
     return () => ctx.revert()
-  }, [])
+  }, [hasAnimated])
 
   return (
-    <div className="mb-8 lg:mb-12">
+    <div className="mb-6 lg:mb-8">
       <div className="flex items-end justify-between gap-4">
         <div>
           <p className="font-mono text-[10px] text-muted-foreground tracking-[0.15em] mb-1">— 04</p>
@@ -257,7 +242,7 @@ function SectionHeader({ count, activeIndex }: { count: number; activeIndex: num
 }
 
 // ─────────────────────────────────────────────────────────────
-// TIMELINE SIDEBAR - STICKY WITHIN SECTION (DESKTOP)
+// TIMELINE SIDEBAR
 // ─────────────────────────────────────────────────────────────
 
 function TimelineSidebar({ 
@@ -277,16 +262,16 @@ function TimelineSidebar({
     
     gsap.to(connectorRef.current, {
       height: `${progress}%`,
-      duration: 0.5,
+      duration: 0.4,
       ease: "power2.out"
     })
   }, [activeIndex, projects.length])
 
   return (
-    <div className="hidden lg:block w-[200px] xl:w-[240px] flex-shrink-0">
-      <div className="sticky top-24 max-h-[calc(100vh-8rem)] overflow-y-auto pr-4">
-        {/* Vertical track */}
+    <div className="hidden lg:flex flex-col w-[180px] xl:w-[200px] flex-shrink-0 h-full">
+      <div className="flex-1 overflow-y-auto pr-2">
         <div className="relative pl-4">
+          {/* Track line */}
           <div className="absolute left-[7px] top-0 bottom-0 w-px bg-foreground/10" />
           <div 
             ref={connectorRef}
@@ -294,8 +279,8 @@ function TimelineSidebar({
             style={{ height: "0%" }}
           />
 
-          {/* Timeline nodes */}
-          <div className="space-y-1">
+          {/* Nodes */}
+          <div className="space-y-0.5">
             {projects.map((project, index) => {
               const isActive = index === activeIndex
               const isPast = index < activeIndex
@@ -304,9 +289,9 @@ function TimelineSidebar({
               return (
                 <div key={project.id}>
                   {showYear && (
-                    <div className="flex items-center gap-2 mb-2 mt-4 first:mt-0">
-                      <div className="w-4 h-px bg-foreground/20" />
-                      <span className="font-mono text-[10px] font-bold text-foreground/50 tracking-wider">
+                    <div className="flex items-center gap-2 mb-1.5 mt-3 first:mt-0">
+                      <div className="w-3 h-px bg-foreground/20" />
+                      <span className="font-mono text-[9px] font-bold text-foreground/40 tracking-wider">
                         {project.year}
                       </span>
                     </div>
@@ -314,87 +299,40 @@ function TimelineSidebar({
 
                   <button
                     onClick={() => onNodeClick(index)}
-                    className={cn(
-                      "w-full flex items-start gap-2 py-1.5 text-left transition-all group"
-                    )}
+                    className="w-full flex items-start gap-2 py-1 text-left transition-all group"
                   >
                     <div 
                       className={cn(
-                        "w-3 h-3 rounded-full border-2 flex-shrink-0 mt-0.5 transition-all",
+                        "w-2.5 h-2.5 rounded-full border-2 flex-shrink-0 mt-0.5 transition-all",
                         isActive ? "bg-accent border-accent scale-125" : 
-                        isPast ? "bg-foreground/60 border-foreground/60" : 
-                        "bg-transparent border-foreground/30"
+                        isPast ? "bg-foreground/50 border-foreground/50" : 
+                        "bg-transparent border-foreground/20 group-hover:border-foreground/40"
                       )}
                     />
                     
-                    <div className="flex-1 min-w-0">
-                      <span 
-                        className={cn(
-                          "font-mono text-[10px] block truncate transition-colors leading-tight",
-                          isActive ? "text-foreground font-bold" : 
-                          isPast ? "text-foreground/60" : 
-                          "text-foreground/30 group-hover:text-foreground/50"
-                        )}
-                      >
-                        {project.growth}
-                      </span>
-                    </div>
+                    <span 
+                      className={cn(
+                        "font-mono text-[9px] block truncate transition-colors leading-tight",
+                        isActive ? "text-foreground font-bold" : 
+                        isPast ? "text-foreground/50" : 
+                        "text-foreground/25 group-hover:text-foreground/40"
+                      )}
+                    >
+                      {project.growth}
+                    </span>
                   </button>
                 </div>
               )
             })}
           </div>
         </div>
-
-        {/* Footer */}
-        <div className="mt-6 pt-4 border-t border-foreground/10">
-          <p className="font-mono text-[8px] text-muted-foreground/50">
-            SCROLL TO NAVIGATE
-          </p>
-        </div>
       </div>
     </div>
   )
 }
 
 // ─────────────────────────────────────────────────────────────
-// MOBILE PROGRESS BAR - STICKY WITHIN SECTION
-// ─────────────────────────────────────────────────────────────
-
-function MobileProgress({ 
-  activeIndex, 
-  total,
-  currentProject 
-}: { 
-  activeIndex: number
-  total: number
-  currentProject: Project
-}) {
-  return (
-    <div className="lg:hidden sticky top-0 z-20 bg-background/95 backdrop-blur-sm border-b border-foreground/10 -mx-4 px-4 py-3 mb-6">
-      {/* Progress bar */}
-      <div className="h-0.5 bg-foreground/10 mb-2">
-        <div 
-          className="h-full bg-accent transition-all duration-300"
-          style={{ width: `${((activeIndex + 1) / total) * 100}%` }}
-        />
-      </div>
-      
-      {/* Current info */}
-      <div className="flex items-center justify-between">
-        <span className="font-mono text-[10px] text-foreground font-bold truncate max-w-[60%]">
-          {currentProject.growth}
-        </span>
-        <span className="font-mono text-[10px] text-muted-foreground">
-          {String(activeIndex + 1).padStart(2, "0")} / {String(total).padStart(2, "0")}
-        </span>
-      </div>
-    </div>
-  )
-}
-
-// ─────────────────────────────────────────────────────────────
-// IMAGE GALLERY - COMPACT
+// IMAGE GALLERY
 // ─────────────────────────────────────────────────────────────
 
 function ImageGallery({ 
@@ -416,7 +354,6 @@ function ImageGallery({
     return () => clearInterval(interval)
   }, [isActive, images.length])
 
-  // Reset to first image when not active
   useEffect(() => {
     if (!isActive) setActiveImage(0)
   }, [isActive])
@@ -430,19 +367,16 @@ function ImageGallery({
           alt={`${projectTitle} - ${idx + 1}`}
           className={cn(
             "absolute inset-0 w-full h-full object-cover transition-all duration-700",
-            idx === activeImage 
-              ? "opacity-100 scale-100" 
-              : "opacity-0 scale-105"
+            idx === activeImage ? "opacity-100 scale-100" : "opacity-0 scale-105"
           )}
           style={{ filter: isActive ? "grayscale(0%)" : "grayscale(100%)" }}
           loading={idx === 0 ? "eager" : "lazy"}
         />
       ))}
 
-      {/* Gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-r from-background/60 via-transparent to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-t from-background/40 via-transparent to-transparent" />
       
-      {/* Image counter */}
       {images.length > 1 && (
         <div className="absolute bottom-3 right-3 flex gap-1">
           {images.map((_, idx) => (
@@ -450,7 +384,7 @@ function ImageGallery({
               key={idx}
               onClick={() => setActiveImage(idx)}
               className={cn(
-                "w-6 h-0.5 transition-all",
+                "w-5 h-0.5 transition-all",
                 idx === activeImage ? "bg-foreground" : "bg-foreground/30"
               )}
             />
@@ -462,21 +396,16 @@ function ImageGallery({
 }
 
 // ─────────────────────────────────────────────────────────────
-// PROJECT CARD - FULL WIDTH, ONE AT A TIME
+// PROJECT SLIDE - FULL HEIGHT OF CONTAINER
 // ─────────────────────────────────────────────────────────────
 
-function ProjectCard({ 
+function ProjectSlide({ 
   project, 
-  index, 
-  isActive,
-  totalProjects 
+  isActive 
 }: { 
   project: Project
-  index: number
   isActive: boolean
-  totalProjects: number
 }) {
-  const cardRef = useRef<HTMLDivElement>(null)
   const titleRef = useRef<HTMLHeadingElement>(null)
   const [hasAnimated, setHasAnimated] = useState(false)
 
@@ -505,166 +434,210 @@ function ProjectCard({
         setHasAnimated(true)
       }
       iteration += 0.5
-    }, 30)
+    }, 25)
 
     return () => clearInterval(interval)
   }, [isActive, hasAnimated, project.growth])
 
-  // Fade animation on scroll
+  // Reset animation when becoming inactive
   useEffect(() => {
-    if (!cardRef.current) return
-
-    const ctx = gsap.context(() => {
-      gsap.fromTo(
-        cardRef.current,
-        { opacity: 0, y: 40 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 0.7,
-          ease: "power3.out",
-          scrollTrigger: {
-            trigger: cardRef.current,
-            start: "top 85%",
-            toggleActions: "play none none none",
-          },
-        }
-      )
-    }, cardRef.current)
-
-    return () => ctx.revert()
-  }, [])
+    if (!isActive) setHasAnimated(false)
+  }, [isActive])
 
   const hasGithub = project.links.github
   const hasDemo = "demo" in project.links
   const hasAppStore = "appStore" in project.links
 
   return (
-    <div
-      ref={cardRef}
+    <div 
       className={cn(
-        "relative border-2 border-foreground bg-background transition-all duration-500",
-        isActive ? "opacity-100" : "opacity-60"
+        "h-full w-full snap-start snap-always flex flex-col lg:flex-row border-2 border-foreground bg-background transition-opacity duration-500",
+        isActive ? "opacity-100" : "opacity-40"
       )}
     >
       {/* Corner brackets */}
-      <svg className="absolute -top-1 -left-1 w-4 h-4 text-foreground">
+      <svg className="absolute -top-1 -left-1 w-4 h-4 text-foreground z-10">
         <path d="M 0 16 L 0 0 L 16 0" stroke="currentColor" strokeWidth="2" fill="none" />
       </svg>
-      <svg className="absolute -top-1 -right-1 w-4 h-4 text-foreground">
+      <svg className="absolute -top-1 -right-1 w-4 h-4 text-foreground z-10">
         <path d="M 0 0 L 16 0 L 16 16" stroke="currentColor" strokeWidth="2" fill="none" />
       </svg>
-      <svg className="absolute -bottom-1 -left-1 w-4 h-4 text-foreground">
+      <svg className="absolute -bottom-1 -left-1 w-4 h-4 text-foreground z-10">
         <path d="M 0 0 L 0 16 L 16 16" stroke="currentColor" strokeWidth="2" fill="none" />
       </svg>
-      <svg className="absolute -bottom-1 -right-1 w-4 h-4 text-foreground">
+      <svg className="absolute -bottom-1 -right-1 w-4 h-4 text-foreground z-10">
         <path d="M 0 16 L 16 16 L 16 0" stroke="currentColor" strokeWidth="2" fill="none" />
       </svg>
 
-      {/* Layout: Image + Content */}
-      <div className="flex flex-col lg:flex-row">
-        {/* Image */}
-        <div className="relative h-48 md:h-64 lg:h-80 lg:w-1/2 border-b lg:border-b-0 lg:border-r border-foreground/20">
-          <ImageGallery 
-            images={project.images} 
-            projectTitle={project.title}
-            isActive={isActive}
-          />
-          
-          {/* Project number overlay */}
-          <div className="absolute top-3 left-3 font-mono text-6xl lg:text-7xl font-black text-foreground/10">
-            {project.id}
-          </div>
-          
-          {/* Year badge */}
-          <div className="absolute top-3 right-3 bg-foreground text-background px-2 py-1">
-            <span className="font-mono text-[10px] font-bold tracking-wider">{project.year}</span>
-          </div>
+      {/* Image Section */}
+      <div className="relative h-[35%] lg:h-full lg:w-[45%] border-b lg:border-b-0 lg:border-r border-foreground/20 flex-shrink-0">
+        <ImageGallery 
+          images={project.images} 
+          projectTitle={project.title}
+          isActive={isActive}
+        />
+        
+        {/* Project number */}
+        <div className="absolute top-3 left-3 font-mono text-5xl lg:text-6xl font-black text-foreground/10">
+          {project.id}
+        </div>
+        
+        {/* Year badge */}
+        <div className="absolute top-3 right-3 bg-foreground text-background px-2 py-0.5">
+          <span className="font-mono text-[9px] font-bold tracking-wider">{project.year}</span>
+        </div>
+      </div>
+
+      {/* Content Section */}
+      <div className="flex-1 p-4 lg:p-6 xl:p-8 flex flex-col overflow-y-auto">
+        {/* Title */}
+        <div className="mb-3">
+          <span className="font-mono text-[9px] text-muted-foreground tracking-[0.15em] block mb-0.5">
+            {project.title}
+          </span>
+          <h3 
+            ref={titleRef}
+            className="font-mono text-lg md:text-xl lg:text-2xl xl:text-3xl font-black text-foreground tracking-tight leading-none"
+          >
+            {project.growth.toUpperCase()}
+          </h3>
         </div>
 
-        {/* Content */}
-        <div className="flex-1 p-5 lg:p-8 flex flex-col">
-          {/* Title area */}
-          <div className="mb-4">
-            <span className="font-mono text-[10px] text-muted-foreground tracking-[0.15em] block mb-1">
-              {project.title}
-            </span>
-            <h3 
-              ref={titleRef}
-              className="font-mono text-xl md:text-2xl lg:text-3xl font-black text-foreground tracking-tight leading-none"
+        {/* Achievement */}
+        <div className="mb-3">
+          <span className="inline-block font-mono text-[9px] font-bold text-accent bg-accent/10 px-2 py-0.5 border border-accent/30">
+            {project.achievement}
+          </span>
+        </div>
+
+        {/* Description */}
+        <p className="font-mono text-[11px] text-muted-foreground mb-3 leading-relaxed">
+          {project.description}
+        </p>
+
+        {/* Tech stack */}
+        <div className="flex flex-wrap gap-1 mb-3">
+          {project.techStack.map((tech) => (
+            <span
+              key={tech}
+              className="font-mono text-[8px] px-1.5 py-0.5 border border-foreground/20 text-foreground/50"
             >
-              {project.growth.toUpperCase()}
-            </h3>
-          </div>
-
-          {/* Achievement */}
-          <div className="mb-4">
-            <span className="inline-block font-mono text-[10px] font-bold text-accent bg-accent/10 px-2 py-1 border border-accent/30">
-              {project.achievement}
+              {tech}
             </span>
-          </div>
-
-          {/* Description */}
-          <p className="font-mono text-xs text-muted-foreground mb-4 leading-relaxed">
-            {project.description}
-          </p>
-
-          {/* Tech stack */}
-          <div className="flex flex-wrap gap-1.5 mb-4">
-            {project.techStack.map((tech) => (
-              <span
-                key={tech}
-                className="font-mono text-[9px] px-2 py-0.5 border border-foreground/20 text-foreground/60"
-              >
-                {tech}
-              </span>
-            ))}
-          </div>
-
-          {/* Learnings */}
-          <div className="mb-4">
-            <span className="font-mono text-[8px] text-muted-foreground tracking-[0.15em] block mb-1.5">
-              KEY LEARNINGS
-            </span>
-            <ul className="space-y-0.5">
-              {project.learned.map((item, i) => (
-                <li key={i} className="font-mono text-[10px] text-foreground/60 flex items-start gap-1.5">
-                  <span className="text-accent">▸</span>
-                  {item}
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Links */}
-          <div className="flex items-center gap-4 mt-auto pt-4 border-t border-foreground/10">
-            {hasGithub && (
-              <a
-                href={project.links.github}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 font-mono text-[10px] text-foreground hover:text-accent transition-colors"
-              >
-                <Github className="w-3.5 h-3.5" />
-                <span>CODE</span>
-              </a>
-            )}
-            {hasDemo && (
-              <a
-                href={(project.links as { demo?: string }).demo}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 font-mono text-[10px] text-foreground hover:text-accent transition-colors"
-              >
-                <ExternalLink className="w-3.5 h-3.5" />
-                <span>DEMO</span>
-              </a>
-            )}
-            {hasAppStore && (
-              <span className="font-mono text-[10px] text-muted-foreground">iOS App</span>
-            )}
-          </div>
+          ))}
         </div>
+
+        {/* Learnings */}
+        <div className="mb-3">
+          <span className="font-mono text-[8px] text-muted-foreground tracking-[0.15em] block mb-1">
+            KEY LEARNINGS
+          </span>
+          <ul className="space-y-0.5">
+            {project.learned.map((item, i) => (
+              <li key={i} className="font-mono text-[9px] text-foreground/50 flex items-start gap-1">
+                <span className="text-accent">▸</span>
+                {item}
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {/* Links */}
+        <div className="flex items-center gap-3 mt-auto pt-3 border-t border-foreground/10">
+          {hasGithub && (
+            <a
+              href={project.links.github}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 font-mono text-[9px] text-foreground hover:text-accent transition-colors"
+            >
+              <Github className="w-3 h-3" />
+              <span>CODE</span>
+            </a>
+          )}
+          {hasDemo && (
+            <a
+              href={(project.links as { demo?: string }).demo}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 font-mono text-[9px] text-foreground hover:text-accent transition-colors"
+            >
+              <ExternalLink className="w-3 h-3" />
+              <span>DEMO</span>
+            </a>
+          )}
+          {hasAppStore && (
+            <span className="font-mono text-[9px] text-muted-foreground">iOS App</span>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ─────────────────────────────────────────────────────────────
+// NAVIGATION CONTROLS
+// ─────────────────────────────────────────────────────────────
+
+function NavigationControls({
+  activeIndex,
+  total,
+  onPrev,
+  onNext,
+  currentProject
+}: {
+  activeIndex: number
+  total: number
+  onPrev: () => void
+  onNext: () => void
+  currentProject: Project
+}) {
+  return (
+    <div className="flex items-center justify-between py-3 border-t border-foreground/10">
+      {/* Progress info */}
+      <div className="flex items-center gap-3">
+        <div className="h-0.5 w-20 bg-foreground/10">
+          <div 
+            className="h-full bg-accent transition-all duration-300"
+            style={{ width: `${((activeIndex + 1) / total) * 100}%` }}
+          />
+        </div>
+        <span className="font-mono text-[10px] text-muted-foreground">
+          {String(activeIndex + 1).padStart(2, "0")} / {String(total).padStart(2, "0")}
+        </span>
+      </div>
+
+      {/* Current project name (mobile) */}
+      <span className="lg:hidden font-mono text-[9px] text-foreground/50 truncate max-w-[30%]">
+        {currentProject.growth}
+      </span>
+
+      {/* Navigation buttons */}
+      <div className="flex items-center gap-1">
+        <button
+          onClick={onPrev}
+          disabled={activeIndex === 0}
+          className={cn(
+            "p-2 border border-foreground/20 transition-all",
+            activeIndex === 0 
+              ? "opacity-30 cursor-not-allowed" 
+              : "hover:bg-foreground hover:text-background"
+          )}
+        >
+          <ChevronUp className="w-3 h-3" />
+        </button>
+        <button
+          onClick={onNext}
+          disabled={activeIndex === total - 1}
+          className={cn(
+            "p-2 border border-foreground/20 transition-all",
+            activeIndex === total - 1 
+              ? "opacity-30 cursor-not-allowed" 
+              : "hover:bg-foreground hover:text-background"
+          )}
+        >
+          <ChevronDown className="w-3 h-3" />
+        </button>
       </div>
     </div>
   )
@@ -677,36 +650,47 @@ function ProjectCard({
 export function ProjectsSection() {
   const [activeIndex, setActiveIndex] = useState(0)
   const sectionRef = useRef<HTMLElement>(null)
+  const scrollContainerRef = useRef<HTMLDivElement>(null)
   const projectRefs = useRef<(HTMLDivElement | null)[]>([])
 
-  // Setup ScrollTrigger for each project
+  // Handle scroll snap detection
   useEffect(() => {
-    if (!sectionRef.current) return
+    const container = scrollContainerRef.current
+    if (!container) return
 
-    const ctx = gsap.context(() => {
-      allProjects.forEach((_, index) => {
-        const projectEl = projectRefs.current[index]
-        if (!projectEl) return
-
-        ScrollTrigger.create({
-          trigger: projectEl,
-          start: "top 60%",
-          end: "bottom 40%",
-          onEnter: () => setActiveIndex(index),
-          onEnterBack: () => setActiveIndex(index),
-        })
-      })
-    }, sectionRef.current)
-
-    return () => ctx.revert()
-  }, [])
-
-  const handleNodeClick = useCallback((index: number) => {
-    const projectEl = projectRefs.current[index]
-    if (projectEl) {
-      projectEl.scrollIntoView({ behavior: "smooth", block: "center" })
+    const handleScroll = () => {
+      const containerHeight = container.clientHeight
+      const scrollTop = container.scrollTop
+      const newIndex = Math.round(scrollTop / containerHeight)
+      
+      if (newIndex !== activeIndex && newIndex >= 0 && newIndex < allProjects.length) {
+        setActiveIndex(newIndex)
+      }
     }
+
+    container.addEventListener("scroll", handleScroll, { passive: true })
+    return () => container.removeEventListener("scroll", handleScroll)
+  }, [activeIndex])
+
+  // Handle timeline node click
+  const handleNodeClick = useCallback((index: number) => {
+    const container = scrollContainerRef.current
+    if (!container) return
+    
+    container.scrollTo({
+      top: index * container.clientHeight,
+      behavior: "smooth"
+    })
   }, [])
+
+  // Navigation handlers
+  const handlePrev = useCallback(() => {
+    if (activeIndex > 0) handleNodeClick(activeIndex - 1)
+  }, [activeIndex, handleNodeClick])
+
+  const handleNext = useCallback(() => {
+    if (activeIndex < allProjects.length - 1) handleNodeClick(activeIndex + 1)
+  }, [activeIndex, handleNodeClick])
 
   return (
     <section
@@ -714,22 +698,14 @@ export function ProjectsSection() {
       ref={sectionRef}
       className="relative py-12 md:py-16 lg:py-20 px-4 md:px-6 bg-background overflow-hidden"
     >
-      {/* Background patterns */}
       <TechnicalPatterns />
 
       <div className="max-w-7xl mx-auto relative">
         {/* Section header */}
         <SectionHeader count={allProjects.length} activeIndex={activeIndex} />
 
-        {/* Mobile progress */}
-        <MobileProgress 
-          activeIndex={activeIndex}
-          total={allProjects.length}
-          currentProject={allProjects[activeIndex]}
-        />
-
-        {/* Main layout: Timeline + Projects */}
-        <div className="flex gap-8 lg:gap-12">
+        {/* Main layout: Timeline + Scroll Container */}
+        <div className="flex gap-6 lg:gap-8">
           {/* Timeline sidebar (desktop) */}
           <TimelineSidebar 
             activeIndex={activeIndex}
@@ -737,33 +713,38 @@ export function ProjectsSection() {
             onNodeClick={handleNodeClick}
           />
 
-          {/* Projects list */}
-          <div className="flex-1 space-y-8 lg:space-y-12">
-            {allProjects.map((project, index) => (
-              <div
-                key={project.id}
-                ref={el => { projectRefs.current[index] = el }}
-              >
-                <ProjectCard
-                  project={project}
-                  index={index}
-                  isActive={index === activeIndex}
-                  totalProjects={allProjects.length}
-                />
-              </div>
-            ))}
-          </div>
-        </div>
+          {/* Projects scroll container */}
+          <div className="flex-1 flex flex-col">
+            {/* Scroll container with fixed height */}
+            <div 
+              ref={scrollContainerRef}
+              className="relative h-[500px] md:h-[550px] lg:h-[600px] overflow-y-auto snap-y snap-mandatory scrollbar-hide"
+              style={{ scrollSnapType: "y mandatory" }}
+            >
+              {allProjects.map((project, index) => (
+                <div
+                  key={project.id}
+                  ref={el => { projectRefs.current[index] = el }}
+                  className="relative h-full w-full"
+                  style={{ scrollSnapAlign: "start" }}
+                >
+                  <ProjectSlide
+                    project={project}
+                    isActive={index === activeIndex}
+                  />
+                </div>
+              ))}
+            </div>
 
-        {/* Footer */}
-        <div className="mt-12 text-center">
-          <a
-            href="#contact"
-            className="inline-flex items-center justify-center gap-2 font-mono text-xs text-muted-foreground hover:text-foreground transition-colors"
-          >
-            <ChevronDown className="w-4 h-4" />
-            <span>CONTINUE</span>
-          </a>
+            {/* Navigation controls */}
+            <NavigationControls
+              activeIndex={activeIndex}
+              total={allProjects.length}
+              onPrev={handlePrev}
+              onNext={handleNext}
+              currentProject={allProjects[activeIndex]}
+            />
+          </div>
         </div>
       </div>
     </section>
