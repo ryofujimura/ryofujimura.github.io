@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef, useEffect, useCallback } from "react"
+import { useState, useRef, useEffect } from "react"
 import { gsap } from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
 import { ExternalLink, Github } from "lucide-react"
@@ -424,24 +424,36 @@ export function ProjectsSection() {
   const projectNameRef = useRef<HTMLSpanElement>(null)
   const prevIndexRef = useRef<number>(0)
 
-  // Scroll to specific project
-  const scrollToProject = useCallback((index: number) => {
-    if (!sectionRef.current) return
+  // Scroll to specific project - uses regular function to always get latest ref
+  const scrollToProject = (index: number) => {
+    const st = scrollTriggerRef.current
+    if (!st) {
+      // Fallback: scroll to section and add index * 100vh
+      if (sectionRef.current) {
+        const rect = sectionRef.current.getBoundingClientRect()
+        const sectionTop = window.scrollY + rect.top
+        const targetScroll = sectionTop + (index * window.innerHeight)
+        window.scrollTo({ top: targetScroll, behavior: "smooth" })
+      }
+      return
+    }
     
     const totalProjects = allProjects.length
-    const section = sectionRef.current
-    const sectionTop = section.offsetTop
     
-    // Each project takes 100vh of scroll distance
-    // Total scroll distance = totalProjects * window.innerHeight
-    const scrollPerProject = window.innerHeight
-    const targetScroll = sectionTop + (index * scrollPerProject)
+    // Get the actual start and end scroll positions from ScrollTrigger
+    const startPos = st.start as number
+    const endPos = st.end as number
+    const totalScrollDistance = endPos - startPos
+    
+    // Calculate target: each project gets equal portion of scroll distance
+    const scrollPerProject = totalScrollDistance / totalProjects
+    const targetScroll = startPos + (index * scrollPerProject) + 10 // small offset to ensure trigger
     
     window.scrollTo({
       top: targetScroll,
       behavior: "smooth"
     })
-  }, [])
+  }
 
   // ASCII scramble animation for project name
   useEffect(() => {
