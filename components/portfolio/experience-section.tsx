@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef, useEffect, useCallback, useMemo } from "react"
+import { useState, useRef, useEffect } from "react"
 import { gsap } from "gsap"
 import { GSAPText, GSAPSVG } from "@/components/gsap-text"
 import { TechnicalGrid, TechnicalPattern } from "@/components/technical-grid"
@@ -9,70 +9,6 @@ import { useIsMobile } from "@/hooks/use-mobile"
 import { cn } from "@/lib/utils"
 
 const INITIAL_INDEX_VISIBLE = 3
-
-// ASCII scramble characters for status animation
-const ASCII_CHARS = "█▓▒░╔╗╚╝║═┌┐└┘│─┼├┤┬┴▀▄■□●○◆◇★☆«»<>[]{}!@#$%^&*"
-
-// Dynamic status display with ASCII scramble animation
-function StatusDisplay({
-  index,
-  shortTitle,
-  company,
-}: {
-  index: number
-  shortTitle: string
-  company: string
-}) {
-  const containerRef = useRef<HTMLSpanElement>(null)
-  const [displayText, setDisplayText] = useState("")
-  const targetText = useMemo(
-    () => `STATUS: [${(index + 1).toString().padStart(2, "0")}] ${shortTitle.toUpperCase()} // ${company.toUpperCase()}`,
-    [index, shortTitle, company]
-  )
-
-  // ASCII scramble animation effect
-  useEffect(() => {
-    let frameId: number | null = null
-    let iteration = 0
-    const duration = 18 // number of frames for full reveal
-
-    const scramble = () => {
-      iteration++
-      const progress = Math.min(iteration / duration, 1)
-      const revealedLength = Math.floor(progress * targetText.length)
-
-      let result = ""
-      for (let i = 0; i < targetText.length; i++) {
-        if (i < revealedLength) {
-          result += targetText[i]
-        } else if (targetText[i] === " ") {
-          result += " "
-        } else {
-          result += ASCII_CHARS[Math.floor(Math.random() * ASCII_CHARS.length)]
-        }
-      }
-      setDisplayText(result)
-
-      if (progress < 1) {
-        frameId = requestAnimationFrame(scramble)
-      }
-    }
-
-    // Reset and start animation
-    iteration = 0
-    scramble()
-
-    return () => {
-      if (frameId !== null) cancelAnimationFrame(frameId)
-    }
-  }, [targetText])
-
-  return (
-    <span ref={containerRef} className="font-mono text-[11px] sm:text-xs text-muted-foreground/70">
-      {displayText}
-    </span>
-  )
-}
 
 // Helper to bold numbers in highlight text (includes adjacent letters and symbols)
 function BoldNumbers({ text }: { text: string }) {
@@ -581,11 +517,6 @@ export function ExperienceSection() {
                 — Steve Jobs
               </span>
             </div>
-            <StatusDisplay
-              index={activeIndex}
-              shortTitle={experiences[activeIndex]?.shortTitle ?? experiences[activeIndex]?.title ?? "—"}
-              company={experiences[activeIndex]?.company ?? "—"}
-            />
           </div>
 
           <div className="relative">
@@ -596,10 +527,6 @@ export function ExperienceSection() {
                 <span className="text-foreground font-semibold">work-log entry</span> across internships,
                 research, and freelance: different environments, same obsession with reliability,
                 observability, and measurable impact.
-              </p>
-              <p className="hidden sm:block font-mono text-[11px] sm:text-xs text-muted-foreground mt-3">
-                Hover or tap to lock a role. In the detail panel, the metrics call out{" "}
-                <span className="text-accent font-semibold">throughput, savings, or deltas</span> – not vibes.
               </p>
 
               <GSAPSVG className="mt-4 w-full h-20 text-foreground/40">
