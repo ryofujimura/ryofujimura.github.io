@@ -924,7 +924,7 @@ export function ProjectsSection() {
         </div>
 
         {/* Legend */}
-        <div className="max-w-6xl mx-auto mt-10 sm:mt-14">
+        <div className="max-w-6xl mx-auto mt-10 sm:mt-14 mb-16 sm:mb-0">
           <div className="ascii-decoration font-mono text-[8px] sm:text-[10px] text-foreground/30 mb-3">
             // SYNTAX_LEGEND
           </div>
