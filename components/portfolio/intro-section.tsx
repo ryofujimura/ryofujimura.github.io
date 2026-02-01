@@ -4,6 +4,7 @@ import { useRef, useState, useEffect, useMemo } from "react"
 import { gsap } from "gsap"
 import { useIsMobile } from "@/hooks/use-mobile"
 import { GSAPText } from "@/components/gsap-text"
+import { BrutalistBackground } from "@/components/brutalist-background"
 
 // ASCII terminal dimensions
 const ASCII_W = 70
@@ -292,6 +293,11 @@ export function IntroSection() {
             height: "100vh",
           }}
         >
+          {/* Technical Background - Hidden on mobile for performance */}
+          <div className="hidden sm:block">
+            <BrutalistBackground variant="full" />
+          </div>
+
           <div className="relative z-10 w-full max-w-5xl mx-auto px-0">
             <div className="flex flex-col items-start gap-4 sm:gap-6 md:gap-8">
               
