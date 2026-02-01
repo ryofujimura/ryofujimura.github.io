@@ -440,23 +440,6 @@ function CloudMessageForm({ onClose }: { onClose: () => void }) {
             />
           </div>
           
-          {/* Username input - bottom left */}
-          <div className="mt-4 flex items-center gap-2">
-            <User className="w-4 h-4 text-muted-foreground/60 shrink-0" />
-            <input
-              ref={usernameRef}
-              type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              placeholder="Enter username"
-              className="flex-1 max-w-[200px] px-3 py-2 rounded-xl border border-white/20 dark:border-white/10 font-mono text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:border-white/40 transition-all duration-300"
-              style={{
-                background: "rgba(255, 255, 255, 0.08)",
-                backdropFilter: "blur(4px)",
-              }}
-            />
-          </div>
-
           {/* Status message */}
           {sendStatus === "success" && (
             <div className="mt-4 flex items-center gap-2 text-green-500 font-mono text-sm">
@@ -471,12 +454,30 @@ function CloudMessageForm({ onClose }: { onClose: () => void }) {
             </div>
           )}
 
-          {/* Send button */}
-          <div className="mt-6 flex justify-end">
+          {/* Username input and Send button - same row */}
+          <div className="mt-6 flex items-center justify-between gap-4">
+            {/* Username input */}
+            <div className="flex items-center gap-2 flex-1">
+              <User className="w-4 h-4 text-muted-foreground/60 shrink-0" />
+              <input
+                ref={usernameRef}
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder="Username"
+                className="flex-1 max-w-[180px] px-3 py-2 rounded-xl border border-white/20 dark:border-white/10 font-mono text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:border-white/40 transition-all duration-300"
+                style={{
+                  background: "rgba(255, 255, 255, 0.08)",
+                  backdropFilter: "blur(4px)",
+                }}
+              />
+            </div>
+            
+            {/* Send button */}
             <button
               onClick={handleSend}
               disabled={!message.trim() || !username.trim() || isSending || sendStatus === "success"}
-              className="send-btn group flex items-center gap-2 px-6 py-3 rounded-full font-mono text-sm font-medium disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-300 border border-white/20"
+              className="send-btn group flex items-center gap-2 px-6 py-2.5 rounded-full font-mono text-sm font-medium disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-300 border border-white/20 shrink-0"
               style={{
                 background: sendStatus === "success"
                   ? "rgba(34, 197, 94, 0.9)"
