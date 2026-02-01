@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect, useMemo, useCallback } from "react"
 import { gsap } from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
-import { ExternalLink, Github, ChevronRight, ChevronLeft, X } from "lucide-react"
+import { ExternalLink, Github, ChevronRight, ChevronLeft, X, ChevronDown } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 gsap.registerPlugin(ScrollTrigger)
@@ -617,99 +617,96 @@ function SectionHeader({ count }: { count: number }) {
 function HorizontalTimeline({ projects }: { projects: Project[] }) {
   const containerRef = useRef<HTMLDivElement>(null)
   const scrollRef = useRef<HTMLDivElement>(null)
+  const [scrollProgress, setScrollProgress] = useState(0)
 
   useEffect(() => {
-    if (!containerRef.current || !scrollRef.current) return
-    const container = containerRef.current
+    if (!scrollRef.current) return
     const scroll = scrollRef.current
 
+    const handleScroll = () => {
+      const maxScroll = scroll.scrollWidth - scroll.clientWidth
+      const progress = maxScroll > 0 ? scroll.scrollLeft / maxScroll : 0
+      setScrollProgress(progress)
+    }
+
+    scroll.addEventListener("scroll", handleScroll)
+    return () => scroll.removeEventListener("scroll", handleScroll)
+  }, [])
+
+  useEffect(() => {
+    if (!containerRef.current) return
     const ctx = gsap.context(() => {
-      // Horizontal scroll animation
-      const totalWidth = scroll.scrollWidth - container.clientWidth
-
-      gsap.to(scroll, {
-        x: -totalWidth,
-        ease: "none",
-        scrollTrigger: {
-          trigger: container,
-          start: "top 20%",
-          end: () => `+=${totalWidth}`,
-          scrub: 1,
-          pin: true,
-          anticipatePin: 1,
-          invalidateOnRefresh: true,
-        },
-      })
-
-      // Timeline line animation
-      const line = container.querySelector(".timeline-line")
-      if (line) {
+      // Animate cards on scroll into view
+      const cards = containerRef.current?.querySelectorAll(".project-card")
+      cards?.forEach((card, i) => {
         gsap.fromTo(
-          line,
-          { scaleX: 0 },
+          card,
+          { opacity: 0, y: 30 },
           {
-            scaleX: 1,
-            ease: "none",
+            opacity: 1,
+            y: 0,
+            duration: 0.6,
+            delay: i * 0.1,
+            ease: "power3.out",
             scrollTrigger: {
-              trigger: container,
-              start: "top 20%",
-              end: () => `+=${totalWidth}`,
-              scrub: 1,
+              trigger: containerRef.current,
+              start: "top 85%",
+              toggleActions: "play none none none",
             },
           }
         )
-      }
-    }, container)
-
+      })
+    }, containerRef.current)
     return () => ctx.revert()
   }, [projects])
 
   return (
-    <div ref={containerRef} className="hidden lg:block relative overflow-hidden">
-      {/* Timeline line */}
-      <div className="absolute top-1/2 left-0 right-0 h-0.5 bg-foreground/10 -translate-y-1/2 z-0">
-        <div className="timeline-line absolute inset-0 bg-foreground/30 origin-left" />
+    <div ref={containerRef} className="hidden lg:block relative">
+      {/* Timeline progress bar */}
+      <div className="mb-4 flex items-center gap-3">
+        <span className="font-mono text-[9px] text-accent">NOW</span>
+        <div className="flex-1 h-1 bg-foreground/10 relative">
+          <div
+            className="absolute inset-y-0 left-0 bg-foreground/40 transition-all duration-150"
+            style={{ width: `${scrollProgress * 100}%` }}
+          />
+        </div>
+        <span className="font-mono text-[9px] text-foreground/50">2022</span>
       </div>
 
-      {/* Scrolling content */}
-      <div ref={scrollRef} className="flex items-center gap-8 py-8 px-4">
+      {/* Horizontal scrollable container */}
+      <div
+        ref={scrollRef}
+        className="flex gap-6 overflow-x-auto pb-4 scrollbar-hide scroll-smooth"
+        style={{ scrollSnapType: "x mandatory" }}
+      >
         {/* Now marker */}
-        <div className="flex-shrink-0 flex flex-col items-center">
-          <pre className="font-mono text-[8px] text-foreground/30 select-none whitespace-pre">{ASCII_GROWTH}</pre>
-          <span className="font-mono text-[10px] text-accent mt-2">NOW</span>
+        <div className="flex-shrink-0 flex flex-col items-center justify-center w-16 scroll-snap-align-start">
+          <pre className="font-mono text-[7px] text-foreground/30 select-none whitespace-pre leading-tight">{ASCII_GROWTH}</pre>
+          <span className="font-mono text-[9px] text-accent mt-1">▼</span>
         </div>
 
         {projects.map((project, index) => (
-          <div key={project.id} className="flex items-center gap-4">
-            {/* Node */}
-            <div className="flex-shrink-0 flex flex-col items-center">
-              <div className="w-4 h-4 border-2 border-foreground bg-background rotate-45">
-                <div className="w-full h-full bg-accent/20" />
-              </div>
-              <span className="font-mono text-[9px] text-foreground/50 mt-2">{project.year}</span>
-            </div>
-
-            {/* Connector */}
-            <div className="w-8 h-px bg-foreground/30" />
-
-            {/* Card */}
+          <div
+            key={project.id}
+            className="project-card flex-shrink-0 scroll-snap-align-start"
+            style={{ scrollSnapAlign: "start" }}
+          >
             <ProjectCard project={project} index={index} />
-
-            {/* Connector after */}
-            {index < projects.length - 1 && <div className="w-8 h-px bg-foreground/30" />}
           </div>
         ))}
 
-        {/* Start marker */}
-        <div className="flex-shrink-0 flex flex-col items-center ml-4">
-          <span className="font-mono text-[10px] text-foreground/50">2022</span>
+        {/* End marker */}
+        <div className="flex-shrink-0 flex flex-col items-center justify-center w-20 scroll-snap-align-start">
+          <span className="font-mono text-[9px] text-foreground/40">2022</span>
           <pre className="font-mono text-[8px] text-foreground/30 select-none mt-1">{ASCII_ARROW}</pre>
         </div>
       </div>
 
       {/* Scroll hint */}
-      <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex items-center gap-2 font-mono text-[9px] text-foreground/40">
-        <span>SCROLL</span>
+      <div className="mt-2 flex items-center justify-center gap-2 font-mono text-[9px] text-foreground/40">
+        <ChevronLeft className="w-3 h-3" />
+        <span>SCROLL HORIZONTALLY</span>
         <ChevronRight className="w-3 h-3" />
       </div>
     </div>
