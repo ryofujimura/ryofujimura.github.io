@@ -10,9 +10,9 @@ interface HeroPortraitProps {
 
 /**
  * ViewfinderOverlay - Complex SVG camera viewfinder frame with animated technical elements
- * Award-winning brutalist aesthetic with layered technical patterns
+ * Square format (256x256) to match face images - brutalist aesthetic
  */
-function ViewfinderOverlay({ isHovered }: { isHovered: boolean }) {
+function ViewfinderOverlay() {
   const svgRef = useRef<SVGSVGElement>(null)
   const [hasAnimated, setHasAnimated] = useState(false)
 
@@ -54,18 +54,6 @@ function ViewfinderOverlay({ isHovered }: { isHovered: boolean }) {
       stagger: 0.1,
       ease: "power2.out",
     })
-
-    // Draw crosshairs
-    tl.to(
-      svg.querySelectorAll("[data-crosshair]"),
-      {
-        strokeDashoffset: 0,
-        duration: 0.4,
-        stagger: 0.05,
-        ease: "power2.out",
-      },
-      "-=0.3"
-    )
 
     // Draw grid lines
     tl.to(
@@ -109,57 +97,21 @@ function ViewfinderOverlay({ isHovered }: { isHovered: boolean }) {
     }
   }, [hasAnimated])
 
-  // Hover animation for focus ring
-  useEffect(() => {
-    if (!svgRef.current) return
-    const focusRing = svgRef.current.querySelector("[data-focus-ring]")
-    if (!focusRing) return
-
-    if (isHovered) {
-      gsap.to(focusRing, {
-        scale: 1.05,
-        opacity: 1,
-        duration: 0.3,
-        ease: "power2.out",
-      })
-    } else {
-      gsap.to(focusRing, {
-        scale: 1,
-        opacity: 0.6,
-        duration: 0.3,
-        ease: "power2.out",
-      })
-    }
-  }, [isHovered])
-
   return (
     <svg
       ref={svgRef}
       className="absolute inset-0 w-full h-full pointer-events-none z-20"
-      viewBox="0 0 400 500"
+      viewBox="0 0 256 256"
       fill="none"
-      preserveAspectRatio="xMidYMid slice"
+      preserveAspectRatio="xMidYMid meet"
     >
-      <defs>
-        {/* Gradient for focus ring */}
-        <linearGradient id="focusGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="currentColor" stopOpacity="0.8" />
-          <stop offset="50%" stopColor="currentColor" stopOpacity="0.4" />
-          <stop offset="100%" stopColor="currentColor" stopOpacity="0.8" />
-        </linearGradient>
-        {/* Clip path for rounded frame */}
-        <clipPath id="frameClip">
-          <rect x="20" y="20" width="360" height="460" rx="12" />
-        </clipPath>
-      </defs>
-
       {/* === LAYER 1: Outer frame brackets === */}
       <g className="text-foreground/40">
         {/* Top-left bracket */}
         <path
           data-draw
           data-corner
-          d="M 8 60 L 8 8 L 60 8"
+          d="M 5 38 L 5 5 L 38 5"
           strokeWidth="2"
           stroke="currentColor"
           strokeLinecap="round"
@@ -168,7 +120,7 @@ function ViewfinderOverlay({ isHovered }: { isHovered: boolean }) {
         <path
           data-draw
           data-corner
-          d="M 340 8 L 392 8 L 392 60"
+          d="M 218 5 L 251 5 L 251 38"
           strokeWidth="2"
           stroke="currentColor"
           strokeLinecap="round"
@@ -177,7 +129,7 @@ function ViewfinderOverlay({ isHovered }: { isHovered: boolean }) {
         <path
           data-draw
           data-corner
-          d="M 392 440 L 392 492 L 340 492"
+          d="M 251 218 L 251 251 L 218 251"
           strokeWidth="2"
           stroke="currentColor"
           strokeLinecap="round"
@@ -186,7 +138,7 @@ function ViewfinderOverlay({ isHovered }: { isHovered: boolean }) {
         <path
           data-draw
           data-corner
-          d="M 60 492 L 8 492 L 8 440"
+          d="M 38 251 L 5 251 L 5 218"
           strokeWidth="2"
           stroke="currentColor"
           strokeLinecap="round"
@@ -197,111 +149,107 @@ function ViewfinderOverlay({ isHovered }: { isHovered: boolean }) {
       <rect
         data-draw
         data-corner
-        x="24"
-        y="24"
-        width="352"
-        height="452"
-        rx="8"
+        x="15"
+        y="15"
+        width="226"
+        height="226"
+        rx="5"
         stroke="currentColor"
         strokeWidth="1"
         className="text-foreground/20"
       />
 
-      {/* === LAYER 5: Rule of thirds grid === */}
+      {/* === LAYER 3: Rule of thirds grid === */}
       <g className="text-foreground/10">
         {/* Vertical lines */}
-        <line data-draw data-grid x1="133" y1="40" x2="133" y2="460" strokeWidth="0.5" stroke="currentColor" />
-        <line data-draw data-grid x1="267" y1="40" x2="267" y2="460" strokeWidth="0.5" stroke="currentColor" />
+        <line data-draw data-grid x1="85" y1="25" x2="85" y2="231" strokeWidth="0.5" stroke="currentColor" />
+        <line data-draw data-grid x1="171" y1="25" x2="171" y2="231" strokeWidth="0.5" stroke="currentColor" />
         {/* Horizontal lines */}
-        <line data-draw data-grid x1="40" y1="167" x2="360" y2="167" strokeWidth="0.5" stroke="currentColor" />
-        <line data-draw data-grid x1="40" y1="333" x2="360" y2="333" strokeWidth="0.5" stroke="currentColor" />
+        <line data-draw data-grid x1="25" y1="85" x2="231" y2="85" strokeWidth="0.5" stroke="currentColor" />
+        <line data-draw data-grid x1="25" y1="171" x2="231" y2="171" strokeWidth="0.5" stroke="currentColor" />
       </g>
 
-      {/* === LAYER 6: Corner measurement marks === */}
+      {/* === LAYER 4: Corner measurement marks === */}
       <g className="text-foreground/50" data-fade>
-        {/* Top-left measurements */}
-        <line x1="40" y1="40" x2="60" y2="40" strokeWidth="1" stroke="currentColor" />
-        <line x1="40" y1="40" x2="40" y2="60" strokeWidth="1" stroke="currentColor" />
-        {/* Top-right measurements */}
-        <line x1="340" y1="40" x2="360" y2="40" strokeWidth="1" stroke="currentColor" />
-        <line x1="360" y1="40" x2="360" y2="60" strokeWidth="1" stroke="currentColor" />
-        {/* Bottom-right measurements */}
-        <line x1="340" y1="460" x2="360" y2="460" strokeWidth="1" stroke="currentColor" />
-        <line x1="360" y1="440" x2="360" y2="460" strokeWidth="1" stroke="currentColor" />
-        {/* Bottom-left measurements */}
-        <line x1="40" y1="460" x2="60" y2="460" strokeWidth="1" stroke="currentColor" />
-        <line x1="40" y1="440" x2="40" y2="460" strokeWidth="1" stroke="currentColor" />
+        {/* Top-left */}
+        <line x1="25" y1="25" x2="40" y2="25" strokeWidth="1" stroke="currentColor" />
+        <line x1="25" y1="25" x2="25" y2="40" strokeWidth="1" stroke="currentColor" />
+        {/* Top-right */}
+        <line x1="216" y1="25" x2="231" y2="25" strokeWidth="1" stroke="currentColor" />
+        <line x1="231" y1="25" x2="231" y2="40" strokeWidth="1" stroke="currentColor" />
+        {/* Bottom-right */}
+        <line x1="216" y1="231" x2="231" y2="231" strokeWidth="1" stroke="currentColor" />
+        <line x1="231" y1="216" x2="231" y2="231" strokeWidth="1" stroke="currentColor" />
+        {/* Bottom-left */}
+        <line x1="25" y1="231" x2="40" y2="231" strokeWidth="1" stroke="currentColor" />
+        <line x1="25" y1="216" x2="25" y2="231" strokeWidth="1" stroke="currentColor" />
       </g>
 
-      {/* === LAYER 7: Technical tick marks along edges === */}
+      {/* === LAYER 5: Technical tick marks along edges === */}
       <g className="text-foreground/20" data-fade>
         {/* Top edge ticks */}
-        {[80, 120, 160, 200, 240, 280, 320].map((x) => (
-          <line key={`top-${x}`} x1={x} y1="32" x2={x} y2={x === 200 ? 44 : 38} strokeWidth="0.5" stroke="currentColor" />
+        {[64, 96, 128, 160, 192].map((x) => (
+          <line key={`top-${x}`} x1={x} y1="20" x2={x} y2={x === 128 ? 28 : 24} strokeWidth="0.5" stroke="currentColor" />
         ))}
         {/* Bottom edge ticks */}
-        {[80, 120, 160, 200, 240, 280, 320].map((x) => (
-          <line key={`bot-${x}`} x1={x} y1="468" x2={x} y2={x === 200 ? 456 : 462} strokeWidth="0.5" stroke="currentColor" />
+        {[64, 96, 128, 160, 192].map((x) => (
+          <line key={`bot-${x}`} x1={x} y1="236" x2={x} y2={x === 128 ? 228 : 232} strokeWidth="0.5" stroke="currentColor" />
         ))}
         {/* Left edge ticks */}
-        {[80, 130, 180, 230, 280, 330, 380, 420].map((y) => (
-          <line key={`left-${y}`} x1="32" y1={y} x2={y === 250 ? 44 : 38} y2={y} strokeWidth="0.5" stroke="currentColor" />
+        {[64, 96, 128, 160, 192].map((y) => (
+          <line key={`left-${y}`} x1="20" y1={y} x2={y === 128 ? 28 : 24} y2={y} strokeWidth="0.5" stroke="currentColor" />
         ))}
         {/* Right edge ticks */}
-        {[80, 130, 180, 230, 280, 330, 380, 420].map((y) => (
-          <line key={`right-${y}`} x1="368" y1={y} x2={y === 250 ? 356 : 362} y2={y} strokeWidth="0.5" stroke="currentColor" />
+        {[64, 96, 128, 160, 192].map((y) => (
+          <line key={`right-${y}`} x1="236" y1={y} x2={y === 128 ? 228 : 232} y2={y} strokeWidth="0.5" stroke="currentColor" />
         ))}
       </g>
 
-      {/* === LAYER 8: Focus point indicators === */}
+      {/* === LAYER 6: Focus point indicators === */}
       <g className="text-foreground/40">
         {/* Rule-of-thirds intersection points */}
-        <circle data-pulse cx="133" cy="167" r="3" fill="currentColor" fillOpacity="0.3" />
-        <circle data-pulse cx="267" cy="167" r="3" fill="currentColor" fillOpacity="0.3" />
-        <circle data-pulse cx="133" cy="333" r="3" fill="currentColor" fillOpacity="0.3" />
-        <circle data-pulse cx="267" cy="333" r="3" fill="currentColor" fillOpacity="0.3" />
+        <circle data-pulse cx="85" cy="85" r="2" fill="currentColor" fillOpacity="0.3" />
+        <circle data-pulse cx="171" cy="85" r="2" fill="currentColor" fillOpacity="0.3" />
+        <circle data-pulse cx="85" cy="171" r="2" fill="currentColor" fillOpacity="0.3" />
+        <circle data-pulse cx="171" cy="171" r="2" fill="currentColor" fillOpacity="0.3" />
       </g>
 
-      {/* === LAYER 9: Technical info overlays === */}
-      <g className="text-foreground/60 font-mono" style={{ fontSize: "8px" }} data-fade>
-        {/* Top-left info */}
-        <text x="44" y="74" fill="currentColor" className="font-mono text-[8px]">
+      {/* === LAYER 7: Technical info overlays === */}
+      <g className="text-foreground/60 font-mono" style={{ fontSize: "6px" }} data-fade>
+        <text x="28" y="48" fill="currentColor" className="font-mono">
           ISO 400
         </text>
-        {/* Top-right info */}
-        <text x="316" y="74" fill="currentColor" className="font-mono text-[8px]" textAnchor="end">
+        <text x="228" y="48" fill="currentColor" className="font-mono" textAnchor="end">
           f/2.8
         </text>
-        {/* Bottom-left info */}
-        <text x="44" y="444" fill="currentColor" className="font-mono text-[8px]">
+        <text x="28" y="220" fill="currentColor" className="font-mono">
           1/125s
         </text>
-        {/* Bottom-right info */}
-        <text x="356" y="444" fill="currentColor" className="font-mono text-[8px]" textAnchor="end">
+        <text x="228" y="220" fill="currentColor" className="font-mono" textAnchor="end">
           50mm
         </text>
       </g>
 
-      {/* === LAYER 10: Corner diagonal lines (brutalist accent) === */}
+      {/* === LAYER 8: Corner diagonal lines (brutalist accent) === */}
       <g className="text-foreground/15">
-        <line data-draw data-grid x1="8" y1="8" x2="40" y2="40" strokeWidth="0.5" stroke="currentColor" />
-        <line data-draw data-grid x1="392" y1="8" x2="360" y2="40" strokeWidth="0.5" stroke="currentColor" />
-        <line data-draw data-grid x1="392" y1="492" x2="360" y2="460" strokeWidth="0.5" stroke="currentColor" />
-        <line data-draw data-grid x1="8" y1="492" x2="40" y2="460" strokeWidth="0.5" stroke="currentColor" />
+        <line data-draw data-grid x1="5" y1="5" x2="25" y2="25" strokeWidth="0.5" stroke="currentColor" />
+        <line data-draw data-grid x1="251" y1="5" x2="231" y2="25" strokeWidth="0.5" stroke="currentColor" />
+        <line data-draw data-grid x1="251" y1="251" x2="231" y2="231" strokeWidth="0.5" stroke="currentColor" />
+        <line data-draw data-grid x1="5" y1="251" x2="25" y2="231" strokeWidth="0.5" stroke="currentColor" />
       </g>
 
-      {/* === LAYER 11: Scan line indicators === */}
+      {/* === LAYER 9: Scan line indicators === */}
       <g className="text-foreground/10" data-fade>
-        <rect x="36" y="248" width="4" height="4" fill="currentColor" />
-        <rect x="360" y="248" width="4" height="4" fill="currentColor" />
-        <rect x="198" y="36" width="4" height="4" fill="currentColor" />
-        <rect x="198" y="460" width="4" height="4" fill="currentColor" />
+        <rect x="23" y="126" width="3" height="3" fill="currentColor" />
+        <rect x="230" y="126" width="3" height="3" fill="currentColor" />
+        <rect x="126" y="23" width="3" height="3" fill="currentColor" />
+        <rect x="126" y="230" width="3" height="3" fill="currentColor" />
       </g>
 
-      {/* === LAYER 12: Recording indicator === */}
+      {/* === LAYER 10: Recording indicator === */}
       <g data-pulse>
-        <circle cx="56" cy="56" r="4" fill="oklch(0.65 0.25 25)" fillOpacity="0.8" />
-        <text x="66" y="59" fill="currentColor" className="font-mono text-[7px] text-foreground/50">
+        <circle cx="36" cy="36" r="3" fill="oklch(0.65 0.25 25)" fillOpacity="0.8" />
+        <text x="43" y="38" fill="currentColor" className="font-mono text-foreground/50" style={{ fontSize: "5px" }}>
           REC
         </text>
       </g>
@@ -310,7 +258,7 @@ function ViewfinderOverlay({ isHovered }: { isHovered: boolean }) {
 }
 
 /**
- * DiagonalPatternOverlay - Brutalist diagonal line pattern
+ * DiagonalPatternOverlay - Brutalist diagonal line pattern (square format)
  */
 function DiagonalPatternOverlay() {
   const patternRef = useRef<SVGSVGElement>(null)
@@ -333,17 +281,17 @@ function DiagonalPatternOverlay() {
     <svg
       ref={patternRef}
       className="absolute inset-0 w-full h-full pointer-events-none z-10 mix-blend-overlay"
-      viewBox="0 0 400 500"
-      preserveAspectRatio="xMidYMid slice"
+      viewBox="0 0 256 256"
+      preserveAspectRatio="xMidYMid meet"
     >
       <g className="text-foreground/5">
-        {Array.from({ length: 20 }, (_, i) => (
+        {Array.from({ length: 12 }, (_, i) => (
           <line
             key={i}
-            x1={-50 + i * 50}
+            x1={-30 + i * 30}
             y1="0"
-            x2={150 + i * 50}
-            y2="500"
+            x2={90 + i * 30}
+            y2="256"
             strokeWidth="1"
             stroke="currentColor"
           />
@@ -354,13 +302,11 @@ function DiagonalPatternOverlay() {
 }
 
 /**
- * HeroPortrait - Award-winning brutalist camera viewfinder portrait component
+ * HeroPortrait - Brutalist camera viewfinder portrait component
  * Features gaze-tracking face with layered SVG overlays and GSAP animations
  */
 export function HeroPortrait({ className = "" }: HeroPortraitProps) {
   const containerRef = useRef<HTMLDivElement>(null)
-  const imageRef = useRef<HTMLDivElement>(null)
-  const [isHovered, setIsHovered] = useState(false)
   
   // Gaze tracking hook - face follows cursor/touch
   const { currentImage, isLoading } = useGazeTracking(containerRef, '/faces/')
@@ -387,68 +333,16 @@ export function HeroPortrait({ className = "" }: HeroPortraitProps) {
     )
   }, [])
 
-  // Hover effects for image
-  useEffect(() => {
-    if (!imageRef.current) return
-
-    if (isHovered) {
-      gsap.to(imageRef.current, {
-        scale: 1.05,
-        duration: 0.5,
-        ease: "power2.out",
-      })
-    } else {
-      gsap.to(imageRef.current, {
-        scale: 1,
-        duration: 0.5,
-        ease: "power2.out",
-      })
-    }
-  }, [isHovered])
-
-  // Mouse move parallax effect
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!containerRef.current || !imageRef.current) return
-
-    const rect = containerRef.current.getBoundingClientRect()
-    const x = (e.clientX - rect.left) / rect.width - 0.5
-    const y = (e.clientY - rect.top) / rect.height - 0.5
-
-    gsap.to(imageRef.current, {
-      x: x * 10,
-      y: y * 10,
-      duration: 0.3,
-      ease: "power2.out",
-    })
-  }
-
-  const handleMouseLeave = () => {
-    setIsHovered(false)
-    if (!imageRef.current) return
-    gsap.to(imageRef.current, {
-      x: 0,
-      y: 0,
-      duration: 0.5,
-      ease: "power2.out",
-    })
-  }
-
   return (
     <div
       ref={containerRef}
-      className={`relative group ${className}`}
-      style={{ aspectRatio: "4/5" }}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={handleMouseLeave}
-      onMouseMove={handleMouseMove}
+      className={`relative ${className}`}
+      style={{ aspectRatio: "1/1" }}
     >
       {/* Base container with rounded corners */}
       <div className="absolute inset-0 rounded-xl overflow-hidden bg-muted/20">
-        {/* Image wrapper with parallax - gaze tracking face */}
-        <div
-          ref={imageRef}
-          className="absolute inset-0 w-full h-full"
-        >
+        {/* Image wrapper - gaze tracking face */}
+        <div className="absolute inset-0 w-full h-full">
           {currentImage && (
             <img
               src={currentImage}
@@ -480,17 +374,7 @@ export function HeroPortrait({ className = "" }: HeroPortraitProps) {
       </div>
 
       {/* Viewfinder SVG overlay */}
-      <ViewfinderOverlay isHovered={isHovered} />
-
-      {/* Hover glow effect */}
-      <div
-        className={`absolute inset-0 rounded-xl transition-opacity duration-500 pointer-events-none ${
-          isHovered ? "opacity-100" : "opacity-0"
-        }`}
-        style={{
-          boxShadow: "inset 0 0 60px 10px rgba(255,255,255,0.05)",
-        }}
-      />
+      <ViewfinderOverlay />
 
       {/* Bottom info bar */}
       <div className="absolute bottom-0 left-0 right-0 z-30 px-4 py-3 bg-gradient-to-t from-background/80 to-transparent">
