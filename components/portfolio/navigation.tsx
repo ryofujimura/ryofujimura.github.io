@@ -153,7 +153,7 @@ function SplitContactButton() {
       <div 
         className="absolute inset-0 flex items-center justify-center"
         style={{ 
-          filter: "blur(8px) contrast(20)",
+          // filter: "blur(8px) contrast(20)",
           background: "transparent",
         }}
       >
@@ -248,7 +248,7 @@ const navItems = [
   { label: "About", href: "#about" },
   { label: "Experience", href: "#experience" },
   { label: "Projects", href: "#projects" },
-  { label: "Contact", href: "#contact" },
+  { label: "Next", href: "#contact" },
 ]
 
 export function Navigation() {
