@@ -3,10 +3,11 @@
 import { useState, useRef, useEffect, useCallback } from "react"
 import { gsap } from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
+import { ScrollToPlugin } from "gsap/ScrollToPlugin"
 import { cn } from "@/lib/utils"
 import Image from "next/image"
 
-gsap.registerPlugin(ScrollTrigger)
+gsap.registerPlugin(ScrollTrigger, ScrollToPlugin)
 
 // ─────────────────────────────────────────────────────────────
 // MOBILE DETECTION HOOK
