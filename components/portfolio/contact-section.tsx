@@ -11,6 +11,115 @@ import { LocationHoverText } from "@/components/portfolio/location-hover-text"
 
 gsap.registerPlugin(ScrollTrigger)
 
+// Rotating words for the tagline
+const ROTATING_WORDS = [
+  "opportunities",
+  "collaboration",
+  "your project",
+  "new ideas",
+  "AI research",
+]
+const WORD_ROTATE_MS = 2800
+const WORD_SLOT_CH = 14
+
+// Vertical letter-by-letter word rotator
+function VerticalWordRotator({
+  words,
+  slotWidthCh,
+  className = "",
+}: {
+  words: string[]
+  slotWidthCh: number
+  className?: string
+}) {
+  const [currentIndex, setCurrentIndex] = useState(0)
+  const [isAnimating, setIsAnimating] = useState(false)
+  const containerRef = useRef<HTMLSpanElement>(null)
+  const currentWordRef = useRef<HTMLSpanElement>(null)
+  const nextWordRef = useRef<HTMLSpanElement>(null)
+
+  useEffect(() => {
+    if (words.length <= 1) return
+
+    const interval = setInterval(() => {
+      if (isAnimating) return
+      setIsAnimating(true)
+
+      const currentEl = currentWordRef.current
+      const nextEl = nextWordRef.current
+      if (!currentEl || !nextEl) {
+        setIsAnimating(false)
+        return
+      }
+
+      const currentChars = currentEl.querySelectorAll(".char")
+      const nextChars = nextEl.querySelectorAll(".char")
+
+      // Animate current word out (letters slide up and fade)
+      gsap.to(currentChars, {
+        y: -20,
+        opacity: 0,
+        duration: 0.3,
+        stagger: 0.02,
+        ease: "power2.in",
+      })
+
+      // Animate next word in (letters slide up from below)
+      gsap.fromTo(
+        nextChars,
+        { y: 20, opacity: 0 },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 0.3,
+          stagger: 0.02,
+          ease: "power2.out",
+          delay: 0.15,
+          onComplete: () => {
+            setCurrentIndex((prev) => (prev + 1) % words.length)
+            setIsAnimating(false)
+            // Reset current word position for next cycle
+            gsap.set(currentChars, { y: 0, opacity: 1 })
+          },
+        }
+      )
+    }, WORD_ROTATE_MS)
+
+    return () => clearInterval(interval)
+  }, [words.length, isAnimating])
+
+  const currentWord = words[currentIndex]
+  const nextWord = words[(currentIndex + 1) % words.length]
+
+  const renderWord = (word: string, ref: React.RefObject<HTMLSpanElement | null>) => (
+    <span ref={ref} className="absolute inset-0 flex items-center">
+      {word.split("").map((char, i) => (
+        <span
+          key={i}
+          className="char inline-block"
+          style={{ whiteSpace: char === " " ? "pre" : "normal" }}
+        >
+          {char === " " ? "\u00A0" : char}
+        </span>
+      ))}
+    </span>
+  )
+
+  return (
+    <span
+      ref={containerRef}
+      className={`relative inline-block overflow-hidden align-baseline ${className}`}
+      style={{ 
+        minWidth: `${slotWidthCh}ch`,
+        height: "1.2em",
+      }}
+    >
+      {renderWord(currentWord, currentWordRef)}
+      {renderWord(nextWord, nextWordRef)}
+    </span>
+  )
+}
+
 // Animated SVG decoration for the header
 function AnimatedHeaderSVG({ className = "" }: { className?: string }) {
   const svgRef = useRef<SVGSVGElement>(null)
@@ -192,9 +301,14 @@ export function ContactSection() {
         </div>
 
         <AnimatedSection delay={200}>
-          <p className="text-base sm:text-lg md:text-xl text-muted-foreground leading-relaxed max-w-2xl mx-auto mb-8 sm:mb-12 px-1">
-            I&apos;m currently looking for new opportunities in software engineering and AI research. 
-            Whether you have a question, a project idea, or just want to connect — my inbox is always open.
+          <p className="text-base sm:text-lg md:text-xl text-muted-foreground leading-relaxed max-w-2xl mx-auto mb-8 sm:mb-12 px-1 font-mono">
+            Open to{" "}
+            <VerticalWordRotator
+              words={ROTATING_WORDS}
+              slotWidthCh={WORD_SLOT_CH}
+              className="text-foreground font-medium"
+            />
+            {" "}— let&apos;s connect.
           </p>
         </AnimatedSection>
 
