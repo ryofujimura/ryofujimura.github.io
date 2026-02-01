@@ -52,8 +52,11 @@ export function CustomCursor() {
       dotX += (mouseX - dotX) * dotEase
       dotY += (mouseY - dotY) * dotEase
 
-      cursor.style.transform = `translate3d(${cursorX - 24}px, ${cursorY - 24}px, 0)`
-      cursorDot.style.transform = `translate3d(${dotX - 4}px, ${dotY - 4}px, 0)`
+      // Position at mouse coordinates, CSS transform handles centering
+      cursor.style.left = `${cursorX}px`
+      cursor.style.top = `${cursorY}px`
+      cursorDot.style.left = `${dotX}px`
+      cursorDot.style.top = `${dotY}px`
 
       requestAnimationFrame(animate)
     }
@@ -77,7 +80,7 @@ export function CustomCursor() {
     <>
       <div
         ref={cursorRef}
-        className="fixed top-0 left-0 pointer-events-none z-[9999] mix-blend-difference hidden lg:flex items-center justify-center transition-[width,height,background-color] duration-300 ease-out"
+        className="fixed pointer-events-none z-[9999] mix-blend-difference hidden lg:flex items-center justify-center transition-[width,height,background-color] duration-300 ease-out -translate-x-1/2 -translate-y-1/2"
         style={{
           width: isHovering ? (cursorText ? 120 : 64) : 48,
           height: isHovering ? (cursorText ? 120 : 64) : 48,
@@ -94,7 +97,7 @@ export function CustomCursor() {
       </div>
       <div
         ref={cursorDotRef}
-        className="fixed top-0 left-0 pointer-events-none z-[9999] hidden lg:block"
+        className="fixed pointer-events-none z-[9999] hidden lg:block -translate-x-1/2 -translate-y-1/2"
         style={{
           width: 8,
           height: 8,

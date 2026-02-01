@@ -130,6 +130,12 @@
     padding-right: env(safe-area-inset-right, 0);
     padding-bottom: env(safe-area-inset-bottom, 0);
   }
+  /* Hide default cursor on large screens where custom cursor is visible */
+  @media (min-width: 1024px) {
+    *, *::before, *::after {
+      cursor: none !important;
+    }
+  }
   /* iOS: remove tap highlight; keep 44px+ touch targets in components */
   button, a, [role="button"] {
     -webkit-tap-highlight-color: transparent;
