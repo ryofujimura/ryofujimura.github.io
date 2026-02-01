@@ -838,38 +838,6 @@ function SkillButton({
   )
 }
 
-// ─────────────────────────────────────────────────────────────
-// ADAPTIVE ASCII BORDER
-// ─────────────────────────────────────────────────────────────
-
-function AsciiBorderLine({ position, className }: { position: "top" | "bottom"; className?: string }) {
-  const lineRef = useRef<HTMLDivElement>(null)
-  const [line, setLine] = useState("")
-
-  useEffect(() => {
-    const updateWidth = () => {
-      if (!lineRef.current) return
-      const width = lineRef.current.offsetWidth
-      // Get computed font size to calculate character width accurately
-      const fontSize = parseFloat(getComputedStyle(lineRef.current).fontSize) || 10
-      // Monospace character width is approximately 0.6 of font size
-      const charWidth = fontSize * 0.6
-      // Subtract 2 for the corner characters (╔/╚ and ╗/╝), and add small buffer
-      const charCount = Math.max(4, Math.floor((width - charWidth * 2) / charWidth))
-      const middle = "═".repeat(charCount)
-      setLine(position === "top" ? `╔${middle}╗` : `╚${middle}╝`)
-    }
-    updateWidth()
-    window.addEventListener("resize", updateWidth)
-    return () => window.removeEventListener("resize", updateWidth)
-  }, [position])
-
-  return (
-    <div ref={lineRef} className={cn("font-mono text-[8px] sm:text-[10px] text-foreground/30", className)}>
-      {line}
-    </div>
-  )
-}
 
 // ─────────────────────────────────────────────────────────────
 // MAIN SECTION
@@ -1036,8 +1004,6 @@ export function ProjectsSection() {
       <div className="relative z-10 px-4 sm:px-6 md:px-8">
         {/* Section header */}
         <div className="max-w-6xl mx-auto mb-8 sm:mb-12">
-          <AsciiBorderLine position="top" className="ascii-decoration mb-4" />
-
           <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
             <div>
               <div className="ascii-decoration font-mono text-[9px] sm:text-[11px] text-foreground/40 tracking-[0.2em] mb-2">
@@ -1054,7 +1020,8 @@ export function ProjectsSection() {
             </div>
           </div>
 
-          <AsciiBorderLine position="bottom" className="ascii-decoration mt-4" />
+          {/* Light divider */}
+          <div className="mt-6 h-px bg-foreground/10" />
         </div>
 
         {/* Skills display with inline terminal */}
