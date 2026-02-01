@@ -216,8 +216,10 @@ function CloudMessageForm({ onClose }: { onClose: () => void }) {
   const backdropRef = useRef<HTMLDivElement>(null)
   const formRef = useRef<HTMLDivElement>(null)
   const contentRef = useRef<HTMLDivElement>(null)
+  const textareaContainerRef = useRef<HTMLDivElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const usernameRef = useRef<HTMLInputElement>(null)
+  const actionRowRef = useRef<HTMLDivElement>(null)
   const [message, setMessage] = useState("")
   const [username, setUsername] = useState("")
   const [sendStatus, setSendStatus] = useState<SendStatus>("idle")
@@ -344,25 +346,34 @@ function CloudMessageForm({ onClose }: { onClose: () => void }) {
       if (result.success) {
         setSendStatus("success")
         
-        // Success animation - shrink textarea height
-        const textarea = textareaRef.current
-        if (textarea) {
-          const currentHeight = textarea.offsetHeight
+        // Success animation - shrink message area to nothing
+        const textareaContainer = textareaContainerRef.current
+        const actionRow = actionRowRef.current
+        
+        if (textareaContainer) {
+          const currentHeight = textareaContainer.offsetHeight
           
           // First, set explicit height so we can animate it
-          gsap.set(textarea, { height: currentHeight })
+          gsap.set(textareaContainer, { height: currentHeight, overflow: 'hidden' })
           
-          // Animate shrinking
-          gsap.to(textarea, {
+          // Animate shrinking the message container
+          gsap.to(textareaContainer, {
             height: 0,
-            paddingTop: 0,
-            paddingBottom: 0,
             opacity: 0,
-            duration: 0.5,
+            duration: 0.4,
             ease: "power3.inOut",
             onComplete: () => {
               setMessage("")
             }
+          })
+        }
+        
+        // Animate reducing the action row's top margin
+        if (actionRow) {
+          gsap.to(actionRow, {
+            marginTop: 0,
+            duration: 0.4,
+            ease: "power3.inOut",
           })
         }
         
@@ -415,7 +426,7 @@ function CloudMessageForm({ onClose }: { onClose: () => void }) {
         {/* Content - responsive padding */}
         <div ref={contentRef} className="relative z-10 p-5 sm:p-8">
           {/* Textarea with glass effect */}
-          <div className="relative">
+          <div ref={textareaContainerRef} className="relative">
             {/* Animated placeholder overlay - hidden during send animation */}
             {!message && sendStatus !== "success" && (
               <div 
@@ -451,7 +462,7 @@ function CloudMessageForm({ onClose }: { onClose: () => void }) {
           )}
 
           {/* Username input and Send button - responsive layout */}
-          <div className="mt-4 sm:mt-6 flex items-center justify-between gap-2 sm:gap-4">
+          <div ref={actionRowRef} className="mt-4 sm:mt-6 flex items-center justify-between gap-2 sm:gap-4">
             {/* Username input */}
             <input
               ref={usernameRef}
