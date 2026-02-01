@@ -111,7 +111,6 @@ function CloudMessageForm({ onClose }: { onClose: () => void }) {
   const formRef = useRef<HTMLDivElement>(null)
   const contentRef = useRef<HTMLDivElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
-  const labelCharsRef = useRef<HTMLSpanElement>(null)
   const [message, setMessage] = useState("")
   const [isSending, setIsSending] = useState(false)
 
@@ -146,23 +145,10 @@ function CloudMessageForm({ onClose }: { onClose: () => void }) {
         ease: "power2.out",
       }, "-=0.2")
 
-      // Phase 3: Label text reveal character by character
-      if (labelCharsRef.current) {
-        const chars = labelCharsRef.current.querySelectorAll(".label-char")
-        gsap.set(chars, { opacity: 0, y: 10 })
-        tl.to(chars, {
-          opacity: 1,
-          y: 0,
-          duration: 0.03,
-          stagger: 0.03,
-          ease: "power2.out",
-        }, "-=0.3")
-      }
-
       // Focus textarea after animation
       setTimeout(() => {
         textareaRef.current?.focus()
-      }, 800)
+      }, 600)
 
     }, formRef)
 
@@ -231,8 +217,6 @@ function CloudMessageForm({ onClose }: { onClose: () => void }) {
     }, 500)
   }, [message, isSending])
 
-  const labelText = "What's on your mind?"
-
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
       {/* Backdrop */}
@@ -249,31 +233,8 @@ function CloudMessageForm({ onClose }: { onClose: () => void }) {
           boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 100px rgba(var(--accent-rgb, 100, 180, 200), 0.1)",
         }}
       >
-        {/* Close button */}
-        <button
-          onClick={handleClose}
-          className="absolute top-4 right-4 w-10 h-10 rounded-full bg-muted/50 hover:bg-muted flex items-center justify-center transition-colors group z-10"
-        >
-          <X className="w-5 h-5 text-muted-foreground group-hover:text-foreground transition-colors" />
-        </button>
-
         {/* Content */}
-        <div ref={contentRef} className="p-8 pt-16">
-          {/* Label with character animation */}
-          <label className="block mb-4 font-mono text-sm text-muted-foreground">
-            <span ref={labelCharsRef} className="inline-flex flex-wrap">
-              {labelText.split("").map((char, i) => (
-                <span
-                  key={i}
-                  className="label-char inline-block"
-                  style={{ whiteSpace: char === " " ? "pre" : "normal" }}
-                >
-                  {char === " " ? "\u00A0" : char}
-                </span>
-              ))}
-            </span>
-          </label>
-
+        <div ref={contentRef} className="p-8">
           {/* Textarea with vapor border effect */}
           <div className="relative">
             {/* Animated border glow */}
@@ -311,13 +272,6 @@ function CloudMessageForm({ onClose }: { onClose: () => void }) {
               <span>{isSending ? "Sending..." : "Send Message"}</span>
               <Send className="w-4 h-4 group-hover:translate-x-1 group-hover:-translate-y-0.5 transition-transform" />
             </button>
-          </div>
-
-          {/* Decorative footer */}
-          <div className="mt-8 pt-6 border-t border-border/20">
-            <p className="text-xs text-muted-foreground/50 font-mono text-center">
-              Messages drift through the ether
-            </p>
           </div>
         </div>
 
