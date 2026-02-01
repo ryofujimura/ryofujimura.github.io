@@ -52,7 +52,7 @@ const SCROLL_CONFIG = {
   mobile: {
     scrollPerProject: 35,
     scrubSpeed: 0.1,
-    slideHeight: 520,
+    slideHeight: 460,
   },
   desktop: {
     scrollPerProject: 40,
@@ -1310,8 +1310,8 @@ function ProjectSlide({
             {!showDetails ? (
               /* Default View (Preview): Image, Tech Stack */
               <div className="flex flex-col gap-3 h-full">
-                {/* Image Gallery - Taller on mobile */}
-                <div className="mobile-content flex-1 min-h-[200px]">
+                {/* Image Gallery */}
+                <div className="mobile-content flex-1 min-h-[160px]">
                   <div className="font-mono text-[7px] text-foreground/30 mb-2">
                     ├── PREVIEW
                   </div>
