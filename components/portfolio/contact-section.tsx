@@ -93,7 +93,7 @@ function VerticalWordRotator({
       }}
     >
       <span ref={wordRef} className="inline-flex">
-        {currentWord.split("").map((char, i) => (
+        {[...currentWord].map((char, i) => (
           <span
             key={`${currentIndex}-${i}`}
             className="char inline-block"
@@ -191,7 +191,7 @@ function AnimatedPlaceholder({
         style={{ minWidth: `${slotWidthCh}ch` }}
       >
         <span ref={wordRef} className="inline-flex">
-          {currentPrompt.split("").map((char, i) => (
+          {[...currentPrompt].map((char, i) => (
             <span
               key={`${currentIndex}-${i}`}
               className="placeholder-char inline-block text-muted-foreground/60"
@@ -821,7 +821,7 @@ function LiquidGlassMessage({
               <circle cx="16" cy="12" r="1" />
             </svg>
             <span className="text-xs font-mono text-foreground/70 font-medium">
-              {message.username.split("").map((char, i) => (
+              {[...message.username].map((char, i) => (
                 <span key={i} className="message-char inline-block">
                   {char}
                 </span>
@@ -831,7 +831,7 @@ function LiquidGlassMessage({
           
           {/* Message content with character animation */}
           <p className="text-sm font-mono text-foreground/60 leading-relaxed">
-            {truncatedMessage.split("").map((char, i) => (
+            {[...truncatedMessage].map((char, i) => (
               <span
                 key={i}
                 className="message-char inline-block"
