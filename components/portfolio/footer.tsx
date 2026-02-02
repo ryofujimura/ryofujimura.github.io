@@ -44,9 +44,10 @@ export function Footer() {
           </div>
 
           <p className="text-xs sm:text-sm text-muted-foreground text-center font-mono">
-            &gt; Built by <span className="text-foreground font-medium">Ryo Fujimura</span>
-            <span className="mx-1 sm:mx-2">·</span>
-            <span>{new Date().getFullYear()}</span>
+            &gt; Built by <span className="text-foreground font-medium">Ryo Fujimura </span>
+            with Cursor
+            {/* <span className="mx-1 sm:mx-2">·</span>
+            <span>{new Date().getFullYear()}</span> */}
           </p>
 
           <MagneticButton

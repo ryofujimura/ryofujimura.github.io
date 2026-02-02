@@ -657,13 +657,11 @@ function LiquidGlassMessage({
   index,
   position,
   isNew = false, // New messages animate immediately without scroll trigger
-  isMobile = false,
 }: { 
   message: FetchedMessage
   index: number
   position: { x: number; y: number; rotation: number }
   isNew?: boolean
-  isMobile?: boolean
 }) {
   const bubbleRef = useRef<HTMLDivElement>(null)
   const contentRef = useRef<HTMLDivElement>(null)
@@ -758,10 +756,9 @@ function LiquidGlassMessage({
     return () => ctx.revert()
   }, [index, isNew])
 
-  // Truncate message if too long (shorter on mobile)
-  const maxLength = isMobile ? 40 : 80
-  const truncatedMessage = message.message.length > maxLength 
-    ? message.message.substring(0, maxLength) + "..." 
+  // Truncate message if too long
+  const truncatedMessage = message.message.length > 80 
+    ? message.message.substring(0, 80) + "..." 
     : message.message
 
   return (
@@ -772,7 +769,7 @@ function LiquidGlassMessage({
         left: `${position.x}%`,
         top: `${position.y}%`,
         transform: `rotate(${position.rotation}deg)`,
-        maxWidth: isMobile ? "160px" : "280px",
+        maxWidth: "280px",
         zIndex: 1,
       }}
     >
@@ -862,48 +859,35 @@ function LiquidGlassMessage({
   )
 }
 
-// Pre-computed positions for messages - pushed to edges to avoid center content
-// Desktop: messages frame the content on far left/right edges
-const MESSAGE_POSITIONS_DESKTOP = [
-  // Left edge - stacked vertically
-  { x: -8, y: 5, rotation: -2 },
+// Pre-computed positions for messages to avoid overlapping
+const MESSAGE_POSITIONS = [
+  { x: 5, y: 10, rotation: -2 },
+  { x: 70, y: 5, rotation: 3 },
+  { x: 2, y: 55, rotation: 1 },
+  { x: 68, y: 60, rotation: -1 },
+  { x: 8, y: 85, rotation: 2 },
+  { x: 72, y: 82, rotation: -3 },
+  // Additional positions for larger screens
   { x: -5, y: 35, rotation: 1.5 },
-  { x: -8, y: 65, rotation: -1 },
-  { x: -3, y: 90, rotation: 2 },
-  // Right edge - stacked vertically
-  { x: 78, y: 8, rotation: 3 },
-  { x: 82, y: 38, rotation: -2 },
-  { x: 78, y: 68, rotation: 1 },
-  { x: 80, y: 92, rotation: -3 },
+  { x: 78, y: 32, rotation: -2 },
 ]
 
-// Mobile: fewer positions, pushed to corners to avoid narrow center
-const MESSAGE_POSITIONS_MOBILE = [
-  { x: -5, y: 3, rotation: -1 },
-  { x: 55, y: 2, rotation: 2 },
-  { x: -3, y: 88, rotation: 1 },
-  { x: 58, y: 90, rotation: -2 },
-]
-
-// Floating messages background - shows recent messages from Firebase
+// Floating messages background - shows recent messages from Firebase (desktop only)
 function FloatingMessagesBackground({ 
   messages, 
-  newMessageIds,
-  isMobile,
+  newMessageIds 
 }: { 
   messages: FetchedMessage[]
   newMessageIds: Set<string>
-  isMobile: boolean
 }) {
   const containerRef = useRef<HTMLDivElement>(null)
-  const positions = isMobile ? MESSAGE_POSITIONS_MOBILE : MESSAGE_POSITIONS_DESKTOP
 
   if (messages.length === 0) return null
 
   return (
     <div 
       ref={containerRef}
-      className="absolute inset-0 overflow-hidden pointer-events-none"
+      className="absolute inset-0 overflow-hidden pointer-events-none hidden md:block"
       style={{ zIndex: 0 }}
     >
       {messages.map((message, index) => (
@@ -911,11 +895,157 @@ function FloatingMessagesBackground({
           key={message.id}
           message={message}
           index={index}
-          position={positions[index % positions.length]}
+          position={MESSAGE_POSITIONS[index % MESSAGE_POSITIONS.length]}
           isNew={newMessageIds.has(message.id)}
-          isMobile={isMobile}
         />
       ))}
+    </div>
+  )
+}
+
+// Mobile messages display - horizontal scroll between button and links
+function MobileMessagesDisplay({ 
+  messages,
+  newMessageIds 
+}: { 
+  messages: FetchedMessage[]
+  newMessageIds: Set<string>
+}) {
+  const scrollRef = useRef<HTMLDivElement>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!containerRef.current || messages.length === 0) return
+
+    const ctx = gsap.context(() => {
+      // Animate container in
+      gsap.fromTo(containerRef.current, 
+        { opacity: 0, y: 20 },
+        { 
+          opacity: 1, 
+          y: 0, 
+          duration: 0.6, 
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: containerRef.current,
+            start: "top 90%",
+            toggleActions: "play none none none",
+          }
+        }
+      )
+
+      // Animate each message card
+      const cards = containerRef.current?.querySelectorAll(".mobile-message-card")
+      if (cards) {
+        gsap.fromTo(cards,
+          { opacity: 0, x: 30, scale: 0.9 },
+          {
+            opacity: 1,
+            x: 0,
+            scale: 1,
+            duration: 0.5,
+            stagger: 0.1,
+            ease: "power2.out",
+            scrollTrigger: {
+              trigger: containerRef.current,
+              start: "top 90%",
+              toggleActions: "play none none none",
+            }
+          }
+        )
+      }
+    }, containerRef)
+
+    return () => ctx.revert()
+  }, [messages.length])
+
+  if (messages.length === 0) return null
+
+  return (
+    <div 
+      ref={containerRef}
+      className="md:hidden mt-8 mb-6 -mx-4 px-4"
+    >
+      {/* Section label */}
+      <p className="text-xs font-mono text-muted-foreground/60 mb-3 text-center">
+        Recent messages
+      </p>
+      
+      {/* Horizontal scroll container */}
+      <div 
+        ref={scrollRef}
+        className="flex gap-3 overflow-x-auto pb-3 snap-x snap-mandatory scrollbar-hide"
+        style={{
+          scrollbarWidth: "none",
+          msOverflowStyle: "none",
+        }}
+      >
+        {messages.map((message) => {
+          const isNew = newMessageIds.has(message.id)
+          const truncatedMessage = message.message.length > 60 
+            ? message.message.substring(0, 60) + "..." 
+            : message.message
+
+          return (
+            <div
+              key={message.id}
+              className={`mobile-message-card flex-shrink-0 snap-start w-[260px] rounded-2xl overflow-hidden ${isNew ? "ring-2 ring-accent/50" : ""}`}
+              style={{
+                background: "linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.05) 100%)",
+                backdropFilter: "blur(20px) saturate(180%)",
+                WebkitBackdropFilter: "blur(20px) saturate(180%)",
+                border: "1px solid rgba(255, 255, 255, 0.18)",
+                boxShadow: `
+                  0 8px 32px rgba(0, 0, 0, 0.08),
+                  0 0 0 1px rgba(255, 255, 255, 0.05) inset
+                `,
+              }}
+            >
+              {/* Specular highlight */}
+              <div 
+                className="absolute inset-0 pointer-events-none"
+                style={{
+                  background: "linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, transparent 50%)",
+                  borderRadius: "inherit",
+                }}
+              />
+              
+              {/* Content */}
+              <div className="relative z-10 p-4">
+                {/* Header with username */}
+                <div className="flex items-center gap-2 mb-2">
+                  <svg
+                    className="w-3.5 h-3.5 text-accent/80"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                  >
+                    <path 
+                      d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                  <span className="text-xs font-mono text-foreground/70 font-medium">
+                    {message.username}
+                  </span>
+                  {isNew && (
+                    <span className="text-[10px] font-mono text-accent bg-accent/10 px-1.5 py-0.5 rounded-full">
+                      new
+                    </span>
+                  )}
+                </div>
+                
+                {/* Message text */}
+                <p className="text-sm font-mono text-foreground/60 leading-relaxed">
+                  {truncatedMessage}
+                </p>
+              </div>
+            </div>
+          )
+        })}
+      </div>
     </div>
   )
 }
@@ -1034,7 +1164,7 @@ export function ContactSection() {
       className="relative py-20 sm:py-24 md:py-32 lg:py-40 px-4 sm:px-6 overflow-hidden"
     >
       {/* Floating messages from Firebase in background */}
-      <FloatingMessagesBackground messages={messages} newMessageIds={newMessageIds} isMobile={isMobile} />
+      <FloatingMessagesBackground messages={messages} newMessageIds={newMessageIds} />
       
       <div 
         className="absolute inset-0 opacity-30 transition-opacity duration-500 pointer-events-none"
@@ -1100,8 +1230,11 @@ export function ContactSection() {
         {/* Cloud Message Form */}
         {isFormOpen && <CloudMessageForm onClose={handleCloseForm} onMessageSent={handleMessageSent} />}
 
+        {/* Mobile Messages Display - between button and links */}
+        <MobileMessagesDisplay messages={messages} newMessageIds={newMessageIds} />
+
         <AnimatedSection delay={400}>
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 sm:gap-4 mt-10 sm:mt-16 max-w-md sm:max-w-none mx-auto">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 sm:gap-4 mt-6 md:mt-16 max-w-md sm:max-w-none mx-auto">
             {socialLinks.map((link) => (
               <MagneticButton
                 key={link.label}

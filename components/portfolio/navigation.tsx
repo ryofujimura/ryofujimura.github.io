@@ -237,7 +237,7 @@ function SplitContactButton() {
         ref={mainTextRef}
         className="relative z-10 text-sm font-medium text-primary-foreground whitespace-nowrap pointer-events-none"
       >
-        Say Hi
+        Get in Touch
       </span>
     </div>
   )
