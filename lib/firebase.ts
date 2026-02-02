@@ -8,10 +8,15 @@ import {
   getDoc,
   setDoc,
   updateDoc,
+  getDocs,
+  query,
+  orderBy,
+  limit,
   serverTimestamp, 
   increment,
   type Firestore,
-  type DocumentReference 
+  type DocumentReference,
+  type Timestamp
 } from "firebase/firestore"
 
 const firebaseConfig = {
@@ -159,5 +164,53 @@ export async function submitContactForm(
   } catch (error) {
     console.error("Error submitting contact form:", error)
     return { success: false }
+  }
+}
+
+// Fetched message structure (with resolved timestamp)
+export interface FetchedMessage {
+  id: string
+  username: string
+  message: string
+  sentAt: Date | null
+  status: "new" | "read" | "replied"
+}
+
+/**
+ * Fetch recent messages from Firestore
+ * @param maxMessages - Maximum number of messages to fetch (default 20)
+ */
+export async function fetchRecentMessages(
+  maxMessages: number = 20
+): Promise<FetchedMessage[]> {
+  const db = getFirebaseFirestore()
+  if (!db) return []
+
+  try {
+    const messagesRef = collection(db, COLLECTIONS.MESSAGES)
+    const q = query(
+      messagesRef,
+      orderBy("sentAt", "desc"),
+      limit(maxMessages)
+    )
+    
+    const snapshot = await getDocs(q)
+    const messages: FetchedMessage[] = []
+    
+    snapshot.forEach((doc) => {
+      const data = doc.data()
+      messages.push({
+        id: doc.id,
+        username: data.username || "Anonymous",
+        message: data.message || "",
+        sentAt: data.sentAt ? (data.sentAt as Timestamp).toDate() : null,
+        status: data.status || "new",
+      })
+    })
+    
+    return messages
+  } catch (error) {
+    console.error("Error fetching messages:", error)
+    return []
   }
 }

@@ -8,7 +8,7 @@ import { MagneticButton } from "@/components/magnetic-button"
 import { RevealText } from "@/components/reveal-text"
 import { Mail, Github, Linkedin, ArrowUpRight, Send, Check, AlertCircle } from "lucide-react"
 import { useIsMobile } from "@/hooks/use-mobile"
-import { submitContactForm } from "@/lib/firebase"
+import { submitContactForm, fetchRecentMessages, type FetchedMessage } from "@/lib/firebase"
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -439,7 +439,7 @@ function CloudMessageForm({ onClose }: { onClose: () => void }) {
                 <AnimatedPlaceholder
                   prompts={PLACEHOLDER_PROMPTS}
                   slotWidthCh={isMobile ? 14 : PLACEHOLDER_SLOT_CH}
-                  isVisible={!message && sendStatus !== "success"}
+                  isVisible={!message}
                 />
               </div>
             )}
@@ -632,6 +632,255 @@ function AnimatedHeaderSVG({ className = "" }: { className?: string }) {
   )
 }
 
+// iOS 26 Liquid Glass Message Bubble - displays a single message
+function LiquidGlassMessage({ 
+  message, 
+  index,
+  position 
+}: { 
+  message: FetchedMessage
+  index: number
+  position: { x: number; y: number; rotation: number }
+}) {
+  const bubbleRef = useRef<HTMLDivElement>(null)
+  const contentRef = useRef<HTMLDivElement>(null)
+  const svgRef = useRef<SVGSVGElement>(null)
+
+  useEffect(() => {
+    if (!bubbleRef.current || !contentRef.current) return
+
+    const ctx = gsap.context(() => {
+      // Initial state - hidden and scaled down
+      gsap.set(bubbleRef.current, { 
+        opacity: 0, 
+        scale: 0.3,
+        y: 30,
+      })
+      
+      // Animate SVG paths
+      const paths = svgRef.current?.querySelectorAll("path, circle")
+      if (paths) {
+        paths.forEach((el) => {
+          const geom = el as SVGGeometryElement
+          if (typeof geom.getTotalLength === "function") {
+            try {
+              const len = geom.getTotalLength()
+              gsap.set(geom, { strokeDasharray: len, strokeDashoffset: len })
+            } catch {
+              // Skip unsupported elements
+            }
+          }
+        })
+      }
+
+      // Main timeline with staggered delay based on index
+      const tl = gsap.timeline({
+        delay: 0.2 + (index * 0.15),
+        scrollTrigger: {
+          trigger: bubbleRef.current,
+          start: "top 95%",
+          toggleActions: "play none none none",
+        },
+      })
+
+      // Phase 1: Bubble appears with spring effect
+      tl.to(bubbleRef.current, {
+        opacity: 1,
+        scale: 1,
+        y: 0,
+        duration: 0.8,
+        ease: "elastic.out(1, 0.5)",
+      })
+
+      // Phase 2: Animate SVG paths (message icon)
+      if (paths) {
+        tl.to(paths, {
+          strokeDashoffset: 0,
+          duration: 0.6,
+          stagger: 0.1,
+          ease: "power2.out",
+        }, "-=0.4")
+      }
+
+      // Phase 3: Text chars animate in
+      const chars = contentRef.current?.querySelectorAll(".message-char")
+      if (chars && chars.length > 0) {
+        tl.fromTo(chars, 
+          { opacity: 0, y: 10 },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.4,
+            stagger: 0.008,
+            ease: "power2.out",
+          }, 
+          "-=0.3"
+        )
+      }
+
+      // Subtle floating animation
+      gsap.to(bubbleRef.current, {
+        y: "+=8",
+        duration: 3 + Math.random() * 2,
+        repeat: -1,
+        yoyo: true,
+        ease: "sine.inOut",
+        delay: 1 + (index * 0.2),
+      })
+
+    }, bubbleRef)
+
+    return () => ctx.revert()
+  }, [index])
+
+  // Truncate message if too long
+  const truncatedMessage = message.message.length > 80 
+    ? message.message.substring(0, 80) + "..." 
+    : message.message
+
+  return (
+    <div
+      ref={bubbleRef}
+      className="absolute pointer-events-none"
+      style={{
+        left: `${position.x}%`,
+        top: `${position.y}%`,
+        transform: `rotate(${position.rotation}deg)`,
+        maxWidth: "280px",
+        zIndex: 1,
+      }}
+    >
+      {/* iOS 26 Liquid Glass Container */}
+      <div 
+        className="relative rounded-2xl overflow-hidden"
+        style={{
+          background: "linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.05) 100%)",
+          backdropFilter: "blur(20px) saturate(180%)",
+          WebkitBackdropFilter: "blur(20px) saturate(180%)",
+          border: "1px solid rgba(255, 255, 255, 0.18)",
+          boxShadow: `
+            0 8px 32px rgba(0, 0, 0, 0.08),
+            0 0 0 1px rgba(255, 255, 255, 0.05) inset,
+            0 1px 0 rgba(255, 255, 255, 0.1) inset
+          `,
+        }}
+      >
+        {/* Specular highlight gradient - iOS glass effect */}
+        <div 
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background: "linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, transparent 50%, rgba(255, 255, 255, 0.05) 100%)",
+            borderRadius: "inherit",
+          }}
+        />
+        
+        {/* Content */}
+        <div ref={contentRef} className="relative z-10 p-4">
+          {/* Header with icon and username */}
+          <div className="flex items-center gap-2 mb-2">
+            <svg
+              ref={svgRef}
+              className="w-4 h-4 text-accent/80"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.5"
+            >
+              {/* Message bubble icon */}
+              <path 
+                d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              {/* Dots inside bubble */}
+              <circle cx="12" cy="12" r="1" />
+              <circle cx="8" cy="12" r="1" />
+              <circle cx="16" cy="12" r="1" />
+            </svg>
+            <span className="text-xs font-mono text-foreground/70 font-medium">
+              {message.username.split("").map((char, i) => (
+                <span key={i} className="message-char inline-block">
+                  {char}
+                </span>
+              ))}
+            </span>
+          </div>
+          
+          {/* Message content with character animation */}
+          <p className="text-sm font-mono text-foreground/60 leading-relaxed">
+            {truncatedMessage.split("").map((char, i) => (
+              <span
+                key={i}
+                className="message-char inline-block"
+                style={{ whiteSpace: char === " " ? "pre" : "normal" }}
+              >
+                {char === " " ? "\u00A0" : char}
+              </span>
+            ))}
+          </p>
+        </div>
+        
+        {/* Bottom edge highlight */}
+        <div 
+          className="absolute bottom-0 left-0 right-0 h-px"
+          style={{
+            background: "linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent)",
+          }}
+        />
+      </div>
+    </div>
+  )
+}
+
+// Floating messages background - shows recent messages from Firebase
+function FloatingMessagesBackground() {
+  const [messages, setMessages] = useState<FetchedMessage[]>([])
+  const containerRef = useRef<HTMLDivElement>(null)
+  const isMobile = useIsMobile()
+
+  // Pre-computed positions for messages to avoid overlapping
+  const messagePositions = [
+    { x: 5, y: 10, rotation: -2 },
+    { x: 70, y: 5, rotation: 3 },
+    { x: 2, y: 55, rotation: 1 },
+    { x: 68, y: 60, rotation: -1 },
+    { x: 8, y: 85, rotation: 2 },
+    { x: 72, y: 82, rotation: -3 },
+    // Additional positions for larger screens
+    { x: -5, y: 35, rotation: 1.5 },
+    { x: 78, y: 32, rotation: -2 },
+  ]
+
+  useEffect(() => {
+    // Fetch messages from Firebase
+    const loadMessages = async () => {
+      const fetchedMessages = await fetchRecentMessages(isMobile ? 4 : 8)
+      setMessages(fetchedMessages)
+    }
+    
+    loadMessages()
+  }, [isMobile])
+
+  if (messages.length === 0) return null
+
+  return (
+    <div 
+      ref={containerRef}
+      className="absolute inset-0 overflow-hidden pointer-events-none"
+      style={{ zIndex: 0 }}
+    >
+      {messages.map((message, index) => (
+        <LiquidGlassMessage
+          key={message.id}
+          message={message}
+          index={index}
+          position={messagePositions[index % messagePositions.length]}
+        />
+      ))}
+    </div>
+  )
+}
+
 const socialLinks = [
   {
     icon: Github,
@@ -643,7 +892,7 @@ const socialLinks = [
     icon: Linkedin,
     label: "LinkedIn",
     href: "https://linkedin.com/in/ryofujimura",
-    username: "/in/ryofujimura",
+    username: "/ryofujimura",
   },
   {
     icon: Mail,
@@ -710,6 +959,9 @@ export function ContactSection() {
       ref={containerRef}
       className="relative py-20 sm:py-24 md:py-32 lg:py-40 px-4 sm:px-6 overflow-hidden"
     >
+      {/* Floating messages from Firebase in background */}
+      <FloatingMessagesBackground />
+      
       <div 
         className="absolute inset-0 opacity-30 transition-opacity duration-500 pointer-events-none"
         style={{
