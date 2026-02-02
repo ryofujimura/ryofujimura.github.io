@@ -112,8 +112,8 @@ const projects = [
     description: "Designed personalized 3D-printed mouse reducing total weight by 45%, with 15.1g custom shell and stress-tested 15% infill. Published at ACM/IEEE ICCPS 2025.",
     skills: ["3D Printing", "CAD", "Research", "HCI"],
     links: [
-      { type: "website" as LinkType, url: "/#experience-honda" },
-      { type: "paper" as LinkType, url: "https://iccps.acm.org/2025/papers/ICCPS2025_paper_28.pdf" }
+      { type: "website" as LinkType, url: "/#experience-cpx-lab" },
+      { type: "paper" as LinkType, url: "/documents/ACMIEEEICCPS2025.pdf" }
     ]
   },
   {
@@ -123,7 +123,10 @@ const projects = [
     year: "2024",
     description: "Robotic keyboard system achieving 102 keystrokes/30s (100% success), 21.7ms latency, 95% classification accuracy using 33 temporal features over 40 trajectories. Published at IEEE ICRA 2026.",
     skills: ["Robotics", "ML", "Signal Processing", "Research"],
-    links: [] as ProjectLink[]
+    links: [
+      { type: "website" as LinkType, url: "/#experience-cpx-lab" },
+      { type: "paper" as LinkType, url: "/documents/IEEEICRA2026.pdf" }
+    ]
   },
   {
     id: "10",
@@ -865,6 +868,7 @@ function SkillButton({
   isAnyActive,
   onClick,
   onRefChange,
+  rowIndex = 0,
 }: {
   skill: string
   projectCount: number
@@ -872,6 +876,7 @@ function SkillButton({
   isAnyActive: boolean
   onClick: () => void
   onRefChange?: (el: HTMLButtonElement | null) => void
+  rowIndex?: number
 }) {
   const buttonRef = useRef<HTMLButtonElement>(null)
   
@@ -914,6 +919,20 @@ function SkillButton({
     return () => clearInterval(interval)
   }, [isActive, skill])
 
+  // GSAP animation for font size based on row
+  useEffect(() => {
+    if (!buttonRef.current) return
+    
+    // Calculate scale factor: row 0 = 1, each subsequent row shrinks by 15%
+    const scaleFactor = Math.max(0.4, 1 - (rowIndex * 0.15))
+    
+    gsap.to(buttonRef.current, {
+      scale: scaleFactor,
+      duration: 0.4,
+      ease: "power2.out",
+    })
+  }, [rowIndex])
+
   const colorClass = getSkillColor(skill)
 
   return (
@@ -924,7 +943,7 @@ function SkillButton({
         "skill-btn group relative inline-flex items-baseline gap-1 transition-all duration-300",
         "font-mono font-bold tracking-tight cursor-pointer touch-manipulation",
         "text-[8vw] sm:text-[8vw] md:text-[6vw] lg:text-[5vw]",
-        "leading-[0.9]",
+        "leading-[0.9] origin-center",
         isActive
           ? cn(colorClass, "scale-[1.02]")
           : isAnyActive
@@ -984,6 +1003,7 @@ export function ProjectsSection() {
   const terminalRef = useRef<HTMLDivElement>(null)
   const [terminalRowBottom, setTerminalRowBottom] = useState<number | null>(null)
   const [terminalHeight, setTerminalHeight] = useState(0)
+  const [skillRowMap, setSkillRowMap] = useState<Map<string, number>>(new Map())
   const isMobile = useIsMobile()
 
   // Track skill button ref
@@ -992,6 +1012,54 @@ export function ProjectsSection() {
       skillRefsMap.current.set(skill, el)
     } else {
       skillRefsMap.current.delete(skill)
+    }
+  }, [])
+
+  // Calculate which row each skill is on
+  useLayoutEffect(() => {
+    if (!skillsContainerRef.current || skillRefsMap.current.size === 0) return
+
+    const calculateRows = () => {
+      const containerRect = skillsContainerRef.current?.getBoundingClientRect()
+      if (!containerRect) return
+
+      // Collect all skill positions
+      const skillPositions: { skill: string; top: number }[] = []
+      skillRefsMap.current.forEach((el, skill) => {
+        const rect = el.getBoundingClientRect()
+        skillPositions.push({ skill, top: rect.top - containerRect.top })
+      })
+
+      // Sort by top position
+      skillPositions.sort((a, b) => a.top - b.top)
+
+      // Group into rows (skills within 20px of each other are on the same row)
+      const newRowMap = new Map<string, number>()
+      let currentRow = 0
+      let lastTop = -Infinity
+
+      skillPositions.forEach(({ skill, top }) => {
+        if (top - lastTop > 20) {
+          // New row
+          if (lastTop !== -Infinity) currentRow++
+          lastTop = top
+        }
+        newRowMap.set(skill, currentRow)
+      })
+
+      setSkillRowMap(newRowMap)
+    }
+
+    // Calculate on mount and resize
+    calculateRows()
+    
+    // Recalculate after a small delay to ensure layout is complete
+    const timeout = setTimeout(calculateRows, 100)
+    
+    window.addEventListener("resize", calculateRows)
+    return () => {
+      window.removeEventListener("resize", calculateRows)
+      clearTimeout(timeout)
     }
   }, [])
 
@@ -1164,23 +1232,32 @@ export function ProjectsSection() {
         >
           {/* Skills flow - wrapped on all screen sizes */}
           <div className="flex flex-row flex-wrap justify-center items-baseline gap-x-[0.15em] gap-y-1 sm:gap-x-[0.2em] sm:gap-y-3">
-            {allSkills.map((skill, index) => (
-              <span key={skill} className="inline-flex items-baseline">
-                <SkillButton
-                  skill={skill}
-                  projectCount={skillsMap.get(skill)?.length || 0}
-                  isActive={activeSkill === skill}
-                  isAnyActive={activeSkill !== null}
-                  onClick={() => handleSkillClick(skill)}
-                  onRefChange={(el) => setSkillRef(skill, el)}
-                />
-                {index < allSkills.length - 1 && (
-                  <span className="font-mono text-[2.5vw] sm:text-[2vw] text-foreground/10 mx-[0.1em] select-none">
-                    ·
-                  </span>
-                )}
-              </span>
-            ))}
+            {allSkills.map((skill, index) => {
+              const rowIndex = skillRowMap.get(skill) || 0
+              // Dot scale follows the skill's row scaling
+              const dotScale = Math.max(0.4, 1 - (rowIndex * 0.15))
+              return (
+                <span key={skill} className="inline-flex items-baseline">
+                  <SkillButton
+                    skill={skill}
+                    projectCount={skillsMap.get(skill)?.length || 0}
+                    isActive={activeSkill === skill}
+                    isAnyActive={activeSkill !== null}
+                    onClick={() => handleSkillClick(skill)}
+                    onRefChange={(el) => setSkillRef(skill, el)}
+                    rowIndex={rowIndex}
+                  />
+                  {index < allSkills.length - 1 && (
+                    <span 
+                      className="font-mono text-[2.5vw] sm:text-[2vw] text-foreground/10 mx-[0.1em] select-none transition-transform duration-300"
+                      style={{ transform: `scale(${dotScale})` }}
+                    >
+                      ·
+                    </span>
+                  )}
+                </span>
+              )
+            })}
           </div>
 
           {/* Terminal positioned below the active skill's row */}
