@@ -11,7 +11,7 @@ gsap.registerPlugin(ScrollTrigger)
 // SKILL & PROJECT DATA
 // ─────────────────────────────────────────────────────────────
 
-type LinkType = "appstore" | "playstore" | "github" | "website" | "instagram" | "youtube"
+type LinkType = "appstore" | "playstore" | "website" | "github" | "instagram" | "youtube" | "paper"
 
 interface ProjectLink {
   type: LinkType
@@ -111,7 +111,10 @@ const projects = [
     year: "2024",
     description: "Designed personalized 3D-printed mouse reducing total weight by 45%, with 15.1g custom shell and stress-tested 15% infill. Published at ACM/IEEE ICCPS 2025.",
     skills: ["3D Printing", "CAD", "Research", "HCI"],
-    links: [] as ProjectLink[]
+    links: [
+      { type: "website" as LinkType, url: "/#experience-honda" },
+      { type: "paper" as LinkType, url: "https://iccps.acm.org/2025/papers/ICCPS2025_paper_28.pdf" }
+    ]
   },
   {
     id: "09",
@@ -191,6 +194,7 @@ const linkConfig: Record<LinkType, { label: string; icon: string }> = {
   website: { label: "Website", icon: "∑" },
   instagram: { label: "Instagram", icon: "" },
   youtube: { label: "YouTube", icon: "¥" },
+  paper: { label: "Paper", icon: "📄" },
 }
 
 // Extract unique skills and map to projects
@@ -861,8 +865,6 @@ function SkillButton({
   isAnyActive,
   onClick,
   onRefChange,
-  rowIndex = 0,
-  totalRows = 1,
 }: {
   skill: string
   projectCount: number
@@ -870,8 +872,6 @@ function SkillButton({
   isAnyActive: boolean
   onClick: () => void
   onRefChange?: (el: HTMLButtonElement | null) => void
-  rowIndex?: number
-  totalRows?: number
 }) {
   const buttonRef = useRef<HTMLButtonElement>(null)
   
@@ -915,11 +915,6 @@ function SkillButton({
   }, [isActive, skill])
 
   const colorClass = getSkillColor(skill)
-  
-  // Calculate font scale based on row position (1.0 for first row, shrinks down to 0.4 for last row)
-  const minScale = 0.4
-  const scaleRange = 1 - minScale
-  const rowScale = totalRows > 1 ? 1 - (rowIndex / (totalRows - 1)) * scaleRange : 1
 
   return (
     <button
@@ -928,6 +923,7 @@ function SkillButton({
       className={cn(
         "skill-btn group relative inline-flex items-baseline gap-1 transition-all duration-300",
         "font-mono font-bold tracking-tight cursor-pointer touch-manipulation",
+        "text-[8vw] sm:text-[8vw] md:text-[6vw] lg:text-[5vw]",
         "leading-[0.9]",
         isActive
           ? cn(colorClass, "scale-[1.02]")
@@ -935,9 +931,6 @@ function SkillButton({
             ? "text-foreground/10 hover:text-foreground/20"
             : cn("text-foreground/20 hover:text-foreground/40", `hover:${colorClass}`)
       )}
-      style={{
-        fontSize: `calc(${rowScale} * clamp(24px, 8vw, 48px))`,
-      }}
     >
       {/* Command prefix */}
       <span 
@@ -992,8 +985,6 @@ export function ProjectsSection() {
   const [terminalRowBottom, setTerminalRowBottom] = useState<number | null>(null)
   const [terminalHeight, setTerminalHeight] = useState(0)
   const isMobile = useIsMobile()
-  const [skillRowMap, setSkillRowMap] = useState<Map<string, number>>(new Map())
-  const [totalRows, setTotalRows] = useState(1)
 
   // Track skill button ref
   const setSkillRef = useCallback((skill: string, el: HTMLButtonElement | null) => {
@@ -1002,47 +993,6 @@ export function ProjectsSection() {
     } else {
       skillRefsMap.current.delete(skill)
     }
-  }, [])
-
-  // Calculate which row each skill is on based on vertical position
-  useLayoutEffect(() => {
-    if (!skillsContainerRef.current || skillRefsMap.current.size === 0) return
-
-    const calculateRows = () => {
-      const containerRect = skillsContainerRef.current?.getBoundingClientRect()
-      if (!containerRect) return
-
-      // Collect all skill positions
-      const positions: { skill: string; top: number }[] = []
-      skillRefsMap.current.forEach((el, skill) => {
-        const rect = el.getBoundingClientRect()
-        positions.push({ skill, top: rect.top - containerRect.top })
-      })
-
-      // Sort by vertical position
-      positions.sort((a, b) => a.top - b.top)
-
-      // Group into rows (skills within 10px of each other are on same row)
-      const rowAssignments = new Map<string, number>()
-      let currentRow = 0
-      let lastTop = -Infinity
-
-      positions.forEach(({ skill, top }) => {
-        if (top - lastTop > 10) {
-          if (lastTop !== -Infinity) currentRow++
-          lastTop = top
-        }
-        rowAssignments.set(skill, currentRow)
-      })
-
-      setSkillRowMap(rowAssignments)
-      setTotalRows(currentRow + 1)
-    }
-
-    // Calculate on mount and resize
-    calculateRows()
-    window.addEventListener("resize", calculateRows)
-    return () => window.removeEventListener("resize", calculateRows)
   }, [])
 
   // Toggle skill
@@ -1223,16 +1173,9 @@ export function ProjectsSection() {
                   isAnyActive={activeSkill !== null}
                   onClick={() => handleSkillClick(skill)}
                   onRefChange={(el) => setSkillRef(skill, el)}
-                  rowIndex={skillRowMap.get(skill) ?? 0}
-                  totalRows={totalRows}
                 />
                 {index < allSkills.length - 1 && (
-                  <span 
-                    className="font-mono text-foreground/10 mx-[0.1em] select-none"
-                    style={{
-                      fontSize: `calc(${totalRows > 1 ? 1 - ((skillRowMap.get(skill) ?? 0) / (totalRows - 1)) * 0.6 : 1} * clamp(8px, 2.5vw, 16px))`,
-                    }}
-                  >
+                  <span className="font-mono text-[2.5vw] sm:text-[2vw] text-foreground/10 mx-[0.1em] select-none">
                     ·
                   </span>
                 )}
