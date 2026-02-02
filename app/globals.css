@@ -146,12 +146,14 @@
   }
 }
 
-/* Hide default cursor on large screens - outside layer for max specificity */
-html, body, *, *::before, *::after {
-  cursor: none !important;
-}
-a, button, input, textarea, select, [role="button"], [tabindex] {
-  cursor: none !important;
+/* Hide default cursor on large screens only (lg: 1024px+) */
+@media (min-width: 1024px) {
+  html, body, *, *::before, *::after {
+    cursor: none !important;
+  }
+  a, button, input, textarea, select, [role="button"], [tabindex] {
+    cursor: none !important;
+  }
 }
 
 /* Hide custom cursor on mobile when message form is open */
