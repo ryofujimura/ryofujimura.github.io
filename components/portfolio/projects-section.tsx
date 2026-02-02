@@ -49,7 +49,7 @@ const projects = [
     subtitle: "Live Shuttle Tracking System",
     year: "2025",
     description: "Real-time shuttle tracking used daily by 25+ users across iOS, Android, and web. <100ms Firebase RTDB update latency. Reduced duplicate/conflicting pickup events by 70%+ through event serialization.",
-    skills: ["Swift", "Kotlin", "Firebase", "Realtime", "Google Maps"],
+    skills: ["Swift", "Kotlin", "Firebase", "Realtime", "Google API"],
     links: [
       { type: "appstore" as LinkType, url: "https://apps.apple.com/us/app/htic-shuttle/id6747784542" },
       { type: "playstore" as LinkType, url: "https://tokaishuttle.web.app/app-release.apk" },
@@ -74,7 +74,7 @@ const projects = [
     subtitle: "Cross-Platform Education App",
     year: "2025",
     description: "Synchronized iOS+Android apps supporting live event updates for 50+ users. 99%+ cross-device sync reliability across unstable networks.",
-    skills: ["Swift", "Kotlin", "Firebase", "Offline-First"],
+    skills: ["Swift", "Kotlin", "Firebase"],
     links: [
       { type: "appstore" as LinkType, url: "https://apps.apple.com/us/app/cyberedu/id6745105687" },
       { type: "playstore" as LinkType, url: "https://cyberedu-rf.vercel.app/SDK/CyberEdu101.apk" },
@@ -186,11 +186,11 @@ const projects = [
 // Link display config
 const linkConfig: Record<LinkType, { label: string; icon: string }> = {
   appstore: { label: "App Store", icon: "" },
-  playstore: { label: "Play Store", icon: "🤖" },
-  github: { label: "GitHub", icon: "" },
-  website: { label: "Website", icon: "➥" },
-  instagram: { label: "Instagram", icon: "♖" },
-  youtube: { label: "YouTube", icon: "▶" },
+  playstore: { label: "Play Store", icon: "å" },
+  github: { label: "GitHub", icon: "©" },
+  website: { label: "Website", icon: "∑" },
+  instagram: { label: "Instagram", icon: "" },
+  youtube: { label: "YouTube", icon: "¥" },
 }
 
 // Extract unique skills and map to projects
@@ -206,9 +206,9 @@ projects.forEach(project => {
 const skillCategories = {
   language: { skills: ["Swift", "Python", "Kotlin"], color: "text-orange-400" },
   framework: { skills: ["SwiftUI", "React", "Next.js", "Flask", "PyTorch", "AVFoundation"], color: "text-cyan-400" },
-  platform: { skills: ["WatchOS", "macOS", "Firebase", "Cloud Functions", "Serverless", "Google Maps", "FCM"], color: "text-green-400" },
+  platform: { skills: ["WatchOS", "macOS", "Firebase", "Cloud Functions", "Serverless", "Google API", "FCM"], color: "text-green-400" },
   concept: { skills: ["GSAP", "Tailwind", "WebSocket", "API", "llama.cpp", "GGUF", "CAD", "3D Printing"], color: "text-yellow-400" },
-  paradigm: { skills: ["Realtime", "Offline-First", "ML", "Core ML", "AI", "Automation", "Algorithms", "Privacy", "Transformers", "Research", "HCI", "Robotics", "Signal Processing"], color: "text-purple-400" },
+  paradigm: { skills: ["Realtime", "ML", "Core ML", "AI", "Automation", "Algorithms", "Privacy", "Transformers", "Research", "HCI", "Robotics", "Signal Processing"], color: "text-purple-400" },
 }
 
 // Get color for a skill
@@ -861,6 +861,8 @@ function SkillButton({
   isAnyActive,
   onClick,
   onRefChange,
+  rowIndex = 0,
+  totalRows = 1,
 }: {
   skill: string
   projectCount: number
@@ -868,6 +870,8 @@ function SkillButton({
   isAnyActive: boolean
   onClick: () => void
   onRefChange?: (el: HTMLButtonElement | null) => void
+  rowIndex?: number
+  totalRows?: number
 }) {
   const buttonRef = useRef<HTMLButtonElement>(null)
   
@@ -911,6 +915,11 @@ function SkillButton({
   }, [isActive, skill])
 
   const colorClass = getSkillColor(skill)
+  
+  // Calculate font scale based on row position (1.0 for first row, shrinks down to 0.4 for last row)
+  const minScale = 0.4
+  const scaleRange = 1 - minScale
+  const rowScale = totalRows > 1 ? 1 - (rowIndex / (totalRows - 1)) * scaleRange : 1
 
   return (
     <button
@@ -919,7 +928,6 @@ function SkillButton({
       className={cn(
         "skill-btn group relative inline-flex items-baseline gap-1 transition-all duration-300",
         "font-mono font-bold tracking-tight cursor-pointer touch-manipulation",
-        "text-[8vw] sm:text-[8vw] md:text-[6vw] lg:text-[5vw]",
         "leading-[0.9]",
         isActive
           ? cn(colorClass, "scale-[1.02]")
@@ -927,6 +935,9 @@ function SkillButton({
             ? "text-foreground/10 hover:text-foreground/20"
             : cn("text-foreground/20 hover:text-foreground/40", `hover:${colorClass}`)
       )}
+      style={{
+        fontSize: `calc(${rowScale} * clamp(24px, 8vw, 48px))`,
+      }}
     >
       {/* Command prefix */}
       <span 
@@ -981,6 +992,8 @@ export function ProjectsSection() {
   const [terminalRowBottom, setTerminalRowBottom] = useState<number | null>(null)
   const [terminalHeight, setTerminalHeight] = useState(0)
   const isMobile = useIsMobile()
+  const [skillRowMap, setSkillRowMap] = useState<Map<string, number>>(new Map())
+  const [totalRows, setTotalRows] = useState(1)
 
   // Track skill button ref
   const setSkillRef = useCallback((skill: string, el: HTMLButtonElement | null) => {
@@ -989,6 +1002,47 @@ export function ProjectsSection() {
     } else {
       skillRefsMap.current.delete(skill)
     }
+  }, [])
+
+  // Calculate which row each skill is on based on vertical position
+  useLayoutEffect(() => {
+    if (!skillsContainerRef.current || skillRefsMap.current.size === 0) return
+
+    const calculateRows = () => {
+      const containerRect = skillsContainerRef.current?.getBoundingClientRect()
+      if (!containerRect) return
+
+      // Collect all skill positions
+      const positions: { skill: string; top: number }[] = []
+      skillRefsMap.current.forEach((el, skill) => {
+        const rect = el.getBoundingClientRect()
+        positions.push({ skill, top: rect.top - containerRect.top })
+      })
+
+      // Sort by vertical position
+      positions.sort((a, b) => a.top - b.top)
+
+      // Group into rows (skills within 10px of each other are on same row)
+      const rowAssignments = new Map<string, number>()
+      let currentRow = 0
+      let lastTop = -Infinity
+
+      positions.forEach(({ skill, top }) => {
+        if (top - lastTop > 10) {
+          if (lastTop !== -Infinity) currentRow++
+          lastTop = top
+        }
+        rowAssignments.set(skill, currentRow)
+      })
+
+      setSkillRowMap(rowAssignments)
+      setTotalRows(currentRow + 1)
+    }
+
+    // Calculate on mount and resize
+    calculateRows()
+    window.addEventListener("resize", calculateRows)
+    return () => window.removeEventListener("resize", calculateRows)
   }, [])
 
   // Toggle skill
@@ -1169,9 +1223,16 @@ export function ProjectsSection() {
                   isAnyActive={activeSkill !== null}
                   onClick={() => handleSkillClick(skill)}
                   onRefChange={(el) => setSkillRef(skill, el)}
+                  rowIndex={skillRowMap.get(skill) ?? 0}
+                  totalRows={totalRows}
                 />
                 {index < allSkills.length - 1 && (
-                  <span className="font-mono text-[2.5vw] sm:text-[2vw] text-foreground/10 mx-[0.1em] select-none">
+                  <span 
+                    className="font-mono text-foreground/10 mx-[0.1em] select-none"
+                    style={{
+                      fontSize: `calc(${totalRows > 1 ? 1 - ((skillRowMap.get(skill) ?? 0) / (totalRows - 1)) * 0.6 : 1} * clamp(8px, 2.5vw, 16px))`,
+                    }}
+                  >
                     ·
                   </span>
                 )}
