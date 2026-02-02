@@ -210,7 +210,13 @@ function AnimatedPlaceholder({
 type SendStatus = "idle" | "sending" | "success" | "error"
 
 // Cloud-themed expandable message form
-function CloudMessageForm({ onClose }: { onClose: () => void }) {
+function CloudMessageForm({ 
+  onClose, 
+  onMessageSent 
+}: { 
+  onClose: () => void
+  onMessageSent?: (message: FetchedMessage) => void
+}) {
   const containerRef = useRef<HTMLDivElement>(null)
   const backdropRef = useRef<HTMLDivElement>(null)
   const formRef = useRef<HTMLDivElement>(null)
@@ -340,10 +346,23 @@ function CloudMessageForm({ onClose }: { onClose: () => void }) {
 
     try {
       // Submit to Firebase Firestore with username and message
-      const result = await submitContactForm(username.trim(), message.trim())
+      const sentMessage = message.trim()
+      const sentUsername = username.trim()
+      const result = await submitContactForm(sentUsername, sentMessage)
       
       if (result.success) {
         setSendStatus("success")
+        
+        // Notify parent about the new message for immediate display
+        if (onMessageSent && result.messageId) {
+          onMessageSent({
+            id: result.messageId,
+            username: sentUsername,
+            message: sentMessage,
+            sentAt: new Date(),
+            status: "new",
+          })
+        }
         
         // Success animation - shrink message area to nothing
         const textareaContainer = textareaContainerRef.current
@@ -391,7 +410,7 @@ function CloudMessageForm({ onClose }: { onClose: () => void }) {
       // Reset error state after 3 seconds
       setTimeout(() => setSendStatus("idle"), 3000)
     }
-  }, [message, username, isSending, handleClose])
+  }, [message, username, isSending, handleClose, onMessageSent])
 
   return (
     <div ref={containerRef} className="fixed inset-0 z-50 flex items-center justify-center px-3 sm:px-4">
@@ -636,11 +655,13 @@ function AnimatedHeaderSVG({ className = "" }: { className?: string }) {
 function LiquidGlassMessage({ 
   message, 
   index,
-  position 
+  position,
+  isNew = false, // New messages animate immediately without scroll trigger
 }: { 
   message: FetchedMessage
   index: number
   position: { x: number; y: number; rotation: number }
+  isNew?: boolean
 }) {
   const bubbleRef = useRef<HTMLDivElement>(null)
   const contentRef = useRef<HTMLDivElement>(null)
@@ -673,14 +694,16 @@ function LiquidGlassMessage({
         })
       }
 
-      // Main timeline with staggered delay based on index
+      // Main timeline - new messages animate immediately, others use scroll trigger
       const tl = gsap.timeline({
-        delay: 0.2 + (index * 0.15),
-        scrollTrigger: {
-          trigger: bubbleRef.current,
-          start: "top 95%",
-          toggleActions: "play none none none",
-        },
+        delay: isNew ? 0.1 : 0.2 + (index * 0.15),
+        ...(isNew ? {} : {
+          scrollTrigger: {
+            trigger: bubbleRef.current,
+            start: "top 95%",
+            toggleActions: "play none none none",
+          },
+        }),
       })
 
       // Phase 1: Bubble appears with spring effect
@@ -688,7 +711,7 @@ function LiquidGlassMessage({
         opacity: 1,
         scale: 1,
         y: 0,
-        duration: 0.8,
+        duration: isNew ? 0.6 : 0.8,
         ease: "elastic.out(1, 0.5)",
       })
 
@@ -725,13 +748,13 @@ function LiquidGlassMessage({
         repeat: -1,
         yoyo: true,
         ease: "sine.inOut",
-        delay: 1 + (index * 0.2),
+        delay: isNew ? 0.5 : 1 + (index * 0.2),
       })
 
     }, bubbleRef)
 
     return () => ctx.revert()
-  }, [index])
+  }, [index, isNew])
 
   // Truncate message if too long
   const truncatedMessage = message.message.length > 80 
@@ -832,34 +855,28 @@ function LiquidGlassMessage({
   )
 }
 
+// Pre-computed positions for messages to avoid overlapping
+const MESSAGE_POSITIONS = [
+  { x: 5, y: 10, rotation: -2 },
+  { x: 70, y: 5, rotation: 3 },
+  { x: 2, y: 55, rotation: 1 },
+  { x: 68, y: 60, rotation: -1 },
+  { x: 8, y: 85, rotation: 2 },
+  { x: 72, y: 82, rotation: -3 },
+  // Additional positions for larger screens
+  { x: -5, y: 35, rotation: 1.5 },
+  { x: 78, y: 32, rotation: -2 },
+]
+
 // Floating messages background - shows recent messages from Firebase
-function FloatingMessagesBackground() {
-  const [messages, setMessages] = useState<FetchedMessage[]>([])
+function FloatingMessagesBackground({ 
+  messages, 
+  newMessageIds 
+}: { 
+  messages: FetchedMessage[]
+  newMessageIds: Set<string>
+}) {
   const containerRef = useRef<HTMLDivElement>(null)
-  const isMobile = useIsMobile()
-
-  // Pre-computed positions for messages to avoid overlapping
-  const messagePositions = [
-    { x: 5, y: 10, rotation: -2 },
-    { x: 70, y: 5, rotation: 3 },
-    { x: 2, y: 55, rotation: 1 },
-    { x: 68, y: 60, rotation: -1 },
-    { x: 8, y: 85, rotation: 2 },
-    { x: 72, y: 82, rotation: -3 },
-    // Additional positions for larger screens
-    { x: -5, y: 35, rotation: 1.5 },
-    { x: 78, y: 32, rotation: -2 },
-  ]
-
-  useEffect(() => {
-    // Fetch messages from Firebase
-    const loadMessages = async () => {
-      const fetchedMessages = await fetchRecentMessages(isMobile ? 4 : 8)
-      setMessages(fetchedMessages)
-    }
-    
-    loadMessages()
-  }, [isMobile])
 
   if (messages.length === 0) return null
 
@@ -874,7 +891,8 @@ function FloatingMessagesBackground() {
           key={message.id}
           message={message}
           index={index}
-          position={messagePositions[index % messagePositions.length]}
+          position={MESSAGE_POSITIONS[index % MESSAGE_POSITIONS.length]}
+          isNew={newMessageIds.has(message.id)}
         />
       ))}
     </div>
@@ -911,6 +929,18 @@ export function ContactSection() {
   const buttonWrapperRef = useRef<HTMLDivElement>(null)
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
   const [isFormOpen, setIsFormOpen] = useState(false)
+  const [messages, setMessages] = useState<FetchedMessage[]>([])
+  const [newMessageIds, setNewMessageIds] = useState<Set<string>>(new Set())
+  const isMobile = useIsMobile()
+
+  // Fetch messages from Firebase on mount
+  useEffect(() => {
+    const loadMessages = async () => {
+      const fetchedMessages = await fetchRecentMessages(isMobile ? 4 : 8)
+      setMessages(fetchedMessages)
+    }
+    loadMessages()
+  }, [isMobile])
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -953,6 +983,29 @@ export function ContactSection() {
     setIsFormOpen(false)
   }, [])
 
+  // Handle new message sent - add to list with animation
+  const handleMessageSent = useCallback((newMessage: FetchedMessage) => {
+    // Add new message to the beginning of the list
+    setMessages(prev => {
+      // Limit to max messages based on screen size
+      const maxMessages = isMobile ? 4 : 8
+      const updated = [newMessage, ...prev].slice(0, maxMessages)
+      return updated
+    })
+    
+    // Mark this message as new for special animation
+    setNewMessageIds(prev => new Set(prev).add(newMessage.id))
+    
+    // Remove the "new" flag after animation completes (2 seconds)
+    setTimeout(() => {
+      setNewMessageIds(prev => {
+        const updated = new Set(prev)
+        updated.delete(newMessage.id)
+        return updated
+      })
+    }, 2000)
+  }, [isMobile])
+
   return (
     <section 
       id="contact" 
@@ -960,7 +1013,7 @@ export function ContactSection() {
       className="relative py-20 sm:py-24 md:py-32 lg:py-40 px-4 sm:px-6 overflow-hidden"
     >
       {/* Floating messages from Firebase in background */}
-      <FloatingMessagesBackground />
+      <FloatingMessagesBackground messages={messages} newMessageIds={newMessageIds} />
       
       <div 
         className="absolute inset-0 opacity-30 transition-opacity duration-500 pointer-events-none"
@@ -1024,7 +1077,7 @@ export function ContactSection() {
         </AnimatedSection>
 
         {/* Cloud Message Form */}
-        {isFormOpen && <CloudMessageForm onClose={handleCloseForm} />}
+        {isFormOpen && <CloudMessageForm onClose={handleCloseForm} onMessageSent={handleMessageSent} />}
 
         <AnimatedSection delay={400}>
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 sm:gap-4 mt-10 sm:mt-16 max-w-md sm:max-w-none mx-auto">
