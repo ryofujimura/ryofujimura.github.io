@@ -136,7 +136,7 @@ export function AboutSection() {
         </div>
 
         {/* Content - max-w-6xl to match navbar */}
-        <div className="relative z-10 w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="relative z-10 w-full max-w-6xl mx-auto">
           {/* Stats Grid */}
           <div 
             ref={statsGridRef} 
@@ -232,7 +232,7 @@ export function AboutSection() {
               href="#contact"
               className="touch-target group inline-flex items-center justify-center gap-2 sm:gap-3 px-6 sm:px-8 py-3 sm:py-4 min-h-[48px] text-xs sm:text-sm font-mono uppercase tracking-wider text-foreground bg-transparent border-2 border-foreground hover:bg-foreground hover:text-background transition-all duration-300"
             >
-              Contact
+              Next
               <ArrowDown className="w-4 h-4 group-hover:translate-y-1 transition-transform shrink-0" />
             </MagneticButton>
           </div>
