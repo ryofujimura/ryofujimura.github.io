@@ -868,7 +868,6 @@ function SkillButton({
   isAnyActive,
   onClick,
   onRefChange,
-  rowIndex = 0,
 }: {
   skill: string
   projectCount: number
@@ -876,7 +875,6 @@ function SkillButton({
   isAnyActive: boolean
   onClick: () => void
   onRefChange?: (el: HTMLButtonElement | null) => void
-  rowIndex?: number
 }) {
   const buttonRef = useRef<HTMLButtonElement>(null)
   
@@ -919,20 +917,6 @@ function SkillButton({
     return () => clearInterval(interval)
   }, [isActive, skill])
 
-  // GSAP animation for font size based on row
-  useEffect(() => {
-    if (!buttonRef.current) return
-    
-    // Calculate scale factor: row 0 = 1, each subsequent row shrinks by 15%
-    const scaleFactor = Math.max(0.4, 1 - (rowIndex * 0.15))
-    
-    gsap.to(buttonRef.current, {
-      scale: scaleFactor,
-      duration: 0.4,
-      ease: "power2.out",
-    })
-  }, [rowIndex])
-
   const colorClass = getSkillColor(skill)
 
   return (
@@ -940,12 +924,12 @@ function SkillButton({
       ref={buttonRef}
       onClick={onClick}
       className={cn(
-        "skill-btn group relative inline-flex items-baseline gap-1 transition-all duration-300",
+        "skill-btn group relative inline-flex items-baseline gap-1",
         "font-mono font-bold tracking-tight cursor-pointer touch-manipulation",
         "text-[8vw] sm:text-[8vw] md:text-[6vw] lg:text-[5vw]",
         "leading-[0.9] origin-center",
         isActive
-          ? cn(colorClass, "scale-[1.02]")
+          ? colorClass
           : isAnyActive
             ? "text-foreground/10 hover:text-foreground/20"
             : cn("text-foreground/20 hover:text-foreground/40", `hover:${colorClass}`)
@@ -1004,20 +988,25 @@ export function ProjectsSection() {
   const [terminalRowBottom, setTerminalRowBottom] = useState<number | null>(null)
   const [terminalHeight, setTerminalHeight] = useState(0)
   const [skillRowMap, setSkillRowMap] = useState<Map<string, number>>(new Map())
+  const [refsReady, setRefsReady] = useState(0) // Counter to trigger recalculation
   const isMobile = useIsMobile()
 
   // Track skill button ref
   const setSkillRef = useCallback((skill: string, el: HTMLButtonElement | null) => {
     if (el) {
       skillRefsMap.current.set(skill, el)
+      // Increment counter to trigger row recalculation
+      setRefsReady(prev => prev + 1)
     } else {
       skillRefsMap.current.delete(skill)
     }
   }, [])
 
   // Calculate which row each skill is on
-  useLayoutEffect(() => {
-    if (!skillsContainerRef.current || skillRefsMap.current.size === 0) return
+  useEffect(() => {
+    if (!skillsContainerRef.current) return
+    // Wait until we have all refs
+    if (skillRefsMap.current.size < allSkills.length) return
 
     const calculateRows = () => {
       const containerRect = skillsContainerRef.current?.getBoundingClientRect()
@@ -1033,13 +1022,13 @@ export function ProjectsSection() {
       // Sort by top position
       skillPositions.sort((a, b) => a.top - b.top)
 
-      // Group into rows (skills within 20px of each other are on the same row)
+      // Group into rows (skills within 30px of each other are on the same row)
       const newRowMap = new Map<string, number>()
       let currentRow = 0
       let lastTop = -Infinity
 
       skillPositions.forEach(({ skill, top }) => {
-        if (top - lastTop > 20) {
+        if (top - lastTop > 30) {
           // New row
           if (lastTop !== -Infinity) currentRow++
           lastTop = top
@@ -1048,20 +1037,29 @@ export function ProjectsSection() {
       })
 
       setSkillRowMap(newRowMap)
+      
+      // Apply GSAP animations to all skill buttons
+      skillRefsMap.current.forEach((el, skill) => {
+        const row = newRowMap.get(skill) || 0
+        const scaleFactor = Math.max(0.45, 1 - (row * 0.12))
+        gsap.to(el, {
+          scale: scaleFactor,
+          duration: 0.5,
+          ease: "power2.out",
+          overwrite: true,
+        })
+      })
     }
 
-    // Calculate on mount and resize
-    calculateRows()
-    
-    // Recalculate after a small delay to ensure layout is complete
-    const timeout = setTimeout(calculateRows, 100)
+    // Calculate after layout settles
+    const timeout = setTimeout(calculateRows, 150)
     
     window.addEventListener("resize", calculateRows)
     return () => {
       window.removeEventListener("resize", calculateRows)
       clearTimeout(timeout)
     }
-  }, [])
+  }, [refsReady])
 
   // Toggle skill
   const handleSkillClick = useCallback((skill: string) => {
@@ -1233,9 +1231,9 @@ export function ProjectsSection() {
           {/* Skills flow - wrapped on all screen sizes */}
           <div className="flex flex-row flex-wrap justify-center items-baseline gap-x-[0.15em] gap-y-1 sm:gap-x-[0.2em] sm:gap-y-3">
             {allSkills.map((skill, index) => {
-              const rowIndex = skillRowMap.get(skill) || 0
+              const rowIdx = skillRowMap.get(skill) || 0
               // Dot scale follows the skill's row scaling
-              const dotScale = Math.max(0.4, 1 - (rowIndex * 0.15))
+              const dotScale = Math.max(0.45, 1 - (rowIdx * 0.12))
               return (
                 <span key={skill} className="inline-flex items-baseline">
                   <SkillButton
@@ -1245,7 +1243,6 @@ export function ProjectsSection() {
                     isAnyActive={activeSkill !== null}
                     onClick={() => handleSkillClick(skill)}
                     onRefChange={(el) => setSkillRef(skill, el)}
-                    rowIndex={rowIndex}
                   />
                   {index < allSkills.length - 1 && (
                     <span 
