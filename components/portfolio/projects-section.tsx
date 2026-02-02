@@ -24,20 +24,23 @@ const projects = [
     title: "Zero Inbox",
     subtitle: "AI-Driven Email Prioritization",
     year: "2025",
-    description: "Swift/SwiftUI email client with Google Mail API + Firebase + AI reasoning engine. 90-95% classification accuracy, 100-300ms inference latency.",
-    skills: ["Swift", "SwiftUI", "Firebase", "ML", "AI"],
-    links: [] as ProjectLink[]
+    description: "Swift/SwiftUI email client with Google Mail API + Firebase + AI reasoning engine. 90-95% classification accuracy, 100-300ms inference latency. Multi-stage decision system with 20 contextual behaviors, 50-200 messages/min throughput.",
+    skills: ["Swift", "SwiftUI", "Firebase", "Core ML", "AI"],
+    links: [
+      { type: "appstore" as LinkType, url: "https://apps.apple.com/us/app/inb0x/id6758564223" },
+      { type: "github" as LinkType, url: "https://github.com/ryofujimura/Zero-Inbox-Life" }
+    ]
   },
   {
     id: "02",
     title: "Research Lab PM",
     subtitle: "AI-Powered Project Management",
     year: "2025",
-    description: "Serverless orchestration layer enabling dynamic AI routing across 30+ researchers. Sub-200ms Cloud Functions response time.",
-    skills: ["Serverless", "Firebase", "GPT-4", "ML"],
+    description: "Serverless orchestration layer enabling dynamic AI routing across 30+ researchers. Sub-200ms Cloud Functions response time. Metadata-aware prompting for task summaries and automated decision support.",
+    skills: ["React", "Firebase", "Cloud Functions", "AI", "Serverless"],
     links: [
-      { type: "github" as LinkType, url: "https://github.com/ryofujimura/research-lab-pm" },
-      { type: "website" as LinkType, url: "https://research-lab-pm.web.app" }
+      { type: "website" as LinkType, url: "https://csulbcpx.web.app/" },
+      { type: "github" as LinkType, url: "https://github.com/ryofujimura/projectmanagementweb" }
     ]
   },
   {
@@ -45,111 +48,137 @@ const projects = [
     title: "HTIC Shuttle",
     subtitle: "Live Shuttle Tracking System",
     year: "2025",
-    description: "Real-time shuttle tracking used daily by 25+ users across iOS, Android, and web. <100ms Firebase RTDB update latency.",
-    skills: ["Swift", "Kotlin", "Firebase", "Realtime"],
+    description: "Real-time shuttle tracking used daily by 25+ users across iOS, Android, and web. <100ms Firebase RTDB update latency. Reduced duplicate/conflicting pickup events by 70%+ through event serialization.",
+    skills: ["Swift", "Kotlin", "Firebase", "Realtime", "Google Maps"],
     links: [
-      { type: "appstore" as LinkType, url: "https://apps.apple.com/app/htic-shuttle" },
-      { type: "playstore" as LinkType, url: "https://play.google.com/store/apps/details?id=com.htic.shuttle" },
-      { type: "github" as LinkType, url: "https://github.com/ryofujimura/htic-shuttle" },
-      { type: "website" as LinkType, url: "https://htic-shuttle.web.app" }
+      { type: "appstore" as LinkType, url: "https://apps.apple.com/us/app/htic-shuttle/id6747784542" },
+      { type: "playstore" as LinkType, url: "https://tokaishuttle.web.app/app-release.apk" },
+      { type: "website" as LinkType, url: "https://tokaishuttle.web.app/" }
     ]
   },
   {
     id: "04",
-    title: "CyberEdu",
-    subtitle: "Cross-Platform Education App",
-    year: "2025",
-    description: "Synchronized iOS+Android apps supporting live event updates for 50+ users. 99%+ cross-device sync reliability.",
-    skills: ["Swift", "Kotlin", "Firebase", "Offline"],
+    title: "Saboriendo",
+    subtitle: "E-commerce Bakery Platform",
+    year: "2024",
+    description: "Full-stack e-commerce using React 19, SwiftUI, Firebase. Barcode-based order verification (CODE128, 11+ formats) reducing lookup time 50%+. 30-minute time-slot booking system with multi-language support (EN/JP/ES).",
+    skills: ["React", "SwiftUI", "Firebase", "AVFoundation", "FCM"],
     links: [
-      { type: "appstore" as LinkType, url: "https://apps.apple.com/app/cyberedu" },
-      { type: "playstore" as LinkType, url: "https://play.google.com/store/apps/details?id=com.cyberedu" },
-      { type: "github" as LinkType, url: "https://github.com/ryofujimura/cyberedu" },
-      { type: "website" as LinkType, url: "https://cyberedu.web.app" }
+      { type: "appstore" as LinkType, url: "https://apps.apple.com/us/app/saboriendo/id6757139459" },
+      { type: "website" as LinkType, url: "https://saboriendo.web.app/" }
     ]
   },
   {
     id: "05",
-    title: "Whiteboard AI",
-    subtitle: "Collaborative Vision ML Canvas",
+    title: "CyberEdu",
+    subtitle: "Cross-Platform Education App",
     year: "2025",
-    description: "Transformer-based vision inference at 150-200ms latency with CRDT-like real-time collaboration. Multi-user async WebSocket pipeline.",
-    skills: ["PyTorch", "WebSocket", "React", "ML"],
+    description: "Synchronized iOS+Android apps supporting live event updates for 50+ users. 99%+ cross-device sync reliability across unstable networks.",
+    skills: ["Swift", "Kotlin", "Firebase", "Offline-First"],
     links: [
-      { type: "github" as LinkType, url: "https://github.com/ryofujimura/whiteboard-ai" },
-      { type: "website" as LinkType, url: "https://whiteboard-ai.web.app" }
+      { type: "appstore" as LinkType, url: "https://apps.apple.com/us/app/cyberedu/id6745105687" },
+      { type: "playstore" as LinkType, url: "https://cyberedu-rf.vercel.app/SDK/CyberEdu101.apk" },
+      { type: "website" as LinkType, url: "https://cyberedu-rf.vercel.app/" }
     ]
   },
   {
     id: "06",
-    title: "With",
-    subtitle: "Offline LLM Chat App",
-    year: "2024",
-    description: "Offline-capable LLM chat using GGUF + llama.cpp with <50ms/token local inference. 2GB+ memory reduction via quantization.",
-    skills: ["Swift", "SwiftUI", "llama.cpp", "ML", "Privacy"],
+    title: "Whiteboard AI",
+    subtitle: "Collaborative Vision ML Canvas",
+    year: "2025",
+    description: "Transformer-based vision inference at 150-200ms latency with CRDT-like real-time collaboration. Multi-user async WebSocket pipeline supporting 5+ concurrent users (scalable to 25).",
+    skills: ["PyTorch", "WebSocket", "React", "Transformers"],
     links: [
-      { type: "github" as LinkType, url: "https://github.com/ryofujimura/with" }
+      { type: "website" as LinkType, url: "https://whiteboard-4dl2wytqj-ryofujimuras-projects.vercel.app" },
+      { type: "github" as LinkType, url: "https://github.com/ryofujimura/whiteboard-ai" }
     ]
   },
   {
     id: "07",
-    title: "Portfolio Website",
-    subtitle: "Brutalist Design System",
+    title: "With",
+    subtitle: "Offline LLM Chat App",
     year: "2024",
-    description: "Optimized client-side performance with 40-60% faster page loads. Modular components with clean deployment pipelines.",
-    skills: ["React", "Next.js", "GSAP", "Tailwind"],
+    description: "Offline-capable LLM chat using GGUF + llama.cpp with <50ms/token local inference. 2GB+ memory reduction via quantization. MVVM SwiftUI architecture with advanced system prompt management.",
+    skills: ["Swift", "SwiftUI", "llama.cpp", "GGUF", "Privacy"],
     links: [
-      { type: "github" as LinkType, url: "https://github.com/ryofujimura/ryofujimura.github.io" },
-      { type: "website" as LinkType, url: "https://ryofujimura.com" }
+      { type: "appstore" as LinkType, url: "https://apps.apple.com/us/app/with-cheer-assistance/id6738982526" }
     ]
   },
   {
     id: "08",
-    title: "Matcha Time",
-    subtitle: "Time Zone Coordination Tool",
+    title: "Custom 3D-Printed Mouse",
+    subtitle: "Personalized Input Device Research",
     year: "2024",
-    description: "Swift/SwiftUI time zone coordination tool used by 50 users at launch. 4-week idea-to-launch timeline.",
-    skills: ["Swift", "SwiftUI", "CloudKit"],
-    links: [
-      { type: "appstore" as LinkType, url: "https://apps.apple.com/app/matcha-time" },
-      { type: "github" as LinkType, url: "https://github.com/ryofujimura/matcha-time" },
-      { type: "website" as LinkType, url: "https://matcha-time.web.app" }
-    ]
+    description: "Designed personalized 3D-printed mouse reducing total weight by 45%, with 15.1g custom shell and stress-tested 15% infill. Published at ACM/IEEE ICCPS 2025.",
+    skills: ["3D Printing", "CAD", "Research", "HCI"],
+    links: [] as ProjectLink[]
   },
   {
     id: "09",
-    title: "Schedule Mastermind",
-    subtitle: "Course Scheduling Engine",
+    title: "Robotic Keyboard Actuation",
+    subtitle: "Human vs. Robot Classification",
     year: "2024",
-    description: "Python Flask scheduler organizing 500+ courses with real-time conflict detection. Reduced scheduling errors by 70%+.",
-    skills: ["Python", "Flask", "Algorithms"],
-    links: [
-      { type: "github" as LinkType, url: "https://github.com/ryofujimura/schedule-mastermind" },
-      { type: "website" as LinkType, url: "https://schedule-mastermind.web.app" }
-    ]
+    description: "Robotic keyboard system achieving 102 keystrokes/30s (100% success), 21.7ms latency, 95% classification accuracy using 33 temporal features over 40 trajectories. Published at IEEE ICRA 2026.",
+    skills: ["Robotics", "ML", "Signal Processing", "Research"],
+    links: [] as ProjectLink[]
   },
   {
     id: "10",
-    title: "Shohei Home Ground",
-    subtitle: "Automated Content Pipeline",
-    year: "2023",
-    description: "Automated daily Instagram posting for 685 posts, growing to 11,000 followers in 8 months. Saved 2+ hours/day via Python automation.",
-    skills: ["Python", "API", "Automation"],
+    title: "Portfolio Website",
+    subtitle: "Brutalist Design System",
+    year: "2024",
+    description: "Next.js 16 + React 19 portfolio with GSAP animations. 40-60% faster page loads via client-side optimization. Modular components with clean deployment pipelines.",
+    skills: ["React", "Next.js", "GSAP", "Tailwind", "Firebase"],
     links: [
-      { type: "instagram" as LinkType, url: "https://instagram.com/shoheihomeground" },
-      { type: "youtube" as LinkType, url: "https://youtube.com/@shoheihomeground" }
+      { type: "website" as LinkType, url: "https://ryofujimura.github.io" },
+      { type: "github" as LinkType, url: "https://github.com/ryofujimura/ryofujimura.github.io" }
     ]
   },
   {
     id: "11",
+    title: "Matcha Time",
+    subtitle: "Time Zone Coordination Tool",
+    year: "2024",
+    description: "macOS menu bar app for time zone management. Used by 50 users at launch. 4-week idea-to-launch timeline.",
+    skills: ["Swift", "SwiftUI", "macOS"],
+    links: [
+      { type: "appstore" as LinkType, url: "https://apps.apple.com/us/app/matcha-time/id6497067918?mt=12" },
+      { type: "github" as LinkType, url: "https://github.com/ryofujimura/timeZoneFinder/" }
+    ]
+  },
+  {
+    id: "12",
+    title: "Schedule Mastermind",
+    subtitle: "Course Scheduling Engine",
+    year: "2023",
+    description: "Python Flask scheduler organizing 500+ courses with real-time conflict detection. Improved planning for 100-300+ students, reduced scheduling errors by 70%+.",
+    skills: ["Python", "Flask", "Algorithms"],
+    links: [
+      { type: "github" as LinkType, url: "https://github.com/ryofujimura/ClassScheduler" }
+    ]
+  },
+  {
+    id: "13",
+    title: "Shohei Home Ground",
+    subtitle: "Automated Content Pipeline",
+    year: "2023",
+    description: "Automated daily Instagram posting for 685 posts, growing to 11,000 followers in 8 months. Saved 2+ hours/day via Python automation enabling consistent monetization.",
+    skills: ["Python", "API", "Automation"],
+    links: [
+      { type: "instagram" as LinkType, url: "https://www.instagram.com/shoheihomeground/" },
+      { type: "youtube" as LinkType, url: "https://www.youtube.com/c/ShoheiHomeGround" }
+    ]
+  },
+  {
+    id: "14",
     title: "Poker Percentage",
     subtitle: "WatchOS Odds Calculator",
     year: "2022",
-    description: "WatchOS poker odds calculator with <10ms probability lookups using precomputed tables. Real-time equity insights.",
+    description: "WatchOS poker odds calculator with <10ms probability lookups using precomputed tables. Real-time equity insights for improved decision accuracy.",
     skills: ["Swift", "SwiftUI", "WatchOS", "Algorithms"],
     links: [
-      { type: "appstore" as LinkType, url: "https://apps.apple.com/app/poker-percentage" },
-      { type: "github" as LinkType, url: "https://github.com/ryofujimura/poker-percentage" }
+      { type: "appstore" as LinkType, url: "https://apps.apple.com/us/app/poker-pocket-odds/id6499280318" },
+      { type: "github" as LinkType, url: "https://github.com/ryofujimura/WatchApp-PokerPercentage" }
     ]
   },
 ]
@@ -157,7 +186,7 @@ const projects = [
 // Link display config
 const linkConfig: Record<LinkType, { label: string; icon: string }> = {
   appstore: { label: "App Store", icon: "" },
-  playstore: { label: "Play Store", icon: "Å" },
+  playstore: { label: "Play Store", icon: "🤖" },
   github: { label: "GitHub", icon: "" },
   website: { label: "Website", icon: "➥" },
   instagram: { label: "Instagram", icon: "♖" },
@@ -176,10 +205,10 @@ projects.forEach(project => {
 // Categorized skills with syntax highlighting colors
 const skillCategories = {
   language: { skills: ["Swift", "Python", "Kotlin"], color: "text-orange-400" },
-  framework: { skills: ["SwiftUI", "React", "Next.js", "Flask", "PyTorch"], color: "text-cyan-400" },
-  platform: { skills: ["WatchOS", "Firebase", "CloudKit", "Serverless"], color: "text-green-400" },
-  concept: { skills: ["GSAP", "Tailwind", "WebSocket", "API", "llama.cpp"], color: "text-yellow-400" },
-  paradigm: { skills: ["Realtime", "Offline", "ML", "AI", "Automation", "Algorithms", "Privacy", "GPT-4"], color: "text-purple-400" },
+  framework: { skills: ["SwiftUI", "React", "Next.js", "Flask", "PyTorch", "AVFoundation"], color: "text-cyan-400" },
+  platform: { skills: ["WatchOS", "macOS", "Firebase", "Cloud Functions", "Serverless", "Google Maps", "FCM"], color: "text-green-400" },
+  concept: { skills: ["GSAP", "Tailwind", "WebSocket", "API", "llama.cpp", "GGUF", "CAD", "3D Printing"], color: "text-yellow-400" },
+  paradigm: { skills: ["Realtime", "Offline-First", "ML", "Core ML", "AI", "Automation", "Algorithms", "Privacy", "Transformers", "Research", "HCI", "Robotics", "Signal Processing"], color: "text-purple-400" },
 }
 
 // Get color for a skill
