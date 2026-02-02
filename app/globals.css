@@ -146,18 +146,27 @@
   }
 }
 
-/* Hide default cursor on large screens only (lg: 1024px+) */
+/* Hide default cursor on large screens only (lg: 1024px+) - Portfolio site only */
 @media (min-width: 1024px) {
-  html, body, *, *::before, *::after {
+  .portfolio-site,
+  .portfolio-site *,
+  .portfolio-site *::before,
+  .portfolio-site *::after {
     cursor: none !important;
   }
-  a, button, input, textarea, select, [role="button"], [tabindex] {
+  .portfolio-site a,
+  .portfolio-site button,
+  .portfolio-site input,
+  .portfolio-site textarea,
+  .portfolio-site select,
+  .portfolio-site [role="button"],
+  .portfolio-site [tabindex] {
     cursor: none !important;
   }
 }
 
-/* Hide custom cursor on mobile when message form is open */
-body.hide-cursor-mobile [class*="z-[9999]"] {
+/* Hide custom cursor on mobile when message form is open - Portfolio site only */
+body.hide-cursor-mobile .portfolio-site [class*="z-[9999]"] {
   display: none !important;
 }
 

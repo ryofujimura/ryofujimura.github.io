@@ -9,7 +9,7 @@ import { CustomCursor } from "@/components/custom-cursor"
 
 export default function Portfolio() {
   return (
-    <main className="min-h-screen bg-background text-foreground selection:bg-accent selection:text-accent-foreground">
+    <main className="portfolio-site min-h-screen bg-background text-foreground selection:bg-accent selection:text-accent-foreground">
       <CustomCursor />
       <Navigation />
       <HeroSection />
