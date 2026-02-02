@@ -1005,7 +1005,7 @@ export function ProjectsSection() {
   useEffect(() => {
     if (!skillsContainerRef.current) return
 
-    const calculateRows = () => {
+    const calculateRows = (animate = false) => {
       const containerRect = skillsContainerRef.current?.getBoundingClientRect()
       if (!containerRect) return
       if (skillRefsMap.current.size < allSkills.length) return
@@ -1037,27 +1037,32 @@ export function ProjectsSection() {
       setSkillRowMap(newRowMap)
       hasCalculatedRows.current = true
       
-      // Apply GSAP scale animations to all skill buttons
-      // Use overwrite: "auto" to not kill other animations (like scroll entrance)
+      // Apply scale to all skill buttons
       skillRefsMap.current.forEach((el, skill) => {
         const row = newRowMap.get(skill) || 0
         const scaleFactor = Math.max(0.45, 1 - (row * 0.12))
-        gsap.to(el, {
-          scale: scaleFactor,
-          duration: 0.5,
-          ease: "power2.out",
-          overwrite: "auto", // Only overwrite scale, not opacity/y/rotateX
-        })
+        
+        if (animate) {
+          // Animate on resize
+          gsap.to(el, {
+            scale: scaleFactor,
+            duration: 0.3,
+            ease: "power2.out",
+            overwrite: "auto",
+          })
+        } else {
+          // Set immediately on initial load (no animation)
+          gsap.set(el, { scale: scaleFactor })
+        }
       })
     }
 
-    // Wait longer for scroll entrance animation to complete before calculating rows
-    // Scroll animation: 0.8s duration + stagger (allSkills.length * 0.06s) ≈ 2-3s total
-    const initialTimeout = setTimeout(calculateRows, 2500)
+    // Calculate immediately on mount (set scale without animation)
+    const initialTimeout = setTimeout(() => calculateRows(false), 100)
     
-    // Recalculate on resize (only after initial calculation is done)
+    // Recalculate on resize with animation
     const handleResize = () => {
-      if (hasCalculatedRows.current) calculateRows()
+      if (hasCalculatedRows.current) calculateRows(true)
     }
     
     window.addEventListener("resize", handleResize)
@@ -1235,13 +1240,19 @@ export function ProjectsSection() {
           style={{ paddingBottom: activeSkill ? `${terminalHeight + 40}px` : undefined }}
         >
           {/* Skills flow - wrapped on all screen sizes */}
-          <div className="flex flex-row flex-wrap justify-center items-baseline gap-x-[0.15em] gap-y-1 sm:gap-x-[0.2em] sm:gap-y-3">
+          <div className="flex flex-row flex-wrap justify-center items-end gap-x-[0.15em] sm:gap-x-[0.2em]">
             {allSkills.map((skill, index) => {
               const rowIdx = skillRowMap.get(skill) || 0
-              // Dot scale follows the skill's row scaling
-              const dotScale = Math.max(0.45, 1 - (rowIdx * 0.12))
+              // Scale and line height follow the skill's row
+              const scaleFactor = Math.max(0.45, 1 - (rowIdx * 0.12))
+              // Line height decreases with each row
+              const lineHeight = Math.max(0.6, 1.1 - (rowIdx * 0.1))
               return (
-                <span key={skill} className="inline-flex items-baseline">
+                <span 
+                  key={skill} 
+                  className="inline-flex items-end transition-all duration-300"
+                  style={{ lineHeight: `${lineHeight}em` }}
+                >
                   <SkillButton
                     skill={skill}
                     projectCount={skillsMap.get(skill)?.length || 0}
@@ -1253,7 +1264,7 @@ export function ProjectsSection() {
                   {index < allSkills.length - 1 && (
                     <span 
                       className="font-mono text-[2.5vw] sm:text-[2vw] text-foreground/10 mx-[0.1em] select-none transition-transform duration-300"
-                      style={{ transform: `scale(${dotScale})` }}
+                      style={{ transform: `scale(${scaleFactor})` }}
                     >
                       ·
                     </span>
