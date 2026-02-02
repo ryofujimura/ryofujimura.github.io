@@ -657,11 +657,13 @@ function LiquidGlassMessage({
   index,
   position,
   isNew = false, // New messages animate immediately without scroll trigger
+  isMobile = false,
 }: { 
   message: FetchedMessage
   index: number
   position: { x: number; y: number; rotation: number }
   isNew?: boolean
+  isMobile?: boolean
 }) {
   const bubbleRef = useRef<HTMLDivElement>(null)
   const contentRef = useRef<HTMLDivElement>(null)
@@ -756,9 +758,10 @@ function LiquidGlassMessage({
     return () => ctx.revert()
   }, [index, isNew])
 
-  // Truncate message if too long
-  const truncatedMessage = message.message.length > 80 
-    ? message.message.substring(0, 80) + "..." 
+  // Truncate message if too long (shorter on mobile)
+  const maxLength = isMobile ? 40 : 80
+  const truncatedMessage = message.message.length > maxLength 
+    ? message.message.substring(0, maxLength) + "..." 
     : message.message
 
   return (
@@ -769,7 +772,7 @@ function LiquidGlassMessage({
         left: `${position.x}%`,
         top: `${position.y}%`,
         transform: `rotate(${position.rotation}deg)`,
-        maxWidth: "280px",
+        maxWidth: isMobile ? "160px" : "280px",
         zIndex: 1,
       }}
     >
@@ -859,28 +862,41 @@ function LiquidGlassMessage({
   )
 }
 
-// Pre-computed positions for messages to avoid overlapping
-const MESSAGE_POSITIONS = [
-  { x: 5, y: 10, rotation: -2 },
-  { x: 70, y: 5, rotation: 3 },
-  { x: 2, y: 55, rotation: 1 },
-  { x: 68, y: 60, rotation: -1 },
-  { x: 8, y: 85, rotation: 2 },
-  { x: 72, y: 82, rotation: -3 },
-  // Additional positions for larger screens
+// Pre-computed positions for messages - pushed to edges to avoid center content
+// Desktop: messages frame the content on far left/right edges
+const MESSAGE_POSITIONS_DESKTOP = [
+  // Left edge - stacked vertically
+  { x: -8, y: 5, rotation: -2 },
   { x: -5, y: 35, rotation: 1.5 },
-  { x: 78, y: 32, rotation: -2 },
+  { x: -8, y: 65, rotation: -1 },
+  { x: -3, y: 90, rotation: 2 },
+  // Right edge - stacked vertically
+  { x: 78, y: 8, rotation: 3 },
+  { x: 82, y: 38, rotation: -2 },
+  { x: 78, y: 68, rotation: 1 },
+  { x: 80, y: 92, rotation: -3 },
+]
+
+// Mobile: fewer positions, pushed to corners to avoid narrow center
+const MESSAGE_POSITIONS_MOBILE = [
+  { x: -5, y: 3, rotation: -1 },
+  { x: 55, y: 2, rotation: 2 },
+  { x: -3, y: 88, rotation: 1 },
+  { x: 58, y: 90, rotation: -2 },
 ]
 
 // Floating messages background - shows recent messages from Firebase
 function FloatingMessagesBackground({ 
   messages, 
-  newMessageIds 
+  newMessageIds,
+  isMobile,
 }: { 
   messages: FetchedMessage[]
   newMessageIds: Set<string>
+  isMobile: boolean
 }) {
   const containerRef = useRef<HTMLDivElement>(null)
+  const positions = isMobile ? MESSAGE_POSITIONS_MOBILE : MESSAGE_POSITIONS_DESKTOP
 
   if (messages.length === 0) return null
 
@@ -895,8 +911,9 @@ function FloatingMessagesBackground({
           key={message.id}
           message={message}
           index={index}
-          position={MESSAGE_POSITIONS[index % MESSAGE_POSITIONS.length]}
+          position={positions[index % positions.length]}
           isNew={newMessageIds.has(message.id)}
+          isMobile={isMobile}
         />
       ))}
     </div>
@@ -1017,7 +1034,7 @@ export function ContactSection() {
       className="relative py-20 sm:py-24 md:py-32 lg:py-40 px-4 sm:px-6 overflow-hidden"
     >
       {/* Floating messages from Firebase in background */}
-      <FloatingMessagesBackground messages={messages} newMessageIds={newMessageIds} />
+      <FloatingMessagesBackground messages={messages} newMessageIds={newMessageIds} isMobile={isMobile} />
       
       <div 
         className="absolute inset-0 opacity-30 transition-opacity duration-500 pointer-events-none"
