@@ -12,7 +12,7 @@ export function Footer() {
     <footer className="py-8 sm:py-12 px-4 sm:px-6 border-t border-border bg-card/50 pb-[max(1.5rem,env(safe-area-inset-bottom))]">
       <div className="max-w-6xl mx-auto">
         <div className="flex flex-col md:flex-row items-center justify-between gap-6 sm:gap-8">
-          <div className="flex items-center gap-1 sm:gap-2">
+          {/* <div className="flex items-center gap-1 sm:gap-2">
             <MagneticButton
               as="a"
               href="https://github.com/ryofujimura"
@@ -41,7 +41,7 @@ export function Footer() {
               <Mail className="w-5 h-5" />
               <span className="sr-only">Email</span>
             </MagneticButton>
-          </div>
+          </div> */}
 
           <p className="text-xs sm:text-sm text-muted-foreground text-center font-mono">
             &gt; Built by <span className="text-foreground font-medium">Ryo Fujimura </span>

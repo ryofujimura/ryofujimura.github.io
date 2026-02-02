@@ -399,12 +399,14 @@ function TerminalOutput({
   skill, 
   isActive,
   onClose,
-  onSkillClick
+  onSkillClick,
+  isMobile = false
 }: { 
   skill: string | null
   isActive: boolean
   onClose: () => void
   onSkillClick?: (skill: string) => void
+  isMobile?: boolean
 }) {
   const outputRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -429,12 +431,12 @@ function TerminalOutput({
     setHistoryIndex(-1)
   }, [skill])
 
-  // Focus input when header animation completes
+  // Focus input when header animation completes (skip on mobile to prevent auto-zoom)
   useEffect(() => {
-    if (isHeaderComplete && inputRef.current) {
+    if (isHeaderComplete && inputRef.current && !isMobile) {
       inputRef.current.focus()
     }
-  }, [isHeaderComplete])
+  }, [isHeaderComplete, isMobile])
 
   // Handle command input
   const handleCommand = useCallback((command: string) => {
@@ -1265,6 +1267,7 @@ export function ProjectsSection() {
                 isActive={true}
                 onClose={() => setActiveSkill(null)}
                 onSkillClick={(newSkill) => setActiveSkill(newSkill)}
+                isMobile={isMobile}
               />
             </div>
           )}
