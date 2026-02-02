@@ -782,6 +782,7 @@ function TerminalOutput({
                                     <input
                                       ref={inputRef}
                                       type="text"
+                                      name="skill-query"
                                       value={inputValue}
                                       onChange={(e) => setInputValue(e.target.value)}
                                       onKeyDown={handleKeyDown}
@@ -791,6 +792,9 @@ function TerminalOutput({
                                       autoCorrect="off"
                                       autoCapitalize="off"
                                       spellCheck={false}
+                                      data-form-type="other"
+                                      data-1p-ignore="true"
+                                      data-lpignore="true"
                                     />
                                     <span className="text-white">&quot;</span>
                                   </div>
