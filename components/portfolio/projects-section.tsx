@@ -887,6 +887,20 @@ function SkillButton({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   const [displayText, setDisplayText] = useState(skill)
+  
+  // Base font size - start with server value (5vw), update on client after mount
+  const [baseSizeVw, setBaseSizeVw] = useState(5)
+  
+  useEffect(() => {
+    // Calculate responsive size on client only (after hydration)
+    const calculateSize = () => {
+      const width = window.innerWidth
+      setBaseSizeVw(width >= 1024 ? 5 : width >= 768 ? 6 : 8)
+    }
+    calculateSize()
+    window.addEventListener('resize', calculateSize)
+    return () => window.removeEventListener('resize', calculateSize)
+  }, [])
   const glitchChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 
   // Glitch effect on hover/active
@@ -922,8 +936,8 @@ function SkillButton({
 
   const colorClass = getSkillColor(skill)
 
-  // Responsive font size via Tailwind classes with CSS variable for multiplier
-  // Base sizes: 8vw on mobile, 6vw on md, 5vw on lg
+  // Calculate font size based on viewport and multiplier
+  const fontSize = `${baseSizeVw * sizeMultiplier}vw`
 
   return (
     <button
@@ -933,15 +947,13 @@ function SkillButton({
         "skill-btn group relative inline-flex items-baseline gap-1",
         "font-mono font-bold tracking-tight cursor-pointer touch-manipulation",
         "leading-[0.9]",
-        // Responsive font size classes
-        "text-[calc(8vw*var(--size-mult,1))] md:text-[calc(6vw*var(--size-mult,1))] lg:text-[calc(5vw*var(--size-mult,1))]",
         isActive
           ? colorClass
           : isAnyActive
             ? "text-foreground/10 hover:text-foreground/20"
             : cn("text-foreground/20 hover:text-foreground/40", `hover:${colorClass}`)
       )}
-      style={{ "--size-mult": sizeMultiplier } as React.CSSProperties}
+      style={{ fontSize }}
     >
       {/* Command prefix */}
       <span 
