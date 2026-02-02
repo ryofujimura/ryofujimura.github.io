@@ -1,20 +1,28 @@
+import Image from "next/image"
+
 export default function HobbiesPage() {
   return (
-    <main className="min-h-screen bg-neutral-50 flex flex-col items-center justify-center p-8">
-      {/* Hero Image */}
-      <div className="w-full max-w-2xl aspect-video relative rounded-2xl overflow-hidden shadow-xl mb-8 bg-neutral-200">
-        {/* Replace with your own image: /images/hobbies/hero.jpg */}
-        <img
-          src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&q=80"
-          alt="Hobbies"
-          className="w-full h-full object-cover"
-        />
-      </div>
+    <main className="min-h-screen bg-background text-foreground flex flex-col items-center justify-center p-8">
+      <div className="max-w-2xl w-full text-center space-y-8">
+        {/* Image */}
+        <div className="relative w-full aspect-video rounded-2xl overflow-hidden shadow-lg">
+          <Image
+            src="/images/hobbies/hero.jpg"
+            alt="Hobbies"
+            fill
+            className="object-cover"
+            priority
+          />
+        </div>
 
-      {/* Simple Text */}
-      <h1 className="text-4xl md:text-5xl font-light text-neutral-800 text-center tracking-tight">
-        Welcome to my hobbies
-      </h1>
+        {/* Text */}
+        <h1 className="text-4xl md:text-5xl font-bold tracking-tight">
+          My Hobbies
+        </h1>
+        <p className="text-lg text-muted-foreground">
+          Coming soon — a collection of things I love to do outside of work.
+        </p>
+      </div>
     </main>
   )
 }
