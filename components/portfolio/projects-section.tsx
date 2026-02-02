@@ -922,12 +922,8 @@ function SkillButton({
 
   const colorClass = getSkillColor(skill)
 
-  // Calculate font size based on viewport and multiplier
-  // Base: 8vw on mobile, 6vw on md, 5vw on lg
-  const baseSizeVw = typeof window !== 'undefined' 
-    ? (window.innerWidth >= 1024 ? 5 : window.innerWidth >= 768 ? 6 : 8)
-    : 5
-  const fontSize = `${baseSizeVw * sizeMultiplier}vw`
+  // Responsive font size via Tailwind classes with CSS variable for multiplier
+  // Base sizes: 8vw on mobile, 6vw on md, 5vw on lg
 
   return (
     <button
@@ -937,13 +933,15 @@ function SkillButton({
         "skill-btn group relative inline-flex items-baseline gap-1",
         "font-mono font-bold tracking-tight cursor-pointer touch-manipulation",
         "leading-[0.9]",
+        // Responsive font size classes
+        "text-[calc(8vw*var(--size-mult,1))] md:text-[calc(6vw*var(--size-mult,1))] lg:text-[calc(5vw*var(--size-mult,1))]",
         isActive
           ? colorClass
           : isAnyActive
             ? "text-foreground/10 hover:text-foreground/20"
             : cn("text-foreground/20 hover:text-foreground/40", `hover:${colorClass}`)
       )}
-      style={{ fontSize }}
+      style={{ "--size-mult": sizeMultiplier } as React.CSSProperties}
     >
       {/* Command prefix */}
       <span 
