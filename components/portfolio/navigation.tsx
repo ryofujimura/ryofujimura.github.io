@@ -342,7 +342,7 @@ export function Navigation() {
             : "bg-transparent"
         )}
       >
-        <div className="max-w-6xl mx-auto py-3 sm:py-4 px-4 sm:px-6">
+        <div className="max-w-6xl mx-auto py-3 sm:py-4">
           <div className="relative flex items-center justify-center">
             {/* Logo - positioned left */}
             <MagneticButton
