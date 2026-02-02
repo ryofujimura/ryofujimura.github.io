@@ -868,6 +868,7 @@ function SkillButton({
   isAnyActive,
   onClick,
   onRefChange,
+  sizeMultiplier = 1,
 }: {
   skill: string
   projectCount: number
@@ -875,6 +876,7 @@ function SkillButton({
   isAnyActive: boolean
   onClick: () => void
   onRefChange?: (el: HTMLButtonElement | null) => void
+  sizeMultiplier?: number
 }) {
   const buttonRef = useRef<HTMLButtonElement>(null)
   
@@ -920,6 +922,13 @@ function SkillButton({
 
   const colorClass = getSkillColor(skill)
 
+  // Calculate font size based on viewport and multiplier
+  // Base: 8vw on mobile, 6vw on md, 5vw on lg
+  const baseSizeVw = typeof window !== 'undefined' 
+    ? (window.innerWidth >= 1024 ? 5 : window.innerWidth >= 768 ? 6 : 8)
+    : 5
+  const fontSize = `${baseSizeVw * sizeMultiplier}vw`
+
   return (
     <button
       ref={buttonRef}
@@ -927,14 +936,14 @@ function SkillButton({
       className={cn(
         "skill-btn group relative inline-flex items-baseline gap-1",
         "font-mono font-bold tracking-tight cursor-pointer touch-manipulation",
-        "text-[8vw] sm:text-[8vw] md:text-[6vw] lg:text-[5vw]",
-        "leading-[0.9] origin-center",
+        "leading-[0.9]",
         isActive
           ? colorClass
           : isAnyActive
             ? "text-foreground/10 hover:text-foreground/20"
             : cn("text-foreground/20 hover:text-foreground/40", `hover:${colorClass}`)
       )}
+      style={{ fontSize }}
     >
       {/* Command prefix */}
       <span 
@@ -1001,75 +1010,31 @@ export function ProjectsSection() {
     }
   }, [])
 
-  // Calculate which row each skill is on
+  // Pre-calculate row assignments based on pyramid structure
+  // More skills fit in lower rows since they're smaller
   useEffect(() => {
-    if (!skillsContainerRef.current) return
-
-    const calculateRows = (animate = false) => {
-      const containerRect = skillsContainerRef.current?.getBoundingClientRect()
-      if (!containerRect) return
-      if (skillRefsMap.current.size < allSkills.length) return
-
-      // Collect all skill positions
-      const skillPositions: { skill: string; top: number }[] = []
-      skillRefsMap.current.forEach((el, skill) => {
-        const rect = el.getBoundingClientRect()
-        skillPositions.push({ skill, top: rect.top - containerRect.top })
-      })
-
-      // Sort by top position
-      skillPositions.sort((a, b) => a.top - b.top)
-
-      // Group into rows (skills within 30px of each other are on the same row)
-      const newRowMap = new Map<string, number>()
-      let currentRow = 0
-      let lastTop = -Infinity
-
-      skillPositions.forEach(({ skill, top }) => {
-        if (top - lastTop > 30) {
-          // New row
-          if (lastTop !== -Infinity) currentRow++
-          lastTop = top
-        }
-        newRowMap.set(skill, currentRow)
-      })
-
-      setSkillRowMap(newRowMap)
-      hasCalculatedRows.current = true
-      
-      // Apply scale to all skill buttons
-      skillRefsMap.current.forEach((el, skill) => {
-        const row = newRowMap.get(skill) || 0
-        const scaleFactor = Math.max(0.45, 1 - (row * 0.12))
-        
-        if (animate) {
-          // Animate on resize
-          gsap.to(el, {
-            scale: scaleFactor,
-            duration: 0.3,
-            ease: "power2.out",
-            overwrite: "auto",
-          })
-        } else {
-          // Set immediately on initial load (no animation)
-          gsap.set(el, { scale: scaleFactor })
-        }
-      })
-    }
-
-    // Calculate immediately on mount (set scale without animation)
-    const initialTimeout = setTimeout(() => calculateRows(false), 100)
+    // Create row map: skills are assigned to rows in a pyramid pattern
+    // Row 0: first ~3-4 skills (largest)
+    // Row 1: next ~4-5 skills
+    // Row 2: next ~5-6 skills, etc.
+    const newRowMap = new Map<string, number>()
+    let currentRow = 0
+    let skillsInRow = 0
+    // Skills per row increases as we go down (since font is smaller)
+    const getSkillsForRow = (row: number) => Math.floor(3 + row * 1.5)
     
-    // Recalculate on resize with animation
-    const handleResize = () => {
-      if (hasCalculatedRows.current) calculateRows(true)
-    }
+    allSkills.forEach((skill, index) => {
+      const maxForThisRow = getSkillsForRow(currentRow)
+      if (skillsInRow >= maxForThisRow) {
+        currentRow++
+        skillsInRow = 0
+      }
+      newRowMap.set(skill, currentRow)
+      skillsInRow++
+    })
     
-    window.addEventListener("resize", handleResize)
-    return () => {
-      window.removeEventListener("resize", handleResize)
-      clearTimeout(initialTimeout)
-    }
+    setSkillRowMap(newRowMap)
+    hasCalculatedRows.current = true
   }, [])
 
   // Toggle skill
@@ -1240,17 +1205,17 @@ export function ProjectsSection() {
           style={{ paddingBottom: activeSkill ? `${terminalHeight + 40}px` : undefined }}
         >
           {/* Skills flow - wrapped on all screen sizes */}
-          <div className="flex flex-row flex-wrap justify-center items-end gap-x-[0.15em] sm:gap-x-[0.2em]">
+          <div className="flex flex-row flex-wrap justify-center items-end gap-x-[0.2em] gap-y-[0.1em]">
             {allSkills.map((skill, index) => {
               const rowIdx = skillRowMap.get(skill) || 0
-              // Scale and line height follow the skill's row
-              const scaleFactor = Math.max(0.45, 1 - (rowIdx * 0.12))
+              // Size multiplier decreases with each row (more items fit)
+              const sizeMultiplier = Math.max(0.4, 1 - (rowIdx * 0.12))
               // Line height decreases with each row
-              const lineHeight = Math.max(0.6, 1.1 - (rowIdx * 0.1))
+              const lineHeight = Math.max(0.7, 1.2 - (rowIdx * 0.1))
               return (
                 <span 
                   key={skill} 
-                  className="inline-flex items-end transition-all duration-300"
+                  className="inline-flex items-end"
                   style={{ lineHeight: `${lineHeight}em` }}
                 >
                   <SkillButton
@@ -1260,11 +1225,12 @@ export function ProjectsSection() {
                     isAnyActive={activeSkill !== null}
                     onClick={() => handleSkillClick(skill)}
                     onRefChange={(el) => setSkillRef(skill, el)}
+                    sizeMultiplier={sizeMultiplier}
                   />
                   {index < allSkills.length - 1 && (
                     <span 
-                      className="font-mono text-[2.5vw] sm:text-[2vw] text-foreground/10 mx-[0.1em] select-none transition-transform duration-300"
-                      style={{ transform: `scale(${scaleFactor})` }}
+                      className="font-mono text-foreground/10 mx-[0.1em] select-none"
+                      style={{ fontSize: `${2.5 * sizeMultiplier}vw` }}
                     >
                       ·
                     </span>
