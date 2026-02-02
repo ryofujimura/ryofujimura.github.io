@@ -1037,7 +1037,8 @@ export function ProjectsSection() {
       setSkillRowMap(newRowMap)
       hasCalculatedRows.current = true
       
-      // Apply GSAP animations to all skill buttons
+      // Apply GSAP scale animations to all skill buttons
+      // Use overwrite: "auto" to not kill other animations (like scroll entrance)
       skillRefsMap.current.forEach((el, skill) => {
         const row = newRowMap.get(skill) || 0
         const scaleFactor = Math.max(0.45, 1 - (row * 0.12))
@@ -1045,21 +1046,24 @@ export function ProjectsSection() {
           scale: scaleFactor,
           duration: 0.5,
           ease: "power2.out",
-          overwrite: true,
+          overwrite: "auto", // Only overwrite scale, not opacity/y/rotateX
         })
       })
     }
 
-    // Initial calculation after mount
-    const initialTimeout = setTimeout(calculateRows, 200)
-    // Recalculate again after fonts/layout settle
-    const settleTimeout = setTimeout(calculateRows, 500)
+    // Wait longer for scroll entrance animation to complete before calculating rows
+    // Scroll animation: 0.8s duration + stagger (allSkills.length * 0.06s) ≈ 2-3s total
+    const initialTimeout = setTimeout(calculateRows, 2500)
     
-    window.addEventListener("resize", calculateRows)
+    // Recalculate on resize (only after initial calculation is done)
+    const handleResize = () => {
+      if (hasCalculatedRows.current) calculateRows()
+    }
+    
+    window.addEventListener("resize", handleResize)
     return () => {
-      window.removeEventListener("resize", calculateRows)
+      window.removeEventListener("resize", handleResize)
       clearTimeout(initialTimeout)
-      clearTimeout(settleTimeout)
     }
   }, [])
 
