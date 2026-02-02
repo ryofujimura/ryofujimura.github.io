@@ -974,7 +974,7 @@ function MobileMessagesDisplay({
       {/* Horizontal scroll container */}
       <div 
         ref={scrollRef}
-        className="flex gap-3 overflow-x-auto pb-3 snap-x snap-mandatory scrollbar-hide"
+        className="flex gap-3 overflow-x-auto snap-x snap-mandatory scrollbar-hide"
         style={{
           scrollbarWidth: "none",
           msOverflowStyle: "none",
@@ -991,24 +991,11 @@ function MobileMessagesDisplay({
               key={message.id}
               className={`mobile-message-card flex-shrink-0 snap-start w-[260px] rounded-2xl overflow-hidden ${isNew ? "ring-2 ring-accent/50" : ""}`}
               style={{
-                background: "linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.05) 100%)",
-                backdropFilter: "blur(20px) saturate(180%)",
-                WebkitBackdropFilter: "blur(20px) saturate(180%)",
-                border: "1px solid rgba(255, 255, 255, 0.18)",
-                boxShadow: `
-                  0 8px 32px rgba(0, 0, 0, 0.08),
-                  0 0 0 1px rgba(255, 255, 255, 0.05) inset
-                `,
+                backdropFilter: "blur(12px)",
+                WebkitBackdropFilter: "blur(12px)",
+                border: "1px solid rgba(255, 255, 255, 0.1)",
               }}
             >
-              {/* Specular highlight */}
-              <div 
-                className="absolute inset-0 pointer-events-none"
-                style={{
-                  background: "linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, transparent 50%)",
-                  borderRadius: "inherit",
-                }}
-              />
               
               {/* Content */}
               <div className="relative z-10 p-4">
