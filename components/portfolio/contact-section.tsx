@@ -6,8 +6,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger"
 import { AnimatedSection } from "@/components/animated-section"
 import { MagneticButton } from "@/components/magnetic-button"
 import { RevealText } from "@/components/reveal-text"
-import { Mail, Github, Linkedin, MapPin, ArrowUpRight, Send, Check, AlertCircle } from "lucide-react"
-import { LocationHoverText } from "@/components/portfolio/location-hover-text"
+import { Mail, Github, Linkedin, ArrowUpRight, Send, Check, AlertCircle } from "lucide-react"
 import { useIsMobile } from "@/hooks/use-mobile"
 import { submitContactForm } from "@/lib/firebase"
 
@@ -795,19 +794,6 @@ export function ContactSection() {
           </div>
         </AnimatedSection>
 
-        {/* Location */}
-        <AnimatedSection delay={500}>
-          <div className="flex items-center justify-center gap-2 mt-8 sm:mt-12 text-muted-foreground font-mono text-sm">
-            <MapPin className="w-4 h-4 shrink-0" />
-            <span>
-              &gt;{" "}
-              <LocationHoverText
-                defaultWords={["Irvine", ", ", "California"]}
-                hoverWords={["Open", " to", " relocate"]}
-              />
-            </span>
-          </div>
-        </AnimatedSection>
       </div>
     </section>
   )
