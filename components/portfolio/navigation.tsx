@@ -145,7 +145,7 @@ function SplitContactButton() {
     <div
       ref={containerRef}
       className="relative flex items-center justify-center h-8"
-      style={{ width: 240 }}
+      style={{ width: 100 }}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
