@@ -692,12 +692,6 @@ function TerminalOutput({
           <div className="font-mono text-[9px] text-white/50">
             <span className="hidden sm:inline">skill_query.sh — </span>{skill}
           </div>
-          <button 
-            onClick={onClose}
-            className="font-mono text-[9px] text-white/60 hover:text-white transition-colors"
-          >
-            [×]
-          </button>
         </div>
 
         {/* Terminal body - click to focus input */}
