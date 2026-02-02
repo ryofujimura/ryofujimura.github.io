@@ -822,8 +822,12 @@ function LiquidGlassMessage({
             </svg>
             <span className="text-xs font-mono text-foreground/70 font-medium">
               {[...message.username].map((char, i) => (
-                <span key={i} className="message-char inline-block">
-                  {char}
+                <span 
+                  key={i} 
+                  className="message-char inline-block"
+                  style={{ whiteSpace: char === " " ? "pre" : "normal" }}
+                >
+                  {char === " " ? "\u00A0" : char}
                 </span>
               ))}
             </span>
