@@ -1209,9 +1209,12 @@ export function ProjectsSection() {
             {allSkills.map((skill, index) => {
               const rowIdx = skillRowMap.get(skill) || 0
               // Size multiplier decreases with each row (more items fit)
-              const sizeMultiplier = Math.max(0.5, 1 - (rowIdx * 0.06))
-              // Line height decreases with each row (also halved)
-              const lineHeight = Math.max(0.8, 1.2 - (rowIdx * 0.05))
+              // Custom size progression per row
+              const sizeByRow = [1.0, 0.9, 0.8, 0.72, 0.6, 0.5, 0.45]
+              const sizeMultiplier = sizeByRow[Math.min(rowIdx, sizeByRow.length - 1)]
+              // Line height follows similar progression
+              const lineHeightByRow = [1.2, 1.1, 1.0, 0.95, 0.85, 0.8, 0.75]
+              const lineHeight = lineHeightByRow[Math.min(rowIdx, lineHeightByRow.length - 1)]
               return (
                 <span 
                   key={skill} 
