@@ -878,11 +878,12 @@ function SkillButton({
 }) {
   const buttonRef = useRef<HTMLButtonElement>(null)
   
-  // Report ref to parent
-  useEffect(() => {
+  // Report ref to parent (only once on mount)
+  useLayoutEffect(() => {
     onRefChange?.(buttonRef.current)
     return () => onRefChange?.(null)
-  }, [onRefChange])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
   const [displayText, setDisplayText] = useState(skill)
   const glitchChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 
@@ -988,15 +989,13 @@ export function ProjectsSection() {
   const [terminalRowBottom, setTerminalRowBottom] = useState<number | null>(null)
   const [terminalHeight, setTerminalHeight] = useState(0)
   const [skillRowMap, setSkillRowMap] = useState<Map<string, number>>(new Map())
-  const [refsReady, setRefsReady] = useState(0) // Counter to trigger recalculation
+  const hasCalculatedRows = useRef(false)
   const isMobile = useIsMobile()
 
   // Track skill button ref
   const setSkillRef = useCallback((skill: string, el: HTMLButtonElement | null) => {
     if (el) {
       skillRefsMap.current.set(skill, el)
-      // Increment counter to trigger row recalculation
-      setRefsReady(prev => prev + 1)
     } else {
       skillRefsMap.current.delete(skill)
     }
@@ -1005,12 +1004,11 @@ export function ProjectsSection() {
   // Calculate which row each skill is on
   useEffect(() => {
     if (!skillsContainerRef.current) return
-    // Wait until we have all refs
-    if (skillRefsMap.current.size < allSkills.length) return
 
     const calculateRows = () => {
       const containerRect = skillsContainerRef.current?.getBoundingClientRect()
       if (!containerRect) return
+      if (skillRefsMap.current.size < allSkills.length) return
 
       // Collect all skill positions
       const skillPositions: { skill: string; top: number }[] = []
@@ -1037,6 +1035,7 @@ export function ProjectsSection() {
       })
 
       setSkillRowMap(newRowMap)
+      hasCalculatedRows.current = true
       
       // Apply GSAP animations to all skill buttons
       skillRefsMap.current.forEach((el, skill) => {
@@ -1051,15 +1050,18 @@ export function ProjectsSection() {
       })
     }
 
-    // Calculate after layout settles
-    const timeout = setTimeout(calculateRows, 150)
+    // Initial calculation after mount
+    const initialTimeout = setTimeout(calculateRows, 200)
+    // Recalculate again after fonts/layout settle
+    const settleTimeout = setTimeout(calculateRows, 500)
     
     window.addEventListener("resize", calculateRows)
     return () => {
       window.removeEventListener("resize", calculateRows)
-      clearTimeout(timeout)
+      clearTimeout(initialTimeout)
+      clearTimeout(settleTimeout)
     }
-  }, [refsReady])
+  }, [])
 
   // Toggle skill
   const handleSkillClick = useCallback((skill: string) => {
