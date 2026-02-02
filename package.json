@@ -7,7 +7,9 @@
     "dev": "next dev",
     "lint": "eslint .",
     "start": "next start",
-    "deploy": "next build && firebase deploy --only hosting:ryof"
+    "deploy": "next build && firebase deploy --only hosting:ryof",
+    "deploy:hobbies": "firebase deploy --only hosting:ryof-hobbies",
+    "deploy:all": "next build && firebase deploy --only hosting"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
