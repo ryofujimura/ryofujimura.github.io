@@ -282,7 +282,7 @@ const experiences = [
     mediaImages: ["/images/projects/nespresso/nespresso_1.jpeg"],
     mediaLabels: ["Proof 1"],
     startDate: "Sep 2024",
-    endDate: "May 2025",
+    endDate: "Aug 2025",
     description: "Drove top-ranked sales in a premium retail setting by matching customer preferences with high-value coffee, equipment, and subscription solutions.",
     highlights: [
       "Ranked #1 Q4 2024 sales in the U.S. Southwest",
