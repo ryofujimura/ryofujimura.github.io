@@ -11,11 +11,6 @@ import {
   addCommentRemote,
   subscribeProductComments,
 } from "./firestore-catalog"
-import {
-  optimizeAllCatalogImages,
-  type OptimizeCatalogProgress,
-  type OptimizeCatalogResult,
-} from "./optimize-catalog-images"
 
 const USER_KEY = "danshari_claim_user"
 
@@ -27,16 +22,6 @@ export async function ensureProductsLoaded(): Promise<Product[]> {
     return []
   }
 }
-
-/** Admin: fetch latest catalog, re-encode + upload optimized images, patch Firestore. */
-export async function runOptimizeAllCatalogImages(
-  onProgress?: (p: OptimizeCatalogProgress) => void,
-): Promise<OptimizeCatalogResult> {
-  const products = await ensureProductsLoaded()
-  return optimizeAllCatalogImages(products, onProgress)
-}
-
-export type { OptimizeCatalogProgress, OptimizeCatalogResult }
 
 /** Live updates when any product changes (Firestore snapshot). */
 export function subscribeProducts(cb: (products: Product[]) => void): () => void {

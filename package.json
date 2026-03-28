@@ -9,8 +9,7 @@
     "start": "next start",
     "deploy": "next build && firebase deploy --only hosting:ryof",
     "deploy:dev": "next build && firebase hosting:channel:deploy dev",
-    "deploy:rules": "firebase deploy --only firestore:rules,storage",
-    "storage:cors": "node scripts/apply-storage-cors.cjs"
+    "deploy:rules": "firebase deploy --only firestore:rules,storage"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",

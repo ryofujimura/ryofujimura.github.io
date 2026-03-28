@@ -4,7 +4,6 @@ import Link from "next/link"
 import { danshariHref } from "@/lib/danshari/paths"
 import { useDanshariUser } from "@/lib/danshari/user-context"
 import { Button } from "@/components/ui/button"
-import { DanshariOptimizeImagesButton } from "@/components/danshari/optimize-images-button"
 import { LogOut, Plus, Package } from "lucide-react"
 
 export function DanshariHeader() {
@@ -21,18 +20,15 @@ export function DanshariHeader() {
           <span>Danshari</span>
         </Link>
 
-        <div className="flex items-center gap-1 sm:gap-2">
-          {user?.is_admin ? (
-            <>
-              <Button asChild variant="ghost" size="sm" className="rounded-xl shrink-0">
-                <Link href={danshariHref("/admin")}>
-                  <Plus className="w-4 h-4 sm:mr-1" />
-                  <span className="hidden sm:inline">Add</span>
-                </Link>
-              </Button>
-              <DanshariOptimizeImagesButton />
-            </>
-          ) : null}
+        <div className="flex items-center gap-2">
+          {user?.is_admin && (
+            <Button asChild variant="ghost" size="sm" className="rounded-xl">
+              <Link href={danshariHref("/admin")}>
+                <Plus className="w-4 h-4 mr-1" />
+                Add
+              </Link>
+            </Button>
+          )}
           <span className="text-sm text-muted-foreground hidden sm:inline">
             {user?.username}
           </span>

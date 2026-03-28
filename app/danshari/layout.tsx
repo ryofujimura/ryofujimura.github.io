@@ -2,7 +2,6 @@ import type { ReactNode } from "react"
 import type { Metadata, Viewport } from "next"
 import { Inter } from "next/font/google"
 import { DanshariProviders } from "@/components/danshari/danshari-providers"
-import { DanshariToaster } from "@/components/danshari/danshari-toaster"
 import "./danshari-theme.css"
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" })
@@ -29,7 +28,6 @@ export default function DanshariLayout({
     <DanshariProviders>
       <div className={`danshari-app min-h-screen ${inter.variable} font-sans`}>
         {children}
-        <DanshariToaster />
       </div>
     </DanshariProviders>
   )
