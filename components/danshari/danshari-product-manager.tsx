@@ -1,6 +1,13 @@
 "use client"
 
-import { useCallback, useEffect, useRef, useState } from "react"
+import {
+  memo,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react"
 import Link from "next/link"
 import { ensureProductsLoaded, getProducts, setProducts } from "@/lib/danshari/store"
 import type { Product } from "@/lib/danshari/types"
@@ -24,6 +31,27 @@ import {
 
 function pickImages(files: FileList | File[]): File[] {
   return [...files].filter((f) => f.type.startsWith("image/"))
+}
+
+/** Related-item picker options (uid + title only). */
+type OtherOption = { uid: string; title: string }
+
+/** Rebuild only when any product id/title changes — not on every description keystroke. */
+function relationOptionsSig(products: Product[]): string {
+  return products.map((x) => `${x.uid}\t${x.title}`).join("\n")
+}
+
+function buildOtherOptionsMap(products: Product[]): Map<string, OtherOption[]> {
+  const map = new Map<string, OtherOption[]>()
+  for (const p of products) {
+    map.set(
+      p.uid,
+      products
+        .filter((x) => x.uid !== p.uid)
+        .map((x) => ({ uid: x.uid, title: x.title.trim() || x.uid })),
+    )
+  }
+  return map
 }
 
 /** Prefilled when a product is created from an uploaded image. */
@@ -161,6 +189,13 @@ export function DanshariProductManager() {
     }
   }
 
+  const relationSig = relationOptionsSig(items)
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- intentionally skip `items` identity; only uid/titles affect picker labels
+  const otherOptionsByUid = useMemo(
+    () => buildOtherOptionsMap(items),
+    [relationSig],
+  )
+
   if (!hydrated) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
@@ -193,13 +228,11 @@ export function DanshariProductManager() {
             Drag images onto the zone below to create one product per image. Edit titles
             and descriptions in the list. Up to two photos per product.{" "}
             <span className="text-foreground/90">
-              Save &amp; publish writes products to Firestore (collection{" "}
+              Edits stay in this page until you save. Save &amp; publish writes to Firestore
+              (collection{" "}
               <code className="rounded bg-muted px-1 py-0.5 text-[0.65rem]">danshari</code>
-              ) and uploads new images to Firebase Storage under{" "}
-              <code className="rounded bg-muted px-1 py-0.5 text-[0.65rem]">
-                danshari/products/…
-              </code>
-              . Everyone sees updates in near real time. You can still use image URLs or{" "}
+              ) and uploads new or replaced photos to Storage then — nothing is sent while you
+              type. You can still use image URLs or{" "}
               <code className="rounded bg-muted px-1 py-0.5 text-[0.65rem]">
                 /danshari/products/…
               </code>{" "}
@@ -271,9 +304,10 @@ export function DanshariProductManager() {
               <ProductEditorRow
                 key={p.uid}
                 product={p}
-                others={items.filter((x) => x.uid !== p.uid)}
-                onChange={(patch) => updateProduct(p.uid, patch)}
-                onRemove={() => removeProduct(p.uid)}
+                productUid={p.uid}
+                otherOptions={otherOptionsByUid.get(p.uid) ?? []}
+                onPatch={updateProduct}
+                onRemove={removeProduct}
               />
             ))
           )}
@@ -329,30 +363,57 @@ export function DanshariProductManager() {
   )
 }
 
-function ProductEditorRow({
-  product: p,
-  others,
-  onChange,
-  onRemove,
-}: {
+type ProductEditorRowProps = {
   product: Product
-  others: Product[]
-  onChange: (patch: Partial<Product>) => void
-  onRemove: () => void
-}) {
+  productUid: string
+  otherOptions: OtherOption[]
+  onPatch: (uid: string, patch: Partial<Product>) => void
+  onRemove: (uid: string) => void
+}
+
+function productEditorRowPropsEqual(
+  prev: ProductEditorRowProps,
+  next: ProductEditorRowProps,
+): boolean {
+  return (
+    prev.product === next.product &&
+    prev.productUid === next.productUid &&
+    prev.onPatch === next.onPatch &&
+    prev.onRemove === next.onRemove &&
+    prev.otherOptions === next.otherOptions
+  )
+}
+
+const ProductEditorRow = memo(function ProductEditorRow({
+  product: p,
+  productUid,
+  otherOptions,
+  onPatch,
+  onRemove,
+}: ProductEditorRowProps) {
   const primaryRef = useRef<HTMLInputElement>(null)
   const secondaryRef = useRef<HTMLInputElement>(null)
+
+  const handlePatch = useCallback(
+    (patch: Partial<Product>) => onPatch(productUid, patch),
+    [onPatch, productUid],
+  )
+
+  const handleRemove = useCallback(
+    () => onRemove(productUid),
+    [onRemove, productUid],
+  )
 
   const setPrimaryFile = async (file: File | undefined) => {
     if (!file || !file.type.startsWith("image/")) return
     const url = await fileToDataUrl(file)
-    onChange({ image_url: url })
+    handlePatch({ image_url: url })
   }
 
   const setSecondaryFile = async (file: File | undefined) => {
     if (!file || !file.type.startsWith("image/")) return
     const url = await fileToDataUrl(file)
-    onChange({ image_url_secondary: url })
+    handlePatch({ image_url_secondary: url })
   }
 
   const onSecondaryDrop = (e: React.DragEvent) => {
@@ -367,7 +428,10 @@ function ProductEditorRow({
   }
 
   return (
-    <Card className="rounded-2xl border-border shadow-sm overflow-hidden">
+    <Card
+      className="rounded-2xl border-border shadow-sm overflow-hidden"
+      style={{ contentVisibility: "auto" }}
+    >
       <CardContent className="p-4 sm:p-5">
         <div className="flex flex-col lg:flex-row gap-5">
           <div className="flex gap-3 shrink-0">
@@ -452,7 +516,7 @@ function ProductEditorRow({
                       variant="ghost"
                       size="sm"
                       className="h-8 text-xs rounded-lg text-destructive"
-                      onClick={() => onChange({ image_url_secondary: null })}
+                      onClick={() => handlePatch({ image_url_secondary: null })}
                     >
                       Remove
                     </Button>
@@ -486,7 +550,7 @@ function ProductEditorRow({
                   <label className="text-xs font-medium text-muted-foreground">Title</label>
                   <Input
                     value={p.title}
-                    onChange={(e) => onChange({ title: e.target.value })}
+                    onChange={(e) => handlePatch({ title: e.target.value })}
                     className="mt-1 h-10 rounded-xl"
                     placeholder="Title"
                   />
@@ -497,7 +561,7 @@ function ProductEditorRow({
                   </label>
                   <textarea
                     value={p.description}
-                    onChange={(e) => onChange({ description: e.target.value })}
+                    onChange={(e) => handlePatch({ description: e.target.value })}
                     className="mt-1 w-full min-h-[5.5rem] p-3 rounded-xl border border-input bg-background text-sm resize-y focus:outline-none focus:ring-2 focus:ring-ring"
                     placeholder="Description"
                   />
@@ -514,7 +578,7 @@ function ProductEditorRow({
                 </div>
                 <DanshariTagEditor
                   tags={Array.isArray(p.tags) ? p.tags : ["General"]}
-                  onChange={(tags) => onChange({ tags })}
+                  onChange={(tags) => handlePatch({ tags })}
                 />
                 <div>
                   <label className="text-xs font-medium text-muted-foreground">
@@ -523,14 +587,14 @@ function ProductEditorRow({
                   <select
                     value={p.related_item_uid ?? ""}
                     onChange={(e) =>
-                      onChange({
+                      handlePatch({
                         related_item_uid: e.target.value || null,
                       })
                     }
                     className="mt-1 w-full h-10 px-3 rounded-xl border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring"
                   >
                     <option value="">None</option>
-                    {others.map((o) => (
+                    {otherOptions.map((o) => (
                       <option key={o.uid} value={o.uid}>
                         {o.title || o.uid}
                       </option>
@@ -543,7 +607,7 @@ function ProductEditorRow({
                 variant="ghost"
                 size="icon"
                 className="shrink-0 text-muted-foreground hover:text-destructive rounded-xl"
-                onClick={onRemove}
+                onClick={handleRemove}
                 aria-label="Delete product"
               >
                 <Trash2 className="size-4" />
@@ -554,4 +618,4 @@ function ProductEditorRow({
       </CardContent>
     </Card>
   )
-}
+}, productEditorRowPropsEqual)

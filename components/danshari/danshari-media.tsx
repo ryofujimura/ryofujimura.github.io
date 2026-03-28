@@ -82,6 +82,7 @@ export function DanshariMedia({
         <img
           src={src}
           alt={alt}
+          decoding="async"
           className={cn("absolute inset-0 size-full object-cover", className)}
         />
       )
@@ -100,6 +101,7 @@ export function DanshariMedia({
       className={cn(fill && "object-cover", className)}
       sizes={sizes}
       priority={priority}
+      loading={priority ? undefined : "lazy"}
     />
   )
 }
