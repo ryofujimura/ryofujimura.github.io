@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { useDanshariUser } from "@/lib/danshari/user-context"
+import { parseAllowedLogin } from "@/lib/danshari/allowed-login"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
@@ -14,14 +15,18 @@ import {
 
 export function DanshariLoginForm() {
   const [username, setUsername] = useState("")
-  const [isAdmin, setIsAdmin] = useState(false)
+  const [error, setError] = useState<string | null>(null)
   const { login } = useDanshariUser()
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    if (username.trim()) {
-      login(username.trim(), isAdmin)
+    setError(null)
+    const result = parseAllowedLogin(username)
+    if (!result.ok) {
+      setError("This name is not on the guest list.")
+      return
     }
+    login(result.username, result.isAdmin)
   }
 
   return (
@@ -37,19 +42,21 @@ export function DanshariLoginForm() {
               type="text"
               placeholder="Your name"
               value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              onChange={(e) => {
+                setUsername(e.target.value)
+                setError(null)
+              }}
               className="h-12 text-base rounded-xl"
               autoFocus
+              autoComplete="username"
+              aria-invalid={!!error}
+              aria-describedby={error ? "login-error" : undefined}
             />
-            <label className="flex items-center gap-3 text-sm text-muted-foreground cursor-pointer">
-              <input
-                type="checkbox"
-                checked={isAdmin}
-                onChange={(e) => setIsAdmin(e.target.checked)}
-                className="w-4 h-4 rounded accent-primary"
-              />
-              Enter as admin
-            </label>
+            {error ? (
+              <p id="login-error" className="text-sm text-destructive" role="alert">
+                {error}
+              </p>
+            ) : null}
             <Button
               type="submit"
               disabled={!username.trim()}
