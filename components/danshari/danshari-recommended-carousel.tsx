@@ -1,14 +1,16 @@
 "use client"
 
 import Link from "next/link"
-import { memo } from "react"
+import { memo, useCallback, useEffect, useState } from "react"
 import { danshariProductHref, danshariTagFilterHref } from "@/lib/danshari/paths"
-import { firstListingImageUrl } from "@/lib/danshari/recommended"
-import type { Product } from "@/lib/danshari/types"
-import { DanshariMedia } from "@/components/danshari/danshari-media"
-import { DanshariTagPills } from "@/components/danshari/tag-pills"
-import { useInViewOnce } from "@/hooks/use-in-view-once"
 import {
+  getListingImagePresentation,
+} from "@/lib/danshari/recommended"
+import type { Product } from "@/lib/danshari/types"
+import { DanshariProductImage } from "@/components/danshari/danshari-product-image"
+import { DanshariTagPills } from "@/components/danshari/tag-pills"
+import {
+  type CarouselApi,
   Carousel,
   CarouselContent,
   CarouselItem,
@@ -23,13 +25,13 @@ type Variant = "sidebar" | "below"
 function RecommendedCardInner({
   product,
   variant,
+  deferDecode,
 }: {
   product: Product
   variant: Variant
+  deferDecode: boolean
 }) {
-  // Wide prefetch so thumbnails load before slides scroll into view (px only for IO support).
-  const { ref: inViewRef, visible } = useInViewOnce("400px")
-  const thumb = firstListingImageUrl(product)
+  const { src, srcSet, placeholderSrc } = getListingImagePresentation(product)
   const isSidebar = variant === "sidebar"
 
   return (
@@ -42,23 +44,22 @@ function RecommendedCardInner({
         )}
       >
         <div
-          ref={inViewRef}
           className={cn(
             "relative shrink-0 overflow-hidden bg-muted",
             isSidebar ? "h-20 w-20 rounded-lg" : "aspect-square w-full rounded-t-xl",
           )}
         >
-          {visible ? (
-            <DanshariMedia
-              src={thumb}
-              alt={product.title}
-              fill
-              className="object-cover"
-              sizes={isSidebar ? "80px" : "(max-width: 640px) 85vw, 280px"}
-            />
-          ) : (
-            <div className="absolute inset-0 bg-muted" aria-hidden />
-          )}
+          <DanshariProductImage
+            mode="thumb"
+            src={src}
+            srcSet={srcSet}
+            placeholderSrc={placeholderSrc}
+            alt={product.title}
+            className="object-cover"
+            sizes={isSidebar ? "80px" : "(max-width: 640px) 85vw, 280px"}
+            viewportRootMargin="280px"
+            deferDecode={deferDecode}
+          />
           {product.claimants.length > 0 ? (
             <div className="absolute top-1.5 right-1.5 z-10 flex items-center gap-0.5 rounded-full bg-primary/90 px-1.5 py-0.5 text-[10px] font-medium text-primary-foreground">
               <Hand className="size-2.5 shrink-0" aria-hidden />
@@ -97,6 +98,23 @@ export function DanshariRecommendedCarousel({
   products: Product[]
   variant: Variant
 }) {
+  const [api, setApi] = useState<CarouselApi | undefined>()
+  const [selected, setSelected] = useState(0)
+
+  const onApi = useCallback((instance: CarouselApi) => {
+    setApi(instance)
+  }, [])
+
+  useEffect(() => {
+    if (!api) return
+    const onSelect = () => setSelected(api.selectedScrollSnap())
+    onSelect()
+    api.on("select", onSelect)
+    return () => {
+      api.off("select", onSelect)
+    }
+  }, [api])
+
   if (products.length === 0) return null
 
   const isSidebar = variant === "sidebar"
@@ -111,6 +129,7 @@ export function DanshariRecommendedCarousel({
         More items
       </h2>
       <Carousel
+        setApi={onApi}
         orientation={orientation}
         opts={{ align: "start", loop: false, duration: 0 }}
         className="w-full"
@@ -126,7 +145,7 @@ export function DanshariRecommendedCarousel({
               isSidebar ? "max-h-[min(72vh,560px)] -mt-3" : "-ml-2",
             )}
           >
-            {products.map((p) => (
+            {products.map((p, i) => (
               <CarouselItem
                 key={p.uid}
                 className={cn(
@@ -135,7 +154,11 @@ export function DanshariRecommendedCarousel({
                     : "pl-2 basis-[88%] sm:basis-[52%] md:basis-[42%] lg:basis-[38%]",
                 )}
               >
-                <RecommendedCard product={p} variant={variant} />
+                <RecommendedCard
+                  product={p}
+                  variant={variant}
+                  deferDecode={Math.abs(i - selected) > 1}
+                />
               </CarouselItem>
             ))}
           </CarouselContent>

@@ -7,9 +7,17 @@ export interface Product {
   image_url: string
   /** Smaller image for grids/carousels; set on publish from data URLs. */
   image_thumb_url: string | null
+  /** Responsive thumb variants (Storage); optional for legacy docs. */
+  image_thumb_320_url: string | null
+  image_thumb_160_url: string | null
   /** Optional second photo (URL, path, or data URL). */
   image_url_secondary: string | null
   image_thumb_secondary: string | null
+  image_thumb_secondary_320_url: string | null
+  image_thumb_secondary_160_url: string | null
+  /** Tiny JPEG data URL for grid blur-up; set on publish. */
+  image_placeholder_data_url: string | null
+  image_placeholder_secondary_data_url: string | null
   related_item_uid: string | null
   /** Usernames in claim order (first = earliest). */
   claimants: string[]

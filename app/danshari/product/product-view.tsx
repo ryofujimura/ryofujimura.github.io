@@ -27,14 +27,14 @@ import {
 import type { Product, Comment } from "@/lib/danshari/types"
 import { catalogListSignature } from "@/lib/danshari/catalog-signature"
 import {
-  firstListingImageUrl,
+  getListingImagePresentation,
   getRecommendedProducts,
 } from "@/lib/danshari/recommended"
 import { useMediaQuery } from "@/hooks/use-media-query"
 import { DanshariRecommendedCarousel } from "@/components/danshari/danshari-recommended-carousel"
 import { DanshariDescriptionRich } from "@/components/danshari/description-rich"
 import { DanshariHeader } from "@/components/danshari/header"
-import { DanshariMedia } from "@/components/danshari/danshari-media"
+import { DanshariProductImage } from "@/components/danshari/danshari-product-image"
 import { DanshariTagPills } from "@/components/danshari/tag-pills"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -48,6 +48,21 @@ import {
   DollarSign,
   Send,
 } from "lucide-react"
+
+function RelatedThumbImage({ product }: { product: Product }) {
+  const { src, srcSet, placeholderSrc } = getListingImagePresentation(product)
+  return (
+    <DanshariProductImage
+      mode="thumb"
+      src={src}
+      srcSet={srcSet}
+      placeholderSrc={placeholderSrc}
+      alt={product.title}
+      sizes="64px"
+      viewportGate={false}
+    />
+  )
+}
 
 function ProductViewInner() {
   const searchParams = useSearchParams()
@@ -230,16 +245,16 @@ function ProductViewInner() {
           }
         >
           <div className="relative rounded-2xl overflow-hidden bg-muted">
-            <DanshariMedia
+            <DanshariProductImage
+              mode="hero"
               src={product.image_url}
               alt={product.title}
-              preserveAspect
+              placeholderSrc={product.image_placeholder_data_url}
               sizes={
                 product.image_url_secondary
                   ? "(max-width: 640px) 100vw, 336px"
                   : "(max-width: 672px) 100vw, 672px"
               }
-              priority
             />
             {claimants.length > 0 ? (
               <div className="absolute top-3 right-3 z-10 flex items-center gap-1 rounded-full bg-primary/90 text-primary-foreground text-xs font-medium px-2.5 py-1">
@@ -250,10 +265,11 @@ function ProductViewInner() {
           </div>
           {product.image_url_secondary ? (
             <div className="relative rounded-2xl overflow-hidden bg-muted">
-              <DanshariMedia
+              <DanshariProductImage
+                mode="contain"
                 src={product.image_url_secondary}
                 alt=""
-                preserveAspect
+                placeholderSrc={product.image_placeholder_secondary_data_url}
                 sizes="(max-width: 640px) 100vw, 336px"
               />
             </div>
@@ -403,15 +419,7 @@ function ProductViewInner() {
                 className="flex items-center gap-3 p-3 pb-2"
               >
                 <div className="relative w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
-                  <DanshariMedia
-                    src={
-                      firstListingImageUrl(relatedProduct) ||
-                      relatedProduct.image_url
-                    }
-                    alt={relatedProduct.title}
-                    fill
-                    sizes="64px"
-                  />
+                  <RelatedThumbImage product={relatedProduct} />
                 </div>
                 <div className="min-w-0">
                   <p className="font-medium text-foreground truncate">

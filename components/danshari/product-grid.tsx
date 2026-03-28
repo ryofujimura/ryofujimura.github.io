@@ -15,12 +15,14 @@ import { useWindowVirtualizer } from "@tanstack/react-virtual"
 import { ensureProductsLoaded, subscribeProducts } from "@/lib/danshari/store"
 import type { Product } from "@/lib/danshari/types"
 import { useMediaQuery } from "@/hooks/use-media-query"
+import { getListingImagePresentation } from "@/lib/danshari/recommended"
 import { danshariHref, danshariTagFilterHref } from "@/lib/danshari/paths"
 import { DanshariProductCard } from "./product-card"
 import { cn } from "@/lib/utils"
 
 /** Window virtualizer + scrollMargin is unreliable on mobile Safari after bfcache / back nav. */
 const VIRTUAL_LIST_MIN_WIDTH = "(min-width: 1024px)"
+const PREFETCH_THUMB_IDLE_COUNT = 16
 
 const ROW_GAP_PX = 16
 /** Approximate row height (square thumb + title + tags + gap); measureElement refines. */
@@ -184,6 +186,39 @@ function DanshariProductGridInner() {
     if (!activeTag) return products
     return products.filter((p) => p.tags.includes(activeTag))
   }, [products, activeTag])
+
+  useEffect(() => {
+    if (filtered.length === 0) return
+    const seen = new Set<string>()
+    const urls: string[] = []
+    for (let i = 0; i < Math.min(PREFETCH_THUMB_IDLE_COUNT, filtered.length); i++) {
+      const u = getListingImagePresentation(filtered[i]!).src
+      if (u && !u.startsWith("data:") && !seen.has(u)) {
+        seen.add(u)
+        urls.push(u)
+      }
+    }
+    if (urls.length === 0) return
+    const run = () => {
+      for (const u of urls) {
+        const img = new Image()
+        img.decoding = "async"
+        img.src = u
+      }
+    }
+    const w = window
+    const id =
+      "requestIdleCallback" in w
+        ? w.requestIdleCallback(run, { timeout: 2800 })
+        : w.setTimeout(run, 400)
+    return () => {
+      if ("cancelIdleCallback" in w) {
+        w.cancelIdleCallback(id as number)
+      } else {
+        w.clearTimeout(id as number)
+      }
+    }
+  }, [filtered])
 
   if (isLoading) {
     return <DanshariProductGridSkeleton />

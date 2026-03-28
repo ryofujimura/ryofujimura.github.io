@@ -2,9 +2,14 @@
 
 /** Max longer edge for “full” image stored in Firestore / shown on product page. */
 const DEFAULT_FULL_MAX = 1920
-/** Max longer edge for grid / carousel / admin thumbnails. */
-const DEFAULT_THUMB_MAX = 480
+/** Max longer edge for primary grid thumbnail (srcset largest). */
+const DEFAULT_THUMB_480 = 480
+const DEFAULT_THUMB_320 = 320
+const DEFAULT_THUMB_160 = 160
+/** Tiny preview for LQIP (longer edge). */
+const PLACEHOLDER_MAX = 28
 const DEFAULT_QUALITY = 0.82
+const PLACEHOLDER_JPEG_QUALITY = 0.42
 
 async function blobFromDataUrl(dataUrl: string): Promise<Blob> {
   const res = await fetch(dataUrl)
@@ -63,65 +68,69 @@ async function canvasToBlobPreferWebp(
   return { blob: jpeg, ext: "jpg" }
 }
 
-export type ProcessedImagePair = {
+function placeholderDataUrlFromImage(img: HTMLImageElement): string {
+  const canvas = drawScaledToCanvas(img, PLACEHOLDER_MAX)
+  return canvas.toDataURL("image/jpeg", PLACEHOLDER_JPEG_QUALITY)
+}
+
+/** All blobs produced from one source image for Storage + Firestore. */
+export type ProcessedImagePack = {
   full: Blob
-  thumb: Blob
   fullExt: string
-  thumbExt: string
+  thumb480: Blob
+  thumb480Ext: string
+  thumb320: Blob
+  thumb320Ext: string
+  thumb160: Blob
+  thumb160Ext: string
+  /** Tiny JPEG data URL for instant blur placeholder in the client. */
+  placeholderDataUrl: string
 }
 
 /**
- * Decode a data URL, resize full + thumb, encode WebP (JPEG fallback).
+ * Decode a data URL, resize full + responsive thumbs, encode WebP (JPEG fallback).
  * Browser-only (canvas).
  */
-async function processImageBlob(
-  blob: Blob,
-  options?: {
-    fullMaxEdge?: number
-    thumbMaxEdge?: number
-    quality?: number
-  },
-): Promise<ProcessedImagePair> {
-  const fullMax = options?.fullMaxEdge ?? DEFAULT_FULL_MAX
-  const thumbMax = options?.thumbMaxEdge ?? DEFAULT_THUMB_MAX
-  const quality = options?.quality ?? DEFAULT_QUALITY
-
-  const img = await loadImageElement(blob)
-
-  const fullCanvas = drawScaledToCanvas(img, fullMax)
-  const thumbCanvas = drawScaledToCanvas(img, thumbMax)
-
-  const fullEnc = await canvasToBlobPreferWebp(fullCanvas, quality)
-  const thumbEnc = await canvasToBlobPreferWebp(thumbCanvas, quality)
-
-  return {
-    full: fullEnc.blob,
-    thumb: thumbEnc.blob,
-    fullExt: fullEnc.ext,
-    thumbExt: thumbEnc.ext,
-  }
-}
-
 export async function processDataUrlForUpload(
   dataUrl: string,
   options?: {
     fullMaxEdge?: number
-    thumbMaxEdge?: number
+    thumb480MaxEdge?: number
+    thumb320MaxEdge?: number
+    thumb160MaxEdge?: number
     quality?: number
   },
-): Promise<ProcessedImagePair> {
-  const blob = await blobFromDataUrl(dataUrl)
-  return processImageBlob(blob, options)
-}
+): Promise<ProcessedImagePack> {
+  const fullMax = options?.fullMaxEdge ?? DEFAULT_FULL_MAX
+  const t480 = options?.thumb480MaxEdge ?? DEFAULT_THUMB_480
+  const t320 = options?.thumb320MaxEdge ?? DEFAULT_THUMB_320
+  const t160 = options?.thumb160MaxEdge ?? DEFAULT_THUMB_160
+  const quality = options?.quality ?? DEFAULT_QUALITY
 
-/** Same pipeline as data-URL path, for remote images fetched as `Blob`. */
-export async function processBlobForUpload(
-  blob: Blob,
-  options?: {
-    fullMaxEdge?: number
-    thumbMaxEdge?: number
-    quality?: number
-  },
-): Promise<ProcessedImagePair> {
-  return processImageBlob(blob, options)
+  const blob = await blobFromDataUrl(dataUrl)
+  const img = await loadImageElement(blob)
+
+  const placeholderDataUrl = placeholderDataUrlFromImage(img)
+
+  const fullCanvas = drawScaledToCanvas(img, fullMax)
+  const c480 = drawScaledToCanvas(img, t480)
+  const c320 = drawScaledToCanvas(img, t320)
+  const c160 = drawScaledToCanvas(img, t160)
+
+  const fullEnc = await canvasToBlobPreferWebp(fullCanvas, quality)
+  const e480 = await canvasToBlobPreferWebp(c480, quality)
+  const e320 = await canvasToBlobPreferWebp(c320, quality)
+  const e160 = await canvasToBlobPreferWebp(c160, quality)
+
+  return {
+    full: fullEnc.blob,
+    fullExt: fullEnc.ext,
+    thumb480: e480.blob,
+    thumb480Ext: e480.ext,
+    thumb320: e320.blob,
+    thumb320Ext: e320.ext,
+    thumb160: e160.blob,
+    thumb160Ext: e160.ext,
+    placeholderDataUrl,
+  }
 }

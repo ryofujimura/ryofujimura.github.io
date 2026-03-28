@@ -12,7 +12,6 @@ import {
   query,
   runTransaction,
   serverTimestamp,
-  updateDoc,
   writeBatch,
   type DocumentSnapshot,
   Timestamp,
@@ -24,10 +23,7 @@ import {
   getFirebaseStorage,
 } from "@/lib/firebase"
 import type { Product, Comment } from "./types"
-import {
-  processDataUrlForUpload,
-  type ProcessedImagePair,
-} from "./image-process"
+import { processDataUrlForUpload } from "./image-process"
 import { parseTagsFromDoc } from "./tags"
 
 const STORAGE_PREFIX = "danshari"
@@ -68,8 +64,14 @@ export function docToProduct(d: DocumentSnapshot): Product {
       tags: ["General"],
       image_url: "",
       image_thumb_url: null,
+      image_thumb_320_url: null,
+      image_thumb_160_url: null,
       image_url_secondary: null,
       image_thumb_secondary: null,
+      image_thumb_secondary_320_url: null,
+      image_thumb_secondary_160_url: null,
+      image_placeholder_data_url: null,
+      image_placeholder_secondary_data_url: null,
       related_item_uid: null,
       claimants: [],
       created_at: new Date().toISOString(),
@@ -88,6 +90,14 @@ export function docToProduct(d: DocumentSnapshot): Product {
       typeof x.image_thumb_url === "string" && x.image_thumb_url.length > 0
         ? x.image_thumb_url
         : null,
+    image_thumb_320_url:
+      typeof x.image_thumb_320_url === "string" && x.image_thumb_320_url.length > 0
+        ? x.image_thumb_320_url
+        : null,
+    image_thumb_160_url:
+      typeof x.image_thumb_160_url === "string" && x.image_thumb_160_url.length > 0
+        ? x.image_thumb_160_url
+        : null,
     image_url_secondary:
       typeof x.image_url_secondary === "string" && x.image_url_secondary.length > 0
         ? x.image_url_secondary
@@ -95,6 +105,26 @@ export function docToProduct(d: DocumentSnapshot): Product {
     image_thumb_secondary:
       typeof x.image_thumb_secondary === "string" && x.image_thumb_secondary.length > 0
         ? x.image_thumb_secondary
+        : null,
+    image_thumb_secondary_320_url:
+      typeof x.image_thumb_secondary_320_url === "string" &&
+      x.image_thumb_secondary_320_url.length > 0
+        ? x.image_thumb_secondary_320_url
+        : null,
+    image_thumb_secondary_160_url:
+      typeof x.image_thumb_secondary_160_url === "string" &&
+      x.image_thumb_secondary_160_url.length > 0
+        ? x.image_thumb_secondary_160_url
+        : null,
+    image_placeholder_data_url:
+      typeof x.image_placeholder_data_url === "string" &&
+      x.image_placeholder_data_url.length > 0
+        ? x.image_placeholder_data_url
+        : null,
+    image_placeholder_secondary_data_url:
+      typeof x.image_placeholder_secondary_data_url === "string" &&
+      x.image_placeholder_secondary_data_url.length > 0
+        ? x.image_placeholder_secondary_data_url
         : null,
     related_item_uid:
       x.related_item_uid === null || typeof x.related_item_uid === "string"
@@ -119,107 +149,89 @@ function commentFromDoc(d: DocumentSnapshot, productUid: string): Comment {
 
 const UPLOAD_CONCURRENCY = 3
 
-/** Long-lived CDN/browser cache for image objects. */
-const IMAGE_CACHE_CONTROL = "public, max-age=31536000, immutable"
-
-export async function uploadProcessedImageSlot(
-  productUid: string,
-  slot: "primary" | "secondary",
-  processed: ProcessedImagePair,
-  pathTag: "publish" | "opt" = "publish",
-): Promise<{ fullUrl: string; thumbUrl: string }> {
-  const storage = getFirebaseStorage()
-  if (!storage) throw new Error("Firebase Storage is not available")
-
-  const ts = Date.now()
-  const tag = pathTag === "opt" ? `${slot}_opt_${ts}` : `${slot}_${ts}`
-  const base = `${STORAGE_PREFIX}/products/${productUid}/${tag}`
-  const fullRef = ref(storage, `${base}_full.${processed.fullExt}`)
-  const thumbRef = ref(storage, `${base}_thumb.${processed.thumbExt}`)
-  const fullMime =
-    processed.fullExt === "webp" ? "image/webp" : "image/jpeg"
-  const thumbMime =
-    processed.thumbExt === "webp" ? "image/webp" : "image/jpeg"
-
-  const meta = {
-    contentType: fullMime,
-    cacheControl: IMAGE_CACHE_CONTROL,
-  } as const
-  const metaThumb = {
-    contentType: thumbMime,
-    cacheControl: IMAGE_CACHE_CONTROL,
-  } as const
-
-  await Promise.all([
-    uploadBytes(fullRef, processed.full, meta),
-    uploadBytes(thumbRef, processed.thumb, metaThumb),
-  ])
-  const [fullUrl, thumbUrl] = await Promise.all([
-    getDownloadURL(fullRef),
-    getDownloadURL(thumbRef),
-  ])
-  return { fullUrl, thumbUrl }
-}
-
 async function uploadImageSlotFromDataUrl(
   dataUrl: string,
   productUid: string,
   slot: "primary" | "secondary",
-): Promise<{ fullUrl: string; thumbUrl: string }> {
+): Promise<{
+  fullUrl: string
+  thumb480Url: string
+  thumb320Url: string
+  thumb160Url: string
+  placeholderDataUrl: string
+}> {
+  const storage = getFirebaseStorage()
+  if (!storage) throw new Error("Firebase Storage is not available")
+
   const processed = await processDataUrlForUpload(dataUrl)
-  return uploadProcessedImageSlot(productUid, slot, processed, "publish")
-}
+  const ts = Date.now()
+  const base = `${STORAGE_PREFIX}/products/${productUid}/${slot}_${ts}`
+  const fullRef = ref(storage, `${base}_full.${processed.fullExt}`)
+  const t480Ref = ref(storage, `${base}_t480.${processed.thumb480Ext}`)
+  const t320Ref = ref(storage, `${base}_t320.${processed.thumb320Ext}`)
+  const t160Ref = ref(storage, `${base}_t160.${processed.thumb160Ext}`)
+  const mime = (ext: string) =>
+    ext === "webp" ? "image/webp" : "image/jpeg"
 
-export async function patchProductImageFields(
-  uid: string,
-  fields: {
-    image_url?: string
-    image_thumb_url?: string | null
-    image_url_secondary?: string | null
-    image_thumb_secondary?: string | null
-  },
-): Promise<void> {
-  const db = getFirebaseFirestore()
-  if (!db) throw new Error("Firestore is not available")
-
-  const payload: Record<string, unknown> = {}
-  if (fields.image_url !== undefined) payload.image_url = fields.image_url
-  if (fields.image_thumb_url !== undefined) {
-    payload.image_thumb_url = fields.image_thumb_url
+  await Promise.all([
+    uploadBytes(fullRef, processed.full, { contentType: mime(processed.fullExt) }),
+    uploadBytes(t480Ref, processed.thumb480, {
+      contentType: mime(processed.thumb480Ext),
+    }),
+    uploadBytes(t320Ref, processed.thumb320, {
+      contentType: mime(processed.thumb320Ext),
+    }),
+    uploadBytes(t160Ref, processed.thumb160, {
+      contentType: mime(processed.thumb160Ext),
+    }),
+  ])
+  const [fullUrl, thumb480Url, thumb320Url, thumb160Url] = await Promise.all([
+    getDownloadURL(fullRef),
+    getDownloadURL(t480Ref),
+    getDownloadURL(t320Ref),
+    getDownloadURL(t160Ref),
+  ])
+  return {
+    fullUrl,
+    thumb480Url,
+    thumb320Url,
+    thumb160Url,
+    placeholderDataUrl: processed.placeholderDataUrl,
   }
-  if (fields.image_url_secondary !== undefined) {
-    payload.image_url_secondary = fields.image_url_secondary
-  }
-  if (fields.image_thumb_secondary !== undefined) {
-    payload.image_thumb_secondary = fields.image_thumb_secondary
-  }
-  if (Object.keys(payload).length === 0) return
-  await updateDoc(doc(db, DANSHARI_COLLECTION, uid), payload)
 }
 
 async function processOneProductImages(p: Product): Promise<Product> {
   let image_url = p.image_url
   let image_url_secondary = p.image_url_secondary
   let image_thumb_url = p.image_thumb_url ?? null
+  let image_thumb_320_url = p.image_thumb_320_url ?? null
+  let image_thumb_160_url = p.image_thumb_160_url ?? null
   let image_thumb_secondary = p.image_thumb_secondary ?? null
+  let image_thumb_secondary_320_url = p.image_thumb_secondary_320_url ?? null
+  let image_thumb_secondary_160_url = p.image_thumb_secondary_160_url ?? null
+  let image_placeholder_data_url = p.image_placeholder_data_url ?? null
+  let image_placeholder_secondary_data_url =
+    p.image_placeholder_secondary_data_url ?? null
 
   if (image_url.startsWith("data:")) {
-    const { fullUrl, thumbUrl } = await uploadImageSlotFromDataUrl(
-      image_url,
-      p.uid,
-      "primary",
-    )
-    image_url = fullUrl
-    image_thumb_url = thumbUrl
+    const r = await uploadImageSlotFromDataUrl(image_url, p.uid, "primary")
+    image_url = r.fullUrl
+    image_thumb_url = r.thumb480Url
+    image_thumb_320_url = r.thumb320Url
+    image_thumb_160_url = r.thumb160Url
+    image_placeholder_data_url = r.placeholderDataUrl
   }
   if (image_url_secondary?.startsWith("data:")) {
-    const { fullUrl, thumbUrl } = await uploadImageSlotFromDataUrl(
+    const r = await uploadImageSlotFromDataUrl(
       image_url_secondary,
       p.uid,
       "secondary",
     )
-    image_url_secondary = fullUrl
-    image_thumb_secondary = thumbUrl
+    image_url_secondary = r.fullUrl
+    image_thumb_secondary = r.thumb480Url
+    image_thumb_secondary_320_url = r.thumb320Url
+    image_thumb_secondary_160_url = r.thumb160Url
+    image_placeholder_secondary_data_url = r.placeholderDataUrl
   }
 
   return {
@@ -227,7 +239,13 @@ async function processOneProductImages(p: Product): Promise<Product> {
     image_url,
     image_url_secondary,
     image_thumb_url,
+    image_thumb_320_url,
+    image_thumb_160_url,
     image_thumb_secondary,
+    image_thumb_secondary_320_url,
+    image_thumb_secondary_160_url,
+    image_placeholder_data_url,
+    image_placeholder_secondary_data_url,
   }
 }
 
@@ -286,8 +304,15 @@ export async function setProductsRemote(products: Product[]): Promise<void> {
         tag: deleteField(),
         image_url: p.image_url,
         image_thumb_url: p.image_thumb_url ?? null,
+        image_thumb_320_url: p.image_thumb_320_url ?? null,
+        image_thumb_160_url: p.image_thumb_160_url ?? null,
         image_url_secondary: p.image_url_secondary ?? null,
         image_thumb_secondary: p.image_thumb_secondary ?? null,
+        image_thumb_secondary_320_url: p.image_thumb_secondary_320_url ?? null,
+        image_thumb_secondary_160_url: p.image_thumb_secondary_160_url ?? null,
+        image_placeholder_data_url: p.image_placeholder_data_url ?? null,
+        image_placeholder_secondary_data_url:
+          p.image_placeholder_secondary_data_url ?? null,
         related_item_uid: p.related_item_uid ?? null,
         claimants: p.claimants,
         created_at: createdAtForFirestore(p.created_at),

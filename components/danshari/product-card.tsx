@@ -3,9 +3,9 @@
 import Link from "next/link"
 import { memo } from "react"
 import { danshariProductHref, danshariTagFilterHref } from "@/lib/danshari/paths"
-import { firstListingImageUrl } from "@/lib/danshari/recommended"
+import { getListingImagePresentation } from "@/lib/danshari/recommended"
 import type { Product } from "@/lib/danshari/types"
-import { DanshariMedia } from "@/components/danshari/danshari-media"
+import { DanshariProductImage } from "@/components/danshari/danshari-product-image"
 import { DanshariTagPills } from "@/components/danshari/tag-pills"
 import { Hand } from "lucide-react"
 
@@ -16,7 +16,7 @@ interface ProductCardProps {
 }
 
 function DanshariProductCardInner({ product, activeTag }: ProductCardProps) {
-  const thumbSrc = firstListingImageUrl(product)
+  const { src, srcSet, placeholderSrc } = getListingImagePresentation(product)
   const hasTwoPhotos =
     Boolean(product.image_url?.trim()) &&
     Boolean(product.image_url_secondary?.trim())
@@ -28,10 +28,12 @@ function DanshariProductCardInner({ product, activeTag }: ProductCardProps) {
         className="group block"
       >
         <div className="relative aspect-square overflow-hidden bg-muted">
-          <DanshariMedia
-            src={thumbSrc}
+          <DanshariProductImage
+            mode="thumb"
+            src={src}
+            srcSet={srcSet}
+            placeholderSrc={placeholderSrc}
             alt={product.title}
-            fill
             className="object-cover group-hover:scale-105 transition-transform duration-300"
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
           />

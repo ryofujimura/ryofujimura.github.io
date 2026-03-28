@@ -14,7 +14,7 @@ import type { Product } from "@/lib/danshari/types"
 import { danshariHref } from "@/lib/danshari/paths"
 import { fileToDataUrl, newProductUid, stemFromFileName } from "@/lib/danshari/image-upload"
 import { DanshariHeader } from "@/components/danshari/header"
-import { DanshariMedia } from "@/components/danshari/danshari-media"
+import { DanshariProductImage } from "@/components/danshari/danshari-product-image"
 import { DanshariTagEditor } from "@/components/danshari/tag-editor"
 import { normalizeTagsForPublish } from "@/lib/danshari/tags"
 import {
@@ -119,8 +119,14 @@ export function DanshariProductManager() {
           tags: ["General"],
           image_url: dataUrl,
           image_thumb_url: null,
+          image_thumb_320_url: null,
+          image_thumb_160_url: null,
           image_url_secondary: null,
           image_thumb_secondary: null,
+          image_thumb_secondary_320_url: null,
+          image_thumb_secondary_160_url: null,
+          image_placeholder_data_url: null,
+          image_placeholder_secondary_data_url: null,
           related_item_uid: null,
           claimants: [],
           created_at: new Date().toISOString(),
@@ -167,7 +173,16 @@ export function DanshariProductManager() {
           : null,
       image_url_secondary: p.image_url_secondary?.trim() || null,
       image_thumb_url: p.image_thumb_url?.trim() || null,
+      image_thumb_320_url: p.image_thumb_320_url?.trim() || null,
+      image_thumb_160_url: p.image_thumb_160_url?.trim() || null,
       image_thumb_secondary: p.image_thumb_secondary?.trim() || null,
+      image_thumb_secondary_320_url:
+        p.image_thumb_secondary_320_url?.trim() || null,
+      image_thumb_secondary_160_url:
+        p.image_thumb_secondary_160_url?.trim() || null,
+      image_placeholder_data_url: p.image_placeholder_data_url?.trim() || null,
+      image_placeholder_secondary_data_url:
+        p.image_placeholder_secondary_data_url?.trim() || null,
       claimants: Array.isArray(p.claimants)
         ? p.claimants.filter((n): n is string => typeof n === "string" && n.length > 0)
         : [],
@@ -415,13 +430,25 @@ const ProductEditorRow = memo(function ProductEditorRow({
   const setPrimaryFile = async (file: File | undefined) => {
     if (!file || !file.type.startsWith("image/")) return
     const url = await fileToDataUrl(file)
-    handlePatch({ image_url: url, image_thumb_url: null })
+    handlePatch({
+      image_url: url,
+      image_thumb_url: null,
+      image_thumb_320_url: null,
+      image_thumb_160_url: null,
+      image_placeholder_data_url: null,
+    })
   }
 
   const setSecondaryFile = async (file: File | undefined) => {
     if (!file || !file.type.startsWith("image/")) return
     const url = await fileToDataUrl(file)
-    handlePatch({ image_url_secondary: url, image_thumb_secondary: null })
+    handlePatch({
+      image_url_secondary: url,
+      image_thumb_secondary: null,
+      image_thumb_secondary_320_url: null,
+      image_thumb_secondary_160_url: null,
+      image_placeholder_secondary_data_url: null,
+    })
   }
 
   const onSecondaryDrop = (e: React.DragEvent) => {
@@ -448,10 +475,10 @@ const ProductEditorRow = memo(function ProductEditorRow({
                 Photo 1
               </span>
               <div className="relative w-[7.5rem] h-[7.5rem] rounded-xl overflow-hidden border border-border bg-muted">
-                <DanshariMedia
+                <DanshariProductImage
+                  mode="adminPreview"
                   src={adminPrimaryPreviewSrc(p)}
                   alt=""
-                  fill
                   sizes="120px"
                 />
               </div>
@@ -495,10 +522,10 @@ const ProductEditorRow = memo(function ProductEditorRow({
                 className="relative w-[7.5rem] h-[7.5rem] rounded-xl overflow-hidden border border-dashed border-border bg-muted/50 flex items-center justify-center"
               >
                 {p.image_url_secondary ? (
-                  <DanshariMedia
+                  <DanshariProductImage
+                    mode="adminPreview"
                     src={adminSecondaryPreviewSrc(p)}
                     alt=""
-                    fill
                     sizes="120px"
                   />
                 ) : (
@@ -534,7 +561,15 @@ const ProductEditorRow = memo(function ProductEditorRow({
                       variant="ghost"
                       size="sm"
                       className="h-8 text-xs rounded-lg text-destructive"
-                      onClick={() => handlePatch({ image_url_secondary: null })}
+                      onClick={() =>
+                        handlePatch({
+                          image_url_secondary: null,
+                          image_thumb_secondary: null,
+                          image_thumb_secondary_320_url: null,
+                          image_thumb_secondary_160_url: null,
+                          image_placeholder_secondary_data_url: null,
+                        })
+                      }
                     >
                       Remove
                     </Button>
