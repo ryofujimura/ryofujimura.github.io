@@ -40,7 +40,7 @@ function useDanshariGridCols(): number {
 
 function DanshariProductGridSkeleton() {
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
+    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2.5 sm:gap-4">
       {Array.from({ length: 6 }).map((_, i) => (
         <div
           key={i}
@@ -110,13 +110,16 @@ function VirtualizedProductRows({
               data-index={vRow.index}
               ref={virtualizer.measureElement}
               className="absolute left-0 top-0 w-full pb-3 sm:pb-4"
-              style={{ transform: `translateY(${vRow.start}px)` }}
+              style={{
+                // start includes scrollMargin for window math; container is
+                // already placed below header/filter — subtract to avoid double offset.
+                transform: `translateY(${vRow.start - scrollMargin}px)`,
+              }}
             >
               <div
-                className="grid gap-3 sm:gap-4 w-full [contain:layout]"
+                className="grid gap-2.5 sm:gap-4 w-full [contain:layout]"
                 style={{
                   gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`,
-                  contentVisibility: "auto",
                 }}
               >
                 {slice.map((product) => (
@@ -192,10 +195,11 @@ function DanshariProductGridInner() {
   return (
     <>
       {allTags.length > 0 ? (
-        <div className="flex flex-wrap items-center gap-2 mb-6">
-          <span className="text-xs font-medium text-muted-foreground mr-1">
+        <div className="mb-3 sm:mb-5 flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-2 sm:gap-y-2">
+          <span className="text-[11px] font-medium text-muted-foreground shrink-0">
             Filter by tag
           </span>
+          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 min-w-0">
           <Link
             href={danshariHref()}
             className={cn(
@@ -223,6 +227,7 @@ function DanshariProductGridInner() {
               {t}
             </Link>
           ))}
+          </div>
         </div>
       ) : null}
 
@@ -243,9 +248,7 @@ function DanshariProductGridInner() {
           cols={cols}
         />
       ) : (
-        <div
-          className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4"
-        >
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2.5 sm:gap-4">
           {filtered.map((product) => (
             <DanshariProductCard
               key={product.uid}

@@ -30,7 +30,7 @@ export default function DanshariHomePage() {
   return (
     <div className="min-h-screen bg-background">
       <DanshariHeader />
-      <main className="max-w-6xl mx-auto px-4 py-6">
+      <main className="max-w-6xl mx-auto px-3 sm:px-4 pt-2 pb-6 sm:pt-4 sm:pb-6">
         <DanshariProductGrid />
       </main>
     </div>
