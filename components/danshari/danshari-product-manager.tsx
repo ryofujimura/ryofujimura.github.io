@@ -17,6 +17,10 @@ import { DanshariHeader } from "@/components/danshari/header"
 import { DanshariMedia } from "@/components/danshari/danshari-media"
 import { DanshariTagEditor } from "@/components/danshari/tag-editor"
 import { normalizeTagsForPublish } from "@/lib/danshari/tags"
+import {
+  adminPrimaryPreviewSrc,
+  adminSecondaryPreviewSrc,
+} from "@/lib/danshari/recommended"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
@@ -114,7 +118,9 @@ export function DanshariProductManager() {
           description: DESCRIPTION_TEMPLATE_FROM_UPLOAD,
           tags: ["General"],
           image_url: dataUrl,
+          image_thumb_url: null,
           image_url_secondary: null,
+          image_thumb_secondary: null,
           related_item_uid: null,
           claimants: [],
           created_at: new Date().toISOString(),
@@ -160,6 +166,8 @@ export function DanshariProductManager() {
           ? p.related_item_uid
           : null,
       image_url_secondary: p.image_url_secondary?.trim() || null,
+      image_thumb_url: p.image_thumb_url?.trim() || null,
+      image_thumb_secondary: p.image_thumb_secondary?.trim() || null,
       claimants: Array.isArray(p.claimants)
         ? p.claimants.filter((n): n is string => typeof n === "string" && n.length > 0)
         : [],
@@ -231,8 +239,8 @@ export function DanshariProductManager() {
               Edits stay in this page until you save. Save &amp; publish writes to Firestore
               (collection{" "}
               <code className="rounded bg-muted px-1 py-0.5 text-[0.65rem]">danshari</code>
-              ) and uploads new or replaced photos to Storage then — nothing is sent while you
-              type. You can still use image URLs or{" "}
+              )               and uploads optimized full + thumbnail images to Storage then — nothing is sent
+              while you type. You can still use image URLs or{" "}
               <code className="rounded bg-muted px-1 py-0.5 text-[0.65rem]">
                 /danshari/products/…
               </code>{" "}
@@ -407,13 +415,13 @@ const ProductEditorRow = memo(function ProductEditorRow({
   const setPrimaryFile = async (file: File | undefined) => {
     if (!file || !file.type.startsWith("image/")) return
     const url = await fileToDataUrl(file)
-    handlePatch({ image_url: url })
+    handlePatch({ image_url: url, image_thumb_url: null })
   }
 
   const setSecondaryFile = async (file: File | undefined) => {
     if (!file || !file.type.startsWith("image/")) return
     const url = await fileToDataUrl(file)
-    handlePatch({ image_url_secondary: url })
+    handlePatch({ image_url_secondary: url, image_thumb_secondary: null })
   }
 
   const onSecondaryDrop = (e: React.DragEvent) => {
@@ -440,7 +448,12 @@ const ProductEditorRow = memo(function ProductEditorRow({
                 Photo 1
               </span>
               <div className="relative w-[7.5rem] h-[7.5rem] rounded-xl overflow-hidden border border-border bg-muted">
-                <DanshariMedia src={p.image_url} alt="" fill sizes="120px" />
+                <DanshariMedia
+                  src={adminPrimaryPreviewSrc(p)}
+                  alt=""
+                  fill
+                  sizes="120px"
+                />
               </div>
               <input
                 ref={primaryRef}
@@ -482,7 +495,12 @@ const ProductEditorRow = memo(function ProductEditorRow({
                 className="relative w-[7.5rem] h-[7.5rem] rounded-xl overflow-hidden border border-dashed border-border bg-muted/50 flex items-center justify-center"
               >
                 {p.image_url_secondary ? (
-                  <DanshariMedia src={p.image_url_secondary} alt="" fill sizes="120px" />
+                  <DanshariMedia
+                    src={adminSecondaryPreviewSrc(p)}
+                    alt=""
+                    fill
+                    sizes="120px"
+                  />
                 ) : (
                   <span className="text-[10px] text-muted-foreground px-2 text-center">
                     Drop or add

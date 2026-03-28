@@ -23,6 +23,7 @@ import {
   getFirebaseStorage,
 } from "@/lib/firebase"
 import type { Product, Comment } from "./types"
+import { processDataUrlForUpload } from "./image-process"
 import { parseTagsFromDoc } from "./tags"
 
 const STORAGE_PREFIX = "danshari"
@@ -31,7 +32,7 @@ const STORAGE_PREFIX = "danshari"
  * Firestore shape for `danshari/{productId}` (document id = product uid):
  * - title, description: string
  * - tags: string[] (legacy `tag` string is read once then removed on next publish)
- * - image_url: string; image_url_secondary: string | null
+ * - image_url, optional image_thumb_url; image_url_secondary, image_thumb_secondary
  * - related_item_uid: string | null
  * - claimants: string[]
  * - created_at: Timestamp (preferred) or ISO string (legacy reads)
@@ -62,7 +63,9 @@ export function docToProduct(d: DocumentSnapshot): Product {
       description: "",
       tags: ["General"],
       image_url: "",
+      image_thumb_url: null,
       image_url_secondary: null,
+      image_thumb_secondary: null,
       related_item_uid: null,
       claimants: [],
       created_at: new Date().toISOString(),
@@ -77,9 +80,17 @@ export function docToProduct(d: DocumentSnapshot): Product {
     description: typeof x.description === "string" ? x.description : "",
     tags: parseTagsFromDoc(x as Record<string, unknown>),
     image_url: typeof x.image_url === "string" ? x.image_url : "",
+    image_thumb_url:
+      typeof x.image_thumb_url === "string" && x.image_thumb_url.length > 0
+        ? x.image_thumb_url
+        : null,
     image_url_secondary:
       typeof x.image_url_secondary === "string" && x.image_url_secondary.length > 0
         ? x.image_url_secondary
+        : null,
+    image_thumb_secondary:
+      typeof x.image_thumb_secondary === "string" && x.image_thumb_secondary.length > 0
+        ? x.image_thumb_secondary
         : null,
     related_item_uid:
       x.related_item_uid === null || typeof x.related_item_uid === "string"
@@ -102,49 +113,91 @@ function commentFromDoc(d: DocumentSnapshot, productUid: string): Comment {
   }
 }
 
-/** Upload a data URL to Storage; return download URL. Pass-through if not data URL. */
-export async function uploadDataUrlIfNeeded(
+const UPLOAD_CONCURRENCY = 3
+
+async function uploadImageSlotFromDataUrl(
   dataUrl: string,
   productUid: string,
-  slot: "primary" | "secondary"
-): Promise<string> {
-  if (!dataUrl.startsWith("data:")) return dataUrl
+  slot: "primary" | "secondary",
+): Promise<{ fullUrl: string; thumbUrl: string }> {
   const storage = getFirebaseStorage()
   if (!storage) throw new Error("Firebase Storage is not available")
 
-  const blob = await (await fetch(dataUrl)).blob()
-  const ext = blob.type.includes("png")
-    ? "png"
-    : blob.type.includes("webp")
-      ? "webp"
-      : "jpg"
-  const objectPath = `${STORAGE_PREFIX}/products/${productUid}/${slot}_${Date.now()}.${ext}`
-  const sRef = ref(storage, objectPath)
-  await uploadBytes(sRef, blob, {
-    contentType: blob.type || "image/jpeg",
-  })
-  return getDownloadURL(sRef)
+  const processed = await processDataUrlForUpload(dataUrl)
+  const ts = Date.now()
+  const base = `${STORAGE_PREFIX}/products/${productUid}/${slot}_${ts}`
+  const fullRef = ref(storage, `${base}_full.${processed.fullExt}`)
+  const thumbRef = ref(storage, `${base}_thumb.${processed.thumbExt}`)
+  const fullMime =
+    processed.fullExt === "webp" ? "image/webp" : "image/jpeg"
+  const thumbMime =
+    processed.thumbExt === "webp" ? "image/webp" : "image/jpeg"
+
+  await Promise.all([
+    uploadBytes(fullRef, processed.full, { contentType: fullMime }),
+    uploadBytes(thumbRef, processed.thumb, { contentType: thumbMime }),
+  ])
+  const [fullUrl, thumbUrl] = await Promise.all([
+    getDownloadURL(fullRef),
+    getDownloadURL(thumbRef),
+  ])
+  return { fullUrl, thumbUrl }
 }
 
-export async function uploadDataUrlImagesForProducts(
-  products: Product[]
-): Promise<Product[]> {
-  const out: Product[] = []
-  for (const p of products) {
-    let image_url = p.image_url
-    let image_url_secondary = p.image_url_secondary
-    if (image_url.startsWith("data:")) {
-      image_url = await uploadDataUrlIfNeeded(image_url, p.uid, "primary")
-    }
-    if (image_url_secondary?.startsWith("data:")) {
-      image_url_secondary = await uploadDataUrlIfNeeded(
-        image_url_secondary,
-        p.uid,
-        "secondary"
-      )
-    }
-    out.push({ ...p, image_url, image_url_secondary })
+async function processOneProductImages(p: Product): Promise<Product> {
+  let image_url = p.image_url
+  let image_url_secondary = p.image_url_secondary
+  let image_thumb_url = p.image_thumb_url ?? null
+  let image_thumb_secondary = p.image_thumb_secondary ?? null
+
+  if (image_url.startsWith("data:")) {
+    const { fullUrl, thumbUrl } = await uploadImageSlotFromDataUrl(
+      image_url,
+      p.uid,
+      "primary",
+    )
+    image_url = fullUrl
+    image_thumb_url = thumbUrl
   }
+  if (image_url_secondary?.startsWith("data:")) {
+    const { fullUrl, thumbUrl } = await uploadImageSlotFromDataUrl(
+      image_url_secondary,
+      p.uid,
+      "secondary",
+    )
+    image_url_secondary = fullUrl
+    image_thumb_secondary = thumbUrl
+  }
+
+  return {
+    ...p,
+    image_url,
+    image_url_secondary,
+    image_thumb_url,
+    image_thumb_secondary,
+  }
+}
+
+/** Resize + WebP/JPEG encode data URLs, upload full + thumb per slot; bounded parallelism. */
+export async function uploadDataUrlImagesForProducts(
+  products: Product[],
+): Promise<Product[]> {
+  const n = products.length
+  if (n === 0) return []
+
+  const out = new Array<Product>(n)
+  let cursor = 0
+
+  async function worker(): Promise<void> {
+    while (true) {
+      const i = cursor++
+      if (i >= n) return
+      out[i] = await processOneProductImages(products[i])
+    }
+  }
+
+  const pool = Math.min(UPLOAD_CONCURRENCY, n)
+  await Promise.all(Array.from({ length: pool }, () => worker()))
   return out
 }
 
@@ -179,7 +232,9 @@ export async function setProductsRemote(products: Product[]): Promise<void> {
         tags: p.tags,
         tag: deleteField(),
         image_url: p.image_url,
+        image_thumb_url: p.image_thumb_url ?? null,
         image_url_secondary: p.image_url_secondary ?? null,
+        image_thumb_secondary: p.image_thumb_secondary ?? null,
         related_item_uid: p.related_item_uid ?? null,
         claimants: p.claimants,
         created_at: createdAtForFirestore(p.created_at),

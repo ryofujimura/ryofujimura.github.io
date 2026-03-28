@@ -18,7 +18,10 @@ import {
   subscribeProductComments,
 } from "@/lib/danshari/store"
 import type { Product, Comment } from "@/lib/danshari/types"
-import { getRecommendedProducts } from "@/lib/danshari/recommended"
+import {
+  firstListingImageUrl,
+  getRecommendedProducts,
+} from "@/lib/danshari/recommended"
 import { useMediaQuery } from "@/hooks/use-media-query"
 import { DanshariRecommendedCarousel } from "@/components/danshari/danshari-recommended-carousel"
 import { DanshariDescriptionRich } from "@/components/danshari/description-rich"
@@ -364,7 +367,10 @@ function ProductViewInner() {
               >
                 <div className="relative w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
                   <DanshariMedia
-                    src={relatedProduct.image_url}
+                    src={
+                      firstListingImageUrl(relatedProduct) ||
+                      relatedProduct.image_url
+                    }
                     alt={relatedProduct.title}
                     fill
                     sizes="64px"
