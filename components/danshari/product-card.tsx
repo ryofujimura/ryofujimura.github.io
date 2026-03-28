@@ -2,19 +2,13 @@
 
 import Link from "next/link"
 import { danshariProductHref } from "@/lib/danshari/paths"
+import { firstListingImageUrl } from "@/lib/danshari/recommended"
 import type { Product } from "@/lib/danshari/types"
 import { DanshariMedia } from "@/components/danshari/danshari-media"
 import { Hand } from "lucide-react"
 
 interface ProductCardProps {
   product: Product
-}
-
-/** Primary listing image: first photo field, or second if primary is empty. */
-function firstListingImageUrl(product: Product): string {
-  const a = product.image_url?.trim() ?? ""
-  const b = product.image_url_secondary?.trim() ?? ""
-  return a || b
 }
 
 export function DanshariProductCard({ product }: ProductCardProps) {

@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState, Suspense } from "react"
+import { useEffect, useMemo, useState, Suspense } from "react"
 import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
 import { danshariHref, danshariProductHref } from "@/lib/danshari/paths"
@@ -14,6 +14,9 @@ import {
   subscribeProductComments,
 } from "@/lib/danshari/store"
 import type { Product, Comment } from "@/lib/danshari/types"
+import { getRecommendedProducts } from "@/lib/danshari/recommended"
+import { useMediaQuery } from "@/hooks/use-media-query"
+import { DanshariRecommendedCarousel } from "@/components/danshari/danshari-recommended-carousel"
 import { DanshariDescriptionRich } from "@/components/danshari/description-rich"
 import { DanshariHeader } from "@/components/danshari/header"
 import { DanshariMedia } from "@/components/danshari/danshari-media"
@@ -41,6 +44,13 @@ function ProductViewInner() {
   const [isLoading, setIsLoading] = useState(true)
   const [commentText, setCommentText] = useState("")
   const [commentPrice, setCommentPrice] = useState("")
+  const [allProducts, setAllProducts] = useState<Product[]>([])
+  const isXl = useMediaQuery("(min-width: 1280px)")
+
+  const recommended = useMemo(
+    () => (product ? getRecommendedProducts(product, allProducts) : []),
+    [product, allProducts],
+  )
 
   useEffect(() => {
     if (userLoading) return
@@ -76,6 +86,7 @@ function ProductViewInner() {
       })
 
     const unsubProducts = subscribeProducts((all) => {
+      setAllProducts(all)
       const p = all.find((x) => x.uid === uid) ?? null
       setProduct(p)
       if (p?.related_item_uid) {
@@ -151,7 +162,7 @@ function ProductViewInner() {
   return (
     <div className="min-h-screen bg-background">
       <DanshariHeader />
-      <main className="max-w-2xl mx-auto px-4 py-4 pb-24">
+      <main className="max-w-7xl mx-auto px-4 py-4 pb-24">
         <Button
           asChild
           variant="ghost"
@@ -164,6 +175,8 @@ function ProductViewInner() {
           </Link>
         </Button>
 
+        <div className="flex flex-col xl:flex-row xl:items-start xl:gap-10">
+          <div className="min-w-0 w-full max-w-2xl flex-1">
         <div
           className={
             product.image_url_secondary
@@ -355,6 +368,18 @@ function ProductViewInner() {
               Post comment
             </Button>
           </form>
+        </div>
+          </div>
+
+          {recommended.length > 0 ? (
+            <aside className="mt-10 w-full shrink-0 xl:mt-0 xl:w-72 xl:sticky xl:top-6 xl:self-start">
+              <DanshariRecommendedCarousel
+                key={isXl ? "sidebar" : "strip"}
+                products={recommended}
+                variant={isXl ? "sidebar" : "below"}
+              />
+            </aside>
+          ) : null}
         </div>
       </main>
     </div>
