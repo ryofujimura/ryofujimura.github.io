@@ -43,7 +43,6 @@ import { Card } from "@/components/ui/card"
 import {
   ArrowLeft,
   Hand,
-  HandMetal,
   MessageCircle,
   DollarSign,
   Send,
@@ -328,20 +327,13 @@ function ProductViewInner() {
 
         <Button
           onClick={handleClaim}
-          className="w-full h-12 text-base rounded-xl mb-6"
+          className="w-full h-16 rounded-xl mb-6 text-5xl leading-none p-0"
           variant={iAmInQueue ? "outline" : "default"}
+          aria-label={iAmInQueue ? "Remove my hand" : "Raise hand to join"}
         >
-          {iAmInQueue ? (
-            <>
-              <HandMetal className="w-5 h-5 mr-2" />
-              Remove my hand
-            </>
-          ) : (
-            <>
-              <Hand className="w-5 h-5 mr-2" />
-              Raise hand to join
-            </>
-          )}
+          <span className="select-none" aria-hidden>
+            {iAmInQueue ? "✋" : "🖐️"}
+          </span>
         </Button>
 
         <div className="mb-6">
