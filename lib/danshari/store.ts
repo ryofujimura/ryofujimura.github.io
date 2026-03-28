@@ -1,8 +1,10 @@
 "use client"
 
 import type { Product, Comment, User } from "./types"
+import { idbGetProductCatalog, idbSetProductCatalog } from "./products-idb"
 
-const PRODUCTS_KEY = "danshari_claim_products"
+/** Legacy key; catalog now lives in IndexedDB (larger quota for image data URLs). */
+const LEGACY_PRODUCTS_KEY = "danshari_claim_products"
 const COMMENTS_KEY = "danshari_claim_comments"
 const USER_KEY = "danshari_claim_user"
 
@@ -114,28 +116,73 @@ const sampleProducts: Product[] = [
   },
 ]
 
-function initializeStore() {
-  if (typeof window === "undefined") return
+/** In-memory catalog after `ensureProductsLoaded()`; `null` until first load. */
+let productCache: Product[] | null = null
+let loadPromise: Promise<Product[]> | null = null
 
-  if (!localStorage.getItem(PRODUCTS_KEY)) {
-    localStorage.setItem(PRODUCTS_KEY, JSON.stringify(sampleProducts))
-  }
+function ensureCommentsInitialized() {
+  if (typeof window === "undefined") return
   if (!localStorage.getItem(COMMENTS_KEY)) {
     localStorage.setItem(COMMENTS_KEY, JSON.stringify([]))
   }
 }
 
+/**
+ * Load catalog from IndexedDB (or migrate from legacy localStorage, or seed samples).
+ * Safe to call multiple times; subsequent calls return the same promise until resolved.
+ */
+export async function ensureProductsLoaded(): Promise<Product[]> {
+  if (typeof window === "undefined") return []
+  if (productCache !== null) return productCache
+
+  loadPromise ??= (async () => {
+    try {
+      const fromIdb = await idbGetProductCatalog()
+      if (fromIdb !== undefined) {
+        productCache = fromIdb.map(migrateProduct)
+        return productCache
+      }
+    } catch (e) {
+      console.error("[danshari] IndexedDB read failed", e)
+    }
+
+    try {
+      const legacy = localStorage.getItem(LEGACY_PRODUCTS_KEY)
+      if (legacy) {
+        const parsed = JSON.parse(legacy) as unknown[]
+        productCache = Array.isArray(parsed) ? parsed.map(migrateProduct) : []
+        localStorage.removeItem(LEGACY_PRODUCTS_KEY)
+        await idbSetProductCatalog(productCache)
+        return productCache
+      }
+    } catch (e) {
+      console.error("[danshari] localStorage migrate failed", e)
+    }
+
+    productCache = sampleProducts.map((p) => ({ ...p }))
+    try {
+      await idbSetProductCatalog(productCache)
+    } catch (e) {
+      console.error("[danshari] IndexedDB seed failed", e)
+    }
+    return productCache
+  })()
+
+  try {
+    return await loadPromise
+  } finally {
+    loadPromise = null
+  }
+}
+
+async function persistProductCatalog(products: Product[]): Promise<void> {
+  await idbSetProductCatalog(products)
+}
+
+/** Sync read; use after `ensureProductsLoaded()`. Before load, returns `[]`. */
 export function getProducts(): Product[] {
   if (typeof window === "undefined") return []
-  initializeStore()
-  const data = localStorage.getItem(PRODUCTS_KEY)
-  if (!data) return []
-  try {
-    const parsed = JSON.parse(data) as unknown[]
-    return Array.isArray(parsed) ? parsed.map(migrateProduct) : []
-  } catch {
-    return []
-  }
+  return productCache ?? []
 }
 
 export function getProduct(uid: string): Product | null {
@@ -143,10 +190,11 @@ export function getProduct(uid: string): Product | null {
   return products.find((p) => p.uid === uid) || null
 }
 
-export function addProduct(
+export async function addProduct(
   product: Omit<Product, "uid" | "claimant" | "created_at">
-): Product {
-  const products = getProducts()
+): Promise<Product> {
+  await ensureProductsLoaded()
+  const list = productCache!
   const newProduct: Product = {
     ...product,
     image_url_secondary: product.image_url_secondary ?? null,
@@ -154,36 +202,37 @@ export function addProduct(
     claimant: null,
     created_at: new Date().toISOString(),
   }
-  products.push(newProduct)
-  localStorage.setItem(PRODUCTS_KEY, JSON.stringify(products))
+  list.push(newProduct)
+  await persistProductCatalog(list)
   return newProduct
 }
 
-/** Replace the full catalog (admin bulk edit). Preserves comments key. */
-export function setProducts(products: Product[]): void {
+/** Replace the full catalog (admin bulk edit). */
+export async function setProducts(products: Product[]): Promise<void> {
   if (typeof window === "undefined") return
-  if (!localStorage.getItem(COMMENTS_KEY)) {
-    localStorage.setItem(COMMENTS_KEY, JSON.stringify([]))
-  }
-  localStorage.setItem(PRODUCTS_KEY, JSON.stringify(products))
+  ensureCommentsInitialized()
+  const copy = products.map((p) => ({ ...p }))
+  productCache = copy
+  await persistProductCatalog(copy)
 }
 
-export function updateProductClaimant(
+export async function updateProductClaimant(
   uid: string,
   claimant: string | null
-): Product | null {
-  const products = getProducts()
+): Promise<Product | null> {
+  await ensureProductsLoaded()
+  const products = productCache!
   const index = products.findIndex((p) => p.uid === uid)
   if (index === -1) return null
 
-  products[index].claimant = claimant
-  localStorage.setItem(PRODUCTS_KEY, JSON.stringify(products))
+  products[index] = { ...products[index], claimant }
+  await persistProductCatalog(products)
   return products[index]
 }
 
 export function getComments(productUid: string): Comment[] {
   if (typeof window === "undefined") return []
-  initializeStore()
+  ensureCommentsInitialized()
   const data = localStorage.getItem(COMMENTS_KEY)
   const comments: Comment[] = data ? JSON.parse(data) : []
   return comments.filter((c) => c.product_uid === productUid)
@@ -193,7 +242,7 @@ export function addComment(
   comment: Omit<Comment, "id" | "created_at">
 ): Comment {
   if (typeof window === "undefined") throw new Error("Cannot add comment on server")
-  initializeStore()
+  ensureCommentsInitialized()
   const data = localStorage.getItem(COMMENTS_KEY)
   const comments: Comment[] = data ? JSON.parse(data) : []
 

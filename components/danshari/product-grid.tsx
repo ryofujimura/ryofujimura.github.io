@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { getProducts } from "@/lib/danshari/store"
+import { ensureProductsLoaded, getProducts } from "@/lib/danshari/store"
 import type { Product } from "@/lib/danshari/types"
 import { DanshariProductCard } from "./product-card"
 
@@ -10,8 +10,10 @@ export function DanshariProductGrid() {
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    setProducts(getProducts())
-    setIsLoading(false)
+    void ensureProductsLoaded()
+      .then(() => setProducts(getProducts()))
+      .catch(() => setProducts([]))
+      .finally(() => setIsLoading(false))
   }, [])
 
   if (isLoading) {

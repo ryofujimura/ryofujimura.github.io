@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation"
 import { danshariHref, danshariProductHref } from "@/lib/danshari/paths"
 import { useDanshariUser } from "@/lib/danshari/user-context"
 import {
+  ensureProductsLoaded,
   getProduct,
   getComments,
   updateProductClaimant,
@@ -39,44 +40,57 @@ function ProductViewInner() {
   const [commentPrice, setCommentPrice] = useState("")
 
   useEffect(() => {
-    if (userLoading) return
-    if (!user) {
-      router.push(danshariHref())
-      return
-    }
-    if (!uid) {
-      setProduct(null)
-      setRelatedProduct(null)
-      setComments([])
-      setIsLoading(false)
-      return
-    }
+    let cancelled = false
 
-    const p = getProduct(uid)
-    if (p) {
-      setProduct(p)
-      setComments(getComments(uid))
-      if (p.related_item_uid) {
-        setRelatedProduct(getProduct(p.related_item_uid))
-      } else {
-        setRelatedProduct(null)
+    void (async () => {
+      if (userLoading) return
+      if (!user) {
+        router.push(danshariHref())
+        return
       }
-    } else {
-      setProduct(null)
-      setRelatedProduct(null)
-      setComments([])
+      if (!uid) {
+        if (!cancelled) {
+          setProduct(null)
+          setRelatedProduct(null)
+          setComments([])
+          setIsLoading(false)
+        }
+        return
+      }
+
+      await ensureProductsLoaded()
+      if (cancelled) return
+
+      const p = getProduct(uid)
+      if (p) {
+        setProduct(p)
+        setComments(getComments(uid))
+        if (p.related_item_uid) {
+          setRelatedProduct(getProduct(p.related_item_uid))
+        } else {
+          setRelatedProduct(null)
+        }
+      } else {
+        setProduct(null)
+        setRelatedProduct(null)
+        setComments([])
+      }
+      setIsLoading(false)
+    })()
+
+    return () => {
+      cancelled = true
     }
-    setIsLoading(false)
   }, [uid, user, userLoading, router])
 
-  const handleClaim = () => {
+  const handleClaim = async () => {
     if (!product || !user) return
 
     if (product.claimant === user.username) {
-      const updated = updateProductClaimant(product.uid, null)
+      const updated = await updateProductClaimant(product.uid, null)
       if (updated) setProduct(updated)
     } else if (!product.claimant) {
-      const updated = updateProductClaimant(product.uid, user.username)
+      const updated = await updateProductClaimant(product.uid, user.username)
       if (updated) setProduct(updated)
     }
   }

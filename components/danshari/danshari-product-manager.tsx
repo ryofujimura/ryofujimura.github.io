@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import Link from "next/link"
-import { getProducts, setProducts } from "@/lib/danshari/store"
+import { ensureProductsLoaded, getProducts, setProducts } from "@/lib/danshari/store"
 import type { Product } from "@/lib/danshari/types"
 import { danshariHref } from "@/lib/danshari/paths"
 import { fileToDataUrl, newProductUid, stemFromFileName } from "@/lib/danshari/image-upload"
@@ -34,10 +34,16 @@ export function DanshariProductManager() {
   const [publishedOk, setPublishedOk] = useState(false)
 
   useEffect(() => {
-    const list = getProducts()
-    setItems(list)
-    setLastSaved(list)
-    setHydrated(true)
+    void ensureProductsLoaded()
+      .then(() => {
+        const list = getProducts()
+        setItems(list)
+        setLastSaved(list)
+      })
+      .catch(() => {
+        setError("Could not load the product catalog from this browser.")
+      })
+      .finally(() => setHydrated(true))
   }, [])
 
   const dirty = useMemo(
@@ -96,7 +102,7 @@ export function DanshariProductManager() {
     [addProductsFromFiles]
   )
 
-  const handlePublish = () => {
+  const handlePublish = async () => {
     setError(null)
     for (const p of items) {
       if (!p.title.trim()) {
@@ -120,11 +126,26 @@ export function DanshariProductManager() {
           : null,
       image_url_secondary: p.image_url_secondary?.trim() || null,
     }))
-    setProducts(cleaned)
-    setLastSaved(cleaned)
-    setItems(cleaned)
-    setPublishedOk(true)
-    setTimeout(() => setPublishedOk(false), 3200)
+    try {
+      await setProducts(cleaned)
+      setLastSaved(cleaned)
+      setItems(cleaned)
+      setPublishedOk(true)
+      setTimeout(() => setPublishedOk(false), 3200)
+    } catch (e) {
+      setPublishedOk(false)
+      const name =
+        e instanceof DOMException ? e.name : (e as Error)?.name ?? ""
+      if (name === "QuotaExceededError") {
+        setError(
+          "Browser storage is full. Remove some photos or use smaller images."
+        )
+      } else {
+        setError(
+          e instanceof Error ? e.message : "Could not save the catalog."
+        )
+      }
+    }
   }
 
   if (!hydrated) {
@@ -159,8 +180,9 @@ export function DanshariProductManager() {
             Drag images onto the zone below to create one product per image. Edit titles
             and descriptions in the list. Up to two photos per product.{" "}
             <span className="text-foreground/90">
-              Save &amp; publish writes the catalog to this browser (localStorage). This
-              site is static—uploads are not written to disk on the server. To put files in{" "}
+              Save &amp; publish stores the catalog in this browser (IndexedDB, larger than
+              localStorage). This site is static—uploads are not written to disk on the
+              server. To put files in{" "}
               <code className="rounded bg-muted px-1 py-0.5 text-[0.65rem]">
                 public/danshari/products/
               </code>

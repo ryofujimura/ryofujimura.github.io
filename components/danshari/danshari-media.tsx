@@ -17,7 +17,7 @@ function isInlineSrc(src: string) {
   return src.startsWith("data:") || src.startsWith("blob:")
 }
 
-/** Renders Next/Image for remote/path URLs, native img for data/blob (localStorage uploads). */
+/** Renders Next/Image for remote/path URLs, native img for data/blob (IndexedDB-backed uploads). */
 export function DanshariMedia({
   src,
   alt,
