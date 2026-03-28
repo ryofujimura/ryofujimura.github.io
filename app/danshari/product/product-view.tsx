@@ -280,34 +280,7 @@ function ProductViewInner() {
           )}
         </Button>
 
-        {relatedProduct && (
-          <div className="mb-6">
-            <h2 className="text-sm font-medium text-muted-foreground mb-3">
-              Related item
-            </h2>
-            <Link
-              href={danshariProductHref(relatedProduct.uid)}
-              className="flex items-center gap-3 p-3 bg-card rounded-xl border border-border hover:border-primary/30 transition-colors"
-            >
-              <div className="relative w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
-                <DanshariMedia
-                  src={relatedProduct.image_url}
-                  alt={relatedProduct.title}
-                  fill
-                  sizes="64px"
-                />
-              </div>
-              <div className="min-w-0">
-                <p className="font-medium text-foreground truncate">
-                  {relatedProduct.title}
-                </p>
-                <DanshariTagPills tags={relatedProduct.tags} size="sm" className="mt-0.5" />
-              </div>
-            </Link>
-          </div>
-        )}
-
-        <div>
+        <div className="mb-6">
           <h2 className="flex items-center gap-2 text-sm font-medium text-muted-foreground mb-3">
             <MessageCircle className="w-4 h-4" />
             Comments ({comments.length})
@@ -370,6 +343,33 @@ function ProductViewInner() {
             </Button>
           </form>
         </div>
+
+        {relatedProduct && (
+          <div className="mb-6">
+            <h2 className="text-sm font-medium text-muted-foreground mb-3">
+              Related item
+            </h2>
+            <Link
+              href={danshariProductHref(relatedProduct.uid)}
+              className="flex items-center gap-3 p-3 bg-card rounded-xl border border-border hover:border-primary/30 transition-colors"
+            >
+              <div className="relative w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
+                <DanshariMedia
+                  src={relatedProduct.image_url}
+                  alt={relatedProduct.title}
+                  fill
+                  sizes="64px"
+                />
+              </div>
+              <div className="min-w-0">
+                <p className="font-medium text-foreground truncate">
+                  {relatedProduct.title}
+                </p>
+                <DanshariTagPills tags={relatedProduct.tags} size="sm" className="mt-0.5" />
+              </div>
+            </Link>
+          </div>
+        )}
           </div>
 
           {recommended.length > 0 ? (
