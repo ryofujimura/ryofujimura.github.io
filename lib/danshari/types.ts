@@ -4,6 +4,8 @@ export interface Product {
   description: string
   tag: string
   image_url: string
+  /** Optional second photo (URL, path, or data URL). */
+  image_url_secondary: string | null
   related_item_uid: string | null
   claimant: string | null
   created_at: string

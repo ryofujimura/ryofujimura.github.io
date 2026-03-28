@@ -6,6 +6,44 @@ const PRODUCTS_KEY = "danshari_claim_products"
 const COMMENTS_KEY = "danshari_claim_comments"
 const USER_KEY = "danshari_claim_user"
 
+function migrateProduct(raw: unknown): Product {
+  if (!raw || typeof raw !== "object") {
+    return {
+      uid: `prod-${Date.now()}`,
+      title: "",
+      description: "",
+      tag: "General",
+      image_url: "",
+      image_url_secondary: null,
+      related_item_uid: null,
+      claimant: null,
+      created_at: new Date().toISOString(),
+    }
+  }
+  const p = raw as Partial<Product>
+  return {
+    uid: typeof p.uid === "string" ? p.uid : `prod-${Date.now()}`,
+    title: typeof p.title === "string" ? p.title : "",
+    description: typeof p.description === "string" ? p.description : "",
+    tag: typeof p.tag === "string" ? p.tag : "General",
+    image_url: typeof p.image_url === "string" ? p.image_url : "",
+    image_url_secondary:
+      typeof p.image_url_secondary === "string" && p.image_url_secondary.length > 0
+        ? p.image_url_secondary
+        : null,
+    related_item_uid:
+      p.related_item_uid === null || typeof p.related_item_uid === "string"
+        ? p.related_item_uid ?? null
+        : null,
+    claimant:
+      p.claimant === null || typeof p.claimant === "string"
+        ? p.claimant ?? null
+        : null,
+    created_at:
+      typeof p.created_at === "string" ? p.created_at : new Date().toISOString(),
+  }
+}
+
 const sampleProducts: Product[] = [
   {
     uid: "prod-1",
@@ -14,6 +52,7 @@ const sampleProducts: Product[] = [
       "Beautiful mid-century leather armchair in excellent condition. Rich brown patina with solid wood frame.",
     tag: "Furniture",
     image_url: "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=800&q=80",
+    image_url_secondary: null,
     related_item_uid: "prod-2",
     claimant: null,
     created_at: new Date().toISOString(),
@@ -24,6 +63,7 @@ const sampleProducts: Product[] = [
     description: "Matching leather ottoman for the vintage armchair. Same rich brown leather.",
     tag: "Furniture",
     image_url: "https://images.unsplash.com/photo-1506439773649-6e0eb8cfb237?w=800&q=80",
+    image_url_secondary: null,
     related_item_uid: "prod-1",
     claimant: null,
     created_at: new Date().toISOString(),
@@ -34,6 +74,7 @@ const sampleProducts: Product[] = [
     description: "Handcrafted ceramic vases in soft earth tones. Set of three different sizes.",
     tag: "Decor",
     image_url: "https://images.unsplash.com/photo-1612198188060-c7c2a3b66eae?w=800&q=80",
+    image_url_secondary: null,
     related_item_uid: null,
     claimant: null,
     created_at: new Date().toISOString(),
@@ -44,6 +85,7 @@ const sampleProducts: Product[] = [
     description: "Solid oak bookshelf with five shelves. Perfect for living room or office.",
     tag: "Furniture",
     image_url: "https://images.unsplash.com/photo-1594620302200-9a762244a156?w=800&q=80",
+    image_url_secondary: null,
     related_item_uid: null,
     claimant: null,
     created_at: new Date().toISOString(),
@@ -54,6 +96,7 @@ const sampleProducts: Product[] = [
     description: "Modern brass desk lamp with adjustable arm. Warm LED lighting included.",
     tag: "Lighting",
     image_url: "https://images.unsplash.com/photo-1507473885765-e6ed057f782c?w=800&q=80",
+    image_url_secondary: null,
     related_item_uid: null,
     claimant: null,
     created_at: new Date().toISOString(),
@@ -64,6 +107,7 @@ const sampleProducts: Product[] = [
     description: "Set of three handwoven storage baskets in natural fibers.",
     tag: "Storage",
     image_url: "https://images.unsplash.com/photo-1618220179428-22790b461013?w=800&q=80",
+    image_url_secondary: null,
     related_item_uid: null,
     claimant: null,
     created_at: new Date().toISOString(),
@@ -85,7 +129,13 @@ export function getProducts(): Product[] {
   if (typeof window === "undefined") return []
   initializeStore()
   const data = localStorage.getItem(PRODUCTS_KEY)
-  return data ? JSON.parse(data) : []
+  if (!data) return []
+  try {
+    const parsed = JSON.parse(data) as unknown[]
+    return Array.isArray(parsed) ? parsed.map(migrateProduct) : []
+  } catch {
+    return []
+  }
 }
 
 export function getProduct(uid: string): Product | null {
@@ -99,6 +149,7 @@ export function addProduct(
   const products = getProducts()
   const newProduct: Product = {
     ...product,
+    image_url_secondary: product.image_url_secondary ?? null,
     uid: `prod-${Date.now()}`,
     claimant: null,
     created_at: new Date().toISOString(),
@@ -106,6 +157,15 @@ export function addProduct(
   products.push(newProduct)
   localStorage.setItem(PRODUCTS_KEY, JSON.stringify(products))
   return newProduct
+}
+
+/** Replace the full catalog (admin bulk edit). Preserves comments key. */
+export function setProducts(products: Product[]): void {
+  if (typeof window === "undefined") return
+  if (!localStorage.getItem(COMMENTS_KEY)) {
+    localStorage.setItem(COMMENTS_KEY, JSON.stringify([]))
+  }
+  localStorage.setItem(PRODUCTS_KEY, JSON.stringify(products))
 }
 
 export function updateProductClaimant(

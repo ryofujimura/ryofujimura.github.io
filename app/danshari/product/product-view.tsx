@@ -1,7 +1,6 @@
 "use client"
 
 import { useEffect, useState, Suspense } from "react"
-import Image from "next/image"
 import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
 import { danshariHref, danshariProductHref } from "@/lib/danshari/paths"
@@ -14,6 +13,7 @@ import {
 } from "@/lib/danshari/store"
 import type { Product, Comment } from "@/lib/danshari/types"
 import { DanshariHeader } from "@/components/danshari/header"
+import { DanshariMedia } from "@/components/danshari/danshari-media"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card } from "@/components/ui/card"
@@ -142,21 +142,38 @@ function ProductViewInner() {
           </Link>
         </Button>
 
-        <div className="relative aspect-square rounded-2xl overflow-hidden bg-muted mb-4">
-          <Image
-            src={product.image_url}
-            alt={product.title}
-            fill
-            className="object-cover"
-            sizes="(max-width: 672px) 100vw, 672px"
-            priority
-          />
-          {isClaimed && (
-            <div className="absolute top-3 right-3 bg-primary/90 text-primary-foreground text-sm px-3 py-1.5 rounded-full flex items-center gap-1.5">
-              <Hand className="w-4 h-4" />
-              {isClaimedByMe ? "You claimed this" : `Claimed by ${product.claimant}`}
+        <div
+          className={
+            product.image_url_secondary
+              ? "grid grid-cols-1 sm:grid-cols-2 gap-2 mb-4"
+              : "mb-4"
+          }
+        >
+          <div className="relative aspect-square rounded-2xl overflow-hidden bg-muted">
+            <DanshariMedia
+              src={product.image_url}
+              alt={product.title}
+              fill
+              sizes="(max-width: 672px) 100vw, 336px"
+              priority
+            />
+            {isClaimed && (
+              <div className="absolute top-3 right-3 z-10 bg-primary/90 text-primary-foreground text-sm px-3 py-1.5 rounded-full flex items-center gap-1.5">
+                <Hand className="w-4 h-4" />
+                {isClaimedByMe ? "You claimed this" : `Claimed by ${product.claimant}`}
+              </div>
+            )}
+          </div>
+          {product.image_url_secondary ? (
+            <div className="relative aspect-square rounded-2xl overflow-hidden bg-muted">
+              <DanshariMedia
+                src={product.image_url_secondary}
+                alt=""
+                fill
+                sizes="(max-width: 672px) 100vw, 336px"
+              />
             </div>
-          )}
+          ) : null}
         </div>
 
         <div className="mb-6">
@@ -200,15 +217,15 @@ function ProductViewInner() {
             <h2 className="text-sm font-medium text-muted-foreground mb-3">
               Related item
             </h2>
-            <Link href={danshariProductHref(relatedProduct.uid)}
+            <Link
+              href={danshariProductHref(relatedProduct.uid)}
               className="flex items-center gap-3 p-3 bg-card rounded-xl border border-border hover:border-primary/30 transition-colors"
             >
               <div className="relative w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
-                <Image
+                <DanshariMedia
                   src={relatedProduct.image_url}
                   alt={relatedProduct.title}
                   fill
-                  className="object-cover"
                   sizes="64px"
                 />
               </div>
