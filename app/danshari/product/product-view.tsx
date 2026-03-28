@@ -300,10 +300,6 @@ function ProductViewInner() {
 
         {claimants.length > 0 ? (
           <div className="rounded-2xl border border-border bg-card/60 p-4 mb-4">
-            <p className="text-xs font-medium text-muted-foreground mb-3">
-              Interested{" "}
-              <span className="text-foreground/70">(order: first → last)</span>
-            </p>
             <div className="flex flex-wrap gap-2">
               {claimants.map((name, i) => {
                 const isSelf = user?.username === name
@@ -317,14 +313,11 @@ function ProductViewInner() {
                         : "border-border bg-background text-foreground"
                     )}
                   >
-                    <span className="tabular-nums text-[10px] font-semibold text-muted-foreground min-w-[1.1rem]">
-                      {i + 1}
-                    </span>
                     <span className="select-none" aria-hidden>
                       {isSelf ? "🤙" : "✋"}
                     </span>
                     <span className={cn(isSelf && "font-semibold")}>
-                      {isSelf ? "You" : name}
+                      {name}
                     </span>
                   </span>
                 )
