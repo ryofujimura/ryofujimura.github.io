@@ -5,6 +5,7 @@ import { danshariProductHref } from "@/lib/danshari/paths"
 import { firstListingImageUrl } from "@/lib/danshari/recommended"
 import type { Product } from "@/lib/danshari/types"
 import { DanshariMedia } from "@/components/danshari/danshari-media"
+import { DanshariTagPills } from "@/components/danshari/tag-pills"
 import {
   Carousel,
   CarouselContent,
@@ -59,9 +60,7 @@ function RecommendedCard({
         <p className="font-medium text-foreground line-clamp-2 text-sm leading-snug">
           {product.title}
         </p>
-        <span className="mt-1 inline-flex w-fit text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
-          {product.tag}
-        </span>
+        <DanshariTagPills tags={product.tags} size="sm" className="mt-1" />
       </div>
     </Link>
   )

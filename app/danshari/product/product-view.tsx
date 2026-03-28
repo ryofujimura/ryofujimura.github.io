@@ -20,6 +20,7 @@ import { DanshariRecommendedCarousel } from "@/components/danshari/danshari-reco
 import { DanshariDescriptionRich } from "@/components/danshari/description-rich"
 import { DanshariHeader } from "@/components/danshari/header"
 import { DanshariMedia } from "@/components/danshari/danshari-media"
+import { DanshariTagPills } from "@/components/danshari/tag-pills"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -216,9 +217,7 @@ function ProductViewInner() {
         </div>
 
         <div className="mb-6">
-          <span className="inline-block text-xs bg-secondary text-secondary-foreground px-2 py-0.5 rounded-full mb-2">
-            {product.tag}
-          </span>
+          <DanshariTagPills tags={product.tags} className="mb-2" />
           <h1 className="text-2xl font-semibold text-foreground mb-2">
             {product.title}
           </h1>
@@ -302,9 +301,7 @@ function ProductViewInner() {
                 <p className="font-medium text-foreground truncate">
                   {relatedProduct.title}
                 </p>
-                <span className="text-xs text-muted-foreground">
-                  {relatedProduct.tag}
-                </span>
+                <DanshariTagPills tags={relatedProduct.tags} size="sm" className="mt-0.5" />
               </div>
             </Link>
           </div>

@@ -8,6 +8,8 @@ import { danshariHref } from "@/lib/danshari/paths"
 import { fileToDataUrl, newProductUid, stemFromFileName } from "@/lib/danshari/image-upload"
 import { DanshariHeader } from "@/components/danshari/header"
 import { DanshariMedia } from "@/components/danshari/danshari-media"
+import { DanshariTagEditor } from "@/components/danshari/tag-editor"
+import { normalizeTagsForPublish } from "@/lib/danshari/tags"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
@@ -81,7 +83,7 @@ export function DanshariProductManager() {
           uid: newProductUid(),
           title: stemFromFileName(file.name),
           description: DESCRIPTION_TEMPLATE_FROM_UPLOAD,
-          tag: "General",
+          tags: ["General"],
           image_url: dataUrl,
           image_url_secondary: null,
           related_item_uid: null,
@@ -123,7 +125,7 @@ export function DanshariProductManager() {
       ...p,
       title: p.title.trim(),
       description: p.description.trim(),
-      tag: p.tag.trim() || "General",
+      tags: normalizeTagsForPublish(Array.isArray(p.tags) ? p.tags : ["General"]),
       related_item_uid:
         p.related_item_uid && uids.has(p.related_item_uid)
           ? p.related_item_uid
@@ -476,37 +478,30 @@ function ProductEditorRow({
                     </code>
                   </p>
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div>
-                    <label className="text-xs font-medium text-muted-foreground">Tag</label>
-                    <Input
-                      value={p.tag}
-                      onChange={(e) => onChange({ tag: e.target.value })}
-                      className="mt-1 h-10 rounded-xl"
-                      placeholder="Tag"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-xs font-medium text-muted-foreground">
-                      Related item
-                    </label>
-                    <select
-                      value={p.related_item_uid ?? ""}
-                      onChange={(e) =>
-                        onChange({
-                          related_item_uid: e.target.value || null,
-                        })
-                      }
-                      className="mt-1 w-full h-10 px-3 rounded-xl border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-                    >
-                      <option value="">None</option>
-                      {others.map((o) => (
-                        <option key={o.uid} value={o.uid}>
-                          {o.title || o.uid}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+                <DanshariTagEditor
+                  tags={Array.isArray(p.tags) ? p.tags : ["General"]}
+                  onChange={(tags) => onChange({ tags })}
+                />
+                <div>
+                  <label className="text-xs font-medium text-muted-foreground">
+                    Related item
+                  </label>
+                  <select
+                    value={p.related_item_uid ?? ""}
+                    onChange={(e) =>
+                      onChange({
+                        related_item_uid: e.target.value || null,
+                      })
+                    }
+                    className="mt-1 w-full h-10 px-3 rounded-xl border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                  >
+                    <option value="">None</option>
+                    {others.map((o) => (
+                      <option key={o.uid} value={o.uid}>
+                        {o.title || o.uid}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               </div>
               <Button

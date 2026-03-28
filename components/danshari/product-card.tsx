@@ -5,6 +5,7 @@ import { danshariProductHref } from "@/lib/danshari/paths"
 import { firstListingImageUrl } from "@/lib/danshari/recommended"
 import type { Product } from "@/lib/danshari/types"
 import { DanshariMedia } from "@/components/danshari/danshari-media"
+import { DanshariTagPills } from "@/components/danshari/tag-pills"
 import { Hand } from "lucide-react"
 
 interface ProductCardProps {
@@ -46,9 +47,7 @@ export function DanshariProductCard({ product }: ProductCardProps) {
         <h3 className="font-medium text-foreground line-clamp-1 text-sm sm:text-base">
           {product.title}
         </h3>
-        <span className="inline-block mt-1 text-xs bg-secondary text-secondary-foreground px-2 py-0.5 rounded-full">
-          {product.tag}
-        </span>
+        <DanshariTagPills tags={product.tags} className="mt-1" />
       </div>
     </Link>
   )

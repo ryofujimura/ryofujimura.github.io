@@ -2,7 +2,8 @@ export interface Product {
   uid: string
   title: string
   description: string
-  tag: string
+  /** Category labels; used for display and “more items” grouping. */
+  tags: string[]
   image_url: string
   /** Optional second photo (URL, path, or data URL). */
   image_url_secondary: string | null

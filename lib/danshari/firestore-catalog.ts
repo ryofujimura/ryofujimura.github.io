@@ -3,6 +3,7 @@
 import {
   addDoc,
   collection,
+  deleteField,
   doc,
   getDoc,
   getDocs,
@@ -22,6 +23,7 @@ import {
   getFirebaseStorage,
 } from "@/lib/firebase"
 import type { Product, Comment } from "./types"
+import { parseTagsFromDoc } from "./tags"
 
 const STORAGE_PREFIX = "danshari"
 
@@ -40,7 +42,7 @@ export function docToProduct(d: DocumentSnapshot): Product {
       uid: d.id,
       title: "",
       description: "",
-      tag: "General",
+      tags: ["General"],
       image_url: "",
       image_url_secondary: null,
       related_item_uid: null,
@@ -55,7 +57,7 @@ export function docToProduct(d: DocumentSnapshot): Product {
     uid: d.id,
     title: typeof x.title === "string" ? x.title : "",
     description: typeof x.description === "string" ? x.description : "",
-    tag: typeof x.tag === "string" ? x.tag : "General",
+    tags: parseTagsFromDoc(x as Record<string, unknown>),
     image_url: typeof x.image_url === "string" ? x.image_url : "",
     image_url_secondary:
       typeof x.image_url_secondary === "string" && x.image_url_secondary.length > 0
@@ -156,7 +158,8 @@ export async function setProductsRemote(products: Product[]): Promise<void> {
       data: {
         title: p.title,
         description: p.description,
-        tag: p.tag,
+        tags: p.tags,
+        tag: deleteField(),
         image_url: p.image_url,
         image_url_secondary: p.image_url_secondary ?? null,
         related_item_uid: p.related_item_uid ?? null,
