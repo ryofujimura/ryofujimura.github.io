@@ -14,9 +14,13 @@ import { useSearchParams } from "next/navigation"
 import { useWindowVirtualizer } from "@tanstack/react-virtual"
 import { ensureProductsLoaded, subscribeProducts } from "@/lib/danshari/store"
 import type { Product } from "@/lib/danshari/types"
+import { useMediaQuery } from "@/hooks/use-media-query"
 import { danshariHref, danshariTagFilterHref } from "@/lib/danshari/paths"
 import { DanshariProductCard } from "./product-card"
 import { cn } from "@/lib/utils"
+
+/** Window virtualizer + scrollMargin is unreliable on mobile Safari after bfcache / back nav. */
+const VIRTUAL_LIST_MIN_WIDTH = "(min-width: 1024px)"
 
 const ROW_GAP_PX = 16
 /** Approximate row height (square thumb + title + tags + gap); measureElement refines. */
@@ -142,6 +146,7 @@ function DanshariProductGridInner() {
   const searchParams = useSearchParams()
   const activeTag = searchParams.get("tag")?.trim() || null
   const cols = useDanshariGridCols()
+  const allowWindowVirtualList = useMediaQuery(VIRTUAL_LIST_MIN_WIDTH)
 
   const [products, setProducts] = useState<Product[]>([])
   const [isLoading, setIsLoading] = useState(true)
@@ -241,7 +246,7 @@ function DanshariProductGridInner() {
             Show all items
           </Link>
         </div>
-      ) : filtered.length >= 12 ? (
+      ) : filtered.length >= 12 && allowWindowVirtualList ? (
         <VirtualizedProductRows
           filtered={filtered}
           activeTag={activeTag}
