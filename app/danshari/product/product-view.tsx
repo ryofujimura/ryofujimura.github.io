@@ -45,7 +45,6 @@ import {
   Hand,
   MessageCircle,
   DollarSign,
-  Send,
 } from "lucide-react"
 
 function RelatedThumbImage({ product }: { product: Product }) {
@@ -410,10 +409,12 @@ function ProductViewInner() {
             <Button
               type="submit"
               disabled={!commentText.trim()}
-              className="h-11 rounded-xl"
+              className="h-11 min-w-11 rounded-xl text-2xl leading-none p-0"
+              aria-label="Post comment"
             >
-              <Send className="w-4 h-4 mr-2" />
-              Post comment
+              <span className="select-none" aria-hidden>
+                💬
+              </span>
             </Button>
           </form>
         </div>
