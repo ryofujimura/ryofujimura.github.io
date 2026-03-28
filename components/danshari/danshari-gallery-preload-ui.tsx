@@ -128,10 +128,6 @@ export function DanshariGalleryPreloadLoginHint() {
           <OrbitRing className="absolute w-14 h-14 opacity-70" />
           <TidyBoxes className="scale-[0.45] gap-1.5" />
         </div>
-        <p className="text-xs text-center text-muted-foreground">
-          Caching photos in the background — you can type your name while we
-          work.
-        </p>
         <div className="w-full max-w-[200px] h-1 rounded-full bg-muted overflow-hidden">
           <div
             className="h-full rounded-full bg-primary/70 transition-[width] duration-300 ease-out"
