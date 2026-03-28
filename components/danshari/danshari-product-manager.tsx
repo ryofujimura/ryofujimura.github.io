@@ -24,6 +24,11 @@ function pickImages(files: FileList | File[]): File[] {
   return [...files].filter((f) => f.type.startsWith("image/"))
 }
 
+/** Prefilled when a product is created from an uploaded image. */
+const DESCRIPTION_TEMPLATE_FROM_UPLOAD = `入手先：
+質：
+リンク：`
+
 export function DanshariProductManager() {
   const [items, setItems] = useState<Product[]>([])
   /** Avoid JSON.stringify on huge data URLs (can exceed max string length). */
@@ -75,7 +80,7 @@ export function DanshariProductManager() {
         created.push({
           uid: newProductUid(),
           title: stemFromFileName(file.name),
-          description: "",
+          description: DESCRIPTION_TEMPLATE_FROM_UPLOAD,
           tag: "General",
           image_url: dataUrl,
           image_url_secondary: null,
