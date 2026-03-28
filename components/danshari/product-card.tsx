@@ -10,39 +10,35 @@ interface ProductCardProps {
   product: Product
 }
 
+/** Primary listing image: first photo field, or second if primary is empty. */
+function firstListingImageUrl(product: Product): string {
+  const a = product.image_url?.trim() ?? ""
+  const b = product.image_url_secondary?.trim() ?? ""
+  return a || b
+}
+
 export function DanshariProductCard({ product }: ProductCardProps) {
-  const hasSecond = Boolean(product.image_url_secondary)
+  const thumbSrc = firstListingImageUrl(product)
+  const hasTwoPhotos =
+    Boolean(product.image_url?.trim()) &&
+    Boolean(product.image_url_secondary?.trim())
 
   return (
     <Link
       href={danshariProductHref(product.uid)}
       className="group block bg-card rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow"
     >
-      <div
-        className={
-          hasSecond
-            ? "relative aspect-square overflow-hidden grid grid-cols-2 gap-px bg-border"
-            : "relative aspect-square overflow-hidden"
-        }
-      >
-        <div className="relative min-h-0 bg-card">
-          <DanshariMedia
-            src={product.image_url}
-            alt={product.title}
-            fill
-            className="group-hover:scale-105 transition-transform duration-300"
-            sizes="(max-width: 640px) 25vw, (max-width: 1024px) 17vw, 12vw"
-          />
-        </div>
-        {hasSecond ? (
-          <div className="relative min-h-0 bg-card">
-            <DanshariMedia
-              src={product.image_url_secondary!}
-              alt=""
-              fill
-              className="group-hover:scale-105 transition-transform duration-300"
-              sizes="(max-width: 640px) 25vw, (max-width: 1024px) 17vw, 12vw"
-            />
+      <div className="relative aspect-square overflow-hidden bg-muted">
+        <DanshariMedia
+          src={thumbSrc}
+          alt={product.title}
+          fill
+          className="object-cover group-hover:scale-105 transition-transform duration-300"
+          sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+        />
+        {hasTwoPhotos ? (
+          <div className="absolute bottom-2 left-2 z-10 rounded-md bg-background/85 px-1.5 py-0.5 text-[10px] font-medium text-foreground backdrop-blur-sm border border-border/60">
+            2 photos
           </div>
         ) : null}
         {product.claimant && (
