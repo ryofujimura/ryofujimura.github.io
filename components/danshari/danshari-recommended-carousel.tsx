@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { danshariProductHref } from "@/lib/danshari/paths"
+import { danshariProductHref, danshariTagFilterHref } from "@/lib/danshari/paths"
 import { firstListingImageUrl } from "@/lib/danshari/recommended"
 import type { Product } from "@/lib/danshari/types"
 import { DanshariMedia } from "@/components/danshari/danshari-media"
@@ -29,40 +29,57 @@ function RecommendedCard({
   const isSidebar = variant === "sidebar"
 
   return (
-    <Link
-      href={danshariProductHref(product.uid)}
+    <div
       className={cn(
-        "group flex rounded-xl border border-border bg-card overflow-hidden shadow-sm transition-colors hover:border-primary/35 hover:shadow-md",
-        isSidebar ? "flex-row items-stretch gap-3 p-2" : "flex-col",
+        "rounded-xl border border-border bg-card overflow-hidden shadow-sm transition-colors hover:border-primary/35 hover:shadow-md",
       )}
     >
-      <div
+      <Link
+        href={danshariProductHref(product.uid)}
         className={cn(
-          "relative shrink-0 overflow-hidden bg-muted",
-          isSidebar ? "h-20 w-20 rounded-lg" : "aspect-square w-full rounded-t-xl",
+          "group flex",
+          isSidebar ? "flex-row items-stretch gap-3 p-2" : "flex-col",
         )}
       >
-        <DanshariMedia
-          src={thumb}
-          alt={product.title}
-          fill
-          className="object-cover transition-transform duration-300 group-hover:scale-105"
-          sizes={isSidebar ? "80px" : "(max-width: 640px) 85vw, 280px"}
+        <div
+          className={cn(
+            "relative shrink-0 overflow-hidden bg-muted",
+            isSidebar ? "h-20 w-20 rounded-lg" : "aspect-square w-full rounded-t-xl",
+          )}
+        >
+          <DanshariMedia
+            src={thumb}
+            alt={product.title}
+            fill
+            className="object-cover transition-transform duration-300 group-hover:scale-105"
+            sizes={isSidebar ? "80px" : "(max-width: 640px) 85vw, 280px"}
+          />
+          {product.claimants.length > 0 ? (
+            <div className="absolute top-1.5 right-1.5 z-10 flex items-center gap-0.5 rounded-full bg-primary/90 px-1.5 py-0.5 text-[10px] font-medium text-primary-foreground">
+              <Hand className="size-2.5 shrink-0" aria-hidden />
+              {product.claimants.length}
+            </div>
+          ) : null}
+        </div>
+        <div
+          className={cn(
+            "min-w-0 flex flex-col justify-center",
+            isSidebar ? "py-0.5 pr-1" : "p-3 pb-2",
+          )}
+        >
+          <p className="font-medium text-foreground line-clamp-2 text-sm leading-snug">
+            {product.title}
+          </p>
+        </div>
+      </Link>
+      <div className={cn("px-3 pb-2", isSidebar && "pl-[calc(0.5rem+5rem)] pr-2 pt-0")}>
+        <DanshariTagPills
+          tags={product.tags}
+          size="sm"
+          filterHref={danshariTagFilterHref}
         />
-        {product.claimants.length > 0 ? (
-          <div className="absolute top-1.5 right-1.5 z-10 flex items-center gap-0.5 rounded-full bg-primary/90 px-1.5 py-0.5 text-[10px] font-medium text-primary-foreground">
-            <Hand className="size-2.5 shrink-0" aria-hidden />
-            {product.claimants.length}
-          </div>
-        ) : null}
       </div>
-      <div className={cn("min-w-0 flex flex-col justify-center", isSidebar ? "py-0.5 pr-1" : "p-3")}>
-        <p className="font-medium text-foreground line-clamp-2 text-sm leading-snug">
-          {product.title}
-        </p>
-        <DanshariTagPills tags={product.tags} size="sm" className="mt-1" />
-      </div>
-    </Link>
+    </div>
   )
 }
 

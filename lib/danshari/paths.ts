@@ -13,3 +13,9 @@ export function danshariProductHref(uid: string): string {
   const q = new URLSearchParams({ uid })
   return `${DANSHARI_BASE}/product?${q.toString()}`
 }
+
+/** Home list filtered to products that include this tag (`?tag=`). */
+export function danshariTagFilterHref(tag: string): string {
+  const q = new URLSearchParams({ tag })
+  return `${DANSHARI_BASE}?${q.toString()}`
+}
