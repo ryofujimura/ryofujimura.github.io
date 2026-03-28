@@ -321,7 +321,7 @@ function ProductViewInner() {
                       {i + 1}
                     </span>
                     <span className="select-none" aria-hidden>
-                      ✋
+                      {isSelf ? "🤙" : "✋"}
                     </span>
                     <span className={cn(isSelf && "font-semibold")}>
                       {isSelf ? "You" : name}
@@ -340,7 +340,7 @@ function ProductViewInner() {
           aria-label={iAmInQueue ? "Remove my hand" : "Raise hand to join"}
         >
           <span className="select-none" aria-hidden>
-            {iAmInQueue ? "✋" : "🖐️"}
+            {iAmInQueue ? "🤙" : "🖐️"}
           </span>
         </Button>
 
