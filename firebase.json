@@ -2,7 +2,8 @@
   "hosting": {
     "site": "ryof",
     "public": "out",
-    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"]
+    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+    "cleanUrls": true
   },
   "firestore": {
     "rules": "firestore.rules",
