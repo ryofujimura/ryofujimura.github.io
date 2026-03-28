@@ -1,5 +1,7 @@
 "use client"
 
+import { getBlob, ref } from "firebase/storage"
+import { getFirebaseStorage } from "@/lib/firebase"
 import type { Product } from "./types"
 import { processBlobForUpload, processDataUrlForUpload } from "./image-process"
 import {
@@ -20,7 +22,34 @@ function isProcessableImageRef(url: string): boolean {
   return u.startsWith("data:") || u.startsWith("http://") || u.startsWith("https://")
 }
 
+function isFirebaseOrGcsDownloadUrl(url: string): boolean {
+  try {
+    const u = new URL(url)
+    return (
+      u.hostname === "firebasestorage.googleapis.com" ||
+      u.hostname === "storage.googleapis.com"
+    )
+  } catch {
+    return false
+  }
+}
+
+/**
+ * Prefer Firebase SDK `getBlob` for Storage URLs. Browser downloads still need
+ * bucket CORS — run `npm run storage:cors` after setting STORAGE_BUCKET.
+ */
 async function fetchImageBlob(url: string): Promise<Blob> {
+  const storage = getFirebaseStorage()
+  if (storage && isFirebaseOrGcsDownloadUrl(url)) {
+    try {
+      const storageRef = ref(storage, url)
+      const blob = await getBlob(storageRef)
+      if (blob.size > 0) return blob
+    } catch (e) {
+      console.warn("[danshari] getBlob failed, trying fetch()", e)
+    }
+  }
+
   const res = await fetch(url, { mode: "cors", credentials: "omit" })
   if (!res.ok) throw new Error(`Fetch failed (${res.status})`)
   const blob = await res.blob()
