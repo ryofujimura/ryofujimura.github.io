@@ -157,7 +157,7 @@ export function DanshariRecommendedCarousel({
                 <RecommendedCard
                   product={p}
                   variant={variant}
-                  deferDecode={Math.abs(i - selected) > 1}
+                  deferDecode={Math.abs(i - selected) > 2}
                 />
               </CarouselItem>
             ))}
