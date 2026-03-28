@@ -17,7 +17,7 @@ export function DanshariHeader() {
           className="flex items-center gap-2 font-semibold text-lg text-foreground"
         >
           <Package className="w-5 h-5 text-primary" />
-          <span>Claim</span>
+          <span>Danshari</span>
         </Link>
 
         <div className="flex items-center gap-2">

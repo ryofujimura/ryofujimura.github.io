@@ -7,7 +7,7 @@ import "./danshari-theme.css"
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" })
 
 export const metadata: Metadata = {
-  title: "Claim | Danshari",
+  title: "Danshari",
   description: "Browse and claim products",
   icons: {
     icon: [{ url: "/danshari/icon.svg", type: "image/svg+xml" }],
