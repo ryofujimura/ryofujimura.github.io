@@ -91,7 +91,7 @@ function VirtualizedProductRows({
   const virtualizer = useWindowVirtualizer({
     count: rowCount,
     estimateSize: () => ESTIMATE_ROW_PX,
-    overscan: 2,
+    overscan: 5,
     scrollMargin,
   })
 

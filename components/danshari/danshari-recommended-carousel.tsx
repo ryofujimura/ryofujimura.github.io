@@ -27,7 +27,8 @@ function RecommendedCardInner({
   product: Product
   variant: Variant
 }) {
-  const { ref: inViewRef, visible } = useInViewOnce("160px")
+  // Wide prefetch so thumbnails load before slides scroll into view (px only for IO support).
+  const { ref: inViewRef, visible } = useInViewOnce("400px")
   const thumb = firstListingImageUrl(product)
   const isSidebar = variant === "sidebar"
 
