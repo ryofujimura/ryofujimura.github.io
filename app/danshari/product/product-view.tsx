@@ -1,0 +1,307 @@
+"use client"
+
+import { useEffect, useState, Suspense } from "react"
+import Image from "next/image"
+import Link from "next/link"
+import { useRouter, useSearchParams } from "next/navigation"
+import { danshariHref, danshariProductHref } from "@/lib/danshari/paths"
+import { useDanshariUser } from "@/lib/danshari/user-context"
+import {
+  getProduct,
+  getComments,
+  updateProductClaimant,
+  addComment,
+} from "@/lib/danshari/store"
+import type { Product, Comment } from "@/lib/danshari/types"
+import { DanshariHeader } from "@/components/danshari/header"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Card } from "@/components/ui/card"
+import {
+  ArrowLeft,
+  Hand,
+  HandMetal,
+  MessageCircle,
+  DollarSign,
+  Send,
+} from "lucide-react"
+
+function ProductViewInner() {
+  const searchParams = useSearchParams()
+  const uid = searchParams.get("uid") ?? ""
+  const router = useRouter()
+  const { user, isLoading: userLoading } = useDanshariUser()
+  const [product, setProduct] = useState<Product | null>(null)
+  const [relatedProduct, setRelatedProduct] = useState<Product | null>(null)
+  const [comments, setComments] = useState<Comment[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [commentText, setCommentText] = useState("")
+  const [commentPrice, setCommentPrice] = useState("")
+
+  useEffect(() => {
+    if (userLoading) return
+    if (!user) {
+      router.push(danshariHref())
+      return
+    }
+    if (!uid) {
+      setProduct(null)
+      setRelatedProduct(null)
+      setComments([])
+      setIsLoading(false)
+      return
+    }
+
+    const p = getProduct(uid)
+    if (p) {
+      setProduct(p)
+      setComments(getComments(uid))
+      if (p.related_item_uid) {
+        setRelatedProduct(getProduct(p.related_item_uid))
+      } else {
+        setRelatedProduct(null)
+      }
+    } else {
+      setProduct(null)
+      setRelatedProduct(null)
+      setComments([])
+    }
+    setIsLoading(false)
+  }, [uid, user, userLoading, router])
+
+  const handleClaim = () => {
+    if (!product || !user) return
+
+    if (product.claimant === user.username) {
+      const updated = updateProductClaimant(product.uid, null)
+      if (updated) setProduct(updated)
+    } else if (!product.claimant) {
+      const updated = updateProductClaimant(product.uid, user.username)
+      if (updated) setProduct(updated)
+    }
+  }
+
+  const handleSubmitComment = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!commentText.trim() || !user || !product) return
+
+    const price = commentPrice ? parseFloat(commentPrice) : null
+    const newComment = addComment({
+      product_uid: product.uid,
+      username: user.username,
+      text: commentText.trim(),
+      price: price && !isNaN(price) ? price : null,
+    })
+
+    setComments((prev) => [...prev, newComment])
+    setCommentText("")
+    setCommentPrice("")
+  }
+
+  if (isLoading || userLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+      </div>
+    )
+  }
+
+  if (!uid || !product) {
+    return (
+      <div className="min-h-screen bg-background">
+        <DanshariHeader />
+        <main className="max-w-2xl mx-auto px-4 py-8 text-center">
+          <p className="text-muted-foreground">Product not found.</p>
+          <Button asChild variant="ghost" className="mt-4">
+            <Link href={danshariHref()}>
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Back to products
+            </Link>
+          </Button>
+        </main>
+      </div>
+    )
+  }
+
+  const isClaimed = !!product.claimant
+  const isClaimedByMe = product.claimant === user?.username
+
+  return (
+    <div className="min-h-screen bg-background">
+      <DanshariHeader />
+      <main className="max-w-2xl mx-auto px-4 py-4 pb-24">
+        <Button
+          asChild
+          variant="ghost"
+          size="sm"
+          className="mb-4 -ml-2 rounded-xl text-muted-foreground"
+        >
+          <Link href={danshariHref()}>
+            <ArrowLeft className="w-4 h-4 mr-1" />
+            Back
+          </Link>
+        </Button>
+
+        <div className="relative aspect-square rounded-2xl overflow-hidden bg-muted mb-4">
+          <Image
+            src={product.image_url}
+            alt={product.title}
+            fill
+            className="object-cover"
+            sizes="(max-width: 672px) 100vw, 672px"
+            priority
+          />
+          {isClaimed && (
+            <div className="absolute top-3 right-3 bg-primary/90 text-primary-foreground text-sm px-3 py-1.5 rounded-full flex items-center gap-1.5">
+              <Hand className="w-4 h-4" />
+              {isClaimedByMe ? "You claimed this" : `Claimed by ${product.claimant}`}
+            </div>
+          )}
+        </div>
+
+        <div className="mb-6">
+          <span className="inline-block text-xs bg-secondary text-secondary-foreground px-2 py-0.5 rounded-full mb-2">
+            {product.tag}
+          </span>
+          <h1 className="text-2xl font-semibold text-foreground mb-2">
+            {product.title}
+          </h1>
+          <p className="text-muted-foreground leading-relaxed">
+            {product.description}
+          </p>
+        </div>
+
+        <Button
+          onClick={handleClaim}
+          disabled={isClaimed && !isClaimedByMe}
+          className="w-full h-12 text-base rounded-xl mb-6"
+          variant={isClaimedByMe ? "outline" : "default"}
+        >
+          {isClaimedByMe ? (
+            <>
+              <HandMetal className="w-5 h-5 mr-2" />
+              Release claim
+            </>
+          ) : isClaimed ? (
+            <>
+              <Hand className="w-5 h-5 mr-2" />
+              Already claimed
+            </>
+          ) : (
+            <>
+              <Hand className="w-5 h-5 mr-2" />
+              Raise hand to claim
+            </>
+          )}
+        </Button>
+
+        {relatedProduct && (
+          <div className="mb-6">
+            <h2 className="text-sm font-medium text-muted-foreground mb-3">
+              Related item
+            </h2>
+            <Link href={danshariProductHref(relatedProduct.uid)}
+              className="flex items-center gap-3 p-3 bg-card rounded-xl border border-border hover:border-primary/30 transition-colors"
+            >
+              <div className="relative w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
+                <Image
+                  src={relatedProduct.image_url}
+                  alt={relatedProduct.title}
+                  fill
+                  className="object-cover"
+                  sizes="64px"
+                />
+              </div>
+              <div className="min-w-0">
+                <p className="font-medium text-foreground truncate">
+                  {relatedProduct.title}
+                </p>
+                <span className="text-xs text-muted-foreground">
+                  {relatedProduct.tag}
+                </span>
+              </div>
+            </Link>
+          </div>
+        )}
+
+        <div>
+          <h2 className="flex items-center gap-2 text-sm font-medium text-muted-foreground mb-3">
+            <MessageCircle className="w-4 h-4" />
+            Comments ({comments.length})
+          </h2>
+
+          <div className="space-y-3 mb-4">
+            {comments.length === 0 ? (
+              <p className="text-sm text-muted-foreground py-4 text-center">
+                No comments yet. Be the first to comment.
+              </p>
+            ) : (
+              comments.map((comment) => (
+                <Card key={comment.id} className="p-3 rounded-xl">
+                  <div className="flex items-start justify-between gap-2 mb-1">
+                    <span className="font-medium text-sm text-foreground">
+                      {comment.username}
+                    </span>
+                    {comment.price !== null && (
+                      <span className="flex items-center gap-0.5 text-xs font-semibold bg-[oklch(0.92_0.08_145)] text-[oklch(0.35_0.12_145)] px-2 py-0.5 rounded-full">
+                        <DollarSign className="w-3 h-3" />
+                        {comment.price.toFixed(2)}
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-sm text-muted-foreground">{comment.text}</p>
+                </Card>
+              ))
+            )}
+          </div>
+
+          <form onSubmit={handleSubmitComment} className="flex flex-col gap-2">
+            <div className="flex gap-2">
+              <Input
+                type="text"
+                placeholder="Add a comment..."
+                value={commentText}
+                onChange={(e) => setCommentText(e.target.value)}
+                className="flex-1 h-11 rounded-xl text-sm"
+              />
+              <div className="relative w-24">
+                <DollarSign className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Input
+                  type="number"
+                  placeholder="Price"
+                  value={commentPrice}
+                  onChange={(e) => setCommentPrice(e.target.value)}
+                  className="h-11 rounded-xl text-sm pl-8"
+                  min="0"
+                  step="0.01"
+                />
+              </div>
+            </div>
+            <Button
+              type="submit"
+              disabled={!commentText.trim()}
+              className="h-11 rounded-xl"
+            >
+              <Send className="w-4 h-4 mr-2" />
+              Post comment
+            </Button>
+          </form>
+        </div>
+      </main>
+    </div>
+  )
+}
+
+export function ProductView() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center bg-background">
+          <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+        </div>
+      }
+    >
+      <ProductViewInner />
+    </Suspense>
+  )
+}
