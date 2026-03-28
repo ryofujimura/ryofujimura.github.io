@@ -350,18 +350,25 @@ function ProductViewInner() {
             ) : (
               comments.map((comment) => (
                 <Card key={comment.id} className="p-3 rounded-xl">
-                  <div className="flex items-start justify-between gap-2 mb-1">
-                    <span className="font-medium text-sm text-foreground">
+                  <div className="flex items-start gap-2">
+                    <span
+                      className="w-[10ch] shrink-0 truncate font-medium text-sm text-foreground"
+                      title={comment.username}
+                    >
                       {comment.username}
                     </span>
-                    {comment.price !== null && (
-                      <span className="flex items-center gap-0.5 text-xs font-semibold bg-[oklch(0.92_0.08_145)] text-[oklch(0.35_0.12_145)] px-2 py-0.5 rounded-full">
-                        <DollarSign className="w-3 h-3" />
-                        {comment.price.toFixed(2)}
-                      </span>
-                    )}
+                    <div className="min-w-0 flex-1 flex items-start gap-2">
+                      <p className="text-sm text-muted-foreground min-w-0 flex-1 [overflow-wrap:anywhere]">
+                        {comment.text}
+                      </p>
+                      {comment.price !== null && (
+                        <span className="flex shrink-0 items-center gap-0.5 text-xs font-semibold bg-[oklch(0.92_0.08_145)] text-[oklch(0.35_0.12_145)] px-2 py-0.5 rounded-full self-start">
+                          <DollarSign className="w-3 h-3" />
+                          {comment.price.toFixed(2)}
+                        </span>
+                      )}
+                    </div>
                   </div>
-                  <p className="text-sm text-muted-foreground">{comment.text}</p>
                 </Card>
               ))
             )}
