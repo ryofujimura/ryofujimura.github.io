@@ -1,12 +1,15 @@
 "use client"
 
-import { useDanshariUser } from "@/lib/danshari/user-context"
-import { DanshariLoginForm } from "@/components/danshari/login-form"
+import { DanshariGalleryPreloadFullscreen } from "@/components/danshari/danshari-gallery-preload-ui"
 import { DanshariHeader } from "@/components/danshari/header"
+import { DanshariLoginForm } from "@/components/danshari/login-form"
 import { DanshariProductGrid } from "@/components/danshari/product-grid"
+import { useDanshariImagePreload } from "@/lib/danshari/image-preload-context"
+import { useDanshariUser } from "@/lib/danshari/user-context"
 
 export default function DanshariHomePage() {
   const { user, isLoading } = useDanshariUser()
+  const { imagesReady } = useDanshariImagePreload()
 
   if (isLoading) {
     return (
@@ -18,6 +21,10 @@ export default function DanshariHomePage() {
 
   if (!user) {
     return <DanshariLoginForm />
+  }
+
+  if (!imagesReady) {
+    return <DanshariGalleryPreloadFullscreen />
   }
 
   return (

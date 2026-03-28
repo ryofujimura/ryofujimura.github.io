@@ -27,7 +27,9 @@ import { DanshariRecommendedCarousel } from "@/components/danshari/danshari-reco
 import { DanshariDescriptionRich } from "@/components/danshari/description-rich"
 import { DanshariHeader } from "@/components/danshari/header"
 import { DanshariMedia } from "@/components/danshari/danshari-media"
+import { DanshariGalleryPreloadFullscreen } from "@/components/danshari/danshari-gallery-preload-ui"
 import { DanshariTagPills } from "@/components/danshari/tag-pills"
+import { useDanshariImagePreload } from "@/lib/danshari/image-preload-context"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -46,6 +48,7 @@ function ProductViewInner() {
   const uid = searchParams.get("uid") ?? ""
   const router = useRouter()
   const { user, isLoading: userLoading } = useDanshariUser()
+  const { imagesReady } = useDanshariImagePreload()
   const [product, setProduct] = useState<Product | null>(null)
   const [relatedProduct, setRelatedProduct] = useState<Product | null>(null)
   const [comments, setComments] = useState<Comment[]>([])
@@ -138,7 +141,27 @@ function ProductViewInner() {
     }
   }
 
-  if (isLoading || userLoading) {
+  if (userLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+      </div>
+    )
+  }
+
+  if (!user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+      </div>
+    )
+  }
+
+  if (!imagesReady) {
+    return <DanshariGalleryPreloadFullscreen />
+  }
+
+  if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
