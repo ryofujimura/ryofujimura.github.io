@@ -73,10 +73,6 @@ export function DanshariGalleryPreloadFullscreen({
       <p className="text-lg font-medium text-foreground text-center max-w-sm">
         {title}
       </p>
-      <p className="mt-2 text-sm text-muted-foreground text-center max-w-xs">
-        Tidying photos into your browser so flipping between items feels
-        instant.
-      </p>
       {catalogReady && phase === "preloading" && total > 0 ? (
         <div className="mt-8 w-full max-w-[220px] space-y-2">
           <div className="h-1.5 rounded-full bg-muted overflow-hidden">
@@ -86,9 +82,6 @@ export function DanshariGalleryPreloadFullscreen({
             />
           </div>
           <div className="danshari-preload-shimmer h-0.5 rounded-full bg-gradient-to-r from-transparent via-primary/40 to-transparent mx-auto w-3/4" />
-          <p className="text-xs text-center text-muted-foreground tabular-nums">
-            {loaded} / {total} images
-          </p>
         </div>
       ) : null}
     </div>
@@ -136,9 +129,6 @@ export function DanshariGalleryPreloadLoginHint() {
             }}
           />
         </div>
-        <p className="text-[11px] text-muted-foreground tabular-nums">
-          {loaded} / {total}
-        </p>
       </div>
     )
   }
