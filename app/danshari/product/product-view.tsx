@@ -158,13 +158,22 @@ function ProductViewInner() {
     e.preventDefault()
     if (!commentText.trim() || !user || !product) return
 
-    const price = commentPrice ? parseFloat(commentPrice) : null
+    const priceRaw = commentPrice.trim()
+    const priceParsed =
+      priceRaw === "" ? null : parseInt(priceRaw, 10)
+    const price =
+      priceParsed !== null &&
+      !Number.isNaN(priceParsed) &&
+      priceParsed >= 0 &&
+      Number.isInteger(priceParsed)
+        ? priceParsed
+        : null
     try {
       await addComment({
         product_uid: product.uid,
         username: user.username,
         text: commentText.trim(),
-        price: price && !isNaN(price) ? price : null,
+        price,
       })
       setCommentText("")
       setCommentPrice("")
@@ -364,7 +373,7 @@ function ProductViewInner() {
                       {comment.price !== null && (
                         <span className="flex shrink-0 items-center gap-0.5 text-xs font-semibold bg-[oklch(0.92_0.08_145)] text-[oklch(0.35_0.12_145)] px-2 py-0.5 rounded-full self-start">
                           <DollarSign className="w-3 h-3" />
-                          {comment.price.toFixed(2)}
+                          {Math.round(comment.price)}
                         </span>
                       )}
                     </div>
@@ -386,13 +395,15 @@ function ProductViewInner() {
               <div className="relative w-24">
                 <DollarSign className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <Input
-                  type="number"
+                  type="text"
+                  inputMode="numeric"
                   placeholder="Price"
+                  autoComplete="off"
                   value={commentPrice}
-                  onChange={(e) => setCommentPrice(e.target.value)}
+                  onChange={(e) =>
+                    setCommentPrice(e.target.value.replace(/\D/g, ""))
+                  }
                   className="h-11 rounded-xl text-sm pl-8"
-                  min="0"
-                  step="0.01"
                 />
               </div>
             </div>
