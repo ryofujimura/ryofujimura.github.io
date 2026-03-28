@@ -451,10 +451,21 @@ const ProductEditorRow = memo(function ProductEditorRow({
     })
   }
 
+  const onPrimaryDrop = (e: React.DragEvent) => {
+    e.preventDefault()
+    const file = e.dataTransfer.files[0]
+    void setPrimaryFile(file)
+  }
+
   const onSecondaryDrop = (e: React.DragEvent) => {
     e.preventDefault()
     const file = e.dataTransfer.files[0]
     void setSecondaryFile(file)
+  }
+
+  const allowImageDrop = (e: React.DragEvent) => {
+    e.preventDefault()
+    e.dataTransfer.dropEffect = "copy"
   }
 
   const downloadName = (slot: 1 | 2) => {
@@ -474,7 +485,12 @@ const ProductEditorRow = memo(function ProductEditorRow({
               <span className="text-[10px] uppercase tracking-wide text-muted-foreground">
                 Photo 1
               </span>
-              <div className="relative w-[7.5rem] h-[7.5rem] rounded-xl overflow-hidden border border-border bg-muted">
+              <div
+                onDragOver={allowImageDrop}
+                onDrop={onPrimaryDrop}
+                title="Drop an image to replace"
+                className="relative w-[7.5rem] h-[7.5rem] rounded-xl overflow-hidden border border-dashed border-border bg-muted/50"
+              >
                 <DanshariProductImage
                   mode="adminPreview"
                   src={adminPrimaryPreviewSrc(p)}
@@ -517,8 +533,9 @@ const ProductEditorRow = memo(function ProductEditorRow({
                 Photo 2
               </span>
               <div
-                onDragOver={(e) => e.preventDefault()}
+                onDragOver={allowImageDrop}
                 onDrop={onSecondaryDrop}
+                title="Drop an image to add or replace"
                 className="relative w-[7.5rem] h-[7.5rem] rounded-xl overflow-hidden border border-dashed border-border bg-muted/50 flex items-center justify-center"
               >
                 {p.image_url_secondary ? (
