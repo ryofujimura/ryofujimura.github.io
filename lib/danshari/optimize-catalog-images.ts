@@ -16,6 +16,20 @@ const OPTIMIZE_OPTS = {
   quality: 0.58,
 } as const
 
+/** One product at a time avoids Storage client retry storms (storage/retry-limit-exceeded). */
+const PRODUCT_CONCURRENCY = 1
+/** Small gap between slot work so XHR + uploads do not burst. */
+const SLOT_PACE_MS = 220
+
+const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms))
+
+function shouldRetryDownloadError(e: unknown): boolean {
+  const msg = e instanceof Error ? e.message : String(e)
+  return /retry-limit|storage\/|network|Failed to fetch|Load failed|timed out/i.test(
+    msg,
+  )
+}
+
 function isProcessableImageRef(url: string): boolean {
   const u = url.trim()
   if (!u) return false
@@ -35,10 +49,9 @@ function isFirebaseOrGcsDownloadUrl(url: string): boolean {
 }
 
 /**
- * Prefer Firebase SDK `getBlob` for Storage URLs. Browser downloads still need
- * bucket CORS — run `npm run storage:cors` after setting STORAGE_BUCKET.
+ * Single attempt: Firebase `getBlob` then `fetch`. CORS must be set on the bucket.
  */
-async function fetchImageBlob(url: string): Promise<Blob> {
+async function fetchImageBlobOnce(url: string): Promise<Blob> {
   const storage = getFirebaseStorage()
   if (storage && isFirebaseOrGcsDownloadUrl(url)) {
     try {
@@ -55,6 +68,26 @@ async function fetchImageBlob(url: string): Promise<Blob> {
   const blob = await res.blob()
   if (!blob.size) throw new Error("Empty image response")
   return blob
+}
+
+/** Retries after retry-limit / transient network errors (bulk runs are heavy). */
+async function fetchImageBlob(url: string): Promise<Blob> {
+  let last: unknown
+  const maxAttempts = 4
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    if (attempt > 0) {
+      await sleep(900 * attempt)
+    }
+    try {
+      return await fetchImageBlobOnce(url)
+    } catch (e) {
+      last = e
+      if (attempt < maxAttempts - 1 && shouldRetryDownloadError(e)) continue
+      break
+    }
+  }
+  if (last instanceof Error) throw last
+  throw new Error(String(last))
 }
 
 async function encodeSlotFromSource(url: string) {
@@ -148,7 +181,7 @@ export async function optimizeAllCatalogImages(
     return { productsTouched: 0, slotsOptimized: 0, errors }
   }
 
-  await runWithConcurrency(products, 2, async (p) => {
+  await runWithConcurrency(products, PRODUCT_CONCURRENCY, async (p) => {
     let anySuccess = false
 
     const runSlot = async (slot: "primary" | "secondary", url: string | null) => {
@@ -168,6 +201,7 @@ export async function optimizeAllCatalogImages(
           productUid: p.uid,
           label: slot,
         })
+        await sleep(SLOT_PACE_MS)
       }
     }
 
