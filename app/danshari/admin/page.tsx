@@ -142,11 +142,21 @@ export default function DanshariAdminPage() {
 
               <div>
                 <label className="text-sm font-medium text-foreground mb-1.5 block">
-                  Image URL *
+                  Image URL or path *
                 </label>
+                <p className="text-xs text-muted-foreground mb-1.5">
+                  Drop files in{" "}
+                  <code className="rounded bg-muted px-1 py-0.5 text-[0.7rem]">
+                    public/danshari/products/
+                  </code>{" "}
+                  then use{" "}
+                  <code className="rounded bg-muted px-1 py-0.5 text-[0.7rem]">
+                    /danshari/products/your-file.jpg
+                  </code>
+                </p>
                 <Input
-                  type="url"
-                  placeholder="https://example.com/image.jpg"
+                  type="text"
+                  placeholder="/danshari/products/chair.jpg or https://…"
                   value={imageUrl}
                   onChange={(e) => setImageUrl(e.target.value)}
                   className="h-11 rounded-xl"
