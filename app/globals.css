@@ -348,7 +348,19 @@ body.hide-cursor-mobile .portfolio-site [class*="z-[9999]"] {
   background-repeat: repeat-x;
 }
 
+@keyframes danshari-publish-bar {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(400%);
+  }
+}
+
 @layer utilities {
+  .animate-danshari-publish-bar {
+    animation: danshari-publish-bar 1.1s ease-in-out infinite;
+  }
   .preserve-3d {
     transform-style: preserve-3d;
   }

@@ -40,6 +40,7 @@ export function DanshariProductManager() {
   const [busyDrop, setBusyDrop] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [publishedOk, setPublishedOk] = useState(false)
+  const [publishing, setPublishing] = useState(false)
 
   useEffect(() => {
     void ensureProductsLoaded()
@@ -135,6 +136,7 @@ export function DanshariProductManager() {
         ? p.claimants.filter((n): n is string => typeof n === "string" && n.length > 0)
         : [],
     }))
+    setPublishing(true)
     try {
       await setProducts(cleaned)
       setItems(cleaned)
@@ -154,6 +156,8 @@ export function DanshariProductManager() {
           e instanceof Error ? e.message : "Could not save the catalog."
         )
       }
+    } finally {
+      setPublishing(false)
     }
   }
 
@@ -276,18 +280,48 @@ export function DanshariProductManager() {
         </div>
       </main>
 
-      <div className="fixed bottom-0 inset-x-0 z-50 border-t border-border bg-card/95 backdrop-blur-md px-4 py-3">
-        <div className="max-w-4xl mx-auto flex flex-wrap items-center justify-between gap-3">
-          <p className="text-sm text-muted-foreground">
-            {dirty ? "You have unsaved changes." : "All changes saved."}
+      <div
+        className="fixed bottom-0 inset-x-0 z-50 border-t border-border bg-card/95 backdrop-blur-md shadow-[0_-4px_24px_rgba(0,0,0,0.06)] dark:shadow-[0_-4px_24px_rgba(0,0,0,0.2)]"
+        aria-busy={publishing}
+      >
+        {publishing ? (
+          <div
+            className="h-0.5 w-full overflow-hidden bg-muted"
+            aria-hidden
+          >
+            <div className="h-full w-1/3 animate-danshari-publish-bar bg-primary" />
+          </div>
+        ) : null}
+        <div className="max-w-4xl mx-auto flex flex-wrap items-center justify-between gap-3 px-4 py-3">
+          <p className="text-sm text-muted-foreground flex items-center gap-2 min-h-[1.25rem]">
+            {publishing ? (
+              <>
+                <Loader2
+                  className="size-4 shrink-0 animate-spin text-primary"
+                  aria-hidden
+                />
+                <span className="text-foreground/80">Publishing to Firestore…</span>
+              </>
+            ) : dirty ? (
+              "You have unsaved changes."
+            ) : (
+              "All changes saved."
+            )}
           </p>
           <Button
             size="lg"
             className="rounded-xl min-w-[180px]"
             onClick={handlePublish}
-            disabled={!dirty}
+            disabled={!dirty || publishing}
           >
-            Save &amp; publish
+            {publishing ? (
+              <>
+                <Loader2 className="size-4 animate-spin mr-2" aria-hidden />
+                Publishing…
+              </>
+            ) : (
+              "Save &amp; publish"
+            )}
           </Button>
         </div>
       </div>
