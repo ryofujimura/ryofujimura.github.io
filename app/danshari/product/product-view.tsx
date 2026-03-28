@@ -230,20 +230,22 @@ function ProductViewInner() {
     <div className="min-h-screen bg-background">
       <DanshariHeader />
       <main className="max-w-7xl mx-auto px-4 py-4 pb-24">
-        <Button
-          asChild
-          variant="ghost"
-          size="sm"
-          className="mb-4 -ml-2 rounded-xl text-muted-foreground"
-        >
-          <Link href={danshariHref()}>
-            <ArrowLeft className="w-4 h-4 mr-1" />
-            Back
-          </Link>
-        </Button>
+        <div className="mx-auto w-full max-w-2xl mb-4">
+          <Button
+            asChild
+            variant="ghost"
+            size="sm"
+            className="-ml-2 rounded-xl text-muted-foreground"
+          >
+            <Link href={danshariHref()}>
+              <ArrowLeft className="w-4 h-4 mr-1" />
+              Back
+            </Link>
+          </Button>
+        </div>
 
-        <div className="flex flex-col 2xl:flex-row 2xl:items-start 2xl:gap-10">
-          <div className="min-w-0 w-full max-w-2xl flex-1">
+        <div className="flex flex-col items-center 2xl:flex-row 2xl:items-start 2xl:justify-center 2xl:gap-10">
+          <div className="min-w-0 w-full max-w-2xl mx-auto">
         <div
           className={
             product.image_url_secondary
@@ -444,7 +446,7 @@ function ProductViewInner() {
           </div>
 
           {recommended.length > 0 ? (
-            <aside className="mt-10 w-full shrink-0 2xl:mt-0 2xl:w-72 2xl:sticky 2xl:top-6 2xl:self-start">
+            <aside className="mt-10 w-full max-w-2xl mx-auto shrink-0 2xl:mt-0 2xl:w-72 2xl:max-w-none 2xl:mx-0 2xl:sticky 2xl:top-6 2xl:self-start">
               <DanshariRecommendedCarousel
                 key={isSidebarLayout ? "sidebar" : "strip"}
                 products={recommended}
