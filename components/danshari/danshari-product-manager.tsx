@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import Link from "next/link"
 import { ensureProductsLoaded, getProducts, setProducts } from "@/lib/danshari/store"
 import type { Product } from "@/lib/danshari/types"
@@ -26,7 +26,8 @@ function pickImages(files: FileList | File[]): File[] {
 
 export function DanshariProductManager() {
   const [items, setItems] = useState<Product[]>([])
-  const [lastSaved, setLastSaved] = useState<Product[]>([])
+  /** Avoid JSON.stringify on huge data URLs (can exceed max string length). */
+  const [dirty, setDirty] = useState(false)
   const [hydrated, setHydrated] = useState(false)
   const [dropActive, setDropActive] = useState(false)
   const [busyDrop, setBusyDrop] = useState(false)
@@ -38,7 +39,7 @@ export function DanshariProductManager() {
       .then(() => {
         const list = getProducts()
         setItems(list)
-        setLastSaved(list)
+        setDirty(false)
       })
       .catch(() => {
         setError("Could not load the product catalog from this browser.")
@@ -46,21 +47,18 @@ export function DanshariProductManager() {
       .finally(() => setHydrated(true))
   }, [])
 
-  const dirty = useMemo(
-    () => JSON.stringify(items) !== JSON.stringify(lastSaved),
-    [items, lastSaved]
-  )
-
   const updateProduct = useCallback((uid: string, patch: Partial<Product>) => {
     setItems((prev) =>
       prev.map((p) => (p.uid === uid ? { ...p, ...patch } : p))
     )
+    setDirty(true)
     setError(null)
     setPublishedOk(false)
   }, [])
 
   const removeProduct = useCallback((uid: string) => {
     setItems((prev) => prev.filter((p) => p.uid !== uid))
+    setDirty(true)
     setError(null)
     setPublishedOk(false)
   }, [])
@@ -87,6 +85,7 @@ export function DanshariProductManager() {
         })
       }
       setItems((prev) => [...created, ...prev])
+      setDirty(true)
       setPublishedOk(false)
     } finally {
       setBusyDrop(false)
@@ -131,8 +130,8 @@ export function DanshariProductManager() {
     }))
     try {
       await setProducts(cleaned)
-      setLastSaved(cleaned)
       setItems(cleaned)
+      setDirty(false)
       setPublishedOk(true)
       setTimeout(() => setPublishedOk(false), 3200)
     } catch (e) {
