@@ -461,6 +461,16 @@ function ProductEditorRow({
                     className="mt-1 w-full min-h-[5.5rem] p-3 rounded-xl border border-input bg-background text-sm resize-y focus:outline-none focus:ring-2 focus:ring-ring"
                     placeholder="Description"
                   />
+                  <p className="text-[10px] text-muted-foreground mt-1.5 leading-snug">
+                    Link syntax:{" "}
+                    <code className="rounded bg-muted px-1 py-px">
+                      visible text&lt;https://example.com&gt;
+                    </code>{" "}
+                    or same-site{" "}
+                    <code className="rounded bg-muted px-1 py-px">
+                      visible text&lt;/danshari&gt;
+                    </code>
+                  </p>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>

@@ -13,6 +13,7 @@ import {
   addComment,
 } from "@/lib/danshari/store"
 import type { Product, Comment } from "@/lib/danshari/types"
+import { DanshariDescriptionRich } from "@/components/danshari/description-rich"
 import { DanshariHeader } from "@/components/danshari/header"
 import { DanshariMedia } from "@/components/danshari/danshari-media"
 import { cn } from "@/lib/utils"
@@ -193,9 +194,10 @@ function ProductViewInner() {
           <h1 className="text-2xl font-semibold text-foreground mb-2">
             {product.title}
           </h1>
-          <p className="text-muted-foreground leading-relaxed">
-            {product.description}
-          </p>
+          <DanshariDescriptionRich
+            text={product.description}
+            className="text-muted-foreground"
+          />
         </div>
 
         {claimants.length > 0 ? (
