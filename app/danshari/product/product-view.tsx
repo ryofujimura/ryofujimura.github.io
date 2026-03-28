@@ -184,12 +184,16 @@ function ProductViewInner() {
               : "mb-4"
           }
         >
-          <div className="relative aspect-square rounded-2xl overflow-hidden bg-muted">
+          <div className="relative rounded-2xl overflow-hidden bg-muted">
             <DanshariMedia
               src={product.image_url}
               alt={product.title}
-              fill
-              sizes="(max-width: 672px) 100vw, 336px"
+              preserveAspect
+              sizes={
+                product.image_url_secondary
+                  ? "(max-width: 640px) 100vw, 336px"
+                  : "(max-width: 672px) 100vw, 672px"
+              }
               priority
             />
             {claimants.length > 0 ? (
@@ -200,12 +204,12 @@ function ProductViewInner() {
             ) : null}
           </div>
           {product.image_url_secondary ? (
-            <div className="relative aspect-square rounded-2xl overflow-hidden bg-muted">
+            <div className="relative rounded-2xl overflow-hidden bg-muted">
               <DanshariMedia
                 src={product.image_url_secondary}
                 alt=""
-                fill
-                sizes="(max-width: 672px) 100vw, 336px"
+                preserveAspect
+                sizes="(max-width: 640px) 100vw, 336px"
               />
             </div>
           ) : null}
