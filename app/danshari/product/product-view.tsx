@@ -1,6 +1,13 @@
 "use client"
 
-import { useEffect, useMemo, useRef, useState, Suspense } from "react"
+import {
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+  Suspense,
+} from "react"
 import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
 import {
@@ -64,6 +71,12 @@ function ProductViewInner() {
     () => (product ? getRecommendedProducts(product, allProducts) : []),
     [product, allProducts],
   )
+
+  // Same pathname + different `uid` is still client navigation; Next may keep scroll.
+  useLayoutEffect(() => {
+    if (!uid) return
+    window.scrollTo(0, 0)
+  }, [uid])
 
   useEffect(() => {
     if (userLoading) return

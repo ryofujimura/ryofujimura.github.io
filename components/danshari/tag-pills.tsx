@@ -43,7 +43,6 @@ export function DanshariTagPills({
             key={`${t}-${i}`}
             href={filterHref(t)}
             className={pillClass(t)}
-            scroll
           >
             {t}
           </Link>
