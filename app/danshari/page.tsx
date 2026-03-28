@@ -1,6 +1,7 @@
 "use client"
 
 import { DanshariHeader } from "@/components/danshari/header"
+import { DanshariIntroSlideCard } from "@/components/danshari/intro-slide-card"
 import { DanshariLoginForm } from "@/components/danshari/login-form"
 import { DanshariProductGrid } from "@/components/danshari/product-grid"
 import { useDanshariUser } from "@/lib/danshari/user-context"
@@ -23,6 +24,7 @@ export default function DanshariHomePage() {
   return (
     <div className="min-h-screen bg-background">
       <DanshariHeader />
+      <DanshariIntroSlideCard />
       <main className="max-w-6xl mx-auto px-3 sm:px-4 pt-2 pb-6 sm:pt-4 sm:pb-6">
         <DanshariProductGrid />
       </main>
