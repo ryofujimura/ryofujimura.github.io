@@ -74,8 +74,8 @@ export type ProcessedImagePair = {
  * Decode a data URL, resize full + thumb, encode WebP (JPEG fallback).
  * Browser-only (canvas).
  */
-export async function processDataUrlForUpload(
-  dataUrl: string,
+async function processImageBlob(
+  blob: Blob,
   options?: {
     fullMaxEdge?: number
     thumbMaxEdge?: number
@@ -86,7 +86,6 @@ export async function processDataUrlForUpload(
   const thumbMax = options?.thumbMaxEdge ?? DEFAULT_THUMB_MAX
   const quality = options?.quality ?? DEFAULT_QUALITY
 
-  const blob = await blobFromDataUrl(dataUrl)
   const img = await loadImageElement(blob)
 
   const fullCanvas = drawScaledToCanvas(img, fullMax)
@@ -101,4 +100,28 @@ export async function processDataUrlForUpload(
     fullExt: fullEnc.ext,
     thumbExt: thumbEnc.ext,
   }
+}
+
+export async function processDataUrlForUpload(
+  dataUrl: string,
+  options?: {
+    fullMaxEdge?: number
+    thumbMaxEdge?: number
+    quality?: number
+  },
+): Promise<ProcessedImagePair> {
+  const blob = await blobFromDataUrl(dataUrl)
+  return processImageBlob(blob, options)
+}
+
+/** Same pipeline as data-URL path, for remote images fetched as `Blob`. */
+export async function processBlobForUpload(
+  blob: Blob,
+  options?: {
+    fullMaxEdge?: number
+    thumbMaxEdge?: number
+    quality?: number
+  },
+): Promise<ProcessedImagePair> {
+  return processImageBlob(blob, options)
 }

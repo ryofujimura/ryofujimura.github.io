@@ -12,6 +12,7 @@ import {
   query,
   runTransaction,
   serverTimestamp,
+  updateDoc,
   writeBatch,
   type DocumentSnapshot,
   Timestamp,
@@ -23,7 +24,10 @@ import {
   getFirebaseStorage,
 } from "@/lib/firebase"
 import type { Product, Comment } from "./types"
-import { processDataUrlForUpload } from "./image-process"
+import {
+  processDataUrlForUpload,
+  type ProcessedImagePair,
+} from "./image-process"
 import { parseTagsFromDoc } from "./tags"
 
 const STORAGE_PREFIX = "danshari"
@@ -115,17 +119,21 @@ function commentFromDoc(d: DocumentSnapshot, productUid: string): Comment {
 
 const UPLOAD_CONCURRENCY = 3
 
-async function uploadImageSlotFromDataUrl(
-  dataUrl: string,
+/** Long-lived CDN/browser cache for image objects. */
+const IMAGE_CACHE_CONTROL = "public, max-age=31536000, immutable"
+
+export async function uploadProcessedImageSlot(
   productUid: string,
   slot: "primary" | "secondary",
+  processed: ProcessedImagePair,
+  pathTag: "publish" | "opt" = "publish",
 ): Promise<{ fullUrl: string; thumbUrl: string }> {
   const storage = getFirebaseStorage()
   if (!storage) throw new Error("Firebase Storage is not available")
 
-  const processed = await processDataUrlForUpload(dataUrl)
   const ts = Date.now()
-  const base = `${STORAGE_PREFIX}/products/${productUid}/${slot}_${ts}`
+  const tag = pathTag === "opt" ? `${slot}_opt_${ts}` : `${slot}_${ts}`
+  const base = `${STORAGE_PREFIX}/products/${productUid}/${tag}`
   const fullRef = ref(storage, `${base}_full.${processed.fullExt}`)
   const thumbRef = ref(storage, `${base}_thumb.${processed.thumbExt}`)
   const fullMime =
@@ -133,15 +141,60 @@ async function uploadImageSlotFromDataUrl(
   const thumbMime =
     processed.thumbExt === "webp" ? "image/webp" : "image/jpeg"
 
+  const meta = {
+    contentType: fullMime,
+    cacheControl: IMAGE_CACHE_CONTROL,
+  } as const
+  const metaThumb = {
+    contentType: thumbMime,
+    cacheControl: IMAGE_CACHE_CONTROL,
+  } as const
+
   await Promise.all([
-    uploadBytes(fullRef, processed.full, { contentType: fullMime }),
-    uploadBytes(thumbRef, processed.thumb, { contentType: thumbMime }),
+    uploadBytes(fullRef, processed.full, meta),
+    uploadBytes(thumbRef, processed.thumb, metaThumb),
   ])
   const [fullUrl, thumbUrl] = await Promise.all([
     getDownloadURL(fullRef),
     getDownloadURL(thumbRef),
   ])
   return { fullUrl, thumbUrl }
+}
+
+async function uploadImageSlotFromDataUrl(
+  dataUrl: string,
+  productUid: string,
+  slot: "primary" | "secondary",
+): Promise<{ fullUrl: string; thumbUrl: string }> {
+  const processed = await processDataUrlForUpload(dataUrl)
+  return uploadProcessedImageSlot(productUid, slot, processed, "publish")
+}
+
+export async function patchProductImageFields(
+  uid: string,
+  fields: {
+    image_url?: string
+    image_thumb_url?: string | null
+    image_url_secondary?: string | null
+    image_thumb_secondary?: string | null
+  },
+): Promise<void> {
+  const db = getFirebaseFirestore()
+  if (!db) throw new Error("Firestore is not available")
+
+  const payload: Record<string, unknown> = {}
+  if (fields.image_url !== undefined) payload.image_url = fields.image_url
+  if (fields.image_thumb_url !== undefined) {
+    payload.image_thumb_url = fields.image_thumb_url
+  }
+  if (fields.image_url_secondary !== undefined) {
+    payload.image_url_secondary = fields.image_url_secondary
+  }
+  if (fields.image_thumb_secondary !== undefined) {
+    payload.image_thumb_secondary = fields.image_thumb_secondary
+  }
+  if (Object.keys(payload).length === 0) return
+  await updateDoc(doc(db, DANSHARI_COLLECTION, uid), payload)
 }
 
 async function processOneProductImages(p: Product): Promise<Product> {
