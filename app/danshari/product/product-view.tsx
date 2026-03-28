@@ -65,7 +65,8 @@ function ProductViewInner() {
   const [commentPrice, setCommentPrice] = useState("")
   const [allProducts, setAllProducts] = useState<Product[]>([])
   const lastCatalogSigRef = useRef<string | null>(null)
-  const isXl = useMediaQuery("(min-width: 1280px)")
+  /** Align with `2xl:` layout — sidebar only when there is room for vertical “More items”. */
+  const isSidebarLayout = useMediaQuery("(min-width: 1536px)")
 
   const recommended = useMemo(
     () => (product ? getRecommendedProducts(product, allProducts) : []),
@@ -226,7 +227,7 @@ function ProductViewInner() {
           </Link>
         </Button>
 
-        <div className="flex flex-col xl:flex-row xl:items-start xl:gap-10">
+        <div className="flex flex-col 2xl:flex-row 2xl:items-start 2xl:gap-10">
           <div className="min-w-0 w-full max-w-2xl flex-1">
         <div
           className={
@@ -438,11 +439,11 @@ function ProductViewInner() {
           </div>
 
           {recommended.length > 0 ? (
-            <aside className="mt-10 w-full shrink-0 xl:mt-0 xl:w-72 xl:sticky xl:top-6 xl:self-start">
+            <aside className="mt-10 w-full shrink-0 2xl:mt-0 2xl:w-72 2xl:sticky 2xl:top-6 2xl:self-start">
               <DanshariRecommendedCarousel
-                key={isXl ? "sidebar" : "strip"}
+                key={isSidebarLayout ? "sidebar" : "strip"}
                 products={recommended}
-                variant={isXl ? "sidebar" : "below"}
+                variant={isSidebarLayout ? "sidebar" : "below"}
               />
             </aside>
           ) : null}

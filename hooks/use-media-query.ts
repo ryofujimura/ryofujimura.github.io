@@ -1,16 +1,27 @@
+"use client"
+
 import * as React from "react"
 
-/** Client-only; first paint is `false` until the effect runs. */
+/**
+ * Subscribes to `window.matchMedia` with correct initial value on the client
+ * (avoids a first paint where layout CSS says “wide” but JS still thinks “narrow”).
+ */
 export function useMediaQuery(query: string): boolean {
-  const [matches, setMatches] = React.useState(false)
+  const subscribe = React.useCallback(
+    (onStoreChange: () => void) => {
+      const mq = window.matchMedia(query)
+      mq.addEventListener("change", onStoreChange)
+      return () => mq.removeEventListener("change", onStoreChange)
+    },
+    [query],
+  )
 
-  React.useEffect(() => {
-    const mq = window.matchMedia(query)
-    const onChange = () => setMatches(mq.matches)
-    onChange()
-    mq.addEventListener("change", onChange)
-    return () => mq.removeEventListener("change", onChange)
-  }, [query])
+  const getSnapshot = React.useCallback(
+    () => window.matchMedia(query).matches,
+    [query],
+  )
 
-  return matches
+  const getServerSnapshot = React.useCallback(() => false, [])
+
+  return React.useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot)
 }
