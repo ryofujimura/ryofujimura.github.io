@@ -4,10 +4,11 @@ import type { ReactNode } from "react"
 import { cn } from "@/lib/utils"
 
 /**
- * Renders `visible text<https://url>` or `visible text</path>` as hyperlinks.
+ * Renders `word<https://url>` or `word</path>` as a hyperlink — only the word
+ * (contiguous non-whitespace) before `<…>` is linked, not whole paragraphs.
  * Multiple links and plain text can be mixed; newlines are preserved.
  */
-const LINK_RE = /([^<]+)<((?:https?:\/\/[^>]+)|(?:\/[^>]+))>/g
+const LINK_RE = /(\S+)\s*<((?:https?:\/\/[^>]+)|(?:\/[^>]+))>/g
 
 function isExternalHref(href: string) {
   return href.startsWith("http://") || href.startsWith("https://")
@@ -48,7 +49,7 @@ export function DanshariDescriptionRich({
         {...(external
           ? { target: "_blank" as const, rel: "noopener noreferrer" }
           : {})}
-        className="text-primary font-medium underline underline-offset-2 hover:opacity-90"
+        className="inline text-primary font-medium underline underline-offset-2 hover:opacity-90"
       >
         {label}
       </a>

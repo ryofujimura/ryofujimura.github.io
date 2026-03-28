@@ -502,13 +502,13 @@ function ProductEditorRow({
                     placeholder="Description"
                   />
                   <p className="text-[10px] text-muted-foreground mt-1.5 leading-snug">
-                    Link syntax:{" "}
+                    Link syntax (only the word before &lt;…&gt; is linked):{" "}
                     <code className="rounded bg-muted px-1 py-px">
-                      visible text&lt;https://example.com&gt;
+                      here&lt;https://example.com&gt;
                     </code>{" "}
                     or same-site{" "}
                     <code className="rounded bg-muted px-1 py-px">
-                      visible text&lt;/danshari&gt;
+                      browse&lt;/danshari&gt;
                     </code>
                   </p>
                 </div>
