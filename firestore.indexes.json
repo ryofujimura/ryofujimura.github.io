@@ -1,6 +1,13 @@
 {
   "indexes": [
     {
+      "collectionGroup": "danshari",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "created_at", "order": "DESCENDING" }
+      ]
+    },
+    {
       "collectionGroup": "messages",
       "queryScope": "COLLECTION",
       "fields": [

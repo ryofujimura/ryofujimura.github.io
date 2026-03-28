@@ -2,6 +2,7 @@ rules_version = '2';
 
 service firebase.storage {
   match /b/{bucket}/o {
+    // Client uploads use danshari/products/{productUid}/… (see lib/danshari/firestore-catalog.ts).
     match /danshari/{allPaths=**} {
       allow read: if true;
       allow write: if true;

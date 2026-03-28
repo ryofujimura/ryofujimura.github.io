@@ -34,7 +34,11 @@ let analytics: Analytics | null = null
 let firestore: Firestore | null = null
 let storage: FirebaseStorage | null = null
 
-/** Top-level Firestore collection for Danshari products (doc id = product uid). */
+/**
+ * Top-level Firestore collection for Danshari products (document id = product `uid`).
+ * Aligns with Firebase Console collection name and `firestore.rules` match `danshari/{productId}`.
+ * Product images in Storage live under prefix `danshari/products/...` (see `storage.rules`).
+ */
 export const DANSHARI_COLLECTION = "danshari"
 
 export function getFirebaseApp(): FirebaseApp | null {

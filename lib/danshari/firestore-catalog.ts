@@ -14,7 +14,7 @@ import {
   serverTimestamp,
   writeBatch,
   type DocumentSnapshot,
-  type Timestamp,
+  Timestamp,
 } from "firebase/firestore"
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage"
 import {
@@ -26,6 +26,24 @@ import type { Product, Comment } from "./types"
 import { parseTagsFromDoc } from "./tags"
 
 const STORAGE_PREFIX = "danshari"
+
+/**
+ * Firestore shape for `danshari/{productId}` (document id = product uid):
+ * - title, description: string
+ * - tags: string[] (legacy `tag` string is read once then removed on next publish)
+ * - image_url: string; image_url_secondary: string | null
+ * - related_item_uid: string | null
+ * - claimants: string[]
+ * - created_at: Timestamp (preferred) or ISO string (legacy reads)
+ *
+ * Subcollection `comments`: username, text, price|null, created_at (Timestamp).
+ */
+
+function createdAtForFirestore(iso: string): Timestamp {
+  const ms = Date.parse(iso)
+  if (Number.isNaN(ms)) return Timestamp.now()
+  return Timestamp.fromMillis(ms)
+}
 
 function tsToIso(v: unknown): string {
   if (v && typeof v === "object" && "toDate" in v && typeof (v as Timestamp).toDate === "function") {
@@ -164,7 +182,7 @@ export async function setProductsRemote(products: Product[]): Promise<void> {
         image_url_secondary: p.image_url_secondary ?? null,
         related_item_uid: p.related_item_uid ?? null,
         claimants: p.claimants,
-        created_at: p.created_at,
+        created_at: createdAtForFirestore(p.created_at),
       },
     })
   }

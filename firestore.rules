@@ -45,7 +45,10 @@ service cloud.firestore {
       allow delete: if request.auth != null;
     }
 
-    // Danshari — product docs at danshari/{productId}; comments subcollection
+    // Danshari — product docs at danshari/{productId} (doc id = product uid).
+    // Fields (app): title, description, tags[], image_url, image_url_secondary,
+    // related_item_uid, claimants[], created_at (Timestamp). Legacy tag string removed on publish.
+    // Subcollection comments/{commentId}: username, text, price, created_at.
     match /danshari/{productId} {
       allow read: if true;
       allow create, update, delete: if true;
