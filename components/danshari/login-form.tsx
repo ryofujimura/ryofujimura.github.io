@@ -12,7 +12,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import { DanshariGalleryPreloadLoginHint } from "@/components/danshari/danshari-gallery-preload-ui"
 
 export function DanshariLoginForm() {
   const [username, setUsername] = useState("")
@@ -66,7 +65,6 @@ export function DanshariLoginForm() {
               Continue
             </Button>
           </form>
-          <DanshariGalleryPreloadLoginHint />
         </CardContent>
       </Card>
     </div>
