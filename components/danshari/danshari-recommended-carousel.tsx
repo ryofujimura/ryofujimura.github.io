@@ -33,15 +33,11 @@ function RecommendedCardInner({
   const isSidebar = variant === "sidebar"
 
   return (
-    <div
-      className={cn(
-        "rounded-xl border border-border bg-card overflow-hidden shadow-sm transition-colors hover:border-primary/35 hover:shadow-md",
-      )}
-    >
+    <div className="rounded-xl border border-border bg-card overflow-hidden shadow-sm">
       <Link
         href={danshariProductHref(product.uid)}
         className={cn(
-          "group flex",
+          "flex",
           isSidebar ? "flex-row items-stretch gap-3 p-2" : "flex-col",
         )}
       >
@@ -57,14 +53,11 @@ function RecommendedCardInner({
               src={thumb}
               alt={product.title}
               fill
-              className="object-cover transition-transform duration-300 group-hover:scale-105"
+              className="object-cover"
               sizes={isSidebar ? "80px" : "(max-width: 640px) 85vw, 280px"}
             />
           ) : (
-            <div
-              className="absolute inset-0 bg-muted motion-safe:animate-pulse"
-              aria-hidden
-            />
+            <div className="absolute inset-0 bg-muted" aria-hidden />
           )}
           {product.claimants.length > 0 ? (
             <div className="absolute top-1.5 right-1.5 z-10 flex items-center gap-0.5 rounded-full bg-primary/90 px-1.5 py-0.5 text-[10px] font-medium text-primary-foreground">
@@ -119,7 +112,7 @@ export function DanshariRecommendedCarousel({
       </h2>
       <Carousel
         orientation={orientation}
-        opts={{ align: "start", loop: false }}
+        opts={{ align: "start", loop: false, duration: 0 }}
         className="w-full"
       >
         <div
