@@ -41,12 +41,12 @@ export function DanshariProductCard({ product }: ProductCardProps) {
             2 photos
           </div>
         ) : null}
-        {product.claimant && (
-          <div className="absolute top-2 right-2 z-10 bg-primary/90 text-primary-foreground text-xs px-2 py-1 rounded-full flex items-center gap-1">
-            <Hand className="w-3 h-3" />
-            Claimed
+        {product.claimants.length > 0 ? (
+          <div className="absolute top-2 right-2 z-10 flex items-center gap-1 bg-primary/90 text-primary-foreground text-xs font-medium px-2 py-1 rounded-full">
+            <Hand className="w-3 h-3 shrink-0" aria-hidden />
+            {product.claimants.length}
           </div>
-        )}
+        ) : null}
       </div>
       <div className="p-3">
         <h3 className="font-medium text-foreground line-clamp-1 text-sm sm:text-base">

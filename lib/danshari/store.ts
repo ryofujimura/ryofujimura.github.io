@@ -8,6 +8,18 @@ const LEGACY_PRODUCTS_KEY = "danshari_claim_products"
 const COMMENTS_KEY = "danshari_claim_comments"
 const USER_KEY = "danshari_claim_user"
 
+function migrateClaimants(p: Record<string, unknown>): string[] {
+  const withClaimants = p as { claimants?: unknown; claimant?: unknown }
+  if (Array.isArray(withClaimants.claimants)) {
+    return withClaimants.claimants.filter(
+      (x): x is string => typeof x === "string" && x.length > 0
+    )
+  }
+  const legacy = withClaimants.claimant
+  if (typeof legacy === "string" && legacy.length > 0) return [legacy]
+  return []
+}
+
 function migrateProduct(raw: unknown): Product {
   if (!raw || typeof raw !== "object") {
     return {
@@ -18,11 +30,11 @@ function migrateProduct(raw: unknown): Product {
       image_url: "",
       image_url_secondary: null,
       related_item_uid: null,
-      claimant: null,
+      claimants: [],
       created_at: new Date().toISOString(),
     }
   }
-  const p = raw as Partial<Product>
+  const p = raw as Partial<Product> & Record<string, unknown>
   return {
     uid: typeof p.uid === "string" ? p.uid : `prod-${Date.now()}`,
     title: typeof p.title === "string" ? p.title : "",
@@ -37,10 +49,7 @@ function migrateProduct(raw: unknown): Product {
       p.related_item_uid === null || typeof p.related_item_uid === "string"
         ? p.related_item_uid ?? null
         : null,
-    claimant:
-      p.claimant === null || typeof p.claimant === "string"
-        ? p.claimant ?? null
-        : null,
+    claimants: migrateClaimants(p),
     created_at:
       typeof p.created_at === "string" ? p.created_at : new Date().toISOString(),
   }
@@ -56,7 +65,7 @@ const sampleProducts: Product[] = [
     image_url: "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=800&q=80",
     image_url_secondary: null,
     related_item_uid: "prod-2",
-    claimant: null,
+    claimants: [],
     created_at: new Date().toISOString(),
   },
   {
@@ -67,7 +76,7 @@ const sampleProducts: Product[] = [
     image_url: "https://images.unsplash.com/photo-1506439773649-6e0eb8cfb237?w=800&q=80",
     image_url_secondary: null,
     related_item_uid: "prod-1",
-    claimant: null,
+    claimants: [],
     created_at: new Date().toISOString(),
   },
   {
@@ -78,7 +87,7 @@ const sampleProducts: Product[] = [
     image_url: "https://images.unsplash.com/photo-1612198188060-c7c2a3b66eae?w=800&q=80",
     image_url_secondary: null,
     related_item_uid: null,
-    claimant: null,
+    claimants: [],
     created_at: new Date().toISOString(),
   },
   {
@@ -89,7 +98,7 @@ const sampleProducts: Product[] = [
     image_url: "https://images.unsplash.com/photo-1594620302200-9a762244a156?w=800&q=80",
     image_url_secondary: null,
     related_item_uid: null,
-    claimant: null,
+    claimants: [],
     created_at: new Date().toISOString(),
   },
   {
@@ -100,7 +109,7 @@ const sampleProducts: Product[] = [
     image_url: "https://images.unsplash.com/photo-1507473885765-e6ed057f782c?w=800&q=80",
     image_url_secondary: null,
     related_item_uid: null,
-    claimant: null,
+    claimants: [],
     created_at: new Date().toISOString(),
   },
   {
@@ -111,7 +120,7 @@ const sampleProducts: Product[] = [
     image_url: "https://images.unsplash.com/photo-1618220179428-22790b461013?w=800&q=80",
     image_url_secondary: null,
     related_item_uid: null,
-    claimant: null,
+    claimants: [],
     created_at: new Date().toISOString(),
   },
 ]
@@ -191,15 +200,15 @@ export function getProduct(uid: string): Product | null {
 }
 
 export async function addProduct(
-  product: Omit<Product, "uid" | "claimant" | "created_at">
+  product: Omit<Product, "uid" | "claimants" | "created_at">
 ): Promise<Product> {
   await ensureProductsLoaded()
   const list = productCache!
   const newProduct: Product = {
     ...product,
     image_url_secondary: product.image_url_secondary ?? null,
+    claimants: [],
     uid: `prod-${Date.now()}`,
-    claimant: null,
     created_at: new Date().toISOString(),
   }
   list.push(newProduct)
@@ -216,16 +225,22 @@ export async function setProducts(products: Product[]): Promise<void> {
   await persistProductCatalog(copy)
 }
 
-export async function updateProductClaimant(
+/** Add username to end of queue, or remove if already listed (preserves order for others). */
+export async function toggleProductClaim(
   uid: string,
-  claimant: string | null
+  username: string
 ): Promise<Product | null> {
   await ensureProductsLoaded()
   const products = productCache!
   const index = products.findIndex((p) => p.uid === uid)
   if (index === -1) return null
 
-  products[index] = { ...products[index], claimant }
+  const cur = [...products[index].claimants]
+  const at = cur.indexOf(username)
+  const next =
+    at >= 0 ? cur.filter((_, i) => i !== at) : [...cur, username]
+
+  products[index] = { ...products[index], claimants: next }
   await persistProductCatalog(products)
   return products[index]
 }

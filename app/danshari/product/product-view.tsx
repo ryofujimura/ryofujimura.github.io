@@ -9,12 +9,13 @@ import {
   ensureProductsLoaded,
   getProduct,
   getComments,
-  updateProductClaimant,
+  toggleProductClaim,
   addComment,
 } from "@/lib/danshari/store"
 import type { Product, Comment } from "@/lib/danshari/types"
 import { DanshariHeader } from "@/components/danshari/header"
 import { DanshariMedia } from "@/components/danshari/danshari-media"
+import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card } from "@/components/ui/card"
@@ -85,14 +86,8 @@ function ProductViewInner() {
 
   const handleClaim = async () => {
     if (!product || !user) return
-
-    if (product.claimant === user.username) {
-      const updated = await updateProductClaimant(product.uid, null)
-      if (updated) setProduct(updated)
-    } else if (!product.claimant) {
-      const updated = await updateProductClaimant(product.uid, user.username)
-      if (updated) setProduct(updated)
-    }
+    const updated = await toggleProductClaim(product.uid, user.username)
+    if (updated) setProduct(updated)
   }
 
   const handleSubmitComment = (e: React.FormEvent) => {
@@ -137,8 +132,9 @@ function ProductViewInner() {
     )
   }
 
-  const isClaimed = !!product.claimant
-  const isClaimedByMe = product.claimant === user?.username
+  const claimants = product.claimants
+  const iAmInQueue =
+    !!user && claimants.some((name) => name === user.username)
 
   return (
     <div className="min-h-screen bg-background">
@@ -171,12 +167,12 @@ function ProductViewInner() {
               sizes="(max-width: 672px) 100vw, 336px"
               priority
             />
-            {isClaimed && (
-              <div className="absolute top-3 right-3 z-10 bg-primary/90 text-primary-foreground text-sm px-3 py-1.5 rounded-full flex items-center gap-1.5">
-                <Hand className="w-4 h-4" />
-                {isClaimedByMe ? "You claimed this" : `Claimed by ${product.claimant}`}
+            {claimants.length > 0 ? (
+              <div className="absolute top-3 right-3 z-10 flex items-center gap-1 rounded-full bg-primary/90 text-primary-foreground text-xs font-medium px-2.5 py-1">
+                <Hand className="w-3.5 h-3.5 shrink-0" aria-hidden />
+                {claimants.length}
               </div>
-            )}
+            ) : null}
           </div>
           {product.image_url_secondary ? (
             <div className="relative aspect-square rounded-2xl overflow-hidden bg-muted">
@@ -202,26 +198,55 @@ function ProductViewInner() {
           </p>
         </div>
 
+        {claimants.length > 0 ? (
+          <div className="rounded-2xl border border-border bg-card/60 p-4 mb-4">
+            <p className="text-xs font-medium text-muted-foreground mb-3">
+              Interested{" "}
+              <span className="text-foreground/70">(order: first → last)</span>
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {claimants.map((name, i) => {
+                const isSelf = user?.username === name
+                return (
+                  <span
+                    key={`${name}-${i}`}
+                    className={cn(
+                      "inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm shadow-sm",
+                      isSelf
+                        ? "border-primary/40 bg-primary/10 text-foreground"
+                        : "border-border bg-background text-foreground"
+                    )}
+                  >
+                    <span className="tabular-nums text-[10px] font-semibold text-muted-foreground min-w-[1.1rem]">
+                      {i + 1}
+                    </span>
+                    <span className="select-none" aria-hidden>
+                      ✋
+                    </span>
+                    <span className={cn(isSelf && "font-semibold")}>
+                      {isSelf ? "You" : name}
+                    </span>
+                  </span>
+                )
+              })}
+            </div>
+          </div>
+        ) : null}
+
         <Button
           onClick={handleClaim}
-          disabled={isClaimed && !isClaimedByMe}
           className="w-full h-12 text-base rounded-xl mb-6"
-          variant={isClaimedByMe ? "outline" : "default"}
+          variant={iAmInQueue ? "outline" : "default"}
         >
-          {isClaimedByMe ? (
+          {iAmInQueue ? (
             <>
               <HandMetal className="w-5 h-5 mr-2" />
-              Release claim
-            </>
-          ) : isClaimed ? (
-            <>
-              <Hand className="w-5 h-5 mr-2" />
-              Already claimed
+              Remove my hand
             </>
           ) : (
             <>
               <Hand className="w-5 h-5 mr-2" />
-              Raise hand to claim
+              Raise hand to join
             </>
           )}
         </Button>

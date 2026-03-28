@@ -7,7 +7,8 @@ export interface Product {
   /** Optional second photo (URL, path, or data URL). */
   image_url_secondary: string | null
   related_item_uid: string | null
-  claimant: string | null
+  /** Usernames in claim order (first = earliest). */
+  claimants: string[]
   created_at: string
 }
 

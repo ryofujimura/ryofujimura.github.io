@@ -82,7 +82,7 @@ export function DanshariProductManager() {
           image_url: dataUrl,
           image_url_secondary: null,
           related_item_uid: null,
-          claimant: null,
+          claimants: [],
           created_at: new Date().toISOString(),
         })
       }
@@ -125,6 +125,9 @@ export function DanshariProductManager() {
           ? p.related_item_uid
           : null,
       image_url_secondary: p.image_url_secondary?.trim() || null,
+      claimants: Array.isArray(p.claimants)
+        ? p.claimants.filter((n): n is string => typeof n === "string" && n.length > 0)
+        : [],
     }))
     try {
       await setProducts(cleaned)
