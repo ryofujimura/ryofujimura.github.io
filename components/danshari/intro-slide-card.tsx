@@ -9,7 +9,7 @@ const INTRO_COPY =
   "このウェブは凌が2026年のうちに手放してもいいかもと思ってるものたち。中には高価なものもあるかも。欲しければ青いボタンで手🖐️をあげてね。質問があればコメントを書いてね。かいたいければ値段も書いてね。"
 
 export function DanshariIntroSlideCard() {
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState(true)
 
   return (
     <div className="border-b border-border bg-background/90">
