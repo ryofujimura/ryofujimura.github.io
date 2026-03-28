@@ -44,6 +44,16 @@ service cloud.firestore {
       // Only authenticated users can delete
       allow delete: if request.auth != null;
     }
+
+    // Danshari — product docs at danshari/{productId}; comments subcollection
+    match /danshari/{productId} {
+      allow read: if true;
+      allow create, update, delete: if true;
+
+      match /comments/{commentId} {
+        allow read, create, update, delete: if true;
+      }
+    }
     
     // Deny all other collections by default
     match /{document=**} {

@@ -1,5 +1,6 @@
 import { initializeApp, getApps, type FirebaseApp } from "firebase/app"
 import { getAnalytics, type Analytics } from "firebase/analytics"
+import { getStorage, type FirebaseStorage } from "firebase/storage"
 import { 
   getFirestore, 
   collection, 
@@ -31,6 +32,10 @@ const firebaseConfig = {
 
 let analytics: Analytics | null = null
 let firestore: Firestore | null = null
+let storage: FirebaseStorage | null = null
+
+/** Top-level Firestore collection for Danshari products (doc id = product uid). */
+export const DANSHARI_COLLECTION = "danshari"
 
 export function getFirebaseApp(): FirebaseApp | null {
   if (typeof window === "undefined") return null
@@ -54,6 +59,15 @@ export function getFirebaseFirestore(): Firestore | null {
   if (!app) return null
   firestore = getFirestore(app)
   return firestore
+}
+
+export function getFirebaseStorage(): FirebaseStorage | null {
+  if (typeof window === "undefined") return null
+  if (storage) return storage
+  const app = getFirebaseApp()
+  if (!app) return null
+  storage = getStorage(app)
+  return storage
 }
 
 // Collection names

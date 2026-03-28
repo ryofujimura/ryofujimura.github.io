@@ -187,18 +187,17 @@ export function DanshariProductManager() {
             Drag images onto the zone below to create one product per image. Edit titles
             and descriptions in the list. Up to two photos per product.{" "}
             <span className="text-foreground/90">
-              Save &amp; publish stores the catalog in this browser (IndexedDB, larger than
-              localStorage). This site is static—uploads are not written to disk on the
-              server. To put files in{" "}
+              Save &amp; publish writes products to Firestore (collection{" "}
+              <code className="rounded bg-muted px-1 py-0.5 text-[0.65rem]">danshari</code>
+              ) and uploads new images to Firebase Storage under{" "}
               <code className="rounded bg-muted px-1 py-0.5 text-[0.65rem]">
-                public/danshari/products/
+                danshari/products/…
               </code>
-              , use <strong>Download</strong> on a photo and commit the file, then set the
-              image path to{" "}
+              . Everyone sees updates in near real time. You can still use image URLs or{" "}
               <code className="rounded bg-muted px-1 py-0.5 text-[0.65rem]">
-                /danshari/products/yourname.jpg
-              </code>
-              .
+                /danshari/products/…
+              </code>{" "}
+              paths for static files in the repo.
             </span>
           </p>
         </div>

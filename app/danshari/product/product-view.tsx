@@ -8,9 +8,10 @@ import { useDanshariUser } from "@/lib/danshari/user-context"
 import {
   ensureProductsLoaded,
   getProduct,
-  getComments,
   toggleProductClaim,
   addComment,
+  subscribeProducts,
+  subscribeProductComments,
 } from "@/lib/danshari/store"
 import type { Product, Comment } from "@/lib/danshari/types"
 import { DanshariDescriptionRich } from "@/components/danshari/description-rich"
@@ -42,46 +43,54 @@ function ProductViewInner() {
   const [commentPrice, setCommentPrice] = useState("")
 
   useEffect(() => {
+    if (userLoading) return
+    if (!user) {
+      router.push(danshariHref())
+      return
+    }
+    if (!uid) {
+      setProduct(null)
+      setRelatedProduct(null)
+      setComments([])
+      setIsLoading(false)
+      return
+    }
+
+    setIsLoading(true)
     let cancelled = false
 
-    void (async () => {
-      if (userLoading) return
-      if (!user) {
-        router.push(danshariHref())
-        return
-      }
-      if (!uid) {
-        if (!cancelled) {
-          setProduct(null)
-          setRelatedProduct(null)
-          setComments([])
-          setIsLoading(false)
-        }
-        return
-      }
-
-      await ensureProductsLoaded()
-      if (cancelled) return
-
-      const p = getProduct(uid)
-      if (p) {
-        setProduct(p)
-        setComments(getComments(uid))
-        if (p.related_item_uid) {
-          setRelatedProduct(getProduct(p.related_item_uid))
+    void ensureProductsLoaded()
+      .then(() => {
+        if (cancelled) return
+        const p = getProduct(uid)
+        setProduct(p ?? null)
+        if (p?.related_item_uid) {
+          setRelatedProduct(getProduct(p.related_item_uid) ?? null)
         } else {
           setRelatedProduct(null)
         }
+        setIsLoading(false)
+      })
+      .catch(() => {
+        if (!cancelled) setIsLoading(false)
+      })
+
+    const unsubProducts = subscribeProducts((all) => {
+      const p = all.find((x) => x.uid === uid) ?? null
+      setProduct(p)
+      if (p?.related_item_uid) {
+        setRelatedProduct(all.find((x) => x.uid === p.related_item_uid) ?? null)
       } else {
-        setProduct(null)
         setRelatedProduct(null)
-        setComments([])
       }
-      setIsLoading(false)
-    })()
+    })
+
+    const unsubComments = subscribeProductComments(uid, setComments)
 
     return () => {
       cancelled = true
+      unsubProducts()
+      unsubComments()
     }
   }, [uid, user, userLoading, router])
 
@@ -91,21 +100,23 @@ function ProductViewInner() {
     if (updated) setProduct(updated)
   }
 
-  const handleSubmitComment = (e: React.FormEvent) => {
+  const handleSubmitComment = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!commentText.trim() || !user || !product) return
 
     const price = commentPrice ? parseFloat(commentPrice) : null
-    const newComment = addComment({
-      product_uid: product.uid,
-      username: user.username,
-      text: commentText.trim(),
-      price: price && !isNaN(price) ? price : null,
-    })
-
-    setComments((prev) => [...prev, newComment])
-    setCommentText("")
-    setCommentPrice("")
+    try {
+      await addComment({
+        product_uid: product.uid,
+        username: user.username,
+        text: commentText.trim(),
+        price: price && !isNaN(price) ? price : null,
+      })
+      setCommentText("")
+      setCommentPrice("")
+    } catch (err) {
+      console.error(err)
+    }
   }
 
   if (isLoading || userLoading) {
