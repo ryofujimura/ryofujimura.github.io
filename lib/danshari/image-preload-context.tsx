@@ -29,6 +29,27 @@ const DanshariImagePreloadContext =
 
 const PRELOAD_CONCURRENCY = 8
 
+/** Sorted join of all catalog image URLs after a successful warm; survives reloads. */
+const PRELOAD_SIG_STORAGE_KEY = "danshari_catalog_image_sig_v1"
+
+function readStoredImageSig(): string | null {
+  if (typeof window === "undefined") return null
+  try {
+    return localStorage.getItem(PRELOAD_SIG_STORAGE_KEY)
+  } catch {
+    return null
+  }
+}
+
+function writeStoredImageSig(sig: string): void {
+  if (typeof window === "undefined") return
+  try {
+    localStorage.setItem(PRELOAD_SIG_STORAGE_KEY, sig)
+  } catch {
+    /* quota / private mode */
+  }
+}
+
 function preloadOne(url: string): Promise<void> {
   return new Promise((resolve) => {
     const img = new Image()
@@ -90,9 +111,19 @@ export function DanshariImagePreloadProvider({
       chainRef.current = chainRef.current.then(async () => {
         setCatalogReady(true)
         const needed = collectCatalogImageUrls(products)
+        const urlSig = [...needed].sort().join("\0")
+
+        // After a full reload the in-memory set is empty; if this tab already
+        // warmed this exact URL set, trust disk cache + skip the loading gate.
+        if (
+          loadedUrlsRef.current.size === 0 &&
+          readStoredImageSig() === urlSig
+        ) {
+          needed.forEach((u) => loadedUrlsRef.current.add(u))
+        }
+
         const pending = needed.filter((u) => !loadedUrlsRef.current.has(u))
         const already = needed.length - pending.length
-        const urlSig = [...needed].sort().join("\0")
 
         if (pending.length === 0) {
           const seen = hasHandledSnapshotRef.current
@@ -102,6 +133,7 @@ export function DanshariImagePreloadProvider({
           setTotal(needed.length)
           setLoaded(needed.length)
           setPhase("ready")
+          writeStoredImageSig(urlSig)
           return
         }
 
@@ -116,6 +148,7 @@ export function DanshariImagePreloadProvider({
         lastIdleUrlSigRef.current = urlSig
         setLoaded(needed.length)
         setPhase("ready")
+        writeStoredImageSig(urlSig)
       })
     })
 
