@@ -71,6 +71,7 @@ export function DanshariMedia({
         style={{ width: "100%", height: "auto" }}
         sizes={sizes ?? "(max-width: 768px) 100vw, 672px"}
         priority={priority}
+        decoding="async"
       />
     )
   }
@@ -83,6 +84,7 @@ export function DanshariMedia({
           src={src}
           alt={alt}
           decoding="async"
+          loading={priority ? "eager" : "lazy"}
           className={cn("absolute inset-0 size-full object-cover", className)}
         />
       )
@@ -102,6 +104,7 @@ export function DanshariMedia({
       sizes={sizes}
       priority={priority}
       loading={priority ? undefined : "lazy"}
+      decoding="async"
     />
   )
 }

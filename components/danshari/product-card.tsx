@@ -1,11 +1,13 @@
 "use client"
 
 import Link from "next/link"
+import { memo } from "react"
 import { danshariProductHref, danshariTagFilterHref } from "@/lib/danshari/paths"
 import { firstListingImageUrl } from "@/lib/danshari/recommended"
 import type { Product } from "@/lib/danshari/types"
 import { DanshariMedia } from "@/components/danshari/danshari-media"
 import { DanshariTagPills } from "@/components/danshari/tag-pills"
+import { useInViewOnce } from "@/hooks/use-in-view-once"
 import { Hand } from "lucide-react"
 
 interface ProductCardProps {
@@ -14,7 +16,8 @@ interface ProductCardProps {
   activeTag?: string | null
 }
 
-export function DanshariProductCard({ product, activeTag }: ProductCardProps) {
+function DanshariProductCardInner({ product, activeTag }: ProductCardProps) {
+  const { ref: inViewRef, visible } = useInViewOnce("100px")
   const thumbSrc = firstListingImageUrl(product)
   const hasTwoPhotos =
     Boolean(product.image_url?.trim()) &&
@@ -26,14 +29,24 @@ export function DanshariProductCard({ product, activeTag }: ProductCardProps) {
         href={danshariProductHref(product.uid)}
         className="group block"
       >
-        <div className="relative aspect-square overflow-hidden bg-muted">
-          <DanshariMedia
-            src={thumbSrc}
-            alt={product.title}
-            fill
-            className="object-cover group-hover:scale-105 transition-transform duration-300"
-            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-          />
+        <div
+          ref={inViewRef}
+          className="relative aspect-square overflow-hidden bg-muted"
+        >
+          {visible ? (
+            <DanshariMedia
+              src={thumbSrc}
+              alt={product.title}
+              fill
+              className="object-cover group-hover:scale-105 transition-transform duration-300"
+              sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+            />
+          ) : (
+            <div
+              className="absolute inset-0 bg-muted motion-safe:animate-pulse"
+              aria-hidden
+            />
+          )}
           {hasTwoPhotos ? (
             <div className="absolute bottom-2 left-2 z-10 rounded-md bg-background/85 px-1.5 py-0.5 text-[10px] font-medium text-foreground backdrop-blur-sm border border-border/60">
               2 photos
@@ -62,3 +75,5 @@ export function DanshariProductCard({ product, activeTag }: ProductCardProps) {
     </div>
   )
 }
+
+export const DanshariProductCard = memo(DanshariProductCardInner)

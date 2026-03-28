@@ -8,6 +8,7 @@ import {
   useRef,
   useState,
 } from "react"
+import { catalogListSignature } from "@/lib/danshari/catalog-signature"
 import Link from "next/link"
 import { useSearchParams } from "next/navigation"
 import { useWindowVirtualizer } from "@tanstack/react-virtual"
@@ -90,7 +91,7 @@ function VirtualizedProductRows({
   const virtualizer = useWindowVirtualizer({
     count: rowCount,
     estimateSize: () => ESTIMATE_ROW_PX,
-    overscan: 4,
+    overscan: 2,
     scrollMargin,
   })
 
@@ -112,9 +113,10 @@ function VirtualizedProductRows({
               style={{ transform: `translateY(${vRow.start}px)` }}
             >
               <div
-                className="grid gap-3 sm:gap-4 w-full"
+                className="grid gap-3 sm:gap-4 w-full [contain:layout]"
                 style={{
                   gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`,
+                  contentVisibility: "auto",
                 }}
               >
                 {slice.map((product) => (
@@ -140,9 +142,16 @@ function DanshariProductGridInner() {
 
   const [products, setProducts] = useState<Product[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const lastSigRef = useRef<string | null>(null)
 
   useEffect(() => {
     const unsub = subscribeProducts((list) => {
+      const sig = catalogListSignature(list)
+      if (lastSigRef.current === sig) {
+        setIsLoading(false)
+        return
+      }
+      lastSigRef.current = sig
       setProducts(list)
       setIsLoading(false)
     })
@@ -229,7 +238,6 @@ function DanshariProductGridInner() {
         </div>
       ) : filtered.length >= 12 ? (
         <VirtualizedProductRows
-          key={cols}
           filtered={filtered}
           activeTag={activeTag}
           cols={cols}

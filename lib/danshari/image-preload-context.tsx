@@ -76,6 +76,9 @@ export function DanshariImagePreloadProvider({
 }) {
   const loadedUrlsRef = useRef(new Set<string>())
   const chainRef = useRef(Promise.resolve())
+  /** Skip duplicate work when URL set unchanged and nothing left to preload. */
+  const lastIdleUrlSigRef = useRef<string>("")
+  const hasHandledSnapshotRef = useRef(false)
 
   const [catalogReady, setCatalogReady] = useState(false)
   const [phase, setPhase] = useState<PreloadPhase>("idle")
@@ -89,19 +92,28 @@ export function DanshariImagePreloadProvider({
         const needed = collectCatalogImageUrls(products)
         const pending = needed.filter((u) => !loadedUrlsRef.current.has(u))
         const already = needed.length - pending.length
-        setTotal(needed.length)
-        setLoaded(already)
+        const urlSig = [...needed].sort().join("\0")
 
         if (pending.length === 0) {
+          const seen = hasHandledSnapshotRef.current
+          hasHandledSnapshotRef.current = true
+          if (seen && urlSig === lastIdleUrlSigRef.current) return
+          lastIdleUrlSigRef.current = urlSig
+          setTotal(needed.length)
+          setLoaded(needed.length)
           setPhase("ready")
           return
         }
 
+        lastIdleUrlSigRef.current = ""
+        setTotal(needed.length)
+        setLoaded(already)
         setPhase("preloading")
         await preloadPool(pending, PRELOAD_CONCURRENCY, (c) => {
           setLoaded(already + c)
         })
         pending.forEach((u) => loadedUrlsRef.current.add(u))
+        lastIdleUrlSigRef.current = urlSig
         setLoaded(needed.length)
         setPhase("ready")
       })

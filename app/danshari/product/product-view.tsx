@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useMemo, useState, Suspense } from "react"
+import { useEffect, useMemo, useRef, useState, Suspense } from "react"
 import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
 import {
@@ -18,6 +18,7 @@ import {
   subscribeProductComments,
 } from "@/lib/danshari/store"
 import type { Product, Comment } from "@/lib/danshari/types"
+import { catalogListSignature } from "@/lib/danshari/catalog-signature"
 import {
   firstListingImageUrl,
   getRecommendedProducts,
@@ -56,6 +57,7 @@ function ProductViewInner() {
   const [commentText, setCommentText] = useState("")
   const [commentPrice, setCommentPrice] = useState("")
   const [allProducts, setAllProducts] = useState<Product[]>([])
+  const lastCatalogSigRef = useRef<string | null>(null)
   const isXl = useMediaQuery("(min-width: 1280px)")
 
   const recommended = useMemo(
@@ -79,6 +81,7 @@ function ProductViewInner() {
 
     setIsLoading(true)
     let cancelled = false
+    lastCatalogSigRef.current = null
 
     void ensureProductsLoaded()
       .then(() => {
@@ -97,6 +100,10 @@ function ProductViewInner() {
       })
 
     const unsubProducts = subscribeProducts((all) => {
+      const sig = catalogListSignature(all)
+      if (lastCatalogSigRef.current === sig) return
+      lastCatalogSigRef.current = sig
+
       setAllProducts(all)
       const p = all.find((x) => x.uid === uid) ?? null
       setProduct(p)

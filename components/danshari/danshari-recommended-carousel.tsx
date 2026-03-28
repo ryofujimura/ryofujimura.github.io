@@ -1,11 +1,13 @@
 "use client"
 
 import Link from "next/link"
+import { memo } from "react"
 import { danshariProductHref, danshariTagFilterHref } from "@/lib/danshari/paths"
 import { firstListingImageUrl } from "@/lib/danshari/recommended"
 import type { Product } from "@/lib/danshari/types"
 import { DanshariMedia } from "@/components/danshari/danshari-media"
 import { DanshariTagPills } from "@/components/danshari/tag-pills"
+import { useInViewOnce } from "@/hooks/use-in-view-once"
 import {
   Carousel,
   CarouselContent,
@@ -18,13 +20,14 @@ import { Hand } from "lucide-react"
 
 type Variant = "sidebar" | "below"
 
-function RecommendedCard({
+function RecommendedCardInner({
   product,
   variant,
 }: {
   product: Product
   variant: Variant
 }) {
+  const { ref: inViewRef, visible } = useInViewOnce("160px")
   const thumb = firstListingImageUrl(product)
   const isSidebar = variant === "sidebar"
 
@@ -42,18 +45,26 @@ function RecommendedCard({
         )}
       >
         <div
+          ref={inViewRef}
           className={cn(
             "relative shrink-0 overflow-hidden bg-muted",
             isSidebar ? "h-20 w-20 rounded-lg" : "aspect-square w-full rounded-t-xl",
           )}
         >
-          <DanshariMedia
-            src={thumb}
-            alt={product.title}
-            fill
-            className="object-cover transition-transform duration-300 group-hover:scale-105"
-            sizes={isSidebar ? "80px" : "(max-width: 640px) 85vw, 280px"}
-          />
+          {visible ? (
+            <DanshariMedia
+              src={thumb}
+              alt={product.title}
+              fill
+              className="object-cover transition-transform duration-300 group-hover:scale-105"
+              sizes={isSidebar ? "80px" : "(max-width: 640px) 85vw, 280px"}
+            />
+          ) : (
+            <div
+              className="absolute inset-0 bg-muted motion-safe:animate-pulse"
+              aria-hidden
+            />
+          )}
           {product.claimants.length > 0 ? (
             <div className="absolute top-1.5 right-1.5 z-10 flex items-center gap-0.5 rounded-full bg-primary/90 px-1.5 py-0.5 text-[10px] font-medium text-primary-foreground">
               <Hand className="size-2.5 shrink-0" aria-hidden />
@@ -82,6 +93,8 @@ function RecommendedCard({
     </div>
   )
 }
+
+const RecommendedCard = memo(RecommendedCardInner)
 
 export function DanshariRecommendedCarousel({
   products,
