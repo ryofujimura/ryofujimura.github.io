@@ -16,6 +16,10 @@ import { fileToDataUrl, newProductUid, stemFromFileName } from "@/lib/danshari/i
 import { DanshariHeader } from "@/components/danshari/header"
 import { DanshariProductImage } from "@/components/danshari/danshari-product-image"
 import { DanshariTagEditor } from "@/components/danshari/tag-editor"
+import {
+  DANSHARI_ALLOWED_USERNAMES,
+  normalizePromotionUsernames,
+} from "@/lib/danshari/allowed-login"
 import { normalizeTagsForPublish } from "@/lib/danshari/tags"
 import {
   adminPrimaryPreviewSrc,
@@ -24,6 +28,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
+import { Checkbox } from "@/components/ui/checkbox"
 import {
   ArrowLeft,
   Download,
@@ -129,6 +134,8 @@ export function DanshariProductManager() {
           image_placeholder_secondary_data_url: null,
           related_item_uid: null,
           claimants: [],
+          promotion_message: "",
+          promotion_usernames: [],
           created_at: new Date().toISOString(),
         })
       }
@@ -186,6 +193,8 @@ export function DanshariProductManager() {
       claimants: Array.isArray(p.claimants)
         ? p.claimants.filter((n): n is string => typeof n === "string" && n.length > 0)
         : [],
+      promotion_message: (p.promotion_message ?? "").trim(),
+      promotion_usernames: normalizePromotionUsernames(p.promotion_usernames),
     }))
     setPublishing(true)
     try {
@@ -650,6 +659,54 @@ const ProductEditorRow = memo(function ProductEditorRow({
                   tags={Array.isArray(p.tags) ? p.tags : ["General"]}
                   onChange={(tags) => handlePatch({ tags })}
                 />
+                <div className="rounded-xl border border-border/80 bg-muted/30 p-3 space-y-2">
+                  <label className="text-xs font-medium text-muted-foreground">
+                    Promotion
+                  </label>
+                  <Input
+                    value={p.promotion_message ?? ""}
+                    onChange={(e) =>
+                      handlePatch({ promotion_message: e.target.value })
+                    }
+                    className="h-9 rounded-xl"
+                    placeholder="Message shown in Promotion (optional)"
+                  />
+                  <p className="text-[10px] text-muted-foreground leading-snug">
+                    Visible only to selected users on the home page.
+                  </p>
+                  <div className="flex flex-wrap gap-x-4 gap-y-2 pt-0.5">
+                    {DANSHARI_ALLOWED_USERNAMES.map((name) => {
+                      const checked = (p.promotion_usernames ?? []).includes(
+                        name,
+                      )
+                      return (
+                        <label
+                          key={name}
+                          className="flex items-center gap-2 text-xs cursor-pointer select-none"
+                        >
+                          <Checkbox
+                            checked={checked}
+                            onCheckedChange={(v) => {
+                              const set = new Set(p.promotion_usernames ?? [])
+                              if (v === true) set.add(name)
+                              else set.delete(name)
+                              handlePatch({
+                                promotion_usernames: [...set].sort((a, b) =>
+                                  a.localeCompare(b, undefined, {
+                                    sensitivity: "base",
+                                  }),
+                                ),
+                              })
+                            }}
+                          />
+                          <span className="capitalize text-foreground">
+                            {name}
+                          </span>
+                        </label>
+                      )
+                    })}
+                  </div>
+                </div>
                 <div>
                   <label className="text-xs font-medium text-muted-foreground">
                     Related item

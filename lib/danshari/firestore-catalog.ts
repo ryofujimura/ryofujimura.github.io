@@ -23,6 +23,7 @@ import {
   getFirebaseStorage,
 } from "@/lib/firebase"
 import type { Product, Comment } from "./types"
+import { normalizePromotionUsernames } from "./allowed-login"
 import { processDataUrlForUpload } from "./image-process"
 import { parseTagsFromDoc } from "./tags"
 
@@ -35,6 +36,7 @@ const STORAGE_PREFIX = "danshari"
  * - image_url, optional image_thumb_url; image_url_secondary, image_thumb_secondary
  * - related_item_uid: string | null
  * - claimants: string[]
+ * - promotion_message: string, promotion_usernames: string[] (optional / legacy)
  * - created_at: Timestamp (preferred) or ISO string (legacy reads)
  *
  * Subcollection `comments`: username, text, price|null, created_at (Timestamp).
@@ -74,6 +76,8 @@ export function docToProduct(d: DocumentSnapshot): Product {
       image_placeholder_secondary_data_url: null,
       related_item_uid: null,
       claimants: [],
+      promotion_message: "",
+      promotion_usernames: [],
       created_at: new Date().toISOString(),
     }
   }
@@ -131,6 +135,9 @@ export function docToProduct(d: DocumentSnapshot): Product {
         ? x.related_item_uid ?? null
         : null,
     claimants,
+    promotion_message:
+      typeof x.promotion_message === "string" ? x.promotion_message : "",
+    promotion_usernames: normalizePromotionUsernames(x.promotion_usernames),
     created_at: tsToIso(x.created_at),
   }
 }
@@ -315,6 +322,8 @@ export async function setProductsRemote(products: Product[]): Promise<void> {
           p.image_placeholder_secondary_data_url ?? null,
         related_item_uid: p.related_item_uid ?? null,
         claimants: p.claimants,
+        promotion_message: p.promotion_message ?? "",
+        promotion_usernames: normalizePromotionUsernames(p.promotion_usernames),
         created_at: createdAtForFirestore(p.created_at),
       },
     })

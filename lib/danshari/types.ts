@@ -21,6 +21,10 @@ export interface Product {
   related_item_uid: string | null
   /** Usernames in claim order (first = earliest). */
   claimants: string[]
+  /** Admin-only copy shown above the catalog for targeted users. */
+  promotion_message: string
+  /** Lowercase logins that see this product in the Promotion block. */
+  promotion_usernames: string[]
   created_at: string
 }
 

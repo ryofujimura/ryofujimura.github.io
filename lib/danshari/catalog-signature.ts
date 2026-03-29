@@ -40,6 +40,10 @@ export function catalogListSignature(list: Product[]): string {
       p.claimants.join("\x1e"),
       "\t",
       p.tags.join("\x1e"),
+      "\t",
+      p.promotion_message ?? "",
+      "\t",
+      (p.promotion_usernames ?? []).join("\x1e"),
       "\n",
     )
   }

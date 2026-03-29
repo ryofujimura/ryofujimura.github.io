@@ -18,6 +18,7 @@ import { useMediaQuery } from "@/hooks/use-media-query"
 import { getListingImagePresentation } from "@/lib/danshari/recommended"
 import { danshariHref, danshariTagFilterHref } from "@/lib/danshari/paths"
 import { DanshariProductCard } from "./product-card"
+import { DanshariPromotionSection } from "@/components/danshari/danshari-promotion-section"
 import { cn } from "@/lib/utils"
 
 /** Window virtualizer + scrollMargin is unreliable on mobile Safari after bfcache / back nav. */
@@ -234,6 +235,7 @@ function DanshariProductGridInner() {
 
   return (
     <>
+      <DanshariPromotionSection products={products} />
       {allTags.length > 0 ? (
         <div className="mb-3 sm:mb-5 flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-2 sm:gap-y-2">
           <span className="text-[11px] font-medium text-muted-foreground shrink-0">
