@@ -15,7 +15,7 @@ function PromotionCard({ product }: { product: Product }) {
   return (
     <Link
       href={danshariProductHref(product.uid)}
-      className="flex gap-3 sm:gap-4 rounded-2xl border border-border bg-card p-3 sm:p-4 shadow-sm hover:shadow-md transition-shadow"
+      className="flex h-full min-h-0 gap-3 sm:gap-4 rounded-2xl border border-border bg-card p-3 sm:p-4 shadow-sm hover:shadow-md transition-shadow"
     >
       <div className="relative w-[5.25rem] h-[5.25rem] sm:w-28 sm:h-28 shrink-0 rounded-xl overflow-hidden bg-muted">
         <DanshariProductImage
@@ -68,7 +68,7 @@ export function DanshariPromotionSection({ products }: { products: Product[] }) 
       >
         Promotion
       </h2>
-      <div className="flex flex-col gap-2.5 sm:gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3">
         {promoted.map((product) => (
           <PromotionCard key={product.uid} product={product} />
         ))}
