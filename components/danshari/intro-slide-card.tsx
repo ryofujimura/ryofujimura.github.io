@@ -16,26 +16,26 @@ export function DanshariIntroSlideCard() {
 
   return (
     <div className="border-b border-border bg-background/90">
-      <div className="w-full flex flex-col items-stretch pt-1 pb-0">
-        <div className="max-w-6xl mx-auto px-3 sm:px-4 w-full flex flex-col items-center">
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            className="h-9 w-9 shrink-0 rounded-full text-muted-foreground hover:text-foreground"
-            onClick={() => setOpen((v) => !v)}
-            aria-expanded={open}
-            aria-controls="danshari-intro-slide"
-            aria-label={open ? "説明を閉じる" : "説明を表示"}
-          >
-            <ChevronDown
-              className={cn(
-                "h-5 w-5 transition-transform duration-300 ease-out",
-                open && "rotate-180"
-              )}
-              aria-hidden
-            />
-          </Button>
+      <div className="max-w-6xl mx-auto w-full px-3 sm:px-4 flex flex-col items-stretch pt-1 pb-0">
+        <div className="flex justify-center">
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          className="h-9 w-9 shrink-0 rounded-full text-muted-foreground hover:text-foreground"
+          onClick={() => setOpen((v) => !v)}
+          aria-expanded={open}
+          aria-controls="danshari-intro-slide"
+          aria-label={open ? "説明を閉じる" : "説明を表示"}
+        >
+          <ChevronDown
+            className={cn(
+              "h-5 w-5 transition-transform duration-300 ease-out",
+              open && "rotate-180"
+            )}
+            aria-hidden
+          />
+        </Button>
         </div>
 
         <div
@@ -44,14 +44,12 @@ export function DanshariIntroSlideCard() {
             open ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
           )}
         >
-          <div id="danshari-intro-slide" className="min-h-0 overflow-hidden w-full">
-            <div className="max-w-6xl mx-auto px-3 sm:px-4 w-full">
-              <div className="rounded-xl border border-border bg-card text-card-foreground shadow-sm px-4 py-3 mb-3 mt-1 text-sm leading-relaxed">
-                {INTRO_COPY}
-              </div>
+          <div id="danshari-intro-slide" className="min-h-0 overflow-hidden">
+            <div className="rounded-xl border border-border bg-card text-card-foreground shadow-sm px-4 py-3 mb-3 mt-1 text-sm leading-relaxed">
+              {INTRO_COPY}
             </div>
             {user?.is_admin ? (
-              <div className="w-full min-w-0">
+              <div className="w-full pb-3">
                 <DanshariAdminUserActivity compact />
               </div>
             ) : null}

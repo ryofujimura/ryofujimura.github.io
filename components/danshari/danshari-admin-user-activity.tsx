@@ -116,27 +116,27 @@ export function DanshariAdminUserActivity({
   return (
     <section
       className={compact ? "mb-0 w-full" : "mb-6 sm:mb-8 w-full"}
-      aria-label="Guest activity"
+      aria-label="Guest hands and comments"
     >
       <Card
         className={
           compact
-            ? "w-full gap-0 rounded-xl border-border/80 py-0 shadow-sm overflow-hidden"
-            : "w-full gap-0 rounded-2xl border-border/80 py-0 shadow-sm overflow-hidden"
+            ? "w-full gap-0 py-0 rounded-xl border-border/80 shadow-sm overflow-hidden"
+            : "w-full gap-0 py-0 rounded-2xl border-border/80 shadow-sm overflow-hidden"
         }
       >
         <CardContent
           className={
             compact
-              ? "w-full max-w-none px-2 sm:px-4 pt-0 pb-3 max-h-[min(50vh,320px)] overflow-y-auto overscroll-contain"
-              : "w-full max-w-none px-3 sm:px-5 pt-0 pb-5 max-h-[min(60vh,480px)] overflow-y-auto overscroll-contain"
+              ? "w-full pt-0 pb-3 px-0 max-h-[min(50vh,320px)] overflow-y-auto overscroll-contain"
+              : "w-full pt-0 pb-4 px-0 sm:px-0 max-h-[min(60vh,480px)] overflow-y-auto overscroll-contain"
           }
         >
           <div
             className={
               compact
-                ? "grid w-full grid-cols-[repeat(auto-fill,minmax(8.5rem,1fr))] gap-2 sm:gap-2.5 items-start"
-                : "grid w-full grid-cols-[repeat(auto-fill,minmax(10rem,1fr))] gap-3 sm:gap-4 items-start"
+                ? "grid grid-cols-[repeat(auto-fill,minmax(9.25rem,1fr))] gap-2 sm:gap-2.5 items-start"
+                : "grid grid-cols-[repeat(auto-fill,minmax(11rem,1fr))] gap-3 sm:gap-4 items-start"
             }
           >
             {otherUsers.map((guestName) => {
