@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useMemo, useState, type CSSProperties } from "react"
 import Link from "next/link"
 import { Hand, MessageCircle, DollarSign } from "lucide-react"
 import { DANSHARI_ALLOWED_USERNAMES } from "@/lib/danshari/allowed-login"
@@ -113,6 +113,11 @@ export function DanshariAdminUserActivity({
 
   if (!isAdmin || otherUsers.length === 0) return null
 
+  const guestColumnCount = otherUsers.length
+  const guestGridTemplate: CSSProperties = {
+    gridTemplateColumns: `repeat(${guestColumnCount}, minmax(0, 1fr))`,
+  }
+
   return (
     <section
       className={compact ? "mb-0 w-full" : "mb-6 sm:mb-8 w-full"}
@@ -135,9 +140,10 @@ export function DanshariAdminUserActivity({
           <div
             className={
               compact
-                ? "grid grid-cols-[repeat(auto-fill,minmax(9.25rem,1fr))] gap-2 sm:gap-2.5 items-start"
-                : "grid grid-cols-[repeat(auto-fill,minmax(11rem,1fr))] gap-3 sm:gap-4 items-start"
+                ? "grid w-full gap-2 sm:gap-2.5 items-start"
+                : "grid w-full gap-3 sm:gap-4 items-start"
             }
+            style={guestGridTemplate}
           >
             {otherUsers.map((guestName) => {
               const rows = activityByUser[guestName] ?? []
