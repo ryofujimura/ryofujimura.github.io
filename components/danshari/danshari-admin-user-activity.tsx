@@ -150,96 +150,151 @@ export function DanshariAdminUserActivity({
         <CardContent
           className={
             compact
-              ? "pt-3 pb-3 px-4 space-y-4 max-h-[min(50vh,320px)] overflow-y-auto overscroll-contain"
-              : "pt-5 space-y-6"
+              ? "pt-3 pb-3 px-3 sm:px-4 max-h-[min(50vh,320px)] overflow-y-auto overscroll-contain"
+              : "pt-5 px-4 sm:px-6 max-h-[min(60vh,480px)] overflow-y-auto overscroll-contain"
           }
         >
-          {otherUsers.map((guestName) => {
-            const rows = activityByUser[guestName] ?? []
-            return (
-              <div key={guestName} className="space-y-3">
-                <h3 className="text-sm font-semibold text-foreground capitalize tracking-tight">
-                  {guestName}
-                </h3>
-                {rows.length === 0 ? (
-                  <p className="text-sm text-muted-foreground pl-0 sm:pl-1">
-                    No hands or comments on any item yet.
-                  </p>
-                ) : (
-                <ul className="space-y-3 list-none m-0 p-0">
-                  {rows.map((row) => (
-                    <li
-                      key={row.productUid}
+          <div
+            className={
+              compact
+                ? "grid grid-cols-[repeat(auto-fill,minmax(9.25rem,1fr))] gap-2 sm:gap-2.5 items-start"
+                : "grid grid-cols-[repeat(auto-fill,minmax(11rem,1fr))] gap-3 sm:gap-4 items-start"
+            }
+          >
+            {otherUsers.map((guestName) => {
+              const rows = activityByUser[guestName] ?? []
+              return (
+                <div
+                  key={guestName}
+                  className={
+                    compact
+                      ? "min-w-0 rounded-lg border border-border/70 bg-muted/25 p-2 flex flex-col gap-1.5"
+                      : "min-w-0 rounded-xl border border-border/70 bg-muted/25 p-2.5 sm:p-3 flex flex-col gap-2"
+                  }
+                >
+                  <h3
+                    className={
+                      compact
+                        ? "text-[11px] font-semibold text-foreground capitalize tracking-tight truncate"
+                        : "text-xs font-semibold text-foreground capitalize tracking-tight truncate"
+                    }
+                    title={guestName}
+                  >
+                    {guestName}
+                  </h3>
+                  {rows.length === 0 ? (
+                    <p
                       className={
                         compact
-                          ? "rounded-lg border border-border/70 bg-muted/30 p-2.5 sm:p-3 space-y-1.5"
-                          : "rounded-xl border border-border/70 bg-muted/30 p-3 sm:p-4 space-y-2"
+                          ? "text-[11px] text-muted-foreground leading-snug"
+                          : "text-xs text-muted-foreground leading-snug"
                       }
                     >
-                      <Link
-                        href={danshariProductHref(row.productUid)}
-                        className="text-sm font-medium text-primary hover:underline underline-offset-4 [overflow-wrap:anywhere]"
-                      >
-                        {row.title}
-                      </Link>
-                      <div className="flex flex-col gap-2 text-sm">
-                        {row.handRaised ? (
-                          <div className="flex items-start gap-2 text-muted-foreground">
-                            <Hand
-                              className="w-4 h-4 shrink-0 mt-0.5 text-primary"
-                              aria-hidden
-                            />
-                            <span>
-                              <span className="font-medium text-foreground">
-                                Hand
-                              </span>
-                              : raised
-                            </span>
-                          </div>
-                        ) : null}
-                        {row.userComments.map((c) => (
-                          <div
-                            key={c.id}
-                            className="flex items-start gap-2 text-muted-foreground"
+                      No activity yet.
+                    </p>
+                  ) : (
+                    <ul
+                      className={
+                        compact
+                          ? "grid grid-cols-1 gap-1.5 list-none m-0 p-0"
+                          : "grid grid-cols-1 gap-2 list-none m-0 p-0"
+                      }
+                    >
+                      {rows.map((row) => (
+                        <li
+                          key={row.productUid}
+                          className={
+                            compact
+                              ? "rounded-md border border-border/60 bg-background/70 p-1.5 space-y-1 min-w-0"
+                              : "rounded-lg border border-border/60 bg-background/70 p-2 space-y-1.5 min-w-0"
+                          }
+                        >
+                          <Link
+                            href={danshariProductHref(row.productUid)}
+                            className={
+                              compact
+                                ? "block text-[11px] font-medium text-primary hover:underline underline-offset-2 [overflow-wrap:anywhere] leading-snug"
+                                : "block text-xs font-medium text-primary hover:underline underline-offset-2 [overflow-wrap:anywhere] leading-snug"
+                            }
                           >
-                            <MessageCircle
-                              className="w-4 h-4 shrink-0 mt-0.5 text-primary"
-                              aria-hidden
-                            />
-                            <div className="min-w-0 flex-1 flex flex-wrap items-start gap-x-2 gap-y-1">
-                              <span>
-                                <span className="font-medium text-foreground">
-                                  Comment
+                            {row.title}
+                          </Link>
+                          <div
+                            className={
+                              compact
+                                ? "flex flex-col gap-1 text-[11px] text-muted-foreground"
+                                : "flex flex-col gap-1.5 text-xs text-muted-foreground"
+                            }
+                          >
+                            {row.handRaised ? (
+                              <div className="flex items-start gap-1 min-w-0">
+                                <Hand
+                                  className={
+                                    compact
+                                      ? "w-3 h-3 shrink-0 mt-0.5 text-primary"
+                                      : "w-3.5 h-3.5 shrink-0 mt-0.5 text-primary"
+                                  }
+                                  aria-hidden
+                                />
+                                <span className="min-w-0">
+                                  <span className="font-medium text-foreground">
+                                    Hand
+                                  </span>{" "}
+                                  raised
                                 </span>
-                                {c.text?.trim() ? (
-                                  <span className="text-muted-foreground">
-                                    : {c.text}
+                              </div>
+                            ) : null}
+                            {row.userComments.map((c) => (
+                              <div
+                                key={c.id}
+                                className="flex items-start gap-1 min-w-0"
+                              >
+                                <MessageCircle
+                                  className={
+                                    compact
+                                      ? "w-3 h-3 shrink-0 mt-0.5 text-primary"
+                                      : "w-3.5 h-3.5 shrink-0 mt-0.5 text-primary"
+                                  }
+                                  aria-hidden
+                                />
+                                <div className="min-w-0 flex-1 flex flex-col gap-0.5">
+                                  <span className="[overflow-wrap:anywhere]">
+                                    <span className="font-medium text-foreground">
+                                      Comment
+                                    </span>
+                                    {c.text?.trim() ? (
+                                      <span>: {c.text}</span>
+                                    ) : (
+                                      <span className="text-muted-foreground/80 italic">
+                                        {" "}
+                                        (empty)
+                                      </span>
+                                    )}
                                   </span>
-                                ) : (
-                                  <span className="text-muted-foreground/80 italic ml-1">
-                                    : (empty)
-                                  </span>
-                                )}
-                              </span>
-                              {c.price !== null && (
-                                <span
-                                  className="inline-flex shrink-0 items-center gap-0.5 text-xs font-semibold bg-[oklch(0.92_0.08_145)] text-[oklch(0.35_0.12_145)] px-2 py-0.5 rounded-full"
-                                >
-                                  <DollarSign className="w-3 h-3" />
-                                  {Math.round(c.price)}
-                                </span>
-                              )}
-                            </div>
+                                  {c.price !== null && (
+                                    <span
+                                      className={
+                                        compact
+                                          ? "inline-flex w-fit items-center gap-0.5 text-[10px] font-semibold bg-[oklch(0.92_0.08_145)] text-[oklch(0.35_0.12_145)] px-1.5 py-0.5 rounded-full"
+                                          : "inline-flex w-fit items-center gap-0.5 text-[11px] font-semibold bg-[oklch(0.92_0.08_145)] text-[oklch(0.35_0.12_145)] px-1.5 py-0.5 rounded-full"
+                                      }
+                                    >
+                                      <DollarSign className="w-2.5 h-2.5" />
+                                      {Math.round(c.price)}
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                            ))}
                           </div>
-                        ))}
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-                )}
-              </div>
-            )
-          })}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              )
+            })}
+          </div>
         </CardContent>
       </Card>
     </section>
