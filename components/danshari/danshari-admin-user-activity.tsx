@@ -34,7 +34,12 @@ function commentsByUserForProduct(
   return comments.filter((c) => c.username.toLowerCase() === key)
 }
 
-export function DanshariAdminUserActivity() {
+export function DanshariAdminUserActivity({
+  compact = false,
+}: {
+  /** Tighter layout + scroll cap when embedded under the intro strip. */
+  compact?: boolean
+} = {}) {
   const { user } = useDanshariUser()
   const [products, setProducts] = useState<Product[]>([])
   const [commentsByProduct, setCommentsByProduct] = useState<
@@ -115,15 +120,40 @@ export function DanshariAdminUserActivity() {
   if (!isAdmin || otherUsers.length === 0) return null
 
   return (
-    <section className="mb-6 sm:mb-8" aria-label="Guest activity">
-      <Card className="rounded-2xl border-border/80 shadow-sm overflow-hidden">
-        <CardHeader className="border-b border-border/60 pb-4">
-          <CardTitle className="text-base sm:text-lg">Guest activity</CardTitle>
-          <CardDescription>
+    <section
+      className={compact ? "mb-0" : "mb-6 sm:mb-8"}
+      aria-label="Guest activity"
+    >
+      <Card
+        className={
+          compact
+            ? "rounded-xl border-border/80 shadow-sm overflow-hidden"
+            : "rounded-2xl border-border/80 shadow-sm overflow-hidden"
+        }
+      >
+        <CardHeader
+          className={
+            compact
+              ? "border-b border-border/60 py-3 px-4 pb-3"
+              : "border-b border-border/60 pb-4"
+          }
+        >
+          <CardTitle
+            className={compact ? "text-sm font-semibold" : "text-base sm:text-lg"}
+          >
+            Guest activity
+          </CardTitle>
+          <CardDescription className={compact ? "text-xs" : undefined}>
             Hands raised and comments per guest (admin view).
           </CardDescription>
         </CardHeader>
-        <CardContent className="pt-5 space-y-6">
+        <CardContent
+          className={
+            compact
+              ? "pt-3 pb-3 px-4 space-y-4 max-h-[min(50vh,320px)] overflow-y-auto overscroll-contain"
+              : "pt-5 space-y-6"
+          }
+        >
           {otherUsers.map((guestName) => {
             const rows = activityByUser[guestName] ?? []
             return (
@@ -140,7 +170,11 @@ export function DanshariAdminUserActivity() {
                   {rows.map((row) => (
                     <li
                       key={row.productUid}
-                      className="rounded-xl border border-border/70 bg-muted/30 p-3 sm:p-4 space-y-2"
+                      className={
+                        compact
+                          ? "rounded-lg border border-border/70 bg-muted/30 p-2.5 sm:p-3 space-y-1.5"
+                          : "rounded-xl border border-border/70 bg-muted/30 p-3 sm:p-4 space-y-2"
+                      }
                     >
                       <Link
                         href={danshariProductHref(row.productUid)}
