@@ -76,11 +76,14 @@ export function DanshariAdminUserActivity({
     }
   }, [isAdmin, productKey])
 
-  const otherUsers = useMemo(() => {
-    if (!user?.username) return []
-    const me = user.username.toLowerCase()
-    return DANSHARI_ALLOWED_USERNAMES.filter((n) => n !== me)
-  }, [user?.username])
+  /** All allowed users for the admin grid, with `ryo` first (host). */
+  const panelUsernames = useMemo(() => {
+    const withoutRyo = DANSHARI_ALLOWED_USERNAMES.filter((n) => n !== "ryo")
+    if (!DANSHARI_ALLOWED_USERNAMES.includes("ryo")) {
+      return [...DANSHARI_ALLOWED_USERNAMES]
+    }
+    return ["ryo", ...withoutRyo]
+  }, [])
 
   const activityByUser = useMemo(() => {
     type Row = {
@@ -90,7 +93,7 @@ export function DanshariAdminUserActivity({
       userComments: Comment[]
     }
     const out: Record<string, Row[]> = {}
-    for (const name of otherUsers) {
+    for (const name of panelUsernames) {
       const rows: Row[] = []
       for (const p of products) {
         const handRaised = userRaisedHand(p, name)
@@ -109,11 +112,11 @@ export function DanshariAdminUserActivity({
       out[name] = rows
     }
     return out
-  }, [otherUsers, products, commentsByProduct])
+  }, [panelUsernames, products, commentsByProduct])
 
-  if (!isAdmin || otherUsers.length === 0) return null
+  if (!isAdmin || panelUsernames.length === 0) return null
 
-  const guestColumnCount = otherUsers.length
+  const guestColumnCount = panelUsernames.length
   const guestGridTemplate: CSSProperties = {
     gridTemplateColumns: `repeat(${guestColumnCount}, minmax(0, 1fr))`,
   }
@@ -145,7 +148,7 @@ export function DanshariAdminUserActivity({
             }
             style={guestGridTemplate}
           >
-            {otherUsers.map((guestName) => {
+            {panelUsernames.map((guestName) => {
               const rows = activityByUser[guestName] ?? []
               return (
                 <div
