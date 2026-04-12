@@ -8,6 +8,10 @@ import {
 } from "@/lib/danshari/recommended"
 import type { Product } from "@/lib/danshari/types"
 import { DanshariProductImage } from "@/components/danshari/danshari-product-image"
+import {
+  SoldListingOverlay,
+  soldListingImageToneClass,
+} from "@/components/danshari/sold-listing-overlay"
 import { DanshariTagPills } from "@/components/danshari/tag-pills"
 import {
   type CarouselApi,
@@ -33,51 +37,76 @@ function RecommendedCardInner({
 }) {
   const { src, srcSet, placeholderSrc } = getListingImagePresentation(product)
   const isSidebar = variant === "sidebar"
+  const sold = Boolean(product.sold)
 
-  return (
-    <div className="rounded-xl border border-border bg-card overflow-hidden shadow-sm">
-      <Link
-        href={danshariProductHref(product.uid)}
+  const linkBody = (
+    <>
+      <div
         className={cn(
-          "flex",
-          isSidebar ? "flex-row items-stretch gap-3 p-2" : "flex-col",
+          "relative shrink-0 overflow-hidden bg-muted",
+          isSidebar ? "h-20 w-20 rounded-lg" : "aspect-square w-full rounded-t-xl",
         )}
       >
+        <DanshariProductImage
+          mode="thumb"
+          src={src}
+          srcSet={srcSet}
+          placeholderSrc={placeholderSrc}
+          alt={product.title}
+          className={cn("object-cover", soldListingImageToneClass(sold))}
+          sizes={isSidebar ? "80px" : "(max-width: 640px) 85vw, 280px"}
+          viewportRootMargin="280px"
+          deferDecode={deferDecode}
+        />
+        <SoldListingOverlay sold={sold} />
+        {product.claimants.length > 0 ? (
+          <div className="absolute top-1.5 right-1.5 z-10 flex items-center gap-0.5 rounded-full bg-primary/90 px-1.5 py-0.5 text-[10px] font-medium text-primary-foreground">
+            <Hand className="size-2.5 shrink-0" aria-hidden />
+            {product.claimants.length}
+          </div>
+        ) : null}
+      </div>
+      <div
+        className={cn(
+          "min-w-0 flex flex-col justify-center",
+          isSidebar ? "py-0.5 pr-1" : "p-3 pb-2",
+        )}
+      >
+        <p className="font-medium text-foreground line-clamp-2 text-sm leading-snug">
+          {product.title}
+        </p>
+      </div>
+    </>
+  )
+
+  return (
+    <div
+      className={cn(
+        "rounded-xl border border-border bg-card overflow-hidden shadow-sm",
+        sold && "opacity-95",
+      )}
+    >
+      {sold ? (
         <div
           className={cn(
-            "relative shrink-0 overflow-hidden bg-muted",
-            isSidebar ? "h-20 w-20 rounded-lg" : "aspect-square w-full rounded-t-xl",
+            "flex cursor-default",
+            isSidebar ? "flex-row items-stretch gap-3 p-2" : "flex-col",
           )}
+          aria-label={`${product.title} — sold`}
         >
-          <DanshariProductImage
-            mode="thumb"
-            src={src}
-            srcSet={srcSet}
-            placeholderSrc={placeholderSrc}
-            alt={product.title}
-            className="object-cover"
-            sizes={isSidebar ? "80px" : "(max-width: 640px) 85vw, 280px"}
-            viewportRootMargin="280px"
-            deferDecode={deferDecode}
-          />
-          {product.claimants.length > 0 ? (
-            <div className="absolute top-1.5 right-1.5 z-10 flex items-center gap-0.5 rounded-full bg-primary/90 px-1.5 py-0.5 text-[10px] font-medium text-primary-foreground">
-              <Hand className="size-2.5 shrink-0" aria-hidden />
-              {product.claimants.length}
-            </div>
-          ) : null}
+          {linkBody}
         </div>
-        <div
+      ) : (
+        <Link
+          href={danshariProductHref(product.uid)}
           className={cn(
-            "min-w-0 flex flex-col justify-center",
-            isSidebar ? "py-0.5 pr-1" : "p-3 pb-2",
+            "flex",
+            isSidebar ? "flex-row items-stretch gap-3 p-2" : "flex-col",
           )}
         >
-          <p className="font-medium text-foreground line-clamp-2 text-sm leading-snug">
-            {product.title}
-          </p>
-        </div>
-      </Link>
+          {linkBody}
+        </Link>
+      )}
       <div className={cn("px-3 pb-2", isSidebar && "pl-[calc(0.5rem+5rem)] pr-2 pt-0")}>
         <DanshariTagPills
           tags={product.tags}

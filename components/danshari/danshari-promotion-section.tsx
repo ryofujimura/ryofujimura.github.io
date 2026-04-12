@@ -7,16 +7,19 @@ import { getListingImagePresentation } from "@/lib/danshari/recommended"
 import type { Product } from "@/lib/danshari/types"
 import { useDanshariUser } from "@/lib/danshari/user-context"
 import { DanshariProductImage } from "@/components/danshari/danshari-product-image"
+import {
+  SoldListingOverlay,
+  soldListingImageToneClass,
+} from "@/components/danshari/sold-listing-overlay"
+import { cn } from "@/lib/utils"
 
 function PromotionCard({ product }: { product: Product }) {
   const { src, srcSet, placeholderSrc } = getListingImagePresentation(product)
   const msg = product.promotion_message?.trim()
+  const sold = Boolean(product.sold)
 
-  return (
-    <Link
-      href={danshariProductHref(product.uid)}
-      className="flex h-full min-h-0 gap-3 sm:gap-4 rounded-2xl border border-border bg-card p-3 sm:p-4 shadow-sm hover:shadow-md transition-shadow"
-    >
+  const inner = (
+    <>
       <div className="relative w-[5.25rem] h-[5.25rem] sm:w-28 sm:h-28 shrink-0 rounded-xl overflow-hidden bg-muted">
         <DanshariProductImage
           mode="thumb"
@@ -24,9 +27,10 @@ function PromotionCard({ product }: { product: Product }) {
           srcSet={srcSet}
           placeholderSrc={placeholderSrc}
           alt=""
-          className="object-cover size-full"
+          className={cn("object-cover size-full", soldListingImageToneClass(sold))}
           sizes="(max-width: 640px) 84px, 112px"
         />
+        <SoldListingOverlay sold={sold} />
       </div>
       <div className="min-w-0 flex-1 py-0.5">
         <h3 className="font-medium text-foreground text-sm sm:text-base leading-snug line-clamp-2">
@@ -38,6 +42,29 @@ function PromotionCard({ product }: { product: Product }) {
           </p>
         ) : null}
       </div>
+    </>
+  )
+
+  const shellClass =
+    "flex h-full min-h-0 gap-3 sm:gap-4 rounded-2xl border border-border bg-card p-3 sm:p-4 shadow-sm transition-shadow"
+
+  if (sold) {
+    return (
+      <div
+        className={cn(shellClass, "cursor-default opacity-95")}
+        aria-label={`${product.title} — sold`}
+      >
+        {inner}
+      </div>
+    )
+  }
+
+  return (
+    <Link
+      href={danshariProductHref(product.uid)}
+      className={cn(shellClass, "hover:shadow-md")}
+    >
+      {inner}
     </Link>
   )
 }

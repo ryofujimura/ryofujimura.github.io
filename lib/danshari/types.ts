@@ -25,6 +25,8 @@ export interface Product {
   promotion_message: string
   /** Lowercase logins that see this product in the Promotion block. */
   promotion_usernames: string[]
+  /** When true, listings show as sold and the product page is not reachable for guests. */
+  sold: boolean
   created_at: string
 }
 

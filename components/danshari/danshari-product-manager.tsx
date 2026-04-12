@@ -136,6 +136,7 @@ export function DanshariProductManager() {
           claimants: [],
           promotion_message: "",
           promotion_usernames: [],
+          sold: false,
           created_at: new Date().toISOString(),
         })
       }
@@ -195,6 +196,7 @@ export function DanshariProductManager() {
         : [],
       promotion_message: (p.promotion_message ?? "").trim(),
       promotion_usernames: normalizePromotionUsernames(p.promotion_usernames),
+      sold: Boolean(p.sold),
     }))
     setPublishing(true)
     try {
@@ -659,6 +661,15 @@ const ProductEditorRow = memo(function ProductEditorRow({
                   tags={Array.isArray(p.tags) ? p.tags : ["General"]}
                   onChange={(tags) => handlePatch({ tags })}
                 />
+                <label className="flex items-center gap-2 text-xs cursor-pointer select-none w-fit">
+                  <Checkbox
+                    checked={Boolean(p.sold)}
+                    onCheckedChange={(v) =>
+                      handlePatch({ sold: v === true })
+                    }
+                  />
+                  <span className="text-foreground font-medium">Sold</span>
+                </label>
                 <div className="rounded-xl border border-border/80 bg-muted/30 p-3 space-y-2">
                   <label className="text-xs font-medium text-muted-foreground">
                     Promotion

@@ -36,6 +36,10 @@ import { DanshariDescriptionRich } from "@/components/danshari/description-rich"
 import { DanshariHeader } from "@/components/danshari/header"
 import { DanshariProductImage } from "@/components/danshari/danshari-product-image"
 import { DanshariTagPills } from "@/components/danshari/tag-pills"
+import {
+  SoldListingOverlay,
+  soldListingImageToneClass,
+} from "@/components/danshari/sold-listing-overlay"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -47,7 +51,13 @@ import {
   DollarSign,
 } from "lucide-react"
 
-function RelatedThumbImage({ product }: { product: Product }) {
+function RelatedThumbImage({
+  product,
+  sold = false,
+}: {
+  product: Product
+  sold?: boolean
+}) {
   const { src, srcSet, placeholderSrc } = getListingImagePresentation(product)
   return (
     <DanshariProductImage
@@ -58,6 +68,7 @@ function RelatedThumbImage({ product }: { product: Product }) {
       alt={product.title}
       sizes="64px"
       viewportGate={false}
+      className={soldListingImageToneClass(sold)}
     />
   )
 }
@@ -211,6 +222,23 @@ function ProductViewInner() {
         <DanshariHeader />
         <main className="max-w-2xl mx-auto px-4 py-8 text-center">
           <p className="text-muted-foreground">Product not found.</p>
+          <Button asChild variant="ghost" className="mt-4">
+            <Link href={danshariHref()}>
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Back to products
+            </Link>
+          </Button>
+        </main>
+      </div>
+    )
+  }
+
+  if (product.sold) {
+    return (
+      <div className="min-h-screen bg-background">
+        <DanshariHeader />
+        <main className="max-w-2xl mx-auto px-4 py-8 text-center">
+          <p className="text-muted-foreground">This item has been sold.</p>
           <Button asChild variant="ghost" className="mt-4">
             <Link href={danshariHref()}>
               <ArrowLeft className="w-4 h-4 mr-2" />
@@ -419,20 +447,39 @@ function ProductViewInner() {
             <h2 className="text-sm font-medium text-muted-foreground mb-3">
               Related item
             </h2>
-            <div className="rounded-xl border border-border bg-card overflow-hidden hover:border-primary/30 transition-colors">
-              <Link
-                href={danshariProductHref(relatedProduct.uid)}
-                className="flex items-center gap-3 p-3 pb-2"
-              >
-                <div className="relative w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
-                  <RelatedThumbImage product={relatedProduct} />
+            <div
+              className={cn(
+                "rounded-xl border border-border bg-card overflow-hidden transition-colors",
+                !relatedProduct.sold && "hover:border-primary/30",
+              )}
+            >
+              {relatedProduct.sold ? (
+                <div className="flex items-center gap-3 p-3 pb-2 cursor-default">
+                  <div className="relative w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
+                    <RelatedThumbImage product={relatedProduct} sold />
+                    <SoldListingOverlay sold />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="font-medium text-foreground truncate">
+                      {relatedProduct.title}
+                    </p>
+                  </div>
                 </div>
-                <div className="min-w-0">
-                  <p className="font-medium text-foreground truncate">
-                    {relatedProduct.title}
-                  </p>
-                </div>
-              </Link>
+              ) : (
+                <Link
+                  href={danshariProductHref(relatedProduct.uid)}
+                  className="flex items-center gap-3 p-3 pb-2"
+                >
+                  <div className="relative w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
+                    <RelatedThumbImage product={relatedProduct} />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="font-medium text-foreground truncate">
+                      {relatedProduct.title}
+                    </p>
+                  </div>
+                </Link>
+              )}
               <div className="px-3 pb-3 pl-[calc(0.75rem+4rem+0.75rem)]">
                 <DanshariTagPills
                   tags={relatedProduct.tags}

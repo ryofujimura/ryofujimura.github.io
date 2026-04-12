@@ -44,6 +44,8 @@ export function catalogListSignature(list: Product[]): string {
       p.promotion_message ?? "",
       "\t",
       (p.promotion_usernames ?? []).join("\x1e"),
+      "\t",
+      p.sold ? "1" : "0",
       "\n",
     )
   }

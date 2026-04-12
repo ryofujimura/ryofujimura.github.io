@@ -89,6 +89,7 @@ export function DanshariAdminUserActivity({
     type Row = {
       productUid: string
       title: string
+      sold: boolean
       handRaised: boolean
       userComments: Comment[]
     }
@@ -105,6 +106,7 @@ export function DanshariAdminUserActivity({
         rows.push({
           productUid: p.uid,
           title: p.title || "Untitled",
+          sold: Boolean(p.sold),
           handRaised,
           userComments,
         })
@@ -196,16 +198,31 @@ export function DanshariAdminUserActivity({
                               : "rounded-lg border border-border/60 bg-background/70 p-2 space-y-1.5 min-w-0"
                           }
                         >
-                          <Link
-                            href={danshariProductHref(row.productUid)}
-                            className={
-                              compact
-                                ? "block text-[11px] font-medium text-primary hover:underline underline-offset-2 [overflow-wrap:anywhere] leading-snug"
-                                : "block text-xs font-medium text-primary hover:underline underline-offset-2 [overflow-wrap:anywhere] leading-snug"
-                            }
-                          >
-                            {row.title}
-                          </Link>
+                          {row.sold ? (
+                            <span
+                              className={
+                                compact
+                                  ? "block text-[11px] font-medium text-muted-foreground [overflow-wrap:anywhere] leading-snug"
+                                  : "block text-xs font-medium text-muted-foreground [overflow-wrap:anywhere] leading-snug"
+                              }
+                            >
+                              {row.title}
+                              <span className="ml-1 text-[10px] uppercase tracking-wide">
+                                (sold)
+                              </span>
+                            </span>
+                          ) : (
+                            <Link
+                              href={danshariProductHref(row.productUid)}
+                              className={
+                                compact
+                                  ? "block text-[11px] font-medium text-primary hover:underline underline-offset-2 [overflow-wrap:anywhere] leading-snug"
+                                  : "block text-xs font-medium text-primary hover:underline underline-offset-2 [overflow-wrap:anywhere] leading-snug"
+                              }
+                            >
+                              {row.title}
+                            </Link>
+                          )}
                           <div
                             className={
                               compact

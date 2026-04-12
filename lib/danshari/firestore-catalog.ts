@@ -37,6 +37,7 @@ const STORAGE_PREFIX = "danshari"
  * - related_item_uid: string | null
  * - claimants: string[]
  * - promotion_message: string, promotion_usernames: string[] (optional / legacy)
+ * - sold: boolean (optional; treated as false when missing)
  * - created_at: Timestamp (preferred) or ISO string (legacy reads)
  *
  * Subcollection `comments`: username, text, price|null, created_at (Timestamp).
@@ -78,6 +79,7 @@ export function docToProduct(d: DocumentSnapshot): Product {
       claimants: [],
       promotion_message: "",
       promotion_usernames: [],
+      sold: false,
       created_at: new Date().toISOString(),
     }
   }
@@ -138,6 +140,7 @@ export function docToProduct(d: DocumentSnapshot): Product {
     promotion_message:
       typeof x.promotion_message === "string" ? x.promotion_message : "",
     promotion_usernames: normalizePromotionUsernames(x.promotion_usernames),
+    sold: x.sold === true,
     created_at: tsToIso(x.created_at),
   }
 }
@@ -324,6 +327,7 @@ export async function setProductsRemote(products: Product[]): Promise<void> {
         claimants: p.claimants,
         promotion_message: p.promotion_message ?? "",
         promotion_usernames: normalizePromotionUsernames(p.promotion_usernames),
+        sold: Boolean(p.sold),
         created_at: createdAtForFirestore(p.created_at),
       },
     })
