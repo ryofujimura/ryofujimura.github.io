@@ -1,6 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: "export",
+  /** GitHub Pages and similar hosts need `photos/index.html`, not only `photos.html`, for `/photos`. */
+  trailingSlash: true,
   devIndicators: false,
   typescript: {
     ignoreBuildErrors: true,
