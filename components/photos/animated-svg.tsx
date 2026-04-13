@@ -9,6 +9,21 @@ if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
 }
 
+/** `getTotalLength()` throws InvalidStateError when the node is in a non-rendered subtree (e.g. `display: none`). */
+function measureStrokeLengths(nodes: Iterable<Element>): number[] | null {
+  const lengths: number[] = [];
+  for (const node of nodes) {
+    const geom = node as SVGGeometryElement;
+    if (typeof geom.getTotalLength !== "function") return null;
+    try {
+      lengths.push(geom.getTotalLength());
+    } catch {
+      return null;
+    }
+  }
+  return lengths;
+}
+
 interface AnimatedSVGProps {
   className?: string;
   variant?: "vitruvian" | "flourish" | "compass" | "ornament";
@@ -25,30 +40,61 @@ export function AnimatedSVG({
   useEffect(() => {
     if (!animate || !svgRef.current) return;
 
-    const paths = svgRef.current.querySelectorAll("path, circle, line");
+    const root = svgRef.current;
+    let ctx: gsap.Context | null = null;
+    let ro: ResizeObserver | null = null;
 
-    const ctx = gsap.context(() => {
-      paths.forEach((path) => {
-        const length = (path as SVGPathElement).getTotalLength?.() || 100;
-        gsap.set(path, {
-          strokeDasharray: length,
-          strokeDashoffset: length,
+    const mount = () => {
+      const shapes = root.querySelectorAll("path, circle, line");
+      if (shapes.length === 0) return false;
+
+      const lengths = measureStrokeLengths(shapes);
+      if (!lengths) return false;
+
+      ctx?.revert();
+      ctx = gsap.context(() => {
+        shapes.forEach((path, i) => {
+          const length = lengths[i]!;
+          gsap.set(path, {
+            strokeDasharray: length,
+            strokeDashoffset: length,
+          });
+
+          gsap.to(path, {
+            strokeDashoffset: 0,
+            duration: 2,
+            ease: "power2.inOut",
+            scrollTrigger: {
+              trigger: root,
+              start: "top 80%",
+              toggleActions: "play none none reverse",
+            },
+          });
         });
+      }, svgRef);
 
-        gsap.to(path, {
-          strokeDashoffset: 0,
-          duration: 2,
-          ease: "power2.inOut",
-          scrollTrigger: {
-            trigger: svgRef.current,
-            start: "top 80%",
-            toggleActions: "play none none reverse",
-          },
-        });
-      });
-    }, svgRef);
+      ScrollTrigger.refresh();
+      return true;
+    };
 
-    return () => ctx.revert();
+    const tryMount = () => {
+      if (!mount()) return;
+      ro?.disconnect();
+      ro = null;
+      window.removeEventListener("resize", tryMount);
+    };
+
+    if (!mount()) {
+      ro = new ResizeObserver(() => tryMount());
+      ro.observe(root);
+      window.addEventListener("resize", tryMount);
+    }
+
+    return () => {
+      ro?.disconnect();
+      window.removeEventListener("resize", tryMount);
+      ctx?.revert();
+    };
   }, [animate]);
 
   if (variant === "vitruvian") {
