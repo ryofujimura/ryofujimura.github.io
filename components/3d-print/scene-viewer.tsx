@@ -27,7 +27,7 @@ const MODELS = [
     roughness: 0.35,
   },
   {
-    label: "Bose Soundlink",
+    label: "MX Ergo S ",
     url: "/3d-print/models/honda-nsx-02-body.stl",
     color: "#c8c8c8",
     metalness: 0.55,
