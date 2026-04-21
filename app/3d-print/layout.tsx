@@ -1,7 +1,7 @@
 import React from "react"
 import type { Metadata, Viewport } from "next"
 import { JetBrains_Mono, Space_Grotesk } from "next/font/google"
-import "./custom.css"
+import "./3d-print.css"
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
@@ -23,12 +23,12 @@ export const viewport: Viewport = {
   themeColor: "#0a0a0a",
 }
 
-export default function CustomLandingLayout({
+export default function ThreeDPrintLandingLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <div
-      className={`custom-landing-page min-h-screen overflow-x-hidden antialiased ${spaceGrotesk.variable} ${jetbrainsMono.variable}`}
+      className={`page-3d-print min-h-screen overflow-x-hidden antialiased ${spaceGrotesk.variable} ${jetbrainsMono.variable}`}
     >
       {children}
     </div>

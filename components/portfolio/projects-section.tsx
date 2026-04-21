@@ -106,10 +106,10 @@ const projects = [
   },
   {
     id: "08",
-    title: "Custom 3D-Printed Mouse",
+    title: "3D-Printed Mouse",
     subtitle: "Personalized Input Device Research",
     year: "2024",
-    description: "Designed personalized 3D-printed mouse reducing total weight by 45%, with 15.1g custom shell and stress-tested 15% infill. Published at ACM/IEEE ICCPS 2025.",
+    description: "Designed personalized 3D-printed mouse reducing total weight by 45%, with 15.1g printed shell and stress-tested 15% infill. Published at ACM/IEEE ICCPS 2025.",
     skills: ["3D Printing", "CAD", "Research", "HCI"],
     links: [
       { type: "website" as LinkType, url: "/#experience-cpx-lab" },

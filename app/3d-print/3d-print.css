@@ -1,6 +1,6 @@
-/* /custom — STL portfolio: scoped theme (dark brutalist) */
+/* /3d-print — STL portfolio: scoped theme (dark brutalist) */
 
-.custom-landing-page {
+.page-3d-print {
   --background: oklch(0.04 0 0);
   --foreground: oklch(0.92 0 0);
   --card: oklch(0.07 0 0);
@@ -41,32 +41,32 @@
   font-family: var(--font-stl-sans), system-ui, sans-serif;
 }
 
-.custom-landing-page .font-sans {
+.page-3d-print .font-sans {
   font-family: var(--font-stl-sans), system-ui, sans-serif;
 }
 
-.custom-landing-page .font-mono {
+.page-3d-print .font-mono {
   font-family: var(--font-stl-mono), ui-monospace, monospace;
 }
 
-.custom-landing-page ::-webkit-scrollbar {
+.page-3d-print ::-webkit-scrollbar {
   width: 4px;
 }
 
-.custom-landing-page ::-webkit-scrollbar-track {
+.page-3d-print ::-webkit-scrollbar-track {
   background: oklch(0.04 0 0);
 }
 
-.custom-landing-page ::-webkit-scrollbar-thumb {
+.page-3d-print ::-webkit-scrollbar-thumb {
   background: oklch(0.25 0 0);
 }
 
-.custom-landing-page ::selection {
+.page-3d-print ::selection {
   background: oklch(0.3 0 0);
   color: oklch(1 0 0);
 }
 
-@keyframes custom-stl-marquee {
+@keyframes page-3d-print-marquee {
   0% {
     transform: translateX(0);
   }
@@ -75,6 +75,6 @@
   }
 }
 
-.custom-landing-page .animate-marquee {
-  animation: custom-stl-marquee 30s linear infinite;
+.page-3d-print .animate-marquee {
+  animation: page-3d-print-marquee 30s linear infinite;
 }

@@ -54,7 +54,7 @@ export function SiteFooter() {
         {/* Info */}
         <div className="flex flex-col gap-4 items-start md:items-end">
           <span className="font-mono text-[10px] tracking-[0.3em] text-muted-foreground/40 uppercase">
-            {"// stl_portfolio.sys"}
+            {"// 3d-print.sys"}
           </span>
           <div className="flex items-center gap-4">
             {["GitHub", "Twitter", "Docs"].map((link) => (

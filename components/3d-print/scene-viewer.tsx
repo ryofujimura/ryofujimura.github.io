@@ -14,21 +14,21 @@ const FIT_SIZE = 2.2
 const MODELS = [
   {
     label: "MX Master 3",
-    url: "/custom/models/honda-nsx-02-body-3.stl",
+    url: "/3d-print/models/honda-nsx-02-body-3.stl",
     color: "#c8c8c8",
     metalness: 0.55,
     roughness: 0.35,
   },
   {
     label: "MX Anywhere 3S",
-    url: "/custom/models/honda-nsx-02-body-2.stl",
+    url: "/3d-print/models/honda-nsx-02-body-2.stl",
     color: "#c8c8c8",
     metalness: 0.55,
     roughness: 0.35,
   },
   {
     label: "Bose Soundlink",
-    url: "/custom/models/honda-nsx-02-body.stl",
+    url: "/3d-print/models/honda-nsx-02-body.stl",
     color: "#c8c8c8",
     metalness: 0.55,
     roughness: 0.35,

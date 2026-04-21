@@ -1,15 +1,15 @@
 "use client"
 
 import dynamic from "next/dynamic"
-import { AsciiBackground } from "@/components/custom/ascii-background"
-import { GridOverlay } from "@/components/custom/grid-overlay"
-import { NavHeader } from "@/components/custom/nav-header"
-import { HeroSection } from "@/components/custom/hero-section"
-import { FeatureCards } from "@/components/custom/feature-cards"
-import { SiteFooter } from "@/components/custom/site-footer"
+import { AsciiBackground } from "@/components/3d-print/ascii-background"
+import { GridOverlay } from "@/components/3d-print/grid-overlay"
+import { NavHeader } from "@/components/3d-print/nav-header"
+import { HeroSection } from "@/components/3d-print/hero-section"
+import { FeatureCards } from "@/components/3d-print/feature-cards"
+import { SiteFooter } from "@/components/3d-print/site-footer"
 
 const SceneViewer = dynamic(
-  () => import("@/components/custom/scene-viewer").then((mod) => mod.SceneViewer),
+  () => import("@/components/3d-print/scene-viewer").then((mod) => mod.SceneViewer),
   {
     ssr: false,
     loading: () => (
@@ -22,7 +22,7 @@ const SceneViewer = dynamic(
   }
 )
 
-export default function CustomPage() {
+export default function ThreeDPrintPage() {
   return (
     <>
       <AsciiBackground />
