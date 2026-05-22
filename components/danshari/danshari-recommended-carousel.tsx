@@ -58,7 +58,7 @@ function RecommendedCardInner({
           viewportRootMargin="280px"
           deferDecode={deferDecode}
         />
-        <SoldListingOverlay sold={sold} />
+        <SoldListingOverlay sold={sold} claimants={product.claimants} />
         {product.claimants.length > 0 ? (
           <div className="absolute top-1.5 right-1.5 z-10 flex items-center gap-0.5 rounded-full bg-primary/90 px-1.5 py-0.5 text-[10px] font-medium text-primary-foreground">
             <Hand className="size-2.5 shrink-0" aria-hidden />

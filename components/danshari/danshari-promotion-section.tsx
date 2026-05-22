@@ -30,7 +30,7 @@ function PromotionCard({ product }: { product: Product }) {
           className={cn("object-cover size-full", soldListingImageToneClass(sold))}
           sizes="(max-width: 640px) 84px, 112px"
         />
-        <SoldListingOverlay sold={sold} />
+        <SoldListingOverlay sold={sold} claimants={product.claimants} />
       </div>
       <div className="min-w-0 flex-1 py-0.5">
         <h3 className="font-medium text-foreground text-sm sm:text-base leading-snug line-clamp-2">

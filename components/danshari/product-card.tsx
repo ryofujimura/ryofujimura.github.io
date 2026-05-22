@@ -44,7 +44,7 @@ function DanshariProductCardInner({ product, activeTag }: ProductCardProps) {
           )}
           sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
         />
-        <SoldListingOverlay sold={sold} />
+        <SoldListingOverlay sold={sold} claimants={product.claimants} />
         {hasTwoPhotos ? (
           <div className="absolute bottom-2 left-2 z-10 rounded-md bg-background/85 px-1.5 py-0.5 text-[10px] font-medium text-foreground backdrop-blur-sm border border-border/60">
             2 photos

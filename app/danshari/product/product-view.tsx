@@ -457,7 +457,7 @@ function ProductViewInner() {
                 <div className="flex items-center gap-3 p-3 pb-2 cursor-default">
                   <div className="relative w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
                     <RelatedThumbImage product={relatedProduct} sold />
-                    <SoldListingOverlay sold />
+                    <SoldListingOverlay sold claimants={relatedProduct.claimants} />
                   </div>
                   <div className="min-w-0">
                     <p className="font-medium text-foreground truncate">
