@@ -13,15 +13,12 @@ gsap.registerPlugin(ScrollTrigger, useGSAP)
 export function ShowcaseSection() {
   const sectionRef = useRef<HTMLElement>(null)
   const trackRef = useRef<HTMLDivElement>(null)
-  const cursorRef = useRef<HTMLDivElement>(null)
   const slideRefs = useRef<(HTMLDivElement | null)[]>([])
   const rowRefs = useRef<(HTMLDivElement | null)[]>([])
   const categoryIndexRef = useRef(0)
   const isAnimatingRef = useRef(false)
 
   const [activeIndex, setActiveIndex] = useState(0)
-  const [cursorLabel, setCursorLabel] = useState(SHOWCASE_CATEGORIES[0]?.label ?? "")
-  const [cursorVisible, setCursorVisible] = useState(false)
   const isMobile = useIsMobile()
 
   const setSlideRef = useCallback((index: number, el: HTMLDivElement | null) => {
@@ -93,8 +90,7 @@ export function ShowcaseSection() {
   }, [])
 
   const selectCategory = useCallback(
-    (index: number, label: string) => {
-      setCursorLabel(label)
+    (index: number) => {
       if (index !== categoryIndexRef.current) {
         setActiveIndex(index)
         animateToCategory(index)
@@ -106,13 +102,7 @@ export function ShowcaseSection() {
   useGSAP(
     () => {
       const section = sectionRef.current
-      const cursor = cursorRef.current
-      if (!section || !cursor) return
-
-      const quickX = gsap.quickTo(cursor, "x", { duration: 0.35, ease: "power3.out" })
-      const quickY = gsap.quickTo(cursor, "y", { duration: 0.35, ease: "power3.out" })
-
-      gsap.set(cursor, { x: 0, y: 0, scale: 0, autoAlpha: 0 })
+      if (!section) return
 
       slideRefs.current.forEach((slide, i) => {
         if (!slide) return
@@ -122,30 +112,6 @@ export function ShowcaseSection() {
           gsap.set(slide, { xPercent: 100, autoAlpha: 0, pointerEvents: "none" })
         }
       })
-
-      const onMove = (e: MouseEvent) => {
-        const rect = section.getBoundingClientRect()
-        quickX(e.clientX - rect.left)
-        quickY(e.clientY - rect.top)
-      }
-
-      const onEnter = () => {
-        if (window.matchMedia("(pointer: coarse)").matches) return
-        setCursorVisible(true)
-        gsap.to(cursor, { autoAlpha: 1, scale: 1, duration: 0.25, ease: "power2.out" })
-      }
-
-      const onLeave = () => {
-        setCursorVisible(false)
-        gsap.to(cursor, { autoAlpha: 0, scale: 0, duration: 0.2, ease: "power2.in" })
-      }
-
-      const coarsePointer = window.matchMedia("(pointer: coarse)").matches
-      section.addEventListener("mousemove", onMove)
-      if (!coarsePointer) {
-        section.addEventListener("mouseenter", onEnter)
-        section.addEventListener("mouseleave", onLeave)
-      }
 
       gsap.fromTo(
         ".showcase-intro",
@@ -184,13 +150,6 @@ export function ShowcaseSection() {
         )
       }
 
-      return () => {
-        section.removeEventListener("mousemove", onMove)
-        if (!coarsePointer) {
-          section.removeEventListener("mouseenter", onEnter)
-          section.removeEventListener("mouseleave", onLeave)
-        }
-      }
     },
     { scope: sectionRef, dependencies: [] }
   )
@@ -200,32 +159,21 @@ export function ShowcaseSection() {
       ref={sectionRef}
       id="showcase"
       aria-labelledby="showcase-title"
-      className={cn(
-        "relative py-20 sm:py-28 overflow-hidden bg-background text-foreground",
-        "border-t border-foreground/10",
-        !isMobile && "cursor-none"
-      )}
+      className="relative py-20 sm:py-28 overflow-hidden bg-background text-foreground border-t border-foreground/10"
     >
-      <div
-        ref={cursorRef}
-        className={cn(
-          "pointer-events-none absolute top-0 left-0 z-50 -translate-x-1/2 -translate-y-1/2",
-          !cursorVisible && "opacity-0"
-        )}
-        aria-hidden
-      >
-        <div className="flex items-center justify-center rounded-full px-3 py-1.5 font-mono text-[9px] uppercase tracking-[0.2em] whitespace-nowrap bg-foreground text-background">
-          {cursorLabel}
-        </div>
-      </div>
-
       <div className="relative z-10 w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <header className="mb-10 sm:mb-14">
-          <p
-            id="showcase-title"
-            className="showcase-intro font-mono text-[9px] sm:text-[10px] uppercase tracking-[0.35em] text-muted-foreground"
-          >
+          <p className="showcase-intro font-mono text-[9px] sm:text-[10px] uppercase tracking-[0.35em] text-muted-foreground mb-4">
             {"// SELECTED_WORK"}
+          </p>
+          <h2
+            id="showcase-title"
+            className="showcase-intro font-mono text-3xl sm:text-4xl md:text-5xl font-black tracking-tighter uppercase text-foreground"
+          >
+            Showcase
+          </h2>
+          <p className="showcase-intro mt-4 max-w-lg font-mono text-xs sm:text-sm leading-relaxed text-muted-foreground">
+            Hover a category to switch tracks. Scroll horizontally within each row to browse projects.
           </p>
         </header>
 
@@ -238,7 +186,7 @@ export function ShowcaseSection() {
               key={cat.id}
               label={cat.label}
               isActive={activeIndex === index}
-              onSelect={() => selectCategory(index, cat.label)}
+              onSelect={() => selectCategory(index)}
               allowClick={isMobile}
             />
           ))}
