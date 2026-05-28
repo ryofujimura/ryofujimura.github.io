@@ -221,17 +221,11 @@ export function ShowcaseSection() {
 
       <div className="relative z-10 w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <header className="mb-10 sm:mb-14">
-          <p className="showcase-intro font-mono text-[9px] sm:text-[10px] uppercase tracking-[0.35em] text-muted-foreground mb-4">
-            {"// SELECTED_WORK"}
-          </p>
-          <h2
+          <p
             id="showcase-title"
-            className="showcase-intro font-mono text-3xl sm:text-4xl md:text-5xl font-black tracking-tighter uppercase text-foreground"
+            className="showcase-intro font-mono text-[9px] sm:text-[10px] uppercase tracking-[0.35em] text-muted-foreground"
           >
-            Showcase
-          </h2>
-          <p className="showcase-intro mt-4 max-w-lg font-mono text-xs sm:text-sm leading-relaxed text-muted-foreground">
-            Hover a category to switch tracks. Scroll horizontally within each row to browse projects.
+            {"// SELECTED_WORK"}
           </p>
         </header>
 
