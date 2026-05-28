@@ -31,7 +31,7 @@ const VERB_SLOT_CH_DESKTOP = 14
 const VERB_SLOT_CH_MOBILE = 11
 
 // Location config
-const LOC_DEFAULT = "EARTH"
+const LOC_DEFAULT = "EARTH 🌍"
 const LOC_HOVER = "OPEN TO RELOCATE"
 const LOC_SLOT_CH_DESKTOP = 20
 const LOC_SLOT_CH_MOBILE = 20
