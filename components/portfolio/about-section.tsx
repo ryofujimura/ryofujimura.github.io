@@ -197,18 +197,6 @@ export function AboutSection() {
             })}
           </div>
 
-          {/* Focus Areas */}
-          <div className="flex flex-wrap gap-2 mb-8 sm:mb-10">
-            {["AI / ML", "Mobile", "Backend", "Full-Stack"].map((area) => (
-              <span 
-                key={area}
-                className="font-mono text-[10px] sm:text-xs uppercase tracking-wider px-3 py-1.5 border border-foreground/30 text-foreground/70 bg-background/50"
-              >
-                {area}
-              </span>
-            ))}
-          </div>
-
           {/* CTA Buttons */}
           <div ref={ctaRef} className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4">
             <MagneticButton
@@ -229,7 +217,7 @@ export function AboutSection() {
             </MagneticButton>
             <MagneticButton
               as="a"
-              href="#contact"
+              href="#showcase"
               className="touch-target group inline-flex items-center justify-center gap-2 sm:gap-3 px-6 sm:px-8 py-3 sm:py-4 min-h-[48px] text-xs sm:text-sm font-mono uppercase tracking-wider text-foreground bg-transparent border-2 border-foreground hover:bg-foreground hover:text-background transition-all duration-300"
             >
               Next
