@@ -96,6 +96,7 @@ export function ShowcaseSection() {
     (index: number, label: string) => {
       setCursorLabel(label)
       if (index !== categoryIndexRef.current) {
+        setActiveIndex(index)
         animateToCategory(index)
       }
     },
@@ -313,7 +314,8 @@ function CategoryNavButton({
     <button
       type="button"
       className={cn(
-        "font-mono text-[10px] sm:text-xs uppercase tracking-[0.2em] px-4 py-2.5 border transition-all duration-300 touch-target",
+        "font-mono text-[10px] sm:text-xs uppercase tracking-[0.2em] px-4 py-2.5 border touch-target",
+        "transition-[color,background-color,border-color,box-shadow] duration-75 ease-out",
         isActive
           ? "font-bold border-foreground text-foreground bg-foreground/5 shadow-[3px_3px_0_0_var(--foreground)]"
           : "border-foreground/20 text-muted-foreground hover:border-foreground/40 hover:text-foreground"
