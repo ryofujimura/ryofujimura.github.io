@@ -5,21 +5,26 @@ import { gsap } from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
 import { useGSAP } from "@gsap/react"
 import { cn } from "@/lib/utils"
-import { useIsMobile } from "@/hooks/use-mobile"
 import { SHOWCASE_CATEGORIES } from "@/components/portfolio/showcase-data"
 
 gsap.registerPlugin(ScrollTrigger, useGSAP)
+
+const SLIDE_DURATION = 0.45
+
+function offscreenX(index: number, pivot: number) {
+  return index < pivot ? -100 : 100
+}
 
 export function ShowcaseSection() {
   const sectionRef = useRef<HTMLElement>(null)
   const trackRef = useRef<HTMLDivElement>(null)
   const slideRefs = useRef<(HTMLDivElement | null)[]>([])
   const rowRefs = useRef<(HTMLDivElement | null)[]>([])
-  const categoryIndexRef = useRef(0)
-  const isAnimatingRef = useRef(false)
+  const displayedIndexRef = useRef(0)
+  const animTargetRef = useRef<number | null>(null)
+  const timelineRef = useRef<gsap.core.Timeline | null>(null)
 
   const [activeIndex, setActiveIndex] = useState(0)
-  const isMobile = useIsMobile()
 
   const setSlideRef = useCallback((index: number, el: HTMLDivElement | null) => {
     slideRefs.current[index] = el
@@ -29,72 +34,117 @@ export function ShowcaseSection() {
     rowRefs.current[index] = el
   }, [])
 
-  const animateToCategory = useCallback((nextIndex: number) => {
-    const currentIndex = categoryIndexRef.current
-    if (
-      nextIndex === currentIndex ||
-      isAnimatingRef.current ||
-      nextIndex < 0 ||
-      nextIndex >= SHOWCASE_CATEGORIES.length
-    ) {
-      return
-    }
-
-    isAnimatingRef.current = true
-    const direction = nextIndex > currentIndex ? 1 : -1
-    const currentSlide = slideRefs.current[currentIndex]
-    const nextSlide = slideRefs.current[nextIndex]
-
-    if (nextSlide) {
-      gsap.set(nextSlide, {
-        xPercent: direction * 100,
-        autoAlpha: 0,
-        pointerEvents: "none",
-      })
-    }
-
-    const tl = gsap.timeline({
-      defaults: { ease: "power3.inOut", duration: 0.65 },
-      onComplete: () => {
-        if (currentSlide) {
-          gsap.set(currentSlide, { pointerEvents: "none" })
-        }
-        if (nextSlide) {
-          gsap.set(nextSlide, { pointerEvents: "auto" })
-        }
-        const row = rowRefs.current[nextIndex]
-        if (row) row.scrollLeft = 0
-        categoryIndexRef.current = nextIndex
-        setActiveIndex(nextIndex)
-        isAnimatingRef.current = false
-      },
+  const finalizeSlides = useCallback((active: number) => {
+    slideRefs.current.forEach((slide, i) => {
+      if (!slide) return
+      if (i === active) {
+        gsap.set(slide, { xPercent: 0, autoAlpha: 1, pointerEvents: "auto" })
+      } else {
+        gsap.set(slide, {
+          xPercent: offscreenX(i, active),
+          autoAlpha: 0,
+          pointerEvents: "none",
+        })
+      }
     })
-
-    if (currentSlide) {
-      tl.to(
-        currentSlide,
-        { xPercent: direction * -100, autoAlpha: 0, duration: 0.55 },
-        0
-      )
-    }
-
-    if (nextSlide) {
-      tl.to(nextSlide, { xPercent: 0, autoAlpha: 1, duration: 0.55 }, 0)
-      tl.fromTo(
-        nextSlide.querySelectorAll(".project-card"),
-        { x: 48, opacity: 0 },
-        { x: 0, opacity: 1, stagger: 0.07, duration: 0.5, ease: "power2.out" },
-        0.12
-      )
-    }
   }, [])
+
+  const animateToCategory = useCallback(
+    (nextIndex: number) => {
+      if (nextIndex < 0 || nextIndex >= SHOWCASE_CATEGORIES.length) return
+
+      const isIdle =
+        animTargetRef.current === null && nextIndex === displayedIndexRef.current
+      if (isIdle) return
+
+      timelineRef.current?.kill()
+      timelineRef.current = null
+
+      const fromIndex = animTargetRef.current ?? displayedIndexRef.current
+      if (fromIndex === nextIndex) {
+        animTargetRef.current = null
+        finalizeSlides(nextIndex)
+        return
+      }
+
+      animTargetRef.current = nextIndex
+      const direction = nextIndex > fromIndex ? 1 : -1
+      const fromSlide = slideRefs.current[fromIndex]
+      const toSlide = slideRefs.current[nextIndex]
+
+      slideRefs.current.forEach((slide, i) => {
+        if (!slide || i === fromIndex || i === nextIndex) return
+        gsap.set(slide, {
+          xPercent: offscreenX(i, nextIndex),
+          autoAlpha: 0,
+          pointerEvents: "none",
+        })
+      })
+
+      if (toSlide) {
+        gsap.set(toSlide, {
+          xPercent: direction * 100,
+          autoAlpha: 0,
+          pointerEvents: "none",
+        })
+      }
+
+      const tl = gsap.timeline({
+        defaults: { ease: "power3.inOut", duration: SLIDE_DURATION },
+        onComplete: () => {
+          displayedIndexRef.current = nextIndex
+          animTargetRef.current = null
+          timelineRef.current = null
+          finalizeSlides(nextIndex)
+          const row = rowRefs.current[nextIndex]
+          if (row) row.scrollLeft = 0
+        },
+        onInterrupt: () => {
+          timelineRef.current = null
+        },
+      })
+      timelineRef.current = tl
+
+      if (fromSlide) {
+        tl.to(
+          fromSlide,
+          { xPercent: direction * -100, autoAlpha: 0, duration: SLIDE_DURATION },
+          0
+        )
+      }
+
+      if (toSlide) {
+        tl.to(
+          toSlide,
+          {
+            xPercent: 0,
+            autoAlpha: 1,
+            pointerEvents: "auto",
+            duration: SLIDE_DURATION,
+          },
+          0
+        )
+        tl.fromTo(
+          toSlide.querySelectorAll(".project-card"),
+          { x: 40, opacity: 0 },
+          {
+            x: 0,
+            opacity: 1,
+            stagger: 0.06,
+            duration: 0.4,
+            ease: "power2.out",
+          },
+          0.1
+        )
+      }
+    },
+    [finalizeSlides]
+  )
 
   const selectCategory = useCallback(
     (index: number) => {
-      if (index !== categoryIndexRef.current) {
-        setActiveIndex(index)
-        animateToCategory(index)
-      }
+      setActiveIndex(index)
+      animateToCategory(index)
     },
     [animateToCategory]
   )
@@ -104,14 +154,7 @@ export function ShowcaseSection() {
       const section = sectionRef.current
       if (!section) return
 
-      slideRefs.current.forEach((slide, i) => {
-        if (!slide) return
-        if (i === 0) {
-          gsap.set(slide, { xPercent: 0, autoAlpha: 1, pointerEvents: "auto" })
-        } else {
-          gsap.set(slide, { xPercent: 100, autoAlpha: 0, pointerEvents: "none" })
-        }
-      })
+      finalizeSlides(0)
 
       gsap.fromTo(
         ".showcase-intro",
@@ -149,9 +192,8 @@ export function ShowcaseSection() {
           }
         )
       }
-
     },
-    { scope: sectionRef, dependencies: [] }
+    { scope: sectionRef, dependencies: [finalizeSlides] }
   )
 
   return (
@@ -173,7 +215,7 @@ export function ShowcaseSection() {
             Showcase
           </h2>
           <p className="showcase-intro mt-4 max-w-lg font-mono text-xs sm:text-sm leading-relaxed text-muted-foreground">
-            Hover a category to switch tracks. Scroll horizontally within each row to browse projects.
+            Hover or click a category to switch tracks. Scroll horizontally within each row to browse projects.
           </p>
         </header>
 
@@ -187,7 +229,6 @@ export function ShowcaseSection() {
               label={cat.label}
               isActive={activeIndex === index}
               onSelect={() => selectCategory(index)}
-              allowClick={isMobile}
             />
           ))}
         </nav>
@@ -245,12 +286,10 @@ function CategoryNavButton({
   label,
   isActive,
   onSelect,
-  allowClick,
 }: {
   label: string
   isActive: boolean
   onSelect: () => void
-  allowClick?: boolean
 }) {
   return (
     <button
@@ -262,9 +301,9 @@ function CategoryNavButton({
           ? "font-bold border-foreground text-foreground bg-foreground/5 shadow-[3px_3px_0_0_var(--foreground)]"
           : "border-foreground/20 text-muted-foreground hover:border-foreground/40 hover:text-foreground"
       )}
-      onMouseEnter={allowClick ? undefined : onSelect}
+      onMouseEnter={onSelect}
       onFocus={onSelect}
-      onClick={allowClick ? onSelect : undefined}
+      onClick={onSelect}
     >
       {label}
     </button>
