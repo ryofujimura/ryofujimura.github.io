@@ -429,10 +429,15 @@ export function HeroSection() {
               {/* Name - Large brutalist typography */}
               <div data-intro-animate className="mb-4 sm:mb-6">
                 <h1 className="font-mono text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-tight leading-[0.9]">
-                  <GSAPText immediate variant="chars" stagger={0.03} duration={0.6}>
-                    RYO
-                  </GSAPText>             
-                  <span className="text-muted-foreground">
+                  <span className="flex items-baseline gap-x-2 sm:gap-x-3">
+                    <GSAPText immediate variant="chars" stagger={0.03} duration={0.6}>
+                      RYO
+                    </GSAPText>
+                    <span className="font-normal text-xs sm:text-sm md:text-base text-muted-foreground tracking-normal">
+                      (Ree-oh)
+                    </span>
+                  </span>
+                  <span className="text-muted-foreground block">
                     <GSAPText immediate variant="chars" stagger={0.03} duration={0.6} delay={0.3}>
                       FUJIMURA
                     </GSAPText>
