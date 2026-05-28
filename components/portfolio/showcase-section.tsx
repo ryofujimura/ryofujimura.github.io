@@ -204,34 +204,33 @@ export function ShowcaseSection() {
       className="relative py-20 sm:py-28 overflow-hidden bg-background text-foreground border-t border-foreground/10"
     >
       <div className="relative z-10 w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <header className="mb-10 sm:mb-14">
-          <p className="showcase-intro font-mono text-[9px] sm:text-[10px] uppercase tracking-[0.35em] text-muted-foreground mb-4">
-            {"// SELECTED_WORK"}
-          </p>
-          <h2
-            id="showcase-title"
-            className="showcase-intro font-mono text-3xl sm:text-4xl md:text-5xl font-black tracking-tighter uppercase text-foreground"
-          >
-            Showcase
-          </h2>
-          <p className="showcase-intro mt-4 max-w-lg font-mono text-xs sm:text-sm leading-relaxed text-muted-foreground">
-            Hover or click a category to switch tracks. Scroll horizontally within each row to browse projects.
-          </p>
-        </header>
+        <header className="showcase-intro mb-10 sm:mb-14 flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p className="font-mono text-[9px] sm:text-[10px] uppercase tracking-[0.35em] text-muted-foreground mb-4">
+              {"// SELECTED_WORK"}
+            </p>
+            <h2
+              id="showcase-title"
+              className="font-mono text-3xl sm:text-4xl md:text-5xl font-black tracking-tighter uppercase text-foreground"
+            >
+              Showcase
+            </h2>
+          </div>
 
-        <nav
-          className="showcase-intro flex flex-wrap gap-2 sm:gap-3 mb-10 sm:mb-12"
-          aria-label="Showcase categories"
-        >
-          {SHOWCASE_CATEGORIES.map((cat, index) => (
-            <CategoryNavButton
-              key={cat.id}
-              label={cat.label}
-              isActive={activeIndex === index}
-              onSelect={() => selectCategory(index)}
-            />
-          ))}
-        </nav>
+          <nav
+            className="flex flex-wrap gap-2 sm:gap-3 sm:justify-end"
+            aria-label="Showcase categories"
+          >
+            {SHOWCASE_CATEGORIES.map((cat, index) => (
+              <CategoryNavButton
+                key={cat.id}
+                label={cat.label}
+                isActive={activeIndex === index}
+                onSelect={() => selectCategory(index)}
+              />
+            ))}
+          </nav>
+        </header>
 
         <div ref={trackRef} className="relative min-h-[420px] sm:min-h-[480px]">
           {SHOWCASE_CATEGORIES.map((cat, slideIndex) => (
