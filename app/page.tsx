@@ -1,5 +1,6 @@
 import { Navigation } from "@/components/portfolio/navigation"
 import { HeroSection } from "@/components/portfolio/hero-section"
+import { ShowcaseSection } from "@/components/portfolio/showcase-section"
 import { AboutSection } from "@/components/portfolio/about-section"
 import { ExperienceSection } from "@/components/portfolio/experience-section"
 import { ProjectsSection } from "@/components/portfolio/projects-section"
@@ -13,6 +14,7 @@ export default function Portfolio() {
       <CustomCursor />
       <Navigation />
       <HeroSection />
+      <ShowcaseSection />
       <AboutSection />
       <ExperienceSection />
       <ProjectsSection />

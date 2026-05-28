@@ -245,6 +245,7 @@ function SplitContactButton() {
 
 const navItems = [
   { label: "About", href: "#about" },
+  { label: "Showcase", href: "#showcase" },
   { label: "Experience", href: "#experience" },
   { label: "Projects", href: "#projects" },
   { label: "Next", href: "#contact" },
