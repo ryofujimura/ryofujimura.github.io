@@ -14,8 +14,8 @@ export default function Portfolio() {
       <CustomCursor />
       <Navigation />
       <HeroSection />
-      <ShowcaseSection />
       <AboutSection />
+      <ShowcaseSection />
       <ExperienceSection />
       <ProjectsSection />
       <ContactSection />
