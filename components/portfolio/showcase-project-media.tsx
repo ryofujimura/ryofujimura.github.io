@@ -143,10 +143,7 @@ export function ShowcaseProjectMedia({ project, isActiveCategory }: ShowcaseProj
   return (
     <div
       ref={mediaRef}
-      className={cn(
-        "relative aspect-[4/3] overflow-hidden transition-transform duration-500 ease-out",
-        "group-hover:scale-[1.02]"
-      )}
+      className="relative aspect-[4/3] overflow-hidden"
     >
       {gallery && !showVideo && (
         <ShowcaseRotatingGallery images={gallery} animate={shouldAnimateGallery} />

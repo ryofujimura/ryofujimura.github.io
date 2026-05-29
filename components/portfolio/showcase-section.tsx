@@ -252,7 +252,7 @@ export function ShowcaseSection() {
                 {cat.projects.map((project) => (
                   <article
                     key={project.id}
-                    className="project-card group shrink-0 snap-start w-[calc(50%-0.5rem)] sm:w-[calc(50%-0.75rem)] border border-foreground/15 bg-background/80 backdrop-blur-sm"
+                    className="project-card shrink-0 snap-start min-w-[min(85vw,420px)] sm:min-w-[min(42vw,480px)] border border-foreground/15 bg-background/80 backdrop-blur-sm"
                   >
                     <ShowcaseProjectMedia
                       project={project}
@@ -286,7 +286,7 @@ function CategoryNavButton({
         "transition-[color,background-color,border-color,box-shadow] duration-75 ease-out",
         isActive
           ? "font-bold border-foreground text-foreground bg-foreground/5 shadow-[3px_3px_0_0_var(--foreground)]"
-          : "border-foreground/20 text-muted-foreground hover:border-foreground/40 hover:text-foreground"
+          : "border-foreground/20 text-muted-foreground"
       )}
       onMouseEnter={onSelect}
       onFocus={onSelect}
