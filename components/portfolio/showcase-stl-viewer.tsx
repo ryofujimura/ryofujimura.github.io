@@ -89,7 +89,7 @@ export function ShowcaseStlViewer({ url, label = "3D_PRINT" }: ShowcaseStlViewer
             camera={{ position: [2.6, 1.5, 2.6], fov: 42, near: 0.01, far: 500 }}
             gl={{ antialias: true, alpha: true }}
             style={{ background: "transparent" }}
-            dpr={[1, 1.75]}
+            dpr={[1, 1.25]}
           >
             <ambientLight intensity={0.45} />
             <directionalLight position={[6, 8, 5]} intensity={1.1} />

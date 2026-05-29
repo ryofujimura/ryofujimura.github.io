@@ -1,8 +1,13 @@
 "use client"
 
 import dynamic from "next/dynamic"
-import { useEffect, useRef, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import type { ShowcaseProject } from "@/components/portfolio/showcase-data"
+import {
+  claimShowcaseVideo,
+  releaseShowcaseVideo,
+} from "@/components/portfolio/showcase-media-session"
+import { useIsMobile } from "@/hooks/use-mobile"
 import { useReducedMotion } from "@/hooks/use-reduced-motion"
 import { cn } from "@/lib/utils"
 
@@ -23,6 +28,8 @@ const ShowcaseStlViewer = dynamic(
 
 const GALLERY_INTERVAL_MS = 4000
 const FADE_MS = 900
+const IN_VIEW_RATIO = 0.55
+const IN_VIEW_DEBOUNCE_MS = 120
 
 function isMediaUrl(value: string) {
   return value.startsWith("/") || value.startsWith("http://") || value.startsWith("https://")
@@ -92,21 +99,47 @@ function ShowcaseRotatingGallery({
 
 type ShowcaseProjectMediaProps = {
   project: ShowcaseProject
+  mediaKey: string
 }
 
-export function ShowcaseProjectMedia({ project }: ShowcaseProjectMediaProps) {
+export function ShowcaseProjectMedia({ project, mediaKey }: ShowcaseProjectMediaProps) {
   const mediaRef = useRef<HTMLDivElement>(null)
   const videoRef = useRef<HTMLVideoElement>(null)
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const prefersReducedMotion = useReducedMotion()
-  const [videoReady, setVideoReady] = useState(false)
-  const [isInView, setIsInView] = useState(false)
+  const isMobile = useIsMobile()
 
-  const posterUrl = posterForProject(project)
-  const showVideo = Boolean(project.video) && !prefersReducedMotion
+  const [isInView, setIsInView] = useState(false)
+  const [videoReady, setVideoReady] = useState(false)
+  const [mayLoadVideo, setMayLoadVideo] = useState(false)
+  const [mobilePlayRequested, setMobilePlayRequested] = useState(false)
+
+  const posterUrl = posterForProject(project) ?? (isMediaUrl(project.image) ? project.image : null)
+  const hasVideo = Boolean(project.video) && !prefersReducedMotion
   const gallery =
     project.gallery && project.gallery.length >= 2 ? project.gallery : null
+
+  const allowAutoplayVideo = hasVideo && !isMobile
+  const allowMobileTapVideo = hasVideo && isMobile
+  const shouldLoadVideo =
+    isInView &&
+    mayLoadVideo &&
+    (allowAutoplayVideo || (allowMobileTapVideo && mobilePlayRequested))
+
   const shouldAnimateGallery = Boolean(gallery) && isInView
-  const showStl = Boolean(project.stl) && isInView
+  const showStl = Boolean(project.stl) && isInView && !isMobile
+
+  const releaseVideo = useCallback(() => {
+    releaseShowcaseVideo(mediaKey)
+    setMayLoadVideo(false)
+    setVideoReady(false)
+    const video = videoRef.current
+    if (video) {
+      video.pause()
+      video.removeAttribute("src")
+      video.load()
+    }
+  }, [mediaKey])
 
   useEffect(() => {
     const container = mediaRef.current
@@ -114,98 +147,122 @@ export function ShowcaseProjectMedia({ project }: ShowcaseProjectMediaProps) {
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        setIsInView(entry.isIntersecting && entry.intersectionRatio >= 0.45)
+        const visible =
+          entry.isIntersecting && entry.intersectionRatio >= IN_VIEW_RATIO
+
+        if (debounceRef.current) clearTimeout(debounceRef.current)
+        debounceRef.current = setTimeout(() => {
+          setIsInView(visible)
+          if (!visible) {
+            setMobilePlayRequested(false)
+          }
+        }, IN_VIEW_DEBOUNCE_MS)
       },
-      { threshold: [0, 0.45, 0.65] }
+      { threshold: [0, IN_VIEW_RATIO, 0.75] }
     )
 
     observer.observe(container)
-    return () => observer.disconnect()
+    return () => {
+      observer.disconnect()
+      if (debounceRef.current) clearTimeout(debounceRef.current)
+    }
   }, [])
 
   useEffect(() => {
-    setVideoReady(false)
-    const video = videoRef.current
-    if (!video || !project.video) return
-    video.load()
-  }, [project.video, project.id])
-
-  useEffect(() => {
-    const video = videoRef.current
-    if (!video || !showVideo) return
-
-    const pause = () => {
-      video.pause()
-    }
-
-    if (!isInView) {
-      pause()
+    if (!isInView || !hasVideo || (isMobile && !mobilePlayRequested)) {
+      releaseVideo()
       return
     }
 
+    if (claimShowcaseVideo(mediaKey)) {
+      setMayLoadVideo(true)
+    } else {
+      setMayLoadVideo(false)
+    }
+
+    return () => {
+      releaseVideo()
+    }
+  }, [isInView, hasVideo, isMobile, mobilePlayRequested, mediaKey, releaseVideo])
+
+  useEffect(() => {
+    const video = videoRef.current
+    if (!video || !shouldLoadVideo || !project.video) return
+
+    const src = video.getAttribute("src")
+    if (src !== project.video) {
+      setVideoReady(false)
+      video.src = project.video
+      video.load()
+    }
+
     void video.play().catch(() => {})
-  }, [showVideo, isInView])
+  }, [shouldLoadVideo, project.video])
 
   const handleVideoReady = () => {
     setVideoReady(true)
   }
 
+  const posterStyle = posterUrl
+    ? projectThumbnailStyle(posterUrl)
+    : projectThumbnailStyle(project.image)
+
   return (
-    <div
-      ref={mediaRef}
-      className="relative aspect-[4/3] overflow-hidden"
-    >
+    <div ref={mediaRef} className="relative aspect-[4/3] overflow-hidden">
       {project.stl && !showStl && (
         <div className="absolute inset-0" style={projectThumbnailStyle(project.image)} />
       )}
 
       {showStl && project.stl && <ShowcaseStlViewer url={project.stl} />}
 
-      {gallery && !showVideo && !project.stl && (
+      {gallery && !hasVideo && !project.stl && (
         <ShowcaseRotatingGallery images={gallery} animate={shouldAnimateGallery} />
       )}
 
-      {!gallery && !showVideo && !project.stl && (
+      {!gallery && !hasVideo && !project.stl && (
         <div className="absolute inset-0" style={projectThumbnailStyle(project.image)} />
       )}
 
-      {showVideo && (
+      {hasVideo && (
         <>
-          {posterUrl ? (
-            <div
-              className={cn(
-                "absolute inset-0 transition-opacity ease-out",
-                videoReady ? "opacity-0" : "opacity-100"
-              )}
-              style={{
-                ...projectThumbnailStyle(posterUrl),
-                transitionDuration: `${FADE_MS}ms`,
-              }}
-              aria-hidden={videoReady}
-            />
-          ) : (
-            <div
-              className="absolute inset-0"
-              style={projectThumbnailStyle(project.image)}
-              aria-hidden={videoReady}
-            />
+          <div
+            className={cn(
+              "absolute inset-0 transition-opacity ease-out",
+              shouldLoadVideo && videoReady ? "opacity-0" : "opacity-100"
+            )}
+            style={{ ...posterStyle, transitionDuration: `${FADE_MS}ms` }}
+            aria-hidden={shouldLoadVideo && videoReady}
+          />
+
+          {allowMobileTapVideo && isInView && !mobilePlayRequested && (
+            <button
+              type="button"
+              className="absolute inset-0 z-[5] flex items-end justify-center pb-8 bg-transparent"
+              onClick={() => setMobilePlayRequested(true)}
+              aria-label={`Play ${project.title} preview`}
+            >
+              <span className="font-mono text-[9px] uppercase tracking-[0.25em] text-foreground/80 bg-background/60 px-3 py-1.5 border border-foreground/20">
+                Tap to play
+              </span>
+            </button>
           )}
 
-          <video
-            ref={videoRef}
-            src={project.video}
-            className={cn(
-              "absolute inset-0 h-full w-full object-cover transition-opacity ease-out",
-              videoReady ? "opacity-100" : "opacity-0"
-            )}
-            style={{ transitionDuration: `${FADE_MS}ms` }}
-            muted
-            loop
-            playsInline
-            preload="auto"
-            aria-label={`${project.title} preview`}
-            onCanPlayThrough={handleVideoReady}
-          />
+          {shouldLoadVideo && project.video && (
+            <video
+              ref={videoRef}
+              className={cn(
+                "absolute inset-0 h-full w-full object-cover transition-opacity ease-out",
+                videoReady ? "opacity-100" : "opacity-0"
+              )}
+              style={{ transitionDuration: `${FADE_MS}ms` }}
+              muted
+              loop
+              playsInline
+              preload="metadata"
+              aria-label={`${project.title} preview`}
+              onCanPlay={() => handleVideoReady()}
+            />
+          )}
         </>
       )}
 

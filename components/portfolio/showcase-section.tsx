@@ -92,7 +92,10 @@ export function ShowcaseSection() {
               key={`${project.categoryId}-${project.id}`}
               className="project-card shrink-0 snap-start min-w-[min(85vw,420px)] sm:min-w-[min(42vw,480px)] border border-foreground/15 bg-background/80 backdrop-blur-sm"
             >
-              <ShowcaseProjectMedia project={project} />
+              <ShowcaseProjectMedia
+                project={project}
+                mediaKey={`${project.categoryId}-${project.id}`}
+              />
             </article>
           ))}
         </div>
