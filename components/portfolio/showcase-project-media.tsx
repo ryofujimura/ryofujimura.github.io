@@ -86,9 +86,18 @@ export function ShowcaseProjectMedia({ project, isActiveCategory }: ShowcaseProj
         <div className="absolute inset-0" style={projectThumbnailStyle(project.image)} />
       )}
       <div
-        className="absolute inset-0 bg-gradient-to-t from-foreground/25 via-transparent to-transparent pointer-events-none"
+        className="absolute inset-0 bg-gradient-to-t from-background/70 via-background/20 to-transparent pointer-events-none"
         aria-hidden
       />
+
+      <div className="absolute inset-x-0 bottom-0 z-10 p-4 sm:p-6 pointer-events-none">
+        <p className="font-mono text-[9px] sm:text-[10px] uppercase tracking-[0.25em] mb-2 text-foreground opacity-70">
+          {project.tag}
+        </p>
+        <h3 className="font-mono text-2xl sm:text-3xl md:text-4xl font-black tracking-tight uppercase text-foreground opacity-70">
+          {project.title}
+        </h3>
+      </div>
     </div>
   )
 }

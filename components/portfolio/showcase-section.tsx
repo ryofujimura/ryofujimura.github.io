@@ -258,14 +258,6 @@ export function ShowcaseSection() {
                       project={project}
                       isActiveCategory={activeIndex === slideIndex}
                     />
-                    <div className="px-4 py-4 sm:px-5 sm:py-5 border-t border-foreground/15">
-                      <p className="font-mono text-[9px] uppercase tracking-[0.25em] mb-2 text-muted-foreground">
-                        {project.tag}
-                      </p>
-                      <h3 className="font-mono text-lg sm:text-xl font-bold tracking-tight uppercase text-foreground">
-                        {project.title}
-                      </h3>
-                    </div>
                   </article>
                 ))}
               </div>
