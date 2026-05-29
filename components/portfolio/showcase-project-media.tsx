@@ -92,10 +92,9 @@ function ShowcaseRotatingGallery({
 
 type ShowcaseProjectMediaProps = {
   project: ShowcaseProject
-  isActiveCategory: boolean
 }
 
-export function ShowcaseProjectMedia({ project, isActiveCategory }: ShowcaseProjectMediaProps) {
+export function ShowcaseProjectMedia({ project }: ShowcaseProjectMediaProps) {
   const mediaRef = useRef<HTMLDivElement>(null)
   const videoRef = useRef<HTMLVideoElement>(null)
   const prefersReducedMotion = useReducedMotion()
@@ -106,8 +105,8 @@ export function ShowcaseProjectMedia({ project, isActiveCategory }: ShowcaseProj
   const showVideo = Boolean(project.video) && !prefersReducedMotion
   const gallery =
     project.gallery && project.gallery.length >= 2 ? project.gallery : null
-  const shouldAnimateGallery = Boolean(gallery) && isActiveCategory && isInView
-  const showStl = Boolean(project.stl) && isActiveCategory && isInView
+  const shouldAnimateGallery = Boolean(gallery) && isInView
+  const showStl = Boolean(project.stl) && isInView
 
   useEffect(() => {
     const container = mediaRef.current
@@ -139,19 +138,13 @@ export function ShowcaseProjectMedia({ project, isActiveCategory }: ShowcaseProj
       video.pause()
     }
 
-    if (!isActiveCategory || !isInView) {
+    if (!isInView) {
       pause()
       return
     }
 
     void video.play().catch(() => {})
-  }, [showVideo, isActiveCategory, isInView])
-
-  useEffect(() => {
-    if (!isActiveCategory) {
-      videoRef.current?.pause()
-    }
-  }, [isActiveCategory])
+  }, [showVideo, isInView])
 
   const handleVideoReady = () => {
     setVideoReady(true)

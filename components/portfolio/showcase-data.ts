@@ -182,3 +182,17 @@ export const SHOWCASE_CATEGORIES: ShowcaseCategory[] = [
     ],
   },
 ]
+
+export type ShowcaseProjectWithCategory = ShowcaseProject & {
+  categoryId: string
+  categoryLabel: string
+}
+
+export const SHOWCASE_PROJECTS: ShowcaseProjectWithCategory[] = SHOWCASE_CATEGORIES.flatMap(
+  (category) =>
+    category.projects.map((project) => ({
+      ...project,
+      categoryId: category.id,
+      categoryLabel: category.label,
+    }))
+)
