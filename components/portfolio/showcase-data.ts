@@ -82,6 +82,7 @@ export const SHOWCASE_CATEGORIES: ShowcaseCategory[] = [
         tag: "On-device LLM",
         image:
           "linear-gradient(155deg, oklch(0.92 0 0) 0%, oklch(0.82 0.01 250) 40%, oklch(0.72 0.03 260) 100%)",
+        video: showcaseImage("with.mov"),
       },
     ],
   },
