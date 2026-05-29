@@ -104,6 +104,7 @@ export const SHOWCASE_CATEGORIES: ShowcaseCategory[] = [
         tag: "Vision ML",
         image:
           "linear-gradient(130deg, oklch(0.9 0.04 300) 0%, oklch(0.8 0.08 290) 55%, oklch(0.68 0.12 280) 100%)",
+        video: showcaseImage("whiteboardai.mov"),
       },
       {
         id: "zero-inbox-ai",
