@@ -317,11 +317,17 @@ function SocialLinks({ className = "" }: { className?: string }) {
 }
 
 /** Technical SVG frame element */
-function TechnicalFrame({ className = "" }: { className?: string }) {
+function TechnicalFrame({
+  className = "",
+  animate = true,
+}: {
+  className?: string
+  animate?: boolean
+}) {
   const frameRef = useRef<SVGSVGElement>(null)
 
   useEffect(() => {
-    if (!frameRef.current) return
+    if (!frameRef.current || !animate) return
     const paths = frameRef.current.querySelectorAll("path, line, rect")
     
     paths.forEach((el) => {
@@ -343,7 +349,7 @@ function TechnicalFrame({ className = "" }: { className?: string }) {
       ease: "power2.inOut",
       delay: 0.5,
     })
-  }, [])
+  }, [animate])
 
   return (
     <svg
@@ -378,21 +384,28 @@ export function HeroSection() {
 
   // Hero entrance animations (immediate)
   useEffect(() => {
-    if (!heroRef.current || prefersReducedMotion) return
+    if (!heroRef.current) return
+
+    if (prefersReducedMotion) {
+      window.__portfolioHeroIntroComplete = true
+      window.dispatchEvent(new CustomEvent(PORTFOLIO_HERO_INTRO_EVENT))
+      return
+    }
 
     const ctx = gsap.context(() => {
       gsap.fromTo(
         "[data-intro-animate]",
-        { opacity: 0, y: 30 },
+        { opacity: 0, y: isMobile ? 16 : 30 },
         {
           opacity: 1,
           y: 0,
-          duration: 0.8,
-          stagger: 0.1,
+          duration: isMobile ? 0.55 : 0.8,
+          stagger: isMobile ? 0.05 : 0.1,
           ease: "power3.out",
-          delay: 0.2,
+          delay: isMobile ? 0.1 : 0.2,
           onComplete: () => {
             gsap.delayedCall(0.55, () => {
+              window.__portfolioHeroIntroComplete = true
               window.dispatchEvent(new CustomEvent(PORTFOLIO_HERO_INTRO_EVENT))
             })
           },
@@ -401,7 +414,7 @@ export function HeroSection() {
     }, heroRef)
 
     return () => ctx.revert()
-  }, [prefersReducedMotion])
+  }, [prefersReducedMotion, isMobile])
 
   return (
     <section id="hero" className="relative">
@@ -411,11 +424,14 @@ export function HeroSection() {
       >
         {/* Brutalist background */}
         <div className="absolute inset-0 opacity-60">
-          <BrutalistBackground variant="dense" />
+          <BrutalistBackground
+            variant={isMobile ? "grid" : "dense"}
+            animate={!isMobile}
+          />
         </div>
         
         {/* Technical frame overlay */}
-        <TechnicalFrame className="opacity-30" />
+        <TechnicalFrame className="opacity-30" animate={!isMobile} />
 
         {/* Content */}
         <div className="relative z-10 w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -436,7 +452,12 @@ export function HeroSection() {
               <div data-intro-animate className="mb-4 sm:mb-6">
                 <h1 className="font-mono text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-tight leading-[0.9]">
                   <span className="flex items-baseline gap-x-2 sm:gap-x-3">
-                    <GSAPText immediate variant="chars" stagger={0.03} duration={0.6}>
+                    <GSAPText
+                      immediate
+                      variant={isMobile ? "words" : "chars"}
+                      stagger={isMobile ? 0.04 : 0.03}
+                      duration={isMobile ? 0.45 : 0.6}
+                    >
                       RYO
                     </GSAPText>
                     <span className="font-normal text-xs sm:text-sm md:text-base text-muted-foreground tracking-normal">
@@ -444,7 +465,13 @@ export function HeroSection() {
                     </span>
                   </span>
                   <span className="text-muted-foreground block">
-                    <GSAPText immediate variant="chars" stagger={0.03} duration={0.6} delay={0.3}>
+                    <GSAPText
+                      immediate
+                      variant={isMobile ? "words" : "chars"}
+                      stagger={isMobile ? 0.04 : 0.03}
+                      duration={isMobile ? 0.45 : 0.6}
+                      delay={isMobile ? 0.12 : 0.3}
+                    >
                       FUJIMURA
                     </GSAPText>
                   </span>
@@ -491,7 +518,7 @@ export function HeroSection() {
             {/* Right column - Portrait */}
             <div className="order-1 lg:order-2 flex justify-center lg:justify-end">
               <div data-intro-animate className="w-[280px] sm:w-[320px] lg:w-[340px]">
-                <HeroPortrait />
+                <HeroPortrait reducedMotion={isMobile} />
               </div>
             </div>
           </div>

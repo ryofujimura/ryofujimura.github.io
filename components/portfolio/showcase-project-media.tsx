@@ -27,7 +27,8 @@ const ShowcaseStlViewer = dynamic(
 
 const GALLERY_INTERVAL_MS = 4000
 const FADE_MS = 900
-const IN_VIEW_RATIO = 0.55
+const IN_VIEW_RATIO_DESKTOP = 0.55
+const IN_VIEW_RATIO_MOBILE = 0.35
 const IN_VIEW_DEBOUNCE_MS = 120
 
 function isMediaUrl(value: string) {
@@ -114,6 +115,7 @@ export function ShowcaseProjectMedia({
   const prefersReducedMotion = useReducedMotion()
 
   const [isInView, setIsInView] = useState(false)
+  const [hasBeenInView, setHasBeenInView] = useState(false)
   const [videoReady, setVideoReady] = useState(false)
   const [mayLoadVideo, setMayLoadVideo] = useState(false)
 
@@ -121,12 +123,17 @@ export function ShowcaseProjectMedia({
   const hasVideo = Boolean(project.video) && !prefersReducedMotion
   const gallery =
     project.gallery && project.gallery.length >= 2 ? project.gallery : null
+  const usesGradientFallback = !isMediaUrl(project.image)
 
-  const shouldLoadVideo = mediaEnabled && isInView && mayLoadVideo && hasVideo
+  /** Only decode posters/videos/STL for cards that entered the viewport (avoids mobile jank). */
+  const showVisualMedia = mediaEnabled && (isInView || hasBeenInView)
 
-  const shouldAnimateGallery = mediaEnabled && Boolean(gallery) && isInView
-  const showStl = mediaEnabled && Boolean(project.stl) && isInView
-  const showMedia = mediaEnabled
+  const shouldLoadVideo = showVisualMedia && isInView && mayLoadVideo && hasVideo
+
+  const shouldAnimateGallery = showVisualMedia && Boolean(gallery) && isInView
+  const showStl = showVisualMedia && Boolean(project.stl) && isInView
+  const showCheapFallback =
+    mediaEnabled && !showVisualMedia && usesGradientFallback && !gallery && !project.stl
 
   const releaseVideo = useCallback(() => {
     releaseShowcaseVideo(mediaKey)
@@ -144,17 +151,23 @@ export function ShowcaseProjectMedia({
     const container = mediaRef.current
     if (!container) return
 
+    const inViewRatio =
+      window.matchMedia("(max-width: 767px)").matches
+        ? IN_VIEW_RATIO_MOBILE
+        : IN_VIEW_RATIO_DESKTOP
+
     const observer = new IntersectionObserver(
       ([entry]) => {
         const visible =
-          entry.isIntersecting && entry.intersectionRatio >= IN_VIEW_RATIO
+          entry.isIntersecting && entry.intersectionRatio >= inViewRatio
 
         if (debounceRef.current) clearTimeout(debounceRef.current)
         debounceRef.current = setTimeout(() => {
           setIsInView(visible)
+          if (visible) setHasBeenInView(true)
         }, IN_VIEW_DEBOUNCE_MS)
       },
-      { threshold: [0, IN_VIEW_RATIO, 0.75] }
+      { threshold: [0, inViewRatio, 0.75] }
     )
 
     observer.observe(container)
@@ -231,25 +244,29 @@ export function ShowcaseProjectMedia({
       className="relative block w-full aspect-[3/4] overflow-hidden leading-none select-none"
       onContextMenu={(event) => event.preventDefault()}
     >
-      {!showMedia && (
+      {(!mediaEnabled || (!showVisualMedia && !showCheapFallback)) && (
         <div className="absolute inset-0 bg-muted animate-pulse" aria-hidden />
       )}
 
-      {showMedia && project.stl && !showStl && (
+      {showCheapFallback && (
+        <div className="absolute inset-0" style={projectThumbnailStyle(project.image)} aria-hidden />
+      )}
+
+      {showVisualMedia && project.stl && !showStl && (
         <div className="absolute inset-0" style={projectThumbnailStyle(project.image)} />
       )}
 
       {showStl && project.stl && <ShowcaseStlViewer url={project.stl} />}
 
-      {showMedia && gallery && !hasVideo && !project.stl && (
+      {showVisualMedia && gallery && !hasVideo && !project.stl && (
         <ShowcaseRotatingGallery images={gallery} animate={shouldAnimateGallery} />
       )}
 
-      {showMedia && !gallery && !hasVideo && !project.stl && (
+      {showVisualMedia && !gallery && !hasVideo && !project.stl && (
         <div className="absolute inset-0" style={projectThumbnailStyle(project.image)} />
       )}
 
-      {showMedia && hasVideo && (
+      {showVisualMedia && hasVideo && (
         <>
           <div
             className={cn(
@@ -293,11 +310,6 @@ export function ShowcaseProjectMedia({
         <p className="font-mono text-[10px] sm:text-xs uppercase tracking-[0.3em] mb-3 sm:mb-4 text-foreground opacity-70">
           {project.tag}
         </p>
-        {project.subtitle && (
-          <p className="font-mono text-[9px] sm:text-[10px] lowercase tracking-[0.2em] mb-2 sm:mb-3 text-foreground/55">
-            {project.subtitle}
-          </p>
-        )}
         <h3 className="font-mono text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black tracking-tight uppercase text-foreground opacity-70 leading-[0.95] max-w-[90%]">
           {project.title}
         </h3>

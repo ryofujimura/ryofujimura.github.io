@@ -6,18 +6,20 @@ import { useGazeTracking } from "@/hooks/use-gaze-tracking"
 
 interface HeroPortraitProps {
   className?: string
+  /** Lighter overlays/animations for mobile hero performance */
+  reducedMotion?: boolean
 }
 
 /**
  * ViewfinderOverlay - Complex SVG camera viewfinder frame with animated technical elements
  * Square format (256x256) to match face images - brutalist aesthetic
  */
-function ViewfinderOverlay() {
+function ViewfinderOverlay({ animate = true }: { animate?: boolean }) {
   const svgRef = useRef<SVGSVGElement>(null)
   const [hasAnimated, setHasAnimated] = useState(false)
 
   useEffect(() => {
-    if (!svgRef.current || hasAnimated) return
+    if (!svgRef.current || hasAnimated || !animate) return
 
     const svg = svgRef.current
     const paths = svg.querySelectorAll("[data-draw]")
@@ -95,7 +97,7 @@ function ViewfinderOverlay() {
     return () => {
       tl.kill()
     }
-  }, [hasAnimated])
+  }, [hasAnimated, animate])
 
   return (
     <svg
@@ -305,11 +307,13 @@ function DiagonalPatternOverlay() {
  * HeroPortrait - Brutalist camera viewfinder portrait component
  * Features gaze-tracking face with layered SVG overlays and GSAP animations
  */
-export function HeroPortrait({ className = "" }: HeroPortraitProps) {
+export function HeroPortrait({ className = "", reducedMotion = false }: HeroPortraitProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   
   // Gaze tracking hook - face follows cursor/touch
-  const { currentImage, isLoading } = useGazeTracking(containerRef, '/faces/')
+  const { currentImage, isLoading } = useGazeTracking(containerRef, "/faces/", {
+    trackPointer: !reducedMotion,
+  })
 
   // Container entrance animation
   useEffect(() => {
@@ -348,10 +352,13 @@ export function HeroPortrait({ className = "" }: HeroPortraitProps) {
               src={currentImage}
               alt="Portrait following gaze"
               className="w-full h-full object-contain object-center"
+              decoding="async"
+              fetchPriority="high"
+              draggable={false}
               style={{
-                transition: 'opacity 0.1s ease-out',
-                userSelect: 'none',
-                pointerEvents: 'none',
+                transition: "opacity 0.1s ease-out",
+                userSelect: "none",
+                pointerEvents: "none",
               }}
             />
           )}
@@ -367,14 +374,14 @@ export function HeroPortrait({ className = "" }: HeroPortraitProps) {
         <div className="absolute inset-0 bg-gradient-to-b from-background/20 via-transparent to-transparent z-[5]" />
 
         {/* Diagonal pattern overlay */}
-        <DiagonalPatternOverlay />
+        {!reducedMotion && <DiagonalPatternOverlay />}
 
         {/* Noise texture overlay */}
         <div className="absolute inset-0 z-[15] opacity-[0.03] pointer-events-none noise-texture" />
       </div>
 
       {/* Viewfinder SVG overlay */}
-      <ViewfinderOverlay />
+      <ViewfinderOverlay animate={!reducedMotion} />
 
       {/* Bottom info bar */}
       <div className="absolute bottom-0 left-0 right-0 z-30 px-4 py-3 bg-gradient-to-t from-background/80 to-transparent">

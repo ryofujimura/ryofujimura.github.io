@@ -38,10 +38,17 @@ interface UseGazeTrackingResult {
  * @param basePath - Base path to face images (default: '/faces/')
  * @returns { currentImage, isLoading, error }
  */
+type UseGazeTrackingOptions = {
+  /** When false, only the center gaze frame is shown (no pointer tracking). */
+  trackPointer?: boolean
+}
+
 export function useGazeTracking(
   containerRef: RefObject<HTMLDivElement | null>,
-  basePath: string = '/faces/'
+  basePath: string = '/faces/',
+  options: UseGazeTrackingOptions = {}
 ): UseGazeTrackingResult {
+  const { trackPointer = true } = options
   const [currentImage, setCurrentImage] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<Error | null>(null)
@@ -88,21 +95,21 @@ export function useGazeTracking(
     const container = containerRef.current
     if (!container) return
 
-    // Add event listeners to the document for global tracking
-    document.addEventListener('mousemove', handleMouseMove)
-    document.addEventListener('touchmove', handleTouchMove, { passive: true })
-
-    // Set initial center gaze
     const rect = container.getBoundingClientRect()
     const centerX = rect.left + rect.width / 2
     const centerY = rect.top + rect.height / 2
     updateGaze(centerX, centerY)
 
+    if (!trackPointer) return
+
+    document.addEventListener("mousemove", handleMouseMove)
+    document.addEventListener("touchmove", handleTouchMove, { passive: true })
+
     return () => {
-      document.removeEventListener('mousemove', handleMouseMove)
-      document.removeEventListener('touchmove', handleTouchMove)
+      document.removeEventListener("mousemove", handleMouseMove)
+      document.removeEventListener("touchmove", handleTouchMove)
     }
-  }, [handleMouseMove, handleTouchMove, updateGaze, containerRef])
+  }, [handleMouseMove, handleTouchMove, updateGaze, containerRef, trackPointer])
 
   return { currentImage, isLoading, error }
 }
