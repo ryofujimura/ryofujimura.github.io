@@ -15,6 +15,17 @@ function offscreenX(index: number, pivot: number) {
   return index < pivot ? -100 : 100
 }
 
+function projectThumbnailStyle(image: string): React.CSSProperties {
+  if (image.startsWith("/") || image.startsWith("http://") || image.startsWith("https://")) {
+    return {
+      backgroundImage: `url(${image})`,
+      backgroundSize: "cover",
+      backgroundPosition: "center",
+    }
+  }
+  return { background: image }
+}
+
 export function ShowcaseSection() {
   const sectionRef = useRef<HTMLElement>(null)
   const trackRef = useRef<HTMLDivElement>(null)
@@ -255,7 +266,7 @@ export function ShowcaseSection() {
                   >
                     <div
                       className="relative aspect-[4/3] overflow-hidden transition-transform duration-500 ease-out group-hover:scale-[1.02]"
-                      style={{ background: project.image }}
+                      style={projectThumbnailStyle(project.image)}
                     >
                       <div
                         className="absolute inset-0 bg-gradient-to-t from-foreground/25 via-transparent to-transparent"

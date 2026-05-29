@@ -1,8 +1,21 @@
+/**
+ * Showcase thumbnails live in `public/images/showcase/`.
+ * Served at `/images/showcase/<filename>` (e.g. zero-inbox.jpg).
+ *
+ * Set `image` to a path (`/images/showcase/zero-inbox.jpg`) or a CSS gradient fallback.
+ */
+export const SHOWCASE_IMAGE_DIR = "/images/showcase"
+
 export type ShowcaseProject = {
   id: string
   title: string
   tag: string
+  /** Public URL path or CSS gradient */
   image: string
+}
+
+export function showcaseImage(filename: string) {
+  return `${SHOWCASE_IMAGE_DIR}/${filename}`
 }
 
 export type ShowcaseCategory = {
