@@ -106,13 +106,6 @@ export const SHOWCASE_CATEGORIES: ShowcaseCategory[] = [
           "linear-gradient(130deg, oklch(0.9 0.04 300) 0%, oklch(0.8 0.08 290) 55%, oklch(0.68 0.12 280) 100%)",
         video: showcaseImage("whiteboardai.mov"),
       },
-      {
-        id: "zero-inbox-ai",
-        title: "Zero Inbox",
-        tag: "Classification",
-        image: showcaseImage("ZeroInbox-developer.jpg"),
-        video: showcaseImage("ZeroInbox.mov"),
-      },
     ],
   },
   {
@@ -156,11 +149,51 @@ export type ShowcaseProjectWithCategory = ShowcaseProject & {
   categoryLabel: string
 }
 
-export const SHOWCASE_PROJECTS: ShowcaseProjectWithCategory[] = SHOWCASE_CATEGORIES.flatMap(
-  (category) =>
+function showcaseProjectKey(categoryId: string, projectId: string) {
+  return `${categoryId}:${projectId}`
+}
+
+/** Featured first, then remaining projects in category order */
+const SHOWCASE_PROJECT_ORDER: Array<[categoryId: string, projectId: string]> = [
+  ["research", "3d-mouse"],
+  ["ai", "whiteboard-ai"],
+  ["mobile", "htic-shuttle"],
+  ["mobile", "zero-inbox"],
+]
+
+function buildShowcaseProjects(): ShowcaseProjectWithCategory[] {
+  const all = SHOWCASE_CATEGORIES.flatMap((category) =>
     category.projects.map((project) => ({
       ...project,
       categoryId: category.id,
       categoryLabel: category.label,
     }))
-)
+  )
+
+  const byKey = new Map(
+    all.map((project) => [showcaseProjectKey(project.categoryId, project.id), project])
+  )
+
+  const ordered: ShowcaseProjectWithCategory[] = []
+
+  for (const [categoryId, projectId] of SHOWCASE_PROJECT_ORDER) {
+    const key = showcaseProjectKey(categoryId, projectId)
+    const project = byKey.get(key)
+    if (project) {
+      ordered.push(project)
+      byKey.delete(key)
+    }
+  }
+
+  for (const project of all) {
+    const key = showcaseProjectKey(project.categoryId, project.id)
+    if (byKey.has(key)) {
+      ordered.push(project)
+      byKey.delete(key)
+    }
+  }
+
+  return ordered
+}
+
+export const SHOWCASE_PROJECTS = buildShowcaseProjects()
