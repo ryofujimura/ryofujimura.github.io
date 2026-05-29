@@ -35,8 +35,7 @@ export const SHOWCASE_CATEGORIES: ShowcaseCategory[] = [
         id: "zero-inbox",
         title: "Zero Inbox",
         tag: "Swift / AI",
-        image:
-          "linear-gradient(135deg, oklch(0.88 0.04 250) 0%, oklch(0.78 0.08 260) 50%, oklch(0.65 0.12 270) 100%)",
+        image: showcaseImage("ZeroInbox-developer.jpg"),
         video: showcaseImage("ZeroInbox.mov"),
       },
       {
@@ -101,8 +100,7 @@ export const SHOWCASE_CATEGORIES: ShowcaseCategory[] = [
         id: "zero-inbox-ai",
         title: "Zero Inbox",
         tag: "Classification",
-        image:
-          "linear-gradient(125deg, oklch(0.9 0.03 250) 0%, oklch(0.78 0.08 260) 50%, oklch(0.66 0.12 270) 100%)",
+        image: showcaseImage("ZeroInbox-developer.jpg"),
         video: showcaseImage("ZeroInbox.mov"),
       },
       {
