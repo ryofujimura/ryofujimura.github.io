@@ -113,13 +113,6 @@ export const SHOWCASE_CATEGORIES: ShowcaseCategory[] = [
         image: showcaseImage("ZeroInbox-developer.jpg"),
         video: showcaseImage("ZeroInbox.mov"),
       },
-      {
-        id: "with-llm",
-        title: "With",
-        tag: "GGUF / llama.cpp",
-        image:
-          "linear-gradient(150deg, oklch(0.92 0.03 70) 0%, oklch(0.82 0.06 60) 50%, oklch(0.72 0.09 50) 100%)",
-      },
     ],
   },
   {
