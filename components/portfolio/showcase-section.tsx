@@ -252,7 +252,7 @@ export function ShowcaseSection() {
                 {cat.projects.map((project) => (
                   <article
                     key={project.id}
-                    className="project-card group shrink-0 snap-start min-w-[min(85vw,420px)] sm:min-w-[min(42vw,480px)] border border-foreground/15 bg-background/80 backdrop-blur-sm"
+                    className="project-card group shrink-0 snap-start w-[calc(50%-0.5rem)] sm:w-[calc(50%-0.75rem)] border border-foreground/15 bg-background/80 backdrop-blur-sm"
                   >
                     <ShowcaseProjectMedia
                       project={project}
