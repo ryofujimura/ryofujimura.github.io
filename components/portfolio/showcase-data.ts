@@ -59,6 +59,7 @@ export const SHOWCASE_CATEGORIES: ShowcaseCategory[] = [
         title: "CyberEdu",
         tag: "Cross-platform",
         image: showcaseImage("cyberedu-appstore.jpg"),
+        video: showcaseImage("cyberedu.mov"),
       },
       {
         id: "matcha-time",
