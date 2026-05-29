@@ -41,7 +41,9 @@ export const SHOWCASE_CATEGORIES: ShowcaseCategory[] = [
         id: "htic-shuttle",
         title: "HTIC Shuttle",
         tag: "Realtime",
-        image: showcaseImage("HTIC-appstore.jpg"),
+        image:
+          "linear-gradient(160deg, oklch(0.9 0.03 240) 0%, oklch(0.8 0.06 250) 45%, oklch(0.7 0.1 260) 100%)",
+        video: showcaseImage("HTIC-appstore.mov"),
       },
       {
         id: "saboriendo",
@@ -160,7 +162,8 @@ export const SHOWCASE_CATEGORIES: ShowcaseCategory[] = [
         id: "tokai-shuttle",
         title: "HTIC Shuttle Web",
         tag: "Firebase",
-        image: showcaseImage("HTICDriver-appstore.jpg"),
+        image:
+          "linear-gradient(130deg, oklch(0.9 0.03 245) 0%, oklch(0.78 0.07 255) 50%, oklch(0.66 0.11 265) 100%)",
       },
       {
         id: "saboriendo-web",
