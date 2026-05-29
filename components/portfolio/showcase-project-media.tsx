@@ -226,7 +226,11 @@ export function ShowcaseProjectMedia({
     : projectThumbnailStyle(project.image)
 
   return (
-    <div ref={mediaRef} className="relative block w-full aspect-[3/4] overflow-hidden leading-none">
+    <div
+      ref={mediaRef}
+      className="relative block w-full aspect-[3/4] overflow-hidden leading-none select-none"
+      onContextMenu={(event) => event.preventDefault()}
+    >
       {!showMedia && (
         <div className="absolute inset-0 bg-muted animate-pulse" aria-hidden />
       )}
@@ -268,6 +272,9 @@ export function ShowcaseProjectMedia({
               loop
               playsInline
               preload="metadata"
+              controlsList="nodownload noplaybackrate"
+              disablePictureInPicture
+              onContextMenu={(event) => event.preventDefault()}
               aria-label={`${project.title} preview`}
               onLoadedData={handleVideoReady}
               onCanPlay={handleVideoReady}

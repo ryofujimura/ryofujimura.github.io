@@ -97,7 +97,8 @@ export function ShowcaseSection() {
           {SHOWCASE_PROJECTS.map((project) => (
             <article
               key={`${project.categoryId}-${project.id}`}
-              className="project-card shrink-0 snap-start min-w-[min(72vw,340px)] sm:min-w-[min(32vw,380px)] overflow-hidden border border-foreground/15"
+              className="project-card shrink-0 snap-start min-w-[min(72vw,340px)] sm:min-w-[min(32vw,380px)] overflow-hidden border border-foreground/15 select-none"
+              onContextMenu={(event) => event.preventDefault()}
             >
               <ShowcaseProjectMedia
                 project={project}
