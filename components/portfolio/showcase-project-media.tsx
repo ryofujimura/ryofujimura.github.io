@@ -293,6 +293,11 @@ export function ShowcaseProjectMedia({
         <p className="font-mono text-[10px] sm:text-xs uppercase tracking-[0.3em] mb-3 sm:mb-4 text-foreground opacity-70">
           {project.tag}
         </p>
+        {project.subtitle && (
+          <p className="font-mono text-[9px] sm:text-[10px] lowercase tracking-[0.2em] mb-2 sm:mb-3 text-foreground/55">
+            {project.subtitle}
+          </p>
+        )}
         <h3 className="font-mono text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black tracking-tight uppercase text-foreground opacity-70 leading-[0.95] max-w-[90%]">
           {project.title}
         </h3>

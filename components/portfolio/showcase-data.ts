@@ -8,6 +8,8 @@ export type ShowcaseProject = {
   id: string
   title: string
   tag: string
+  /** Small line shown between tag and title (e.g. specialty label) */
+  subtitle?: string
   /** Public URL path or CSS gradient fallback; also used as video poster when `video` is set */
   image: string
   /** Optional preview video (plays when card scrolls into view) */
@@ -38,6 +40,7 @@ export const SHOWCASE_CATEGORIES: ShowcaseCategory[] = [
       {
         id: "zero-inbox",
         title: "Zero Inbox",
+        subtitle: "prompt engineering",
         tag: "Swift / AI",
         image: showcaseImage("ZeroInbox-developer.jpg"),
         video: showcaseImage("ZeroInbox.mov"),
