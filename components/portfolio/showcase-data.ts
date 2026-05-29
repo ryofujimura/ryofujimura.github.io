@@ -65,6 +65,7 @@ export const SHOWCASE_CATEGORIES: ShowcaseCategory[] = [
         title: "Matcha Time",
         tag: "macOS",
         image: showcaseImage("MatchaTime-appstore.jpg"),
+        video: showcaseImage("Matchatime.mov"),
       },
       {
         id: "poker-percentage",
