@@ -128,13 +128,6 @@ export const SHOWCASE_CATEGORIES: ShowcaseCategory[] = [
         stl: showcaseImage("3dprintmouse.stl"),
       },
       {
-        id: "hci",
-        title: "Personalized HCI",
-        tag: "Ergonomics",
-        image:
-          "linear-gradient(145deg, oklch(0.91 0.02 240) 0%, oklch(0.8 0.05 250) 55%, oklch(0.68 0.09 260) 100%)",
-      },
-      {
         id: "cpx",
         title: "CPX Lab",
         tag: "Publications",
@@ -147,27 +140,6 @@ export const SHOWCASE_CATEGORIES: ShowcaseCategory[] = [
     id: "web",
     label: "Web",
     projects: [
-      {
-        id: "stl-portfolio",
-        title: "STL Portfolio",
-        tag: "Three.js",
-        image:
-          "linear-gradient(140deg, oklch(0.91 0.04 145) 0%, oklch(0.8 0.08 150) 50%, oklch(0.68 0.12 155) 100%)",
-      },
-      {
-        id: "danshari",
-        title: "Danshari",
-        tag: "Next.js",
-        image:
-          "linear-gradient(155deg, oklch(0.92 0.03 160) 0%, oklch(0.8 0.07 165) 55%, oklch(0.68 0.1 170) 100%)",
-      },
-      {
-        id: "tokai-shuttle",
-        title: "HTIC Shuttle Web",
-        tag: "Firebase",
-        image:
-          "linear-gradient(130deg, oklch(0.9 0.03 245) 0%, oklch(0.78 0.07 255) 50%, oklch(0.66 0.11 265) 100%)",
-      },
       {
         id: "saboriendo-web",
         title: "Saboriendo Web",
