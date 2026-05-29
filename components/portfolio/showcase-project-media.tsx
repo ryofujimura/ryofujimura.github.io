@@ -208,7 +208,7 @@ export function ShowcaseProjectMedia({ project, mediaKey }: ShowcaseProjectMedia
     : projectThumbnailStyle(project.image)
 
   return (
-    <div ref={mediaRef} className="relative aspect-[4/3] overflow-hidden">
+    <div ref={mediaRef} className="relative block w-full aspect-[4/3] overflow-hidden leading-none">
       {project.stl && !showStl && (
         <div className="absolute inset-0" style={projectThumbnailStyle(project.image)} />
       )}

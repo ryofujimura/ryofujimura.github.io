@@ -82,7 +82,7 @@ export function ShowcaseSection() {
         <div
           ref={rowRef}
           className={cn(
-            "showcase-intro flex flex-row gap-4 sm:gap-6 overflow-x-auto pb-4 min-h-[420px] sm:min-h-[480px]",
+            "showcase-intro flex flex-row items-start gap-4 sm:gap-6 overflow-x-auto pb-4",
             "snap-x snap-mandatory scroll-smooth",
             "[scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
           )}
@@ -90,7 +90,7 @@ export function ShowcaseSection() {
           {SHOWCASE_PROJECTS.map((project) => (
             <article
               key={`${project.categoryId}-${project.id}`}
-              className="project-card shrink-0 snap-start min-w-[min(85vw,420px)] sm:min-w-[min(42vw,480px)] border border-foreground/15 bg-background/80 backdrop-blur-sm"
+              className="project-card shrink-0 snap-start min-w-[min(85vw,420px)] sm:min-w-[min(42vw,480px)] overflow-hidden border border-foreground/15"
             >
               <ShowcaseProjectMedia
                 project={project}
