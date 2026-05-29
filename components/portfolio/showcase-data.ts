@@ -16,6 +16,8 @@ export type ShowcaseProject = {
   poster?: string
   /** Rotating stills with opacity crossfade (e.g. Saboriendo1 / Saboriendo2) */
   gallery?: string[]
+  /** Interactive STL viewport (same pattern as /3d-print SceneViewer) */
+  stl?: string
 }
 
 export function showcaseImage(filename: string) {
@@ -127,6 +129,7 @@ export const SHOWCASE_CATEGORIES: ShowcaseCategory[] = [
         tag: "ACM ICCPS 2025",
         image:
           "linear-gradient(135deg, oklch(0.9 0.03 250) 0%, oklch(0.78 0.07 260) 45%, oklch(0.66 0.11 270) 100%)",
+        stl: showcaseImage("3dprintmouse.stl"),
       },
       {
         id: "hci",

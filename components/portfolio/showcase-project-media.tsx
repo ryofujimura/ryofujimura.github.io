@@ -1,9 +1,25 @@
 "use client"
 
+import dynamic from "next/dynamic"
 import { useEffect, useRef, useState } from "react"
 import type { ShowcaseProject } from "@/components/portfolio/showcase-data"
 import { useReducedMotion } from "@/hooks/use-reduced-motion"
 import { cn } from "@/lib/utils"
+
+const ShowcaseStlViewer = dynamic(
+  () =>
+    import("@/components/portfolio/showcase-stl-viewer").then((mod) => mod.ShowcaseStlViewer),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="absolute inset-0 flex items-center justify-center bg-background/30">
+        <span className="font-mono text-[9px] tracking-[0.3em] text-muted-foreground/40 uppercase animate-pulse">
+          loading.viewport
+        </span>
+      </div>
+    ),
+  }
+)
 
 const GALLERY_INTERVAL_MS = 4000
 const FADE_MS = 900
@@ -91,6 +107,7 @@ export function ShowcaseProjectMedia({ project, isActiveCategory }: ShowcaseProj
   const gallery =
     project.gallery && project.gallery.length >= 2 ? project.gallery : null
   const shouldAnimateGallery = Boolean(gallery) && isActiveCategory && isInView
+  const showStl = Boolean(project.stl) && isActiveCategory && isInView
 
   useEffect(() => {
     const container = mediaRef.current
@@ -145,11 +162,17 @@ export function ShowcaseProjectMedia({ project, isActiveCategory }: ShowcaseProj
       ref={mediaRef}
       className="relative aspect-[4/3] overflow-hidden"
     >
-      {gallery && !showVideo && (
+      {project.stl && !showStl && (
+        <div className="absolute inset-0" style={projectThumbnailStyle(project.image)} />
+      )}
+
+      {showStl && project.stl && <ShowcaseStlViewer url={project.stl} />}
+
+      {gallery && !showVideo && !project.stl && (
         <ShowcaseRotatingGallery images={gallery} animate={shouldAnimateGallery} />
       )}
 
-      {!gallery && !showVideo && (
+      {!gallery && !showVideo && !project.stl && (
         <div className="absolute inset-0" style={projectThumbnailStyle(project.image)} />
       )}
 
