@@ -14,6 +14,8 @@ export type ShowcaseProject = {
   video?: string
   /** Optional poster override (defaults to `image` when it is a URL) */
   poster?: string
+  /** Rotating stills with opacity crossfade (e.g. Saboriendo1 / Saboriendo2) */
+  gallery?: string[]
 }
 
 export function showcaseImage(filename: string) {
@@ -49,7 +51,8 @@ export const SHOWCASE_CATEGORIES: ShowcaseCategory[] = [
         id: "saboriendo",
         title: "Saboriendo",
         tag: "E-commerce",
-        image: showcaseImage("Saboriendo-appstore.jpg"),
+        image: showcaseImage("Saboriendo1.jpg"),
+        gallery: [showcaseImage("Saboriendo1.jpg"), showcaseImage("Saboriendo2.jpg")],
       },
       {
         id: "cyberedu",
@@ -168,7 +171,8 @@ export const SHOWCASE_CATEGORIES: ShowcaseCategory[] = [
         id: "saboriendo-web",
         title: "Saboriendo Web",
         tag: "React 19",
-        image: showcaseImage("Saboriendo-appstore.jpg"),
+        image: showcaseImage("Saboriendo1.jpg"),
+        gallery: [showcaseImage("Saboriendo1.jpg"), showcaseImage("Saboriendo2.jpg")],
       },
     ],
   },

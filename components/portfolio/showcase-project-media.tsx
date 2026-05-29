@@ -5,6 +5,9 @@ import type { ShowcaseProject } from "@/components/portfolio/showcase-data"
 import { useReducedMotion } from "@/hooks/use-reduced-motion"
 import { cn } from "@/lib/utils"
 
+const GALLERY_INTERVAL_MS = 4000
+const FADE_MS = 900
+
 function isMediaUrl(value: string) {
   return value.startsWith("/") || value.startsWith("http://") || value.startsWith("https://")
 }
@@ -27,6 +30,50 @@ function posterForProject(project: ShowcaseProject): string | null {
   return null
 }
 
+function ShowcaseRotatingGallery({
+  images,
+  animate,
+}: {
+  images: string[]
+  animate: boolean
+}) {
+  const [activeIndex, setActiveIndex] = useState(0)
+  const prefersReducedMotion = useReducedMotion()
+
+  useEffect(() => {
+    setActiveIndex(0)
+  }, [images])
+
+  useEffect(() => {
+    if (!animate || prefersReducedMotion || images.length < 2) return
+
+    const id = window.setInterval(() => {
+      setActiveIndex((current) => (current + 1) % images.length)
+    }, GALLERY_INTERVAL_MS)
+
+    return () => window.clearInterval(id)
+  }, [animate, images, prefersReducedMotion])
+
+  return (
+    <div className="absolute inset-0">
+      {images.map((src, index) => (
+        <div
+          key={src}
+          className={cn(
+            "absolute inset-0 transition-opacity ease-in-out",
+            index === activeIndex ? "opacity-100" : "opacity-0"
+          )}
+          style={{
+            ...projectThumbnailStyle(src),
+            transitionDuration: `${FADE_MS}ms`,
+          }}
+          aria-hidden={index !== activeIndex}
+        />
+      ))}
+    </div>
+  )
+}
+
 type ShowcaseProjectMediaProps = {
   project: ShowcaseProject
   isActiveCategory: boolean
@@ -37,9 +84,28 @@ export function ShowcaseProjectMedia({ project, isActiveCategory }: ShowcaseProj
   const videoRef = useRef<HTMLVideoElement>(null)
   const prefersReducedMotion = useReducedMotion()
   const [videoReady, setVideoReady] = useState(false)
+  const [isInView, setIsInView] = useState(false)
 
   const posterUrl = posterForProject(project)
   const showVideo = Boolean(project.video) && !prefersReducedMotion
+  const gallery =
+    project.gallery && project.gallery.length >= 2 ? project.gallery : null
+  const shouldAnimateGallery = Boolean(gallery) && isActiveCategory && isInView
+
+  useEffect(() => {
+    const container = mediaRef.current
+    if (!container) return
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsInView(entry.isIntersecting && entry.intersectionRatio >= 0.45)
+      },
+      { threshold: [0, 0.45, 0.65] }
+    )
+
+    observer.observe(container)
+    return () => observer.disconnect()
+  }, [])
 
   useEffect(() => {
     setVideoReady(false)
@@ -50,34 +116,19 @@ export function ShowcaseProjectMedia({ project, isActiveCategory }: ShowcaseProj
 
   useEffect(() => {
     const video = videoRef.current
-    const container = mediaRef.current
-    if (!video || !container || !showVideo) return
+    if (!video || !showVideo) return
 
     const pause = () => {
       video.pause()
     }
 
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (!isActiveCategory) {
-          pause()
-          return
-        }
-        if (entry.isIntersecting && entry.intersectionRatio >= 0.45) {
-          void video.play().catch(() => {})
-        } else {
-          pause()
-        }
-      },
-      { threshold: [0, 0.45, 0.65] }
-    )
-
-    observer.observe(container)
-    return () => {
-      observer.disconnect()
+    if (!isActiveCategory || !isInView) {
       pause()
+      return
     }
-  }, [showVideo, isActiveCategory])
+
+    void video.play().catch(() => {})
+  }, [showVideo, isActiveCategory, isInView])
 
   useEffect(() => {
     if (!isActiveCategory) {
@@ -97,7 +148,11 @@ export function ShowcaseProjectMedia({ project, isActiveCategory }: ShowcaseProj
         "group-hover:scale-[1.02]"
       )}
     >
-      {!showVideo && (
+      {gallery && !showVideo && (
+        <ShowcaseRotatingGallery images={gallery} animate={shouldAnimateGallery} />
+      )}
+
+      {!gallery && !showVideo && (
         <div className="absolute inset-0" style={projectThumbnailStyle(project.image)} />
       )}
 
@@ -106,10 +161,13 @@ export function ShowcaseProjectMedia({ project, isActiveCategory }: ShowcaseProj
           {posterUrl ? (
             <div
               className={cn(
-                "absolute inset-0 transition-opacity duration-700 ease-out",
+                "absolute inset-0 transition-opacity ease-out",
                 videoReady ? "opacity-0" : "opacity-100"
               )}
-              style={projectThumbnailStyle(posterUrl)}
+              style={{
+                ...projectThumbnailStyle(posterUrl),
+                transitionDuration: `${FADE_MS}ms`,
+              }}
               aria-hidden={videoReady}
             />
           ) : (
@@ -124,9 +182,10 @@ export function ShowcaseProjectMedia({ project, isActiveCategory }: ShowcaseProj
             ref={videoRef}
             src={project.video}
             className={cn(
-              "absolute inset-0 h-full w-full object-cover transition-opacity duration-700 ease-out",
+              "absolute inset-0 h-full w-full object-cover transition-opacity ease-out",
               videoReady ? "opacity-100" : "opacity-0"
             )}
+            style={{ transitionDuration: `${FADE_MS}ms` }}
             muted
             loop
             playsInline
