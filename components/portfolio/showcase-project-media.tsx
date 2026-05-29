@@ -1,12 +1,16 @@
 "use client"
 
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 import type { ShowcaseProject } from "@/components/portfolio/showcase-data"
 import { useReducedMotion } from "@/hooks/use-reduced-motion"
 import { cn } from "@/lib/utils"
 
+function isMediaUrl(value: string) {
+  return value.startsWith("/") || value.startsWith("http://") || value.startsWith("https://")
+}
+
 function projectThumbnailStyle(image: string): React.CSSProperties {
-  if (image.startsWith("/") || image.startsWith("http://") || image.startsWith("https://")) {
+  if (isMediaUrl(image)) {
     return {
       backgroundImage: `url(${image})`,
       backgroundSize: "cover",
@@ -14,6 +18,13 @@ function projectThumbnailStyle(image: string): React.CSSProperties {
     }
   }
   return { background: image }
+}
+
+function posterForProject(project: ShowcaseProject): string | null {
+  if (!project.video) return null
+  if (project.poster && isMediaUrl(project.poster)) return project.poster
+  if (isMediaUrl(project.image)) return project.image
+  return null
 }
 
 type ShowcaseProjectMediaProps = {
@@ -25,11 +36,22 @@ export function ShowcaseProjectMedia({ project, isActiveCategory }: ShowcaseProj
   const mediaRef = useRef<HTMLDivElement>(null)
   const videoRef = useRef<HTMLVideoElement>(null)
   const prefersReducedMotion = useReducedMotion()
+  const [videoReady, setVideoReady] = useState(false)
+
+  const posterUrl = posterForProject(project)
+  const showVideo = Boolean(project.video) && !prefersReducedMotion
+
+  useEffect(() => {
+    setVideoReady(false)
+    const video = videoRef.current
+    if (!video || !project.video) return
+    video.load()
+  }, [project.video, project.id])
 
   useEffect(() => {
     const video = videoRef.current
     const container = mediaRef.current
-    if (!video || !container || !project.video || prefersReducedMotion) return
+    if (!video || !container || !showVideo) return
 
     const pause = () => {
       video.pause()
@@ -55,13 +77,17 @@ export function ShowcaseProjectMedia({ project, isActiveCategory }: ShowcaseProj
       observer.disconnect()
       pause()
     }
-  }, [project.video, isActiveCategory, prefersReducedMotion])
+  }, [showVideo, isActiveCategory])
 
   useEffect(() => {
     if (!isActiveCategory) {
       videoRef.current?.pause()
     }
   }, [isActiveCategory])
+
+  const handleVideoReady = () => {
+    setVideoReady(true)
+  }
 
   return (
     <div
@@ -71,20 +97,46 @@ export function ShowcaseProjectMedia({ project, isActiveCategory }: ShowcaseProj
         "group-hover:scale-[1.02]"
       )}
     >
-      {project.video ? (
-        <video
-          ref={videoRef}
-          src={project.video}
-          className="absolute inset-0 h-full w-full object-cover"
-          muted
-          loop
-          playsInline
-          preload="metadata"
-          aria-label={`${project.title} preview`}
-        />
-      ) : (
+      {!showVideo && (
         <div className="absolute inset-0" style={projectThumbnailStyle(project.image)} />
       )}
+
+      {showVideo && (
+        <>
+          {posterUrl ? (
+            <div
+              className={cn(
+                "absolute inset-0 transition-opacity duration-700 ease-out",
+                videoReady ? "opacity-0" : "opacity-100"
+              )}
+              style={projectThumbnailStyle(posterUrl)}
+              aria-hidden={videoReady}
+            />
+          ) : (
+            <div
+              className="absolute inset-0"
+              style={projectThumbnailStyle(project.image)}
+              aria-hidden={videoReady}
+            />
+          )}
+
+          <video
+            ref={videoRef}
+            src={project.video}
+            className={cn(
+              "absolute inset-0 h-full w-full object-cover transition-opacity duration-700 ease-out",
+              videoReady ? "opacity-100" : "opacity-0"
+            )}
+            muted
+            loop
+            playsInline
+            preload="auto"
+            aria-label={`${project.title} preview`}
+            onCanPlayThrough={handleVideoReady}
+          />
+        </>
+      )}
+
       <div
         className="absolute inset-0 bg-gradient-to-t from-background/70 via-background/20 to-transparent pointer-events-none"
         aria-hidden

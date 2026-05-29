@@ -8,10 +8,12 @@ export type ShowcaseProject = {
   id: string
   title: string
   tag: string
-  /** Public URL path or CSS gradient fallback */
+  /** Public URL path or CSS gradient fallback; also used as video poster when `video` is set */
   image: string
   /** Optional preview video (plays when card scrolls into view) */
   video?: string
+  /** Optional poster override (defaults to `image` when it is a URL) */
+  poster?: string
 }
 
 export function showcaseImage(filename: string) {
@@ -41,8 +43,7 @@ export const SHOWCASE_CATEGORIES: ShowcaseCategory[] = [
         id: "htic-shuttle",
         title: "HTIC Shuttle",
         tag: "Realtime",
-        image:
-          "linear-gradient(160deg, oklch(0.9 0.03 240) 0%, oklch(0.8 0.06 250) 45%, oklch(0.7 0.1 260) 100%)",
+        image: showcaseImage("HTIC-appstore.jpg"),
         video: showcaseImage("HTIC-appstore.mov"),
       },
       {
