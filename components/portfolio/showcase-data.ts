@@ -96,6 +96,7 @@ export const SHOWCASE_CATEGORIES: ShowcaseCategory[] = [
         tag: "Serverless AI",
         image:
           "linear-gradient(140deg, oklch(0.93 0.05 85) 0%, oklch(0.83 0.1 75) 50%, oklch(0.73 0.14 65) 100%)",
+        video: showcaseImage("projectmanagement.mov"),
       },
       {
         id: "whiteboard-ai",
