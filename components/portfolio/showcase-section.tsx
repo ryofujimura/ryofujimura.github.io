@@ -6,6 +6,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger"
 import { useGSAP } from "@gsap/react"
 import { cn } from "@/lib/utils"
 import { SHOWCASE_CATEGORIES } from "@/components/portfolio/showcase-data"
+import { ShowcaseProjectMedia } from "@/components/portfolio/showcase-project-media"
 
 gsap.registerPlugin(ScrollTrigger, useGSAP)
 
@@ -13,17 +14,6 @@ const SLIDE_DURATION = 0.45
 
 function offscreenX(index: number, pivot: number) {
   return index < pivot ? -100 : 100
-}
-
-function projectThumbnailStyle(image: string): React.CSSProperties {
-  if (image.startsWith("/") || image.startsWith("http://") || image.startsWith("https://")) {
-    return {
-      backgroundImage: `url(${image})`,
-      backgroundSize: "cover",
-      backgroundPosition: "center",
-    }
-  }
-  return { background: image }
 }
 
 export function ShowcaseSection() {
@@ -264,15 +254,10 @@ export function ShowcaseSection() {
                     key={project.id}
                     className="project-card group shrink-0 snap-start min-w-[min(85vw,420px)] sm:min-w-[min(42vw,480px)] border border-foreground/15 bg-background/80 backdrop-blur-sm"
                   >
-                    <div
-                      className="relative aspect-[4/3] overflow-hidden transition-transform duration-500 ease-out group-hover:scale-[1.02]"
-                      style={projectThumbnailStyle(project.image)}
-                    >
-                      <div
-                        className="absolute inset-0 bg-gradient-to-t from-foreground/25 via-transparent to-transparent"
-                        aria-hidden
-                      />
-                    </div>
+                    <ShowcaseProjectMedia
+                      project={project}
+                      isActiveCategory={activeIndex === slideIndex}
+                    />
                     <div className="px-4 py-4 sm:px-5 sm:py-5 border-t border-foreground/15">
                       <p className="font-mono text-[9px] uppercase tracking-[0.25em] mb-2 text-muted-foreground">
                         {project.tag}
