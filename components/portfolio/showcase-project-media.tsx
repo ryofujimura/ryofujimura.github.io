@@ -7,7 +7,6 @@ import {
   claimShowcaseVideo,
   releaseShowcaseVideo,
 } from "@/components/portfolio/showcase-media-session"
-import { useIsMobile } from "@/hooks/use-mobile"
 import { useReducedMotion } from "@/hooks/use-reduced-motion"
 import { cn } from "@/lib/utils"
 
@@ -113,28 +112,20 @@ export function ShowcaseProjectMedia({
   const videoRef = useRef<HTMLVideoElement>(null)
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const prefersReducedMotion = useReducedMotion()
-  const isMobile = useIsMobile()
 
   const [isInView, setIsInView] = useState(false)
   const [videoReady, setVideoReady] = useState(false)
   const [mayLoadVideo, setMayLoadVideo] = useState(false)
-  const [mobilePlayRequested, setMobilePlayRequested] = useState(false)
 
   const posterUrl = posterForProject(project) ?? (isMediaUrl(project.image) ? project.image : null)
   const hasVideo = Boolean(project.video) && !prefersReducedMotion
   const gallery =
     project.gallery && project.gallery.length >= 2 ? project.gallery : null
 
-  const allowAutoplayVideo = hasVideo && !isMobile
-  const allowMobileTapVideo = hasVideo && isMobile
-  const shouldLoadVideo =
-    mediaEnabled &&
-    isInView &&
-    mayLoadVideo &&
-    (allowAutoplayVideo || (allowMobileTapVideo && mobilePlayRequested))
+  const shouldLoadVideo = mediaEnabled && isInView && mayLoadVideo && hasVideo
 
   const shouldAnimateGallery = mediaEnabled && Boolean(gallery) && isInView
-  const showStl = mediaEnabled && Boolean(project.stl) && isInView && !isMobile
+  const showStl = mediaEnabled && Boolean(project.stl) && isInView
   const showMedia = mediaEnabled
 
   const releaseVideo = useCallback(() => {
@@ -161,9 +152,6 @@ export function ShowcaseProjectMedia({
         if (debounceRef.current) clearTimeout(debounceRef.current)
         debounceRef.current = setTimeout(() => {
           setIsInView(visible)
-          if (!visible) {
-            setMobilePlayRequested(false)
-          }
         }, IN_VIEW_DEBOUNCE_MS)
       },
       { threshold: [0, IN_VIEW_RATIO, 0.75] }
@@ -177,7 +165,7 @@ export function ShowcaseProjectMedia({
   }, [])
 
   useEffect(() => {
-    if (!mediaEnabled || !isInView || !hasVideo || (isMobile && !mobilePlayRequested)) {
+    if (!mediaEnabled || !isInView || !hasVideo) {
       releaseVideo()
       return
     }
@@ -191,7 +179,7 @@ export function ShowcaseProjectMedia({
     return () => {
       releaseVideo()
     }
-  }, [mediaEnabled, isInView, hasVideo, isMobile, mobilePlayRequested, mediaKey, releaseVideo])
+  }, [mediaEnabled, isInView, hasVideo, mediaKey, releaseVideo])
 
   useEffect(() => {
     const video = videoRef.current
@@ -207,9 +195,31 @@ export function ShowcaseProjectMedia({
     void video.play().catch(() => {})
   }, [shouldLoadVideo, project.video])
 
-  const handleVideoReady = () => {
+  const handleVideoReady = useCallback(() => {
     setVideoReady(true)
-  }
+  }, [])
+
+  useEffect(() => {
+    const video = videoRef.current
+    if (!video || !shouldLoadVideo) return
+
+    const syncReady = () => {
+      if (video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
+        handleVideoReady()
+      }
+    }
+
+    syncReady()
+    video.addEventListener("loadeddata", syncReady)
+    video.addEventListener("canplay", syncReady)
+    video.addEventListener("playing", syncReady)
+
+    return () => {
+      video.removeEventListener("loadeddata", syncReady)
+      video.removeEventListener("canplay", syncReady)
+      video.removeEventListener("playing", syncReady)
+    }
+  }, [shouldLoadVideo, handleVideoReady])
 
   const posterStyle = posterUrl
     ? projectThumbnailStyle(posterUrl)
@@ -246,19 +256,6 @@ export function ShowcaseProjectMedia({
             aria-hidden={shouldLoadVideo && videoReady}
           />
 
-          {allowMobileTapVideo && isInView && !mobilePlayRequested && (
-            <button
-              type="button"
-              className="absolute inset-0 z-[5] flex items-end justify-center pb-8 bg-transparent"
-              onClick={() => setMobilePlayRequested(true)}
-              aria-label={`Play ${project.title} preview`}
-            >
-              <span className="font-mono text-[9px] uppercase tracking-[0.25em] text-foreground/80 bg-background/60 px-3 py-1.5 border border-foreground/20">
-                Tap to play
-              </span>
-            </button>
-          )}
-
           {shouldLoadVideo && project.video && (
             <video
               ref={videoRef}
@@ -270,9 +267,11 @@ export function ShowcaseProjectMedia({
               muted
               loop
               playsInline
-              preload="none"
+              preload="metadata"
               aria-label={`${project.title} preview`}
-              onCanPlay={() => handleVideoReady()}
+              onLoadedData={handleVideoReady}
+              onCanPlay={handleVideoReady}
+              onPlaying={handleVideoReady}
             />
           )}
         </>
