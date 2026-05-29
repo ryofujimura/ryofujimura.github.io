@@ -5,25 +5,9 @@ import React from "react"
 import { useEffect, useRef } from "react"
 import { gsap } from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
+import { scheduleScrollTriggerRefresh } from "@/lib/gsap-scroll-trigger"
 
 gsap.registerPlugin(ScrollTrigger)
-
-let refreshScheduled = false
-function scheduleScrollTriggerRefresh() {
-  if (typeof window === "undefined") return
-  if (refreshScheduled) return
-  refreshScheduled = true
-  // Two RAFs helps after mobile address-bar/layout shifts.
-  requestAnimationFrame(() => {
-    requestAnimationFrame(() => {
-      try {
-        ScrollTrigger.refresh()
-      } finally {
-        refreshScheduled = false
-      }
-    })
-  })
-}
 
 interface GSAPTextProps {
   children: string
@@ -50,6 +34,7 @@ export function GSAPText({
   const containerRef = useRef<HTMLDivElement>(null)
   const hasAnimated = useRef(false)
   const scrambleIntervalRef = useRef<number | null>(null)
+  const failsafeTimerRef = useRef<number | null>(null)
 
   useEffect(() => {
     if (!containerRef.current || hasAnimated.current) return
@@ -69,6 +54,10 @@ export function GSAPText({
           .join("")
 
         const chars = container.querySelectorAll("span")
+
+        const revealChars = () => {
+          gsap.set(chars, { y: 0, opacity: 1, clearProps: "transform" })
+        }
 
         gsap.to(chars, {
           y: 0,
@@ -96,6 +85,11 @@ export function GSAPText({
                     },
               }),
         })
+
+        if (immediate) {
+          const maxMs = (delay + duration + stagger * Math.max(chars.length - 1, 0)) * 1000 + 600
+          failsafeTimerRef.current = window.setTimeout(revealChars, maxMs)
+        }
       } else if (variant === "words") {
         container.innerHTML = text
           .split(" ")
@@ -212,6 +206,10 @@ export function GSAPText({
     }
 
     return () => {
+      if (failsafeTimerRef.current != null) {
+        window.clearTimeout(failsafeTimerRef.current)
+        failsafeTimerRef.current = null
+      }
       if (scrambleIntervalRef.current != null) {
         window.clearInterval(scrambleIntervalRef.current)
         scrambleIntervalRef.current = null

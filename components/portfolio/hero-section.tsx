@@ -9,6 +9,7 @@ import { MagneticButton } from "@/components/magnetic-button"
 import { HeroPortrait } from "@/components/portfolio/hero-portrait"
 import { useToast } from "@/hooks/use-toast"
 import { Check, Github, Globe, Linkedin, Mail } from "lucide-react"
+import { PORTFOLIO_HERO_INTRO_EVENT } from "@/hooks/use-deferred-showcase-media"
 
 const SITE_URL = "https://ryofujimura.github.io/"
 const MOBILE_BREAKPOINT = 768
@@ -390,6 +391,11 @@ export function HeroSection() {
           stagger: 0.1,
           ease: "power3.out",
           delay: 0.2,
+          onComplete: () => {
+            gsap.delayedCall(0.55, () => {
+              window.dispatchEvent(new CustomEvent(PORTFOLIO_HERO_INTRO_EVENT))
+            })
+          },
         }
       )
     }, heroRef)

@@ -100,9 +100,15 @@ function ShowcaseRotatingGallery({
 type ShowcaseProjectMediaProps = {
   project: ShowcaseProject
   mediaKey: string
+  /** When false, posters/videos/STL stay unloaded so hero GSAP can run first. */
+  mediaEnabled?: boolean
 }
 
-export function ShowcaseProjectMedia({ project, mediaKey }: ShowcaseProjectMediaProps) {
+export function ShowcaseProjectMedia({
+  project,
+  mediaKey,
+  mediaEnabled = true,
+}: ShowcaseProjectMediaProps) {
   const mediaRef = useRef<HTMLDivElement>(null)
   const videoRef = useRef<HTMLVideoElement>(null)
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -122,12 +128,14 @@ export function ShowcaseProjectMedia({ project, mediaKey }: ShowcaseProjectMedia
   const allowAutoplayVideo = hasVideo && !isMobile
   const allowMobileTapVideo = hasVideo && isMobile
   const shouldLoadVideo =
+    mediaEnabled &&
     isInView &&
     mayLoadVideo &&
     (allowAutoplayVideo || (allowMobileTapVideo && mobilePlayRequested))
 
-  const shouldAnimateGallery = Boolean(gallery) && isInView
-  const showStl = Boolean(project.stl) && isInView && !isMobile
+  const shouldAnimateGallery = mediaEnabled && Boolean(gallery) && isInView
+  const showStl = mediaEnabled && Boolean(project.stl) && isInView && !isMobile
+  const showMedia = mediaEnabled
 
   const releaseVideo = useCallback(() => {
     releaseShowcaseVideo(mediaKey)
@@ -169,7 +177,7 @@ export function ShowcaseProjectMedia({ project, mediaKey }: ShowcaseProjectMedia
   }, [])
 
   useEffect(() => {
-    if (!isInView || !hasVideo || (isMobile && !mobilePlayRequested)) {
+    if (!mediaEnabled || !isInView || !hasVideo || (isMobile && !mobilePlayRequested)) {
       releaseVideo()
       return
     }
@@ -183,7 +191,7 @@ export function ShowcaseProjectMedia({ project, mediaKey }: ShowcaseProjectMedia
     return () => {
       releaseVideo()
     }
-  }, [isInView, hasVideo, isMobile, mobilePlayRequested, mediaKey, releaseVideo])
+  }, [mediaEnabled, isInView, hasVideo, isMobile, mobilePlayRequested, mediaKey, releaseVideo])
 
   useEffect(() => {
     const video = videoRef.current
@@ -209,21 +217,25 @@ export function ShowcaseProjectMedia({ project, mediaKey }: ShowcaseProjectMedia
 
   return (
     <div ref={mediaRef} className="relative block w-full aspect-[3/4] overflow-hidden leading-none">
-      {project.stl && !showStl && (
+      {!showMedia && (
+        <div className="absolute inset-0 bg-muted animate-pulse" aria-hidden />
+      )}
+
+      {showMedia && project.stl && !showStl && (
         <div className="absolute inset-0" style={projectThumbnailStyle(project.image)} />
       )}
 
       {showStl && project.stl && <ShowcaseStlViewer url={project.stl} />}
 
-      {gallery && !hasVideo && !project.stl && (
+      {showMedia && gallery && !hasVideo && !project.stl && (
         <ShowcaseRotatingGallery images={gallery} animate={shouldAnimateGallery} />
       )}
 
-      {!gallery && !hasVideo && !project.stl && (
+      {showMedia && !gallery && !hasVideo && !project.stl && (
         <div className="absolute inset-0" style={projectThumbnailStyle(project.image)} />
       )}
 
-      {hasVideo && (
+      {showMedia && hasVideo && (
         <>
           <div
             className={cn(
@@ -258,7 +270,7 @@ export function ShowcaseProjectMedia({ project, mediaKey }: ShowcaseProjectMedia
               muted
               loop
               playsInline
-              preload="metadata"
+              preload="none"
               aria-label={`${project.title} preview`}
               onCanPlay={() => handleVideoReady()}
             />

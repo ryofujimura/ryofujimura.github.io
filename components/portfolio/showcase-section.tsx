@@ -1,9 +1,11 @@
 "use client"
 
-import { useRef } from "react"
+import { useEffect, useRef } from "react"
 import { gsap } from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
 import { useGSAP } from "@gsap/react"
+import { useDeferredShowcaseMedia } from "@/hooks/use-deferred-showcase-media"
+import { scheduleScrollTriggerRefresh } from "@/lib/gsap-scroll-trigger"
 import { cn } from "@/lib/utils"
 import { SHOWCASE_PROJECTS } from "@/components/portfolio/showcase-data"
 import { ShowcaseProjectMedia } from "@/components/portfolio/showcase-project-media"
@@ -13,6 +15,11 @@ gsap.registerPlugin(ScrollTrigger, useGSAP)
 export function ShowcaseSection() {
   const sectionRef = useRef<HTMLElement>(null)
   const rowRef = useRef<HTMLDivElement>(null)
+  const mediaEnabled = useDeferredShowcaseMedia()
+
+  useEffect(() => {
+    if (mediaEnabled) scheduleScrollTriggerRefresh()
+  }, [mediaEnabled])
 
   useGSAP(
     () => {
@@ -95,6 +102,7 @@ export function ShowcaseSection() {
               <ShowcaseProjectMedia
                 project={project}
                 mediaKey={`${project.categoryId}-${project.id}`}
+                mediaEnabled={mediaEnabled}
               />
             </article>
           ))}
