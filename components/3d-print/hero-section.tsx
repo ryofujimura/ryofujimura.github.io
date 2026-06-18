@@ -3,6 +3,7 @@
 import { useRef } from "react"
 import gsap from "gsap"
 import { useGSAP } from "@gsap/react"
+import { HeroStlBackdrop } from "./hero-stl-backdrop"
 
 gsap.registerPlugin(useGSAP)
 
@@ -68,7 +69,7 @@ export function HeroSection() {
   const letters = headline.split("")
 
   return (
-    <div ref={containerRef} className="relative flex flex-col gap-6 max-w-xl">
+    <div ref={containerRef} className="relative flex flex-col gap-6 max-w-xl overflow-visible">
       {/* Top decorative rule */}
       <div className="hero-rule h-px bg-foreground/20 origin-left" />
 
@@ -80,18 +81,29 @@ export function HeroSection() {
         <div className="h-px flex-1 bg-border/30" />
       </div>
 
-      {/* Main headline */}
-      <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-sans font-bold tracking-tight leading-none text-foreground overflow-hidden">
-        {letters.map((letter, i) => (
-          <span
-            key={i}
-            className="hero-letter inline-block"
-            style={{ display: letter === " " ? "inline" : "inline-block" }}
-          >
-            {letter === " " ? "\u00A0" : letter}
-          </span>
-        ))}
-      </h1>
+      {/* Main headline — STL silhouette behind type; bleeds left, non-interactive */}
+      <div className="relative isolate overflow-visible">
+        <div
+          className="pointer-events-none select-none absolute z-0 opacity-50
+            -left-[42%] -right-[18%] sm:-left-[48%] sm:-right-[22%]
+            -top-12 -bottom-10 sm:-top-16 sm:-bottom-12
+            origin-left scale-[1.12] sm:scale-[1.18] -skew-x-[7deg]"
+          aria-hidden
+        >
+          <HeroStlBackdrop className="size-full min-h-[12rem] sm:min-h-[14rem]" />
+        </div>
+        <h1 className="relative z-10 text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-sans font-bold tracking-tight leading-none text-foreground overflow-hidden">
+          {letters.map((letter, i) => (
+            <span
+              key={i}
+              className="hero-letter inline-block"
+              style={{ display: letter === " " ? "inline" : "inline-block" }}
+            >
+              {letter === " " ? "\u00A0" : letter}
+            </span>
+          ))}
+        </h1>
+      </div>
 
       {/* Second decorative rule */}
       <div className="hero-rule h-px bg-foreground/10 origin-left" />
