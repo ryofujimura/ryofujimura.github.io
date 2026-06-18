@@ -57,7 +57,7 @@ export default function TabAudioRouterPrivacyPage() {
           <h2 className="text-lg font-semibold text-foreground">This documentation page</h2>
           <p>
             This page is hosted on the same site as the rest of{" "}
-            <span className="text-foreground">ryofujimura.github.io</span>. The site root layout may load Firebase
+            <span className="text-foreground">ryo.twelveforty.xyz</span>. The site root layout may load Firebase
             Analytics when enabled for the portfolio. See your browser’s controls and Firebase/Google documentation for
             how that product handles data.
           </p>

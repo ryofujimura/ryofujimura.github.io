@@ -2,12 +2,14 @@ import React from "react"
 import type { Metadata, Viewport } from 'next'
 import { Inter, JetBrains_Mono } from 'next/font/google'
 import { FirebaseAnalytics } from '@/components/firebase-analytics'
+import { SITE_URL } from '@/lib/site-url'
 import './globals.css'
 
 const _inter = Inter({ subsets: ["latin"], variable: '--font-inter' });
 const _jetbrainsMono = JetBrains_Mono({ subsets: ["latin"], variable: '--font-jetbrains' });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: 'Ryo Fujimura | Software Engineer & AI Researcher',
   description: 'Software engineer specializing in AI/ML, mobile development, and full-stack engineering. Published researcher with experience at Bose, Honda, and CSULB.',
   generator: 'v0.app',

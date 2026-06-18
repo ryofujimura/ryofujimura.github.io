@@ -10,8 +10,7 @@ import { HeroPortrait } from "@/components/portfolio/hero-portrait"
 import { useToast } from "@/hooks/use-toast"
 import { Check, Github, Globe, Linkedin, Mail } from "lucide-react"
 import { PORTFOLIO_HERO_INTRO_EVENT } from "@/hooks/use-deferred-showcase-media"
-
-const SITE_URL = "https://ryofujimura.github.io/"
+import { SITE_URL } from "@/lib/site-url"
 const MOBILE_BREAKPOINT = 768
 
 // Mode verb rotator config

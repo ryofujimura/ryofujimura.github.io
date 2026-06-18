@@ -136,7 +136,7 @@ const projects = [
     description: "Next.js 16 + React 19 portfolio with GSAP animations. 40-60% faster page loads via client-side optimization. Modular components with clean deployment pipelines.",
     skills: ["React", "Next.js", "GSAP", "Tailwind", "Firebase"],
     links: [
-      { type: "website" as LinkType, url: "https://ryofujimura.github.io" },
+      { type: "website" as LinkType, url: "https://ryo.twelveforty.xyz" },
       { type: "github" as LinkType, url: "https://github.com/ryofujimura/ryofujimura.github.io" }
     ]
   },
