@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}Project Experience{% endblock %}
+
+{% block styles %}
+        <link rel="stylesheet" href="{{ url_for('main.static', filename='style.css') }}" />
+{% endblock %}
+
+{% block content %}
+    {% if project %}
+        <div class="experience-block">
+            <img src="{{ url_for('main.static', filename='img-asset/' + project['image']) }}" alt="{{ project['company'] }}">
+            <div>
+                <h3>{{ project['role'] }}</h3>
+                <p>{{ project['company'] }}</p>
+                <p>{{ project['description'] }}</p>
+                {% if project['link'] %}
+                    <p><a href="{{ project['link'] }}" target="_blank">Learn More</a></p>
+                {% endif %}
+            </div>
+        </div>
+    {% else %}
+        {% if request.args.get('project_id') == '7' %}
+            <h1>Welcome to Schedule Mastermind</h1>
+            <p>This is where the Schedule Mastermind application will be displayed.</p>
+        {% else %}
+            <p>No project selected.</p>
+        {% endif %}
+    {% endif %}
+{% endblock %}
