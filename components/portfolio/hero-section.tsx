@@ -41,7 +41,10 @@ const LOC_SLOT_CH_MOBILE = 20
  * Uses window.matchMedia with resize event listener for dynamic updates
  */
 function useResponsiveMobile() {
-  const [isMobile, setIsMobile] = useState(false)
+  const [isMobile, setIsMobile] = useState(() => {
+    if (typeof window === "undefined") return false
+    return window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT - 1}px)`).matches
+  })
 
   useEffect(() => {
     const mql = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT - 1}px)`)
@@ -447,8 +450,8 @@ export function HeroSection() {
                 <span className="hidden sm:inline">SYS: OPERATIONAL</span>
               </div>
 
-              {/* Name - Large brutalist typography */}
-              <div data-intro-animate className="mb-4 sm:mb-6">
+              {/* Name - GSAPText handles its own entrance; avoid stacking intro y-offset here */}
+              <div className="mb-4 sm:mb-6">
                 <h1 className="font-mono text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-tight leading-[0.9]">
                   <span className="flex items-baseline gap-x-2 sm:gap-x-3">
                     <GSAPText

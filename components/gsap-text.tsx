@@ -21,6 +21,14 @@ interface GSAPTextProps {
   immediate?: boolean
 }
 
+function finalizeReveal(elements: Element | Element[] | NodeListOf<Element>) {
+  const list = elements instanceof Element ? [elements] : Array.from(elements)
+  list.forEach((el) => {
+    el.classList.remove("opacity-0", "translate-y-full")
+  })
+  gsap.set(list, { clearProps: "transform,opacity" })
+}
+
 export function GSAPText({
   children,
   className = "",
@@ -31,7 +39,7 @@ export function GSAPText({
   scrub = false,
   immediate = false,
 }: GSAPTextProps) {
-  const containerRef = useRef<HTMLDivElement>(null)
+  const containerRef = useRef<HTMLSpanElement>(null)
   const hasAnimated = useRef(false)
   const scrambleIntervalRef = useRef<number | null>(null)
   const failsafeTimerRef = useRef<number | null>(null)
@@ -41,6 +49,13 @@ export function GSAPText({
 
     const container = containerRef.current
     const text = children
+
+    const cancelFailsafe = () => {
+      if (failsafeTimerRef.current != null) {
+        window.clearTimeout(failsafeTimerRef.current)
+        failsafeTimerRef.current = null
+      }
+    }
 
     const ctx = gsap.context(() => {
       if (variant === "chars") {
@@ -56,7 +71,8 @@ export function GSAPText({
         const chars = container.querySelectorAll("span")
 
         const revealChars = () => {
-          gsap.set(chars, { y: 0, opacity: 1, clearProps: "transform" })
+          cancelFailsafe()
+          finalizeReveal(chars)
         }
 
         gsap.to(chars, {
@@ -66,6 +82,7 @@ export function GSAPText({
           stagger,
           delay,
           ease: "power4.out",
+          onComplete: revealChars,
           ...(immediate
             ? {}
             : {
@@ -107,6 +124,9 @@ export function GSAPText({
           stagger: stagger * 3,
           delay,
           ease: "power4.out",
+          onComplete: () => {
+            if (words.length) finalizeReveal(words)
+          },
           ...(immediate
             ? {}
             : {
@@ -130,12 +150,14 @@ export function GSAPText({
         container.innerHTML = `<span class="block overflow-hidden"><span class="block translate-y-full">${text}</span></span>`
 
         const line = container.querySelector("span > span")
+        if (!line) return
 
         gsap.to(line, {
           y: 0,
           duration,
           delay,
           ease: "power4.out",
+          onComplete: () => finalizeReveal(line),
           ...(immediate
             ? {}
             : {
@@ -206,10 +228,7 @@ export function GSAPText({
     }
 
     return () => {
-      if (failsafeTimerRef.current != null) {
-        window.clearTimeout(failsafeTimerRef.current)
-        failsafeTimerRef.current = null
-      }
+      cancelFailsafe()
       if (scrambleIntervalRef.current != null) {
         window.clearInterval(scrambleIntervalRef.current)
         scrambleIntervalRef.current = null
@@ -218,7 +237,7 @@ export function GSAPText({
     }
   }, [children, variant, delay, stagger, duration, scrub, immediate])
 
-  return <div ref={containerRef} className={className} />
+  return <span ref={containerRef} className={`inline-block ${className}`.trim()} />
 }
 
 interface GSAPSVGProps {
